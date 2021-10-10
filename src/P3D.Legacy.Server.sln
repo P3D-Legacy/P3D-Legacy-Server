@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31717.71
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Server", "P3D.Legacy.Server\P3D.Legacy.Server.csproj", "{2000C495-3FDC-4238-ACC3-38942B2A8C0E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Common", "P3D.Legacy.Common\P3D.Legacy.Common.csproj", "{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2000C495-3FDC-4238-ACC3-38942B2A8C0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2000C495-3FDC-4238-ACC3-38942B2A8C0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2000C495-3FDC-4238-ACC3-38942B2A8C0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2000C495-3FDC-4238-ACC3-38942B2A8C0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BE1E891D-648F-4AD9-981D-5743A83ACDD2}
+	EndGlobalSection
+EndGlobal
