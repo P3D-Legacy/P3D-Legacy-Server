@@ -1,14 +1,16 @@
 ﻿namespace P3D.Legacy.Common.Packets
 {
-    public enum P3DPacketTypes
+    public enum P3DPacketType : byte
     {
+#pragma warning disable format
+        None                        = 0xFF,
         GameData                    = 0x00,
-        NOT_USED                    = 0x01,
+        NotUsed                     = 0x01,
         ChatMessagePrivate          = 0x02,
         ChatMessageGlobal           = 0x03,
         Kicked                      = 0x04,
 
-        ID                          = 0x07,
+        Id                          = 0x07,
         CreatePlayer                = 0x08,
         DestroyPlayer               = 0x09,
         ServerClose                 = 0x0A,
@@ -37,5 +39,6 @@
 
         ServerInfoData              = 0x62,
         ServerDataRequest           = 0x63
+#pragma warning restore format
     }
 }

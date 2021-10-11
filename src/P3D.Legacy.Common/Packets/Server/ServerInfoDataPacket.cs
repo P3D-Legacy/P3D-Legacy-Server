@@ -1,39 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Linq;
 
 namespace P3D.Legacy.Common.Packets.Server
 {
-    public class ServerInfoDataPacket : P3DPacket
+    public sealed record ServerInfoDataPacket() : P3DPacket(P3DPacketType.ServerInfoData)
     {
-        public override P3DPacketTypes Id => P3DPacketTypes.ServerInfoData;
-
-        public int CurrentPlayers { get => int.Parse(DataItems[0] == string.Empty ? 0.ToString() : DataItems[0]); init => DataItems[0] = value.ToString(); }
-        public int MaxPlayers { get => int.Parse(DataItems[1] == string.Empty ? 0.ToString() : DataItems[1]); init => DataItems[1] = value.ToString(); }
-        public string ServerName { get => DataItems[2]; init => DataItems[2] = value; }
-        public string ServerMessage { get => DataItems[3]; init => DataItems[3] = value; }
+        public int CurrentPlayers { get => DataItemStorage.GetInt32(0); init => DataItemStorage.SetInt32(0, value); }
+        public int MaxPlayers { get => DataItemStorage.GetInt32(1); init => DataItemStorage.SetInt32(1, value); }
+        public string ServerName { get => DataItemStorage.Get(2); init => DataItemStorage.Set(2, value); }
+        public string ServerMessage { get => DataItemStorage.Get(3); init => DataItemStorage.Set(3, value); }
         public string[] PlayerNames
         {
-            get
-            {
-                if (DataItems.Length > 4)
-                {
-                    var list = new List<string>();
-                    for (var i = 4; i < DataItems.Length; i++)
-                        list.Add(DataItems[i]);
-
-                    return list.ToArray();
-                }
-
-                return Array.Empty<string>();
-            }
+            get => DataItemStorage.Skip(4).ToArray();
             init
             {
-                if (value != null)
-                {
-                    for (var i = 0; i < value.Length; i++)
-                        DataItems[4 + i] = value[i];
-                }
+                for (var i = 0; i < value.Length; i++)
+                    DataItemStorage.Set(4 + i, value[i]);
             }
+        }
+
+        public void Deconstruct(out int currentPlayers, out int maxPlayers, out string serverName, out string serverMessage, out string[] playerNames)
+        {
+            currentPlayers = CurrentPlayers;
+            maxPlayers = MaxPlayers;
+            serverName = ServerName;
+            serverMessage = ServerMessage;
+            playerNames = PlayerNames;
         }
     }
 }

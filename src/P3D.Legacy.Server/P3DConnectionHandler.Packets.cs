@@ -1,13 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common;
+using P3D.Legacy.Common.Packets.Chat;
 using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Common.Packets.Shared;
+using P3D.Legacy.Server.Services;
 
 using System;
 using System.Linq;
-using System.Numerics;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,99 +26,36 @@ namespace P3D.Legacy.Server
 
         private void ParseGameData(GameDataPacket packet)
         {
-            if (packet.DataItems is null)
+            if (packet.DataItemStorage.Count == 0)
             {
-                _logger.LogWarning("P3D Reading Error: ParseGameData DataItems is null");
+                _logger.LogWarning("P3D Reading Error: ParseGameData DataItems is empty");
                 return;
             }
 
-            var strArray = packet.DataItems.ToArray();
-            if (strArray.Length < 14)
+            if (packet.DataItemStorage.Count < 14)
             {
-                _logger.LogWarning("P3D Reading Error: ParseGameData DataItems < 14. Packet DataItems {DataItems}", packet.DataItems);
+                _logger.LogWarning("P3D Reading Error: ParseGameData DataItems < 14. Packet DataItems {DataItems}", packet.DataItemStorage);
                 return;
             }
 
-            for (var index = 0; index < strArray.Length; index++)
-            {
-                var dataItem = strArray[index];
+            GameMode = packet.GameMode;
+            IsGameJoltPlayer = packet.IsGameJoltPlayer;
+            GameJoltId = packet.GameJoltId;
+            DecimalSeparator = packet.DecimalSeparator;
 
-                if (string.IsNullOrEmpty(dataItem))
-                    continue;
+            Name = packet.Name;
+            LevelFile = packet.LevelFile;
 
-                switch (index)
-                {
-                    case 0:
-                        GameMode = packet.GameMode;
-                        break;
+            Position = packet.Position;
+            Facing = packet.Facing;
+            Moving = packet.Moving;
+            Skin = packet.Skin;
+            BusyType = packet.BusyType;
 
-                    case 1:
-                        IsGameJoltPlayer = packet.IsGameJoltPlayer;
-                        break;
-
-                    case 2:
-                        GameJoltID = packet.GameJoltID;
-                        break;
-
-                    case 3:
-                        DecimalSeparator = packet.DecimalSeparator;
-                        break;
-
-                    case 4:
-                        Name = packet.Name;
-                        break;
-
-                    case 5:
-                        LevelFile = packet.LevelFile;
-                        break;
-
-                    case 6:
-                        Position = packet.GetPosition(DecimalSeparator);
-                        //if (packet.GetPokemonPosition(DecimalSeparator) != Vector3.Zero)
-                        //{
-                        //    LastPosition = Position;
-                        //
-                        //    Position = packet.GetPosition(DecimalSeparator);
-                        //
-                        //    IsMoving = LastPosition != Position;
-                        //}
-                        break;
-
-                    case 7:
-                        Facing = packet.Facing;
-                        break;
-
-                    case 8:
-                        Moving = packet.Moving;
-                        break;
-
-                    case 9:
-                        Skin = packet.Skin;
-                        break;
-
-                    case 10:
-                        BusyType = packet.BusyType;
-                        //Basic.ServersManager.UpdatePlayerList();
-                        break;
-
-                    case 11:
-                        PokemonVisible = packet.PokemonVisible;
-                        break;
-
-                    case 12:
-                        if (packet.GetPokemonPosition(DecimalSeparator) != Vector3.Zero)
-                            PokemonPosition = packet.GetPokemonPosition(DecimalSeparator);
-                        break;
-
-                    case 13:
-                        PokemonSkin = packet.PokemonSkin;
-                        break;
-
-                    case 14:
-                        PokemonFacing = packet.PokemonFacing;
-                        break;
-                }
-            }
+            PokemonVisible = packet.PokemonVisible;
+            PokemonPosition = packet.PokemonPosition;
+            PokemonSkin = packet.PokemonSkin;
+            PokemonFacing = packet.PokemonFacing;
         }
 
         private async Task HandleGameDataAsync(GameDataPacket packet, CancellationToken ct)
@@ -124,8 +63,8 @@ namespace P3D.Legacy.Server
             if (_connectionState == P3DConnectionState.None)
             {
                 _connectionState = P3DConnectionState.Initializing;
-                if (InitializingAsync is not null)
-                    await InitializingAsync(_connectionIdFeature.ConnectionId, this);
+                if (OnInitializingAsync is not null)
+                    await OnInitializingAsync(_connectionIdFeature.ConnectionId, this);
             }
 
             ParseGameData(packet);
@@ -135,23 +74,65 @@ namespace P3D.Legacy.Server
             //else
             //    Module.SendPacketToAll(packet);
 
-            await _writer.WriteAsync(_protocol, GetDataPacket(), ct);
-
-
             if (_connectionState != P3DConnectionState.Intitialized)
             {
-                _connectionState = P3DConnectionState.Intitialized;
-                if (InitializedAsync is not null)
-                    await InitializedAsync(_connectionIdFeature.ConnectionId, this);
+                _playerHandlerService.OnEventAsync += PlayerHandlerService_OnEventAsync;
 
-                await _writer.WriteAsync(_protocol, new IDPacket { Origin = Origin.Server, PlayerID = Id }, ct);
-                await _writer.WriteAsync(_protocol, GetWorldPacket(), ct);
+                _connectionState = P3DConnectionState.Intitialized;
+                if (OnInitializedAsync is not null)
+                    await OnInitializedAsync(_connectionIdFeature.ConnectionId, this);
+
+                await _writer.WriteAsync(_protocol, new IdPacket
+                {
+                    Origin = Origin.Server,
+                    PlayerId = Id
+
+                }, ct);
+                await _writer.WriteAsync(_protocol, new WorldDataPacket
+                {
+                    Origin = Origin.Server,
+
+                    Season = _worldService.Season,
+                    Weather = _worldService.Weather,
+                    CurrentTime = $"{_worldService.CurrentTime.Hours:00},{_worldService.CurrentTime.Minutes:00},{_worldService.CurrentTime.Seconds:00}"
+                }, ct);
+            }
+
+            await _writer.WriteAsync(_protocol, new GameDataPacket
+            {
+                Origin = Origin.Server,
+
+                GameMode = GameMode,
+                IsGameJoltPlayer = IsGameJoltPlayer,
+                GameJoltId = GameJoltId,
+                DecimalSeparator = DecimalSeparator,
+                Name = Name,
+                LevelFile = LevelFile,
+                Position = Position,
+                Facing = Facing,
+                Moving = Moving,
+                Skin = Skin,
+                BusyType = BusyType,
+                PokemonVisible = PokemonVisible,
+                PokemonPosition = PokemonPosition,
+                PokemonSkin = PokemonSkin,
+                PokemonFacing = PokemonFacing
+            }, ct);
+        }
+
+        private async Task PlayerHandlerService_OnEventAsync(Event arg)
+        {
+            switch (arg)
+            {
+                case PlayerJoinedEvent playerJoinedEvent:
+                    await SendServerMessageAsync(playerJoinedEvent.Message);
+                    break;
             }
         }
 
-        /*
         private async Task HandleChatMessageAsync(ChatMessageGlobalPacket packet)
         {
+            /*
             var message = new ChatMessage(this, packet.Message);
             if (packet.Message.StartsWith("/"))
             {
@@ -168,19 +149,25 @@ namespace P3D.Legacy.Server
             {
                 Module.OnClientChatMessage(message);
             }
+            */
         }
         private async Task HandlePrivateMessageAsync(ChatMessagePrivatePacket packet)
         {
+            /*
             var destClient = Module.GetClient(packet.DestinationPlayerName);
             if (destClient != null)
             {
-                SendPacket(new ChatMessagePrivatePacket { Origin = packet.Origin, DataItems = packet.DataItems });
+                await _writer.WriteAsync(_protocol, new ChatMessagePrivatePacket
+                {
+                    Origin = packet.Origin,
+                    DataItems = packet.DataItems
+                });
                 destClient.SendPrivateMessage(new ChatMessage(this, packet.Message));
             }
             else
                 SendServerMessage($"The player with the name \"{packet.DestinationPlayerName}\" doesn't exist.");
+            */
         }
-        */
 
 
         /*
@@ -294,7 +281,7 @@ namespace P3D.Legacy.Server
             var clientNames = _playerHandlerService.Players.Select(x => x.Name).ToArray();
             await _writer.WriteAsync(_protocol, new ServerInfoDataPacket
             {
-                Origin = Id,
+                Origin = Origin.Server,
 
                 CurrentPlayers = clientNames.Length,
                 MaxPlayers = _serverOptions.MaxPlayers,

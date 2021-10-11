@@ -1,12 +1,16 @@
-﻿using P3D.Legacy.Common.Data;
+﻿using P3D.Legacy.Common.Data.P3DData;
 
 namespace P3D.Legacy.Common.Packets.Battle
 {
-    public class BattleEndRoundDataPacket : P3DPacket
+    public sealed record BattleEndRoundDataPacket() : P3DPacket(P3DPacketType.BattleEndRoundData)
     {
-        public override P3DPacketTypes Id => P3DPacketTypes.BattleEndRoundData;
+        public int DestinationPlayerId { get => DataItemStorage.GetInt32(0); init => DataItemStorage.SetInt32(0, value); }
+        public BattleEndRoundData BattleData { get => new(DataItemStorage.Get(1)); init => DataItemStorage.Set(1, value.ToP3DString()); }
 
-        public int DestinationPlayerID { get => int.Parse(DataItems[0] == string.Empty ? 0.ToString() : DataItems[0]); set => DataItems[0] = value.ToString(); }
-        public BattleEndRoundData BattleData { get => DataItems[1]; set => DataItems[1] = value; }
+        public void Deconstruct(out int destinationPlayerId, out BattleEndRoundData battleData)
+        {
+            destinationPlayerId = DestinationPlayerId;
+            battleData = BattleData;
+        }
     }
 }

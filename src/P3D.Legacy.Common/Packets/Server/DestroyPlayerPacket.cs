@@ -1,9 +1,12 @@
 ﻿namespace P3D.Legacy.Common.Packets.Server
 {
-    public class DestroyPlayerPacket : P3DPacket
+    public sealed record DestroyPlayerPacket() : P3DPacket(P3DPacketType.DestroyPlayer)
     {
-        public override P3DPacketTypes Id => P3DPacketTypes.DestroyPlayer;
+        public ulong PlayerId { get => DataItemStorage.GetUInt64(0); init => DataItemStorage.SetUInt64(0, value); }
 
-        public int PlayerID { get => int.Parse(DataItems[0] == string.Empty ? 0.ToString() : DataItems[0]); set => DataItems[0] = value.ToString(); }
+        public void Deconstruct(out ulong playerId)
+        {
+            playerId = PlayerId;
+        }
     }
 }

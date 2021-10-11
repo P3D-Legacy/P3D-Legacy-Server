@@ -1,24 +1,19 @@
-using Bedrock.Framework.Protocols;
+﻿using Bedrock.Framework.Protocols;
 
 using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using P3D.Legacy.Common.Packets;
-using P3D.Legacy.Common.Packets.Battle;
-using P3D.Legacy.Common.Packets.Chat;
+using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets.Client;
-using P3D.Legacy.Common.Packets.Server;
-using P3D.Legacy.Common.Packets.Shared;
-using P3D.Legacy.Common.Packets.Trade;
 using P3D.Legacy.Server.Options;
 using P3D.Legacy.Server.Services;
 
 using System;
-using System.Linq;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Connections.Features;
 
 namespace P3D.Legacy.Server
 {
@@ -26,11 +21,14 @@ namespace P3D.Legacy.Server
 
     public partial class P3DConnectionHandler : ConnectionHandler, IPlayer
     {
-        public event Func<string, P3DConnectionHandler, Task>? InitializingAsync;
-        public event Func<string, P3DConnectionHandler, Task>? InitializedAsync;
-        public event Func<string, P3DConnectionHandler, Task>? DisconnectedAsync;
+        public event Func<string, P3DConnectionHandler, Task>? OnInitializingAsync;
+        public event Func<string, P3DConnectionHandler, Task>? OnInitializedAsync;
+        public event Func<string, P3DConnectionHandler, Task>? OnDisconnectedAsync;
         public Task AssignIdAsync(uint id)
         {
+            if (Id != 0)
+                throw new InvalidOperationException("Id was already assigned!");
+
             Id = id;
             return Task.CompletedTask;
         }
@@ -49,19 +47,22 @@ namespace P3D.Legacy.Server
         private ProtocolWriter _writer = default!;
         private P3DConnectionState _connectionState = P3DConnectionState.None;
 
+#pragma warning disable CS8618
         public P3DConnectionHandler(
+#pragma warning restore CS8618
             ILogger<P3DConnectionHandler> logger,
             P3DProtocol protocol,
             PlayerHandlerService playerHandlerService,
             WorldService worldService,
-            IOptions<ServerOptions> serverOptions
-            )
+            IOptions<ServerOptions> serverOptions)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));
             _playerHandlerService = playerHandlerService ?? throw new ArgumentNullException(nameof(playerHandlerService));
             _worldService = worldService ?? throw new ArgumentNullException(nameof(worldService));
             _serverOptions = serverOptions.Value ?? throw new ArgumentNullException(nameof(serverOptions));
+
+            ResetState();
         }
 
         public override async Task OnConnectedAsync(ConnectionContext connection)
@@ -70,6 +71,12 @@ namespace P3D.Legacy.Server
             if (_connectionState == P3DConnectionState.Finalized)
             {
                 _connectionState = P3DConnectionState.None;
+                _playerHandlerService.OnEventAsync -= PlayerHandlerService_OnEventAsync;
+            }
+
+            if (_connectionState == P3DConnectionState.None)
+            {
+                ResetState();
             }
 
             _connectionIdFeature = connection.Features.Get<IConnectionIdFeature>();
@@ -78,19 +85,20 @@ namespace P3D.Legacy.Server
             await _playerHandlerService.AcknowledgeConnectionAsync(_connectionIdFeature.ConnectionId, this);
 
             var connectionCompleteFeature = connection.Features.Get<IConnectionCompleteFeature>();
-            connectionCompleteFeature.OnCompleted(async _ =>
+            connectionCompleteFeature.OnCompleted(async connectionId =>
             {
                 _connectionState = P3DConnectionState.Finalized;
-                if (DisconnectedAsync is not null)
-                    await DisconnectedAsync(_connectionIdFeature.ConnectionId, this);
-            }, null!);
+                if (OnDisconnectedAsync is not null)
+                    await OnDisconnectedAsync((string) connectionId, this);
+            }, _connectionIdFeature.ConnectionId);
 
-            _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_lifetimeNotificationFeature.ConnectionClosedRequested);
+            _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed, _lifetimeNotificationFeature.ConnectionClosedRequested);
             var ct = _cancellationTokenSource.Token;
 
             await using (var reader = connection.CreateReader())
             await using (_writer = connection.CreateWriter())
             {
+                var watch = Stopwatch.StartNew();
                 while (!ct.IsCancellationRequested)
                 {
                     try
@@ -106,6 +114,13 @@ namespace P3D.Legacy.Server
                     finally
                     {
                         reader.Advance();
+                    }
+
+                    if (_connectionState == P3DConnectionState.Intitialized && watch.ElapsedMilliseconds >= 1000)
+                    {
+                        await _writer.WriteAsync(_protocol, new PingPacket { Origin = Origin.Server}, ct);
+
+                        watch.Restart();
                     }
                 }
             }

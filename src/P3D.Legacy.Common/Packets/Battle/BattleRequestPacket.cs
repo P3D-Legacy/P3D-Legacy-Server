@@ -1,9 +1,12 @@
 ﻿namespace P3D.Legacy.Common.Packets.Battle
 {
-    public class BattleRequestPacket : P3DPacket
+    public sealed record BattleRequestPacket() : P3DPacket(P3DPacketType.BattleRequest)
     {
-        public override P3DPacketTypes Id => P3DPacketTypes.BattleRequest;
+        public int DestinationPlayerId { get => DataItemStorage.GetInt32(0); init => DataItemStorage.SetInt32(0, value); }
 
-        public int DestinationPlayerID { get => int.Parse(DataItems[0] == string.Empty ? 0.ToString() : DataItems[0]); set => DataItems[0] = value.ToString(); }
+        public void Deconstruct(out int destinationPlayerId)
+        {
+            destinationPlayerId = DestinationPlayerId;
+        }
     }
 }

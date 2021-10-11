@@ -1,15 +1,16 @@
+﻿using Bedrock.Framework;
+
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using P3D.Legacy.Common.Packets;
+using P3D.Legacy.Server.Options;
 using P3D.Legacy.Server.Services;
 
 using System.Net;
-using Bedrock.Framework;
-using Microsoft.Extensions.Configuration;
-using P3D.Legacy.Server.Options;
 
 namespace P3D.Legacy.Server
 {

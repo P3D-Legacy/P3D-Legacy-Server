@@ -1,11 +1,18 @@
-﻿namespace P3D.Legacy.Common.Packets.Server
-{
-    public class WorldDataPacket : P3DPacket
-    {
-        public override P3DPacketTypes Id => P3DPacketTypes.WorldData;
+﻿using P3D.Legacy.Common.Data;
 
-        public int Season { get => int.Parse(DataItems[0] == string.Empty ? 0.ToString() : DataItems[0]); set => DataItems[0] = value.ToString(); }
-        public int Weather { get => int.Parse(DataItems[1] == string.Empty ? 0.ToString() : DataItems[1]); set => DataItems[1] = value.ToString(); }
-        public string CurrentTime { get => DataItems[2]; set => DataItems[2] = value; }
+namespace P3D.Legacy.Common.Packets.Server
+{
+    public sealed record WorldDataPacket() : P3DPacket(P3DPacketType.WorldData)
+    {
+        public WorldSeason Season { get => (WorldSeason) DataItemStorage.GetInt32(0); init => DataItemStorage.SetInt32(0, (int) value); }
+        public WorldWeather Weather { get => (WorldWeather) DataItemStorage.GetInt32(1); init => DataItemStorage.SetInt32(1, (int) value); }
+        public string CurrentTime { get => DataItemStorage.Get(2); init => DataItemStorage.Set(2, value); }
+
+        public void Deconstruct(out WorldSeason season, out WorldWeather weather, out string currentTime)
+        {
+            season = Season;
+            weather = Weather;
+            currentTime = CurrentTime;
+        }
     }
 }

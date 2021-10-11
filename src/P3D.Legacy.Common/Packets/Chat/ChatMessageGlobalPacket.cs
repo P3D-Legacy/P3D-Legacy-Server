@@ -1,9 +1,12 @@
 ﻿namespace P3D.Legacy.Common.Packets.Chat
 {
-    public class ChatMessageGlobalPacket : P3DPacket
+    public sealed record ChatMessageGlobalPacket() : P3DPacket(P3DPacketType.ChatMessageGlobal)
     {
-        public override P3DPacketTypes Id => P3DPacketTypes.ChatMessageGlobal;
+        public string Message { get => DataItemStorage.Get(0); init => DataItemStorage.Set(0, value); }
 
-        public string Message { get => DataItems[0]; set => DataItems[0] = value; }
+        public void Deconstruct(out string message)
+        {
+            message = Message;
+        }
     }
 }

@@ -1,9 +1,12 @@
 ﻿namespace P3D.Legacy.Common.Packets.Server
 {
-    public class IDPacket : P3DPacket
+    public sealed record IdPacket() : P3DPacket(P3DPacketType.Id)
     {
-        public override P3DPacketTypes Id => P3DPacketTypes.ID;
+        public ulong PlayerId { get => DataItemStorage.GetUInt64(0); init => DataItemStorage.SetUInt64(0, value); }
 
-        public uint PlayerID { get => uint.Parse(DataItems[0] == string.Empty ? 0U.ToString() : DataItems[0]); set => DataItems[0] = value.ToString(); }
+        public void Deconstruct(out ulong playerId)
+        {
+            playerId = PlayerId;
+        }
     }
 }

@@ -1,36 +1,59 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
+﻿using P3D.Legacy.Common.Extensions;
+
 using System.Numerics;
-using P3D.Legacy.Common.Extensions;
 
 namespace P3D.Legacy.Common.Packets.Shared
 {
-    public class GameDataPacket : P3DPacket
+    public sealed record GameDataPacket() : P3DPacket(P3DPacketType.GameData)
     {
-        public override P3DPacketTypes Id => P3DPacketTypes.GameData;
+        public string GameMode { get => DataItemStorage.Get(0); init => DataItemStorage.Set(0, value); }
+        public bool IsGameJoltPlayer { get => DataItemStorage.GetBool(1); init => DataItemStorage.SetBool(1, value); }
+        public ulong GameJoltId { get => DataItemStorage.GetUInt64(2); init => DataItemStorage.SetUInt64(2, value); }
+        public char DecimalSeparator { get => DataItemStorage.GetChar(3); init => DataItemStorage.SetChar(3, value); }
+        public string Name { get => DataItemStorage.Get(4); init => DataItemStorage.Set(4, value); }
+        public string LevelFile { get => DataItemStorage.Get(5); init => DataItemStorage.Set(5, value); }
+        public Vector3 Position { get => Vector3Extensions.FromP3DString(DataItemStorage.Get(6), DecimalSeparator); set => DataItemStorage.Set(6, value.ToP3DString(DecimalSeparator)); }
+        public int Facing { get => DataItemStorage.GetInt32(7); init => DataItemStorage.SetInt32(7, value); }
+        public bool Moving { get => DataItemStorage.GetBool(8); init => DataItemStorage.SetBool(8, value); }
+        public string Skin { get => DataItemStorage.Get(9); init => DataItemStorage.Set(9, value); }
+        public string BusyType { get => DataItemStorage.Get(10); init => DataItemStorage.Set(10, value); }
+        public bool PokemonVisible { get => DataItemStorage.GetBool(11); init => DataItemStorage.SetBool(11, value); }
+        public Vector3 PokemonPosition { get => Vector3Extensions.FromP3DString(DataItemStorage.Get(12), DecimalSeparator); init => DataItemStorage.Set(12, value.ToP3DString(DecimalSeparator)); }
+        public string PokemonSkin { get => DataItemStorage.Get(13); init => DataItemStorage.Set(13, value); }
+        public int PokemonFacing { get => DataItemStorage.GetInt32(14); init => DataItemStorage.SetInt32(14, value); }
 
-        public string GameMode { get => DataItems[0]; set => DataItems[0] = value; }
-        public bool IsGameJoltPlayer { get => int.TryParse(DataItems[1], NumberStyles.Any, CultureInfo, out var isGameJoltPlayer) && isGameJoltPlayer == 1; set => DataItems[1] = (value ? 1 : 2).ToString(CultureInfo); }
-        public long GameJoltID { get => long.TryParse(DataItems[2], NumberStyles.Any, CultureInfo, out var gameJoltID) ? gameJoltID : 0; set => DataItems[2] = value.ToString(CultureInfo); }
-        public char DecimalSeparator { get => DataItems[3].Any() ? DataItems[3][0] : ','; set => DataItems[3] = value.ToString(); }
-        public string Name { get => DataItems[4]; set => DataItems[4] = value; }
-        public string LevelFile { get => DataItems[5]; set => DataItems[5] = value; }
-        private string Position { get => DataItems[6]; set => DataItems[6] = value; }
-        public int Facing { get => int.TryParse(DataItems[7], NumberStyles.Any, CultureInfo, out var facing) ? facing : 0; set => DataItems[7] = value.ToString(CultureInfo); }
-        public bool Moving { get => int.TryParse(DataItems[8], NumberStyles.Any, CultureInfo, out var moving) && moving == 1; set => DataItems[8] = (value ? 1 : 2).ToString(CultureInfo); }
-        public string Skin { get => DataItems[9]; set => DataItems[9] = value; }
-        public string BusyType { get => DataItems[10]; set => DataItems[10] = value; }
-        public bool PokemonVisible { get => int.TryParse(DataItems[11], NumberStyles.Any, CultureInfo, out var visible) && visible == 1; set => DataItems[11] = (value ? 1 : 2).ToString(CultureInfo); }
-        private string PokemonPosition { get => DataItems[12]; set => DataItems[12] = value; }
-        public string PokemonSkin { get => DataItems[13]; set => DataItems[13] = value; }
-        public int PokemonFacing { get { try { return int.TryParse(DataItems[14], NumberStyles.Any, CultureInfo, out var facing) ? facing : 0; } catch (Exception) { return 0; } } set => DataItems[14] = value.ToString(CultureInfo); }
-
-
-        public Vector3 GetPosition(char separator) { return Vector3Extensions.FromP3DString(Position, separator, CultureInfo); }
-        public void SetPosition(Vector3 position, char separator) { Position = position.ToP3DString(separator, CultureInfo); }
-
-        public Vector3 GetPokemonPosition(char separator) { return Vector3Extensions.FromP3DString(PokemonPosition, separator, CultureInfo); }
-        public void SetPokemonPosition(Vector3 position, char separator) { PokemonPosition = position.ToP3DString(separator, CultureInfo); }
+        public void Deconstruct(
+            out string gameMode,
+            out bool isGameJoltPlayer,
+            out ulong gameJoltId,
+            out char decimalSeparator,
+            out string name,
+            out string levelFile,
+            out Vector3 position,
+            out int facing,
+            out bool moving,
+            out string skin,
+            out string busyType,
+            out bool pokemonVisible,
+            out Vector3 pokemonPosition,
+            out string pokemonSkin,
+            out int pokemonFacing)
+        {
+            gameMode = GameMode;
+            isGameJoltPlayer = IsGameJoltPlayer;
+            gameJoltId = GameJoltId;
+            decimalSeparator = DecimalSeparator;
+            name = Name;
+            levelFile = LevelFile;
+            position = Position;
+            facing = Facing;
+            moving = Moving;
+            skin = Skin;
+            busyType = BusyType;
+            pokemonVisible = PokemonVisible;
+            pokemonPosition = PokemonPosition;
+            pokemonSkin = PokemonSkin;
+            pokemonFacing = PokemonFacing;
+        }
     }
 }

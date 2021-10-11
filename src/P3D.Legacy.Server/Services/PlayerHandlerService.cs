@@ -7,48 +7,54 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Services
 {
+    public record Event;
+    public record PlayerJoinedEvent(string Message) : Event;
+
     public interface IPlayer
     {
-        event Func<string, P3DConnectionHandler, Task>? InitializingAsync;
-        event Func<string, P3DConnectionHandler, Task>? InitializedAsync;
-        event Func<string, P3DConnectionHandler, Task>? DisconnectedAsync;
+        event Func<string, P3DConnectionHandler, Task>? OnInitializingAsync;
+        event Func<string, P3DConnectionHandler, Task>? OnInitializedAsync;
+        event Func<string, P3DConnectionHandler, Task>? OnDisconnectedAsync;
 
         Task AssignIdAsync(uint id);
     }
 
-    public record PlayerInfo
-    {
-        public uint Id { get; init; }
-        public string Name { get; init; }
-    }
+    public record PlayerInfo(ulong Id, string Name);
 
     public class PlayerHandlerService
     {
-        private static uint _globalPlayerIncrement = 0;
+        private static uint GlobalPlayerIncrement = 0;
 
-        public IReadOnlyCollection<PlayerInfo> Players => _connections.Values.Select(x => new PlayerInfo() { Id = x.Id, Name = x.Name }).ToImmutableArray();
+        public event Func<Event, Task>? OnEventAsync;
+
+        public IReadOnlyCollection<PlayerInfo> Players => _connections.Values.Select(x => new PlayerInfo(x.Id, x.Name)).ToImmutableArray();
         private readonly Dictionary<string, P3DConnectionHandler> _connections = new();
 
         public Task AcknowledgeConnectionAsync(string connectionId, P3DConnectionHandler connectionHandler)
         {
-            connectionHandler.InitializingAsync += ConnectionHandler_InitializingAsync;
-            connectionHandler.InitializedAsync += ConnectionHandler_InitializedAsync;
-            connectionHandler.DisconnectedAsync += ConnectionHandler_DisconnectedAsync;
+            connectionHandler.OnInitializingAsync += ConnectionHandler_OnInitializingAsync;
+            connectionHandler.OnInitializedAsync += ConnectionHandler_OnInitializedAsync;
+            connectionHandler.OnDisconnectedAsync += ConnectionHandler_OnDisconnectedAsync;
             return Task.CompletedTask;
         }
 
-        private async Task ConnectionHandler_InitializingAsync(string connectionId, P3DConnectionHandler connectionHandler)
+        private async Task ConnectionHandler_OnInitializingAsync(string connectionId, P3DConnectionHandler connectionHandler)
         {
-            await connectionHandler.AssignIdAsync(Interlocked.Increment(ref _globalPlayerIncrement));
+            await connectionHandler.AssignIdAsync(Interlocked.Increment(ref GlobalPlayerIncrement));
         }
-        private Task ConnectionHandler_InitializedAsync(string connectionId, P3DConnectionHandler connectionHandler)
+        private async Task ConnectionHandler_OnInitializedAsync(string connectionId, P3DConnectionHandler connectionHandler)
         {
             _connections[connectionId] = connectionHandler;
-            return Task.CompletedTask;
+
+            if (OnEventAsync is not null)
+                await OnEventAsync(new PlayerJoinedEvent($"Player {connectionHandler.Name} joined the game!"));
         }
-        private Task ConnectionHandler_DisconnectedAsync(string connectionId, P3DConnectionHandler connectionHandler)
+        private Task ConnectionHandler_OnDisconnectedAsync(string connectionId, P3DConnectionHandler connectionHandler)
         {
             _connections.Remove(connectionId);
+            connectionHandler.OnInitializingAsync -= ConnectionHandler_OnInitializingAsync;
+            connectionHandler.OnInitializedAsync -= ConnectionHandler_OnInitializedAsync;
+            connectionHandler.OnDisconnectedAsync -= ConnectionHandler_OnDisconnectedAsync;
             return Task.CompletedTask;
         }
     }

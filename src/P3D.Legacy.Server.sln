@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Server", "P3D.Le
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Common", "P3D.Legacy.Common\P3D.Legacy.Common.csproj", "{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P3D.Legacy.Common.Tests", "..\tests\P3D.Legacy.Common.Tests\P3D.Legacy.Common.Tests.csproj", "{4C2886A3-01CD-48C9-8217-84E3F37E2A8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C2886A3-01CD-48C9-8217-84E3F37E2A8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C2886A3-01CD-48C9-8217-84E3F37E2A8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C2886A3-01CD-48C9-8217-84E3F37E2A8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C2886A3-01CD-48C9-8217-84E3F37E2A8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

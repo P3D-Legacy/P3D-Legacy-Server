@@ -1,9 +1,10 @@
-using Bedrock.Framework.Protocols;
+﻿using Bedrock.Framework.Protocols;
 
 using Microsoft.Extensions.Logging;
 
 using Nerdbank.Streams;
 
+using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets;
 
 using System;
@@ -28,38 +29,57 @@ namespace P3D.Legacy.Server
 
         public bool TryParseMessage(in ReadOnlySequence<byte> input, ref SequencePosition consumed, ref SequencePosition examined, out P3DPacket? message)
         {
-            message = null;
-
             _sequenceTextReader.Initialize(input, Encoding.ASCII);
-            while (_sequenceTextReader.ReadLine() is { } line)
+            if (_sequenceTextReader.ReadLine() is not { } line)
             {
-                consumed = examined = input.GetPosition(Encoding.ASCII.GetByteCount(line) + NewLineLength, consumed);
-
-                if (P3DPacket.TryParseId(line, out var id))
-                {
-                    message = _packetFactory.GetFromId(id);
-                    if (message is null)
-                    {
-                        _logger.LogCritical("Line is not a P3D packet! {Line}", line);
-                        continue;
-                    }
-
-                    _logger.LogInformation("Received a message type {Type}", message.GetType());
-                    message.TryParseData(line);
-                }
-                else
-                {
-                    _logger.LogCritical("Line is not a P3D packet! {Line}", line);
-                }
+                message = null;
+                return false;
             }
 
+            consumed = examined = input.GetPosition(Encoding.ASCII.GetByteCount(line) + NewLineLength, consumed);
+
+            var sequence = new ReadOnlySequence<char>(line.AsMemory());
+            var position = default(SequencePosition);
+
+            if (!P3DPacket.TryParseProtocol(in sequence, ref position, out var protocol) || protocol != ProtocolEnum.V1)
+            {
+                _logger.LogCritical("Line is not a P3D packet! Invalid protocol! {Line}", line);
+                message = null;
+                return false;
+            }
+
+            if (!P3DPacket.TryParseId(in sequence, ref position, out var id))
+            {
+                _logger.LogCritical("Line is not a P3D packet! {Line}", line);
+                message = null;
+                return false;
+            }
+
+            if (_packetFactory.GetFromId(id) is not { } packet)
+            {
+                _logger.LogCritical("Line is not a P3D packet! Invalid Packet Id! {Line}", line);
+                message = null;
+                return false;
+            }
+
+            if (!packet.TryPopulateData(in sequence, ref position))
+            {
+                _logger.LogCritical("Failed to populate message type {Type}", packet.GetType());
+                message = null;
+                return false;
+            }
+
+            _logger.LogInformation("Received a message type {Type}", packet.GetType());
+            message = packet;
             return true;
+
         }
 
         public void WriteMessage(P3DPacket message, IBufferWriter<byte> output)
         {
             _logger.LogInformation("Sending a message type {Type}", message.GetType());
-            output.Write(Encoding.ASCII.GetBytes($"{message.CreateData()}\r\n"));
+            var text = $"{message.CreateData()}\r\n";
+            output.Write(Encoding.ASCII.GetBytes(text));
         }
     }
 }

@@ -1,9 +1,12 @@
 ﻿namespace P3D.Legacy.Common.Packets.Server
 {
-    public class ServerClosePacket : P3DPacket
+    public sealed record ServerClosePacket() : P3DPacket(P3DPacketType.ServerClose)
     {
-        public override P3DPacketTypes Id => P3DPacketTypes.ServerClose;
+        public string Reason { get => DataItemStorage.Get(0); init => DataItemStorage.Set(0, value); }
 
-        public string Reason { get => DataItems[0]; set => DataItems[0] = value; }
+        public void Deconstruct(out string reason)
+        {
+            reason = Reason;
+        }
     }
 }

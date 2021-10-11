@@ -1,9 +1,12 @@
 ﻿namespace P3D.Legacy.Common.Packets.Trade
 {
-    public class TradeRequestPacket : P3DPacket
+    public sealed record TradeRequestPacket() : P3DPacket(P3DPacketType.TradeRequest)
     {
-        public override P3DPacketTypes Id => P3DPacketTypes.TradeRequest;
+        public int DestinationPlayerId { get => DataItemStorage.GetInt32(0); init => DataItemStorage.SetInt32(0, value); }
 
-        public int DestinationPlayerID { get => int.Parse(DataItems[0] == string.Empty ? 0.ToString() : DataItems[0]); set => DataItems[0] = value.ToString(); }
+        public void Deconstruct(out int destinationPlayerId)
+        {
+            destinationPlayerId = DestinationPlayerId;
+        }
     }
 }
