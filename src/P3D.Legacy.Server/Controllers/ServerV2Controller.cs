@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Services;
+using P3D.Legacy.Server.Queries.Players;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Controllers
 {
@@ -18,18 +20,17 @@ namespace P3D.Legacy.Server.Controllers
         public sealed record StatusResponseV2(IEnumerable<StatusResponseV2Player> Players);
 
         private readonly ILogger _logger;
-        private readonly PlayerHandlerService _playerHandlerService;
 
-        public ServerV2Controller(ILogger<ServerV2Controller> logger, PlayerHandlerService playerHandlerService)
+        public ServerV2Controller(ILogger<ServerV2Controller> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _playerHandlerService = playerHandlerService ?? throw new ArgumentNullException(nameof(playerHandlerService));
         }
 
         [HttpGet("status")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(StatusResponseV2), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
-        public ActionResult GetStatus() => Ok(new StatusResponseV2(_playerHandlerService.Players.Select(x => new StatusResponseV2Player(x.Name, x.GameJoltId))));
+        public async Task<ActionResult> GetStatusAsync([FromServices] IPlayerQueries playerQueries, CancellationToken ct) =>
+            Ok(new StatusResponseV2(await playerQueries.GetAllAsync(ct).Select(x => new StatusResponseV2Player(x.Name, x.GameJoltId)).ToArrayAsync(ct)));
     }
 }

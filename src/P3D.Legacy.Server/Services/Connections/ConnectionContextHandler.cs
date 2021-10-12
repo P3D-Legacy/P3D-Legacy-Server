@@ -1,0 +1,59 @@
+﻿using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Connections.Features;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace P3D.Legacy.Server.Services.Connections
+{
+    public abstract class ConnectionContextHandler : IDisposable
+    {
+        protected ConnectionContext Connection { get; private set; } = default!;
+
+        private CancellationTokenSource? _stoppingCts;
+        private Task? _executingTask;
+
+        public Task<ConnectionContextHandler> SetConnectionContextAsync(ConnectionContext connectionContext)
+        {
+            Connection = connectionContext;
+
+            var lifetimeNotificationFeature = Connection.Features.Get<IConnectionLifetimeNotificationFeature>();
+            _stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(Connection.ConnectionClosed, lifetimeNotificationFeature.ConnectionClosedRequested);
+            _executingTask = OnCreatedAsync(_stoppingCts.Token);
+
+            return Task.FromResult(this);
+        }
+
+        protected abstract Task OnCreatedAsync(CancellationToken ct);
+
+        public async Task ListenAsync() => await (_executingTask ?? Task.CompletedTask);
+
+        public virtual async Task StopAsync(CancellationToken ct)
+        {
+            if (_stoppingCts == null || _executingTask == null)
+            {
+                return;
+            }
+
+            try
+            {
+                // Signal cancellation to the executing method
+                _stoppingCts.Cancel();
+            }
+            finally
+            {
+                // Wait until the task completes or the stop token triggers
+#pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
+                await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, ct));
+#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
+            }
+
+        }
+
+        public virtual void Dispose()
+        {
+            _stoppingCts?.Cancel();
+        }
+    }
+}

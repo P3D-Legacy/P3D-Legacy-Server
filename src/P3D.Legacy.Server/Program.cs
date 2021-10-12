@@ -1,7 +1,16 @@
 ﻿using Bedrock.Framework;
 
+using BetterHostedServices;
+
 using CorrelationId;
 using CorrelationId.DependencyInjection;
+
+using Discord;
+using Discord.WebSocket;
+
+using MediatR;
+using MediatR.Pipeline;
+using MediatR.Registration;
 
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Hosting;
@@ -11,29 +20,33 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 
 using P3D.Legacy.Common.Packets;
+using P3D.Legacy.Server.Behaviours;
+using P3D.Legacy.Server.Commands;
 using P3D.Legacy.Server.Extensions;
-using P3D.Legacy.Server.HttpLogging;
-using P3D.Legacy.Server.Options;
+using P3D.Legacy.Server.Models.Options;
+using P3D.Legacy.Server.Notifications;
+using P3D.Legacy.Server.Queries.Players;
 using P3D.Legacy.Server.Services;
-using P3D.Legacy.Server.Utils;
+using P3D.Legacy.Server.Services.Connections;
+using P3D.Legacy.Server.Services.Discord;
+using P3D.Legacy.Server.Services.Server;
+using P3D.Legacy.Server.Utils.HttpLogging;
 
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
-using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            await CreateHostBuilder(args).Build().RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) => Host
@@ -42,6 +55,11 @@ namespace P3D.Legacy.Server
             {
                 services.Configure<ServerOptions>(ctx.Configuration.GetSection("Server"));
                 services.Configure<P3DOptions>(ctx.Configuration.GetSection("P3D"));
+                services.Configure<DiscordOptions>(ctx.Configuration.GetSection("Discord"));
+
+                services.AddBetterHostedServices();
+
+                services.AddMediatRInternal();
 
                 services.AddDefaultCorrelationId(options =>
                 {
@@ -69,10 +87,26 @@ namespace P3D.Legacy.Server
                     .AddPolly()
                     .AddCorrelationIdOverrideForwarding();
 
-                services.AddTransient<P3DPacketFactory>();
-                services.AddTransient<P3DProtocol>();
-                services.AddSingleton<WorldService>();
-                services.AddSingleton<PlayerHandlerService>();
+                services.AddSingleton<P3DPacketFactory>();
+
+                services.AddScoped<P3DConnectionContextHandler>();
+
+                services.AddScoped<ConnectionContextHandlerFactory>();
+                services.AddScoped<P3DProtocol>();
+
+                services.AddSingleton<IPlayerIdGenerator, DefaultPlayerIdGenerator>();
+
+                services.AddTransient<IPlayerQueries, PlayerQueries>();
+
+                services.AddSingleton<DefaultPlayerContainer>();
+                services.AddTransient<IPlayerContainerWriter>(sp => sp.GetRequiredService<DefaultPlayerContainer>());
+                services.AddTransient<IPlayerContainerReader>(sp => sp.GetRequiredService<DefaultPlayerContainer>());
+
+                services.AddHostedServiceAsSingleton<WorldService>();
+
+                services.AddHostedServiceAsSingleton<DiscordPassthroughService>();
+                services.AddSingleton<DiscordSocketClient>();
+                services.AddSingleton<IDiscordClient, DiscordSocketClient>(sp => sp.GetRequiredService<DiscordSocketClient>());
             })
             .ConfigureServer((ctx, server) =>
             {

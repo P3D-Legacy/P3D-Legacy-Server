@@ -35,6 +35,14 @@ namespace P3D.Legacy.Common
         public IEnumerator<string> GetEnumerator() => Iterate(_dataItems).GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => Iterate(_dataItems).GetEnumerator();
 
+        public void Add(DataItemStorage dataItemStorage)
+        {
+            foreach (var dataItem in dataItemStorage)
+            {
+                Set(Count, dataItem);
+            }
+        }
+
         public string Get(int index) => !_dataItems.TryGetValue(index, out var value) ? string.Empty : value;
         public char GetChar(int index) => Get(index) is { Length: >= 1 } str ? str[0] : '.';
         public bool GetBool(int index) => GetInt32(index) == 1;

@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 using P3D.Legacy.Server.Utils;
 
 using System;
-using System.Runtime.CompilerServices;
 
 namespace P3D.Legacy.Server.Extensions
 {
