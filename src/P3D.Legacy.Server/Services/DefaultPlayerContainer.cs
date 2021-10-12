@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Models;
 

@@ -41,7 +41,7 @@ namespace P3D.Legacy.Common.Data.P3DData
 
         public override string ToP3DString()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

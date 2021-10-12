@@ -8,10 +8,6 @@ using CorrelationId.DependencyInjection;
 using Discord;
 using Discord.WebSocket;
 
-using MediatR;
-using MediatR.Pipeline;
-using MediatR.Registration;
-
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -22,11 +18,8 @@ using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common.Packets;
-using P3D.Legacy.Server.Behaviours;
-using P3D.Legacy.Server.Commands;
 using P3D.Legacy.Server.Extensions;
 using P3D.Legacy.Server.Models.Options;
-using P3D.Legacy.Server.Notifications;
 using P3D.Legacy.Server.Queries.Players;
 using P3D.Legacy.Server.Services;
 using P3D.Legacy.Server.Services.Connections;

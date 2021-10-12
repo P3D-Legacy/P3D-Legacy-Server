@@ -1,6 +1,4 @@
-﻿using P3D.Legacy.Common.Data;
-
-using System;
+﻿using System;
 using System.Buffers;
 
 namespace P3D.Legacy.Common.Packets
@@ -10,7 +8,7 @@ namespace P3D.Legacy.Common.Packets
         private static ReadOnlySpan<char> ParseSection(in ReadOnlySequence<char> sequence, ref SequencePosition position)
         {
             var reader = new SequenceReader<char>(sequence.Slice(position));
-            reader.TryReadTo(out ReadOnlySpan<char> section, '|', true);
+            reader.TryReadTo(out ReadOnlySpan<char> section, '|');
 
             position = reader.Position;
             return section;
@@ -19,7 +17,7 @@ namespace P3D.Legacy.Common.Packets
         public static bool TryParseProtocol(in ReadOnlySequence<char> sequence, ref SequencePosition position, out Protocol protocol)
         {
             var reader = new SequenceReader<char>(sequence.Slice(position));
-            if (!reader.TryReadTo(out ReadOnlySpan<char> _, '|', false))
+            if (!reader.TryReadTo(out ReadOnlySpan<char> _, '|'))
             {
                 protocol = default;
                 return false;
@@ -32,7 +30,7 @@ namespace P3D.Legacy.Common.Packets
         public static bool TryParseId(in ReadOnlySequence<char> sequence, ref SequencePosition position, out P3DPacketType id)
         {
             var reader = new SequenceReader<char>(sequence.Slice(position));
-            if (!reader.TryReadTo(out ReadOnlySpan<char> _, '|', false))
+            if (!reader.TryReadTo(out ReadOnlySpan<char> _, '|'))
             {
                 id = P3DPacketType.None;
                 return false;

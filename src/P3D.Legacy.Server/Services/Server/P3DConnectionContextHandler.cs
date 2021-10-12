@@ -7,15 +7,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Common.Packets.Chat;
 using P3D.Legacy.Common.Packets.Client;
-using P3D.Legacy.Common.Packets.Server;
-using P3D.Legacy.Common.Packets.Shared;
 using P3D.Legacy.Server.Commands;
 using P3D.Legacy.Server.Models;
-using P3D.Legacy.Server.Models.Events;
 using P3D.Legacy.Server.Models.Options;
-using P3D.Legacy.Server.Notifications;
 using P3D.Legacy.Server.Queries.Players;
 using P3D.Legacy.Server.Services.Connections;
 
@@ -41,7 +36,7 @@ namespace P3D.Legacy.Server.Services.Server
         private ProtocolWriter _writer = default!;
         private P3DConnectionState _connectionState = P3DConnectionState.None;
 
-        public P3DConnectionContextHandler(ILogger<P3DConnectionHandler> logger, P3DProtocol protocol, IPlayerQueries playerQueries, WorldService worldService, IOptions<ServerOptions> serverOptions, IMediator mediator)
+        public P3DConnectionContextHandler(ILogger<P3DConnectionContextHandler> logger, P3DProtocol protocol, IPlayerQueries playerQueries, WorldService worldService, IOptions<ServerOptions> serverOptions, IMediator mediator)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));

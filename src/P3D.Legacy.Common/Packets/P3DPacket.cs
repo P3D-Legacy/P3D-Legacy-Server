@@ -1,6 +1,4 @@
-﻿using P3D.Legacy.Common.Data;
-
-namespace P3D.Legacy.Common.Packets
+﻿namespace P3D.Legacy.Common.Packets
 {
     public abstract partial record P3DPacket(P3DPacketType Id)
     {

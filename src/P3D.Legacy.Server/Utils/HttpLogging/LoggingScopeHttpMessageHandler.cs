@@ -124,7 +124,7 @@ namespace P3D.Legacy.Server.Utils.HttpLogging
                     logger.Log(
                         LogLevel.Trace,
                         EventIds.ResponseHeader,
-                        new HttpHeadersLogValue(HttpHeadersLogValue.Kind.Response, response.Headers, response.Content?.Headers, shouldRedactHeaderValue),
+                        new HttpHeadersLogValue(HttpHeadersLogValue.Kind.Response, response.Headers, response.Content.Headers, shouldRedactHeaderValue),
                         null,
                         (state, ex) => state.ToString());
                 }

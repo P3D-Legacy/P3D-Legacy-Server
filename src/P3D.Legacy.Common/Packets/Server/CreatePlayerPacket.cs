@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace P3D.Legacy.Common.Packets.Server
+﻿namespace P3D.Legacy.Common.Packets.Server
 {
     public sealed record CreatePlayerPacket() : P3DPacket(P3DPacketType.CreatePlayer)
     {

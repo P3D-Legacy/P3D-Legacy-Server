@@ -37,7 +37,7 @@ namespace P3D.Legacy.Common.Data.P3DData
 
         public BattleOfferData(in ReadOnlySpan<char> data) : base(in data)
         {
-            LeadMonsterIndex = int.TryParse(data, out var index) ? (int?) index : null;
+            LeadMonsterIndex = int.TryParse(data, out var index) ? index : null;
             Monsters = ParseOfferData(data);
         }
 
