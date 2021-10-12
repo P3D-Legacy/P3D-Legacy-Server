@@ -27,4 +27,8 @@
     <ProjectReference Include="..\P3D.Legacy.Common\P3D.Legacy.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NotificationHandlers\" />
+  </ItemGroup>
+
 </Project>

@@ -30,50 +30,6 @@ namespace P3D.Legacy.Server.Services.Server
     {
         private enum P3DConnectionState { None, Initializing, Intitialized, Finalized }
 
-        public Task AssignIdAsync(ulong id, CancellationToken ct)
-        {
-            if (Id != 0)
-                throw new InvalidOperationException("Id was already assigned!");
-
-            Id = id;
-
-            return Task.CompletedTask;
-        }
-
-        /*
-        public async Task NotifyAsync(Event @event, CancellationToken ct)
-        {
-            switch (@event)
-            {
-                case PlayerJoinedEvent(var (id, name, _)):
-                    await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerId = id }, ct);
-                    await SendServerMessageAsync($"Player {name} joined the game!", ct);
-                    break;
-
-                case PlayerLeavedEvent(var (id, name, _)):
-                    if (Id == id) break;
-                    await SendPacketAsync(new DestroyPlayerPacket { Origin = Origin.Server, PlayerId = id }, ct);
-                    await SendServerMessageAsync($"Player {name} leaved the game!", ct);
-                    break;
-
-                case PlayerGameDataEvent(var (id, _, _), var dataItemStorage):
-                    if (Id == id) break;
-                    await SendPacketAsync(new GameDataPacket { Origin = id, DataItemStorage = { dataItemStorage } }, ct);
-                    break;
-
-                case PlayerGlobalMessageEvent(var (id, _, _), var message):
-                    await SendPacketAsync(new ChatMessageGlobalPacket { Origin = id, Message = message }, ct);
-                    break;
-
-                case PlayerLocalMessageEvent(var (id, _, _), var location, var message):
-                    if (LevelFile.Equals(location, StringComparison.OrdinalIgnoreCase))
-                        await SendPacketAsync(new ChatMessageGlobalPacket { Origin = id, Message = message }, ct);
-                    break;
-            }
-        }
-        */
-
-
         private readonly ILogger _logger;
         private readonly P3DProtocol _protocol;
         private readonly IPlayerQueries _playerQueries;
