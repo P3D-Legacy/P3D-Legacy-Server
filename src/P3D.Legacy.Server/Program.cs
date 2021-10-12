@@ -54,6 +54,8 @@ namespace P3D.Legacy.Server
 
                 services.AddMediatRInternal();
 
+                services.AddSingleton<DefaultJsonSerializer>();
+
                 services.AddDefaultCorrelationId(options =>
                 {
                     options.AddToLoggingScope = true;
@@ -72,7 +74,7 @@ namespace P3D.Legacy.Server
                     .ConfigureHttpClient((sp, client) =>
                     {
                         var backendOptions = sp.GetRequiredService<IOptions<P3DOptions>>().Value;
-                        client.BaseAddress = new Uri(backendOptions.APIEndpoint);
+                        client.BaseAddress = new Uri(backendOptions.APIEndpointV1);
                         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", backendOptions.APIToken);
                         client.Timeout = Timeout.InfiniteTimeSpan;
                     })

@@ -2,7 +2,7 @@
 {
     public sealed record P3DOptions
     {
-        public string APIEndpoint { get; init; } = default!;
+        public string APIEndpointV1 { get; init; } = default!;
         public string APIToken { get; init; } = default!;
     }
 }
