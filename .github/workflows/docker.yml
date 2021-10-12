@@ -36,7 +36,7 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: ghcr.io
-        username: BUTR
+        username: P3D-Legacy
         password: ${{ secrets.TOKEN_GPR }}
 
     - name: Build and Push
@@ -48,7 +48,7 @@ jobs:
         file: ./src/P3D.Legacy.Server/Dockerfile
         platforms: linux/amd64,linux/arm64
         push: true
-        tags: ghcr.io/p3d-legacyp3d-legacy-server:latest
+        tags: ghcr.io/p3d-legacy/p3d-legacy-server:latest
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
 
@@ -60,5 +60,4 @@ jobs:
       with:
         token: ${{ secrets.TOKEN_GPR }}
         repository: P3D-Legacy/P3D-Legacy-Server
- 
         event-type: deploy-docker-image
