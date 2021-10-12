@@ -19,12 +19,12 @@ namespace P3D.Legacy.Server
 {
     public enum P3DConnectionState { None, Initializing, Intitialized, Finalized }
 
-    public partial class P3DConnectionHandler : ConnectionHandler, IPlayer
+    public partial class P3DConnectionHandler : ConnectionHandler, IPlayer, IGameJoltPlayer
     {
         public event Func<string, P3DConnectionHandler, Task>? OnInitializingAsync;
         public event Func<string, P3DConnectionHandler, Task>? OnInitializedAsync;
         public event Func<string, P3DConnectionHandler, Task>? OnDisconnectedAsync;
-        public Task AssignIdAsync(uint id)
+        public Task AssignIdAsync(ulong id)
         {
             if (Id != 0)
                 throw new InvalidOperationException("Id was already assigned!");

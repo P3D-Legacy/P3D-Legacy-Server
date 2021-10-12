@@ -16,18 +16,26 @@ namespace P3D.Legacy.Server.Services
         event Func<string, P3DConnectionHandler, Task>? OnInitializedAsync;
         event Func<string, P3DConnectionHandler, Task>? OnDisconnectedAsync;
 
-        Task AssignIdAsync(uint id);
+        ulong Id { get; }
+        string Name { get; }
+
+        Task AssignIdAsync(ulong id);
     }
 
-    public record PlayerInfo(ulong Id, string Name);
+    public interface IGameJoltPlayer
+    {
+        ulong GameJoltId { get; }
+    }
+
+    public record PlayerInfo(ulong Id, string Name, ulong GameJoltId);
 
     public class PlayerHandlerService
     {
-        private static uint GlobalPlayerIncrement = 0;
+        private static ulong GlobalPlayerIncrement = 0;
 
         public event Func<Event, Task>? OnEventAsync;
 
-        public IReadOnlyCollection<PlayerInfo> Players => _connections.Values.Select(x => new PlayerInfo(x.Id, x.Name)).ToImmutableArray();
+        public IReadOnlyCollection<PlayerInfo> Players => _connections.Values.Select(x => new PlayerInfo(x.Id, x.Name, x.GameJoltId)).ToImmutableArray();
         private readonly Dictionary<string, P3DConnectionHandler> _connections = new();
 
         public Task AcknowledgeConnectionAsync(string connectionId, P3DConnectionHandler connectionHandler)

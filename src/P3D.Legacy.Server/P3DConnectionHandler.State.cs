@@ -7,13 +7,13 @@ namespace P3D.Legacy.Server
 {
     public partial class P3DConnectionHandler
     {
-        public ulong Id { get; set; }
-        public string Name { get; protected set; }
+        public ulong Id { get; private set; }
+        public string Name { get; private set; }
+        public ulong GameJoltId { get; private set; }
 
 
         private string GameMode { get; set; }
         private bool IsGameJoltPlayer { get; set; }
-        private ulong GameJoltId { get; set; }
         private char DecimalSeparator { get; set; }
 
         private string LevelFile { get; set; }
