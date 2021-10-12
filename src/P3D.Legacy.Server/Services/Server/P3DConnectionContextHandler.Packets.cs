@@ -229,7 +229,7 @@ namespace P3D.Legacy.Server.Services.Server
         }
         private async Task HandlePrivateMessageAsync(ChatMessagePrivatePacket packet, CancellationToken ct)
         {
-            //await _mediator.Publish(new PlayerPrivateMessageEvent(new PlayerEventModel(Id, Name, GameJoltId), packet.DestinationPlayerName, packet.Message), ct);
+            await _mediator.Publish(new PlayerSentPrivateMessageNotification(Id, Name, GameJoltId, packet.DestinationPlayerName, packet.Message), ct);
         }
 
 
