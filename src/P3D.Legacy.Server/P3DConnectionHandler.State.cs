@@ -24,10 +24,10 @@ namespace P3D.Legacy.Server
         private string Skin { get; set; }
         private string BusyType { get; set; }
 
-        private bool PokemonVisible { get; set; }
-        private Vector3 PokemonPosition { get; set; }
-        private string PokemonSkin { get; set; }
-        private int PokemonFacing { get; set; }
+        private bool MonsterVisible { get; set; }
+        private Vector3 MonsterPosition { get; set; }
+        private string MonsterSkin { get; set; }
+        private int MonsterFacing { get; set; }
 
         private void ResetState()
         {
@@ -47,10 +47,10 @@ namespace P3D.Legacy.Server
             Skin = string.Empty;
             BusyType = string.Empty;
 
-            PokemonVisible = false;
-            PokemonPosition = Vector3.Zero;
-            PokemonSkin = string.Empty;
-            PokemonFacing = 0;
+            MonsterVisible = false;
+            MonsterPosition = Vector3.Zero;
+            MonsterSkin = string.Empty;
+            MonsterFacing = 0;
         }
     }
 }

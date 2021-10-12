@@ -52,10 +52,10 @@ namespace P3D.Legacy.Server
             Skin = packet.Skin;
             BusyType = packet.BusyType;
 
-            PokemonVisible = packet.PokemonVisible;
-            PokemonPosition = packet.PokemonPosition;
-            PokemonSkin = packet.PokemonSkin;
-            PokemonFacing = packet.PokemonFacing;
+            MonsterVisible = packet.MonsterVisible;
+            MonsterPosition = packet.MonsterPosition;
+            MonsterSkin = packet.MonsterSkin;
+            MonsterFacing = packet.MonsterFacing;
         }
 
         private async Task HandleGameDataAsync(GameDataPacket packet, CancellationToken ct)
@@ -113,10 +113,10 @@ namespace P3D.Legacy.Server
                 Moving = Moving,
                 Skin = Skin,
                 BusyType = BusyType,
-                PokemonVisible = PokemonVisible,
-                PokemonPosition = PokemonPosition,
-                PokemonSkin = PokemonSkin,
-                PokemonFacing = PokemonFacing
+                MonsterVisible = MonsterVisible,
+                MonsterPosition = MonsterPosition,
+                MonsterSkin = MonsterSkin,
+                MonsterFacing = MonsterFacing
             }, ct);
         }
 

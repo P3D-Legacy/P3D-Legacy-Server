@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace P3D.Legacy.Common.Data.P3DData
 {
-    // If LeadMonsterIndex is not null, this is a confirmation, else client just gives the pokemons for the battle
+    // If LeadMonsterIndex is not null, this is a confirmation, else client just gives the monsters for the battle
     public sealed record BattleOfferData : P3DData
     {
         private static IReadOnlyList<MonsterData> ParseOfferData(ReadOnlySpan<char> data)

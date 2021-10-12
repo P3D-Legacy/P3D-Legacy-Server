@@ -17,10 +17,10 @@ namespace P3D.Legacy.Common.Packets.Shared
         public bool Moving { get => DataItemStorage.GetBool(8); init => DataItemStorage.SetBool(8, value); }
         public string Skin { get => DataItemStorage.Get(9); init => DataItemStorage.Set(9, value); }
         public string BusyType { get => DataItemStorage.Get(10); init => DataItemStorage.Set(10, value); }
-        public bool PokemonVisible { get => DataItemStorage.GetBool(11); init => DataItemStorage.SetBool(11, value); }
-        public Vector3 PokemonPosition { get => Vector3Extensions.FromP3DString(DataItemStorage.Get(12), DecimalSeparator); init => DataItemStorage.Set(12, value.ToP3DString(DecimalSeparator)); }
-        public string PokemonSkin { get => DataItemStorage.Get(13); init => DataItemStorage.Set(13, value); }
-        public int PokemonFacing { get => DataItemStorage.GetInt32(14); init => DataItemStorage.SetInt32(14, value); }
+        public bool MonsterVisible { get => DataItemStorage.GetBool(11); init => DataItemStorage.SetBool(11, value); }
+        public Vector3 MonsterPosition { get => Vector3Extensions.FromP3DString(DataItemStorage.Get(12), DecimalSeparator); init => DataItemStorage.Set(12, value.ToP3DString(DecimalSeparator)); }
+        public string MonsterSkin { get => DataItemStorage.Get(13); init => DataItemStorage.Set(13, value); }
+        public int MonsterFacing { get => DataItemStorage.GetInt32(14); init => DataItemStorage.SetInt32(14, value); }
 
         public void Deconstruct(
             out string gameMode,
@@ -34,10 +34,10 @@ namespace P3D.Legacy.Common.Packets.Shared
             out bool moving,
             out string skin,
             out string busyType,
-            out bool pokemonVisible,
-            out Vector3 pokemonPosition,
-            out string pokemonSkin,
-            out int pokemonFacing)
+            out bool monsterVisible,
+            out Vector3 monsterPosition,
+            out string monsterSkin,
+            out int monsterFacing)
         {
             gameMode = GameMode;
             isGameJoltPlayer = IsGameJoltPlayer;
@@ -50,10 +50,10 @@ namespace P3D.Legacy.Common.Packets.Shared
             moving = Moving;
             skin = Skin;
             busyType = BusyType;
-            pokemonVisible = PokemonVisible;
-            pokemonPosition = PokemonPosition;
-            pokemonSkin = PokemonSkin;
-            pokemonFacing = PokemonFacing;
+            monsterVisible = MonsterVisible;
+            monsterPosition = MonsterPosition;
+            monsterSkin = MonsterSkin;
+            monsterFacing = MonsterFacing;
         }
     }
 }
