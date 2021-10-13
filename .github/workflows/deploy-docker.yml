@@ -11,7 +11,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment:
-      name: 'p3d-backend'
+      name: 'next-p3d-backend'
       url: 'https://karp.pokemon3d.net'
     steps:
     - uses: appleboy/ssh-action@master
