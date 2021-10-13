@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Connections.Features;
+using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets;
@@ -201,26 +202,7 @@ namespace P3D.Legacy.Server.Services.Server
                 await _mediator.Publish(new PlayerJoinedNotification(Id, Name, GameJoltId), ct);
             }
 
-            await SendPacketAsync(new GameDataPacket
-            {
-                Origin = Origin.Server,
-
-                GameMode = GameMode,
-                IsGameJoltPlayer = IsGameJoltPlayer,
-                GameJoltId = GameJoltId,
-                DecimalSeparator = DecimalSeparator,
-                Name = Name,
-                LevelFile = LevelFile,
-                Position = Position,
-                Facing = Facing,
-                Moving = Moving,
-                Skin = Skin,
-                BusyType = BusyType,
-                MonsterVisible = MonsterVisible,
-                MonsterPosition = MonsterPosition,
-                MonsterSkin = MonsterSkin,
-                MonsterFacing = MonsterFacing
-            }, ct);
+            await SendPacketAsync(GetFromP3DPlayerState(this, this), ct);
         }
 
         private async Task HandleChatMessageAsync(ChatMessageGlobalPacket packet, CancellationToken ct)
@@ -308,7 +290,8 @@ namespace P3D.Legacy.Server.Services.Server
                 ServerMessage = _serverOptions.ServerMessage,
             }, ct);
 
-            _lifetimeNotificationFeature.RequestClose();
+            var lifetimeNotificationFeature = Features.Get<IConnectionLifetimeNotificationFeature>();
+            lifetimeNotificationFeature.RequestClose();
         }
     }
 }

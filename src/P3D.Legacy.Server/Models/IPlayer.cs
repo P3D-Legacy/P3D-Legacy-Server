@@ -1,6 +1,9 @@
-﻿using P3D.Legacy.Common;
+﻿using Microsoft.AspNetCore.Http.Features;
+
+using P3D.Legacy.Common;
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,22 +11,16 @@ namespace P3D.Legacy.Server.Models
 {
     public record ServerPlayer : IPlayer
     {
-        public string ConnectionId { get; } = "SERVER";
-        public Origin Id { get; } = Origin.Server;
-        public string Name { get; } = "Server";
-        public ulong GameJoltId { get; } = 0;
-        public Permissions Permissions { get; } = Permissions.Server;
+        public string ConnectionId => "SERVER";
+        public Origin Id => Origin.Server;
+        public string Name => "Server";
+        public ulong GameJoltId => 0;
+        public Permissions Permissions => Permissions.Server;
+
+        public IFeatureCollection Features { get; } = new FeatureCollection();
 
         public Task AssignIdAsync(long id, CancellationToken ct) => throw new NotSupportedException();
         public Task AssignPermissionsAsync(Permissions permissions, CancellationToken ct) => throw new NotSupportedException();
-
-        public void Deconstruct(out Origin id, out string name, out ulong gameJoltId, out string connectionId)
-        {
-            id = Id;
-            name = Name;
-            gameJoltId = GameJoltId;
-            connectionId = ConnectionId;
-        }
     }
 
     [Flags]
@@ -53,6 +50,8 @@ namespace P3D.Legacy.Server.Models
         string Name { get; }
         ulong GameJoltId { get; }
         Permissions Permissions { get; }
+
+        IFeatureCollection Features { get; }
 
         Task AssignIdAsync(long id, CancellationToken ct);
         Task AssignPermissionsAsync(Permissions permissions, CancellationToken ct);

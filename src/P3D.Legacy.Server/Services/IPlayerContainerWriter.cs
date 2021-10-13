@@ -8,6 +8,6 @@ namespace P3D.Legacy.Server.Services
     public interface IPlayerContainerWriter
     {
         Task AddAsync(IPlayer player, CancellationToken ct);
-        Task RemoveAsync(IPlayer player, CancellationToken ct);
+        Task<bool> RemoveAsync(IPlayer player, CancellationToken ct);
     }
 }

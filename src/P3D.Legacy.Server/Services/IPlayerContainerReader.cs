@@ -10,5 +10,6 @@ namespace P3D.Legacy.Server.Services
     {
         Task<IPlayer?> GetAsync(long id, CancellationToken ct);
         IAsyncEnumerable<IPlayer> GetAllAsync(CancellationToken ct);
+        IEnumerable<IPlayer> GetAll();
     }
 }

@@ -4,7 +4,7 @@ namespace P3D.Legacy.Common
 {
     public readonly struct Origin : IEquatable<Origin>
     {
-        public static Origin Server => new(-1);
+        public static Origin Server { get; } = new(-1);
 
         public static implicit operator Origin(int value) => new(value);
         public static implicit operator Origin(long value) => new(value);

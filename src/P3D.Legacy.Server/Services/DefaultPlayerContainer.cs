@@ -37,16 +37,19 @@ namespace P3D.Legacy.Server.Services
 
         public Task<IPlayer?> GetAsync(long id, CancellationToken ct) => Task.FromResult(_connections.FirstOrDefault(x => x.Id == id));
         public IAsyncEnumerable<IPlayer> GetAllAsync(CancellationToken ct) => _connections.ToAsyncEnumerable();
+        public IEnumerable<IPlayer> GetAll() => _connections;
+
         public Task AddAsync(IPlayer player, CancellationToken ct)
         {
             _connections = _connections.Add(player);
             return Task.CompletedTask;
         }
 
-        public Task RemoveAsync(IPlayer player, CancellationToken ct)
+        public Task<bool> RemoveAsync(IPlayer player, CancellationToken ct)
         {
+            var oldConnections = _connections;
             _connections = _connections.Remove(player);
-            return Task.CompletedTask;
+            return Task.FromResult(!ReferenceEquals(oldConnections, _connections));
         }
     }
 }

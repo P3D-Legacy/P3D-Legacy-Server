@@ -3,6 +3,7 @@
 using MediatR;
 
 using Microsoft.AspNetCore.Connections.Features;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -11,7 +12,6 @@ using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Server.Commands;
 using P3D.Legacy.Server.Models;
 using P3D.Legacy.Server.Models.Options;
-using P3D.Legacy.Server.Queries.Permissions;
 using P3D.Legacy.Server.Queries.Players;
 using P3D.Legacy.Server.Services.Connections;
 
@@ -28,18 +28,19 @@ namespace P3D.Legacy.Server.Services.Server
 
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
+        private readonly IPlayerContainerReader _playerContainer;
         private readonly IPlayerQueries _playerQueries;
         private readonly P3DProtocol _protocol;
         private readonly WorldService _worldService;
         private readonly ServerOptions _serverOptions;
 
-        private IConnectionLifetimeNotificationFeature _lifetimeNotificationFeature = default!;
         private ProtocolWriter _writer = default!;
         private P3DConnectionState _connectionState = P3DConnectionState.None;
 
         public P3DConnectionContextHandler(
             ILogger<P3DConnectionContextHandler> logger,
             P3DProtocol protocol,
+            IPlayerContainerReader playerContainer,
             IPlayerQueries playerQueries,
             WorldService worldService,
             IOptions<ServerOptions> serverOptions,
@@ -47,6 +48,7 @@ namespace P3D.Legacy.Server.Services.Server
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));
+            _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
             _playerQueries = playerQueries ?? throw new ArgumentNullException(nameof(playerQueries));
             _worldService = worldService ?? throw new ArgumentNullException(nameof(worldService));
             _serverOptions = serverOptions.Value ?? throw new ArgumentNullException(nameof(serverOptions));
@@ -55,13 +57,12 @@ namespace P3D.Legacy.Server.Services.Server
 
         protected override async Task OnCreatedAsync(CancellationToken ct)
         {
-            _lifetimeNotificationFeature = Connection.Features.Get<IConnectionLifetimeNotificationFeature>();
+            Features = new FeatureCollection(Connection.Features);
+            Features.Set(this as IP3DPlayerState);
 
-            var connectionIdFeature = Connection.Features.Get<IConnectionIdFeature>();
-            ConnectionId = connectionIdFeature.ConnectionId;
+            ConnectionId = Features.Get<IConnectionIdFeature>().ConnectionId;
 
-            var connectionCompleteFeature = Connection.Features.Get<IConnectionCompleteFeature>();
-            connectionCompleteFeature.OnCompleted(async _ =>
+            Features.Get<IConnectionCompleteFeature>().OnCompleted(async _ =>
             {
                 _connectionState = P3DConnectionState.Finalized;
                 await _mediator.Send(new PlayerFinalizingCommand(this), CancellationToken.None);

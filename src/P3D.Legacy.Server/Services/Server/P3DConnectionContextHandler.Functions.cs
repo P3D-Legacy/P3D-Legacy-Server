@@ -1,6 +1,7 @@
 ﻿using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Chat;
+using P3D.Legacy.Common.Packets.Shared;
 using P3D.Legacy.Server.Models;
 
 using System;
@@ -11,6 +12,26 @@ namespace P3D.Legacy.Server.Services.Server
 {
     public partial class P3DConnectionContextHandler
     {
+        private static GameDataPacket GetFromP3DPlayerState(IPlayer player, IP3DPlayerState state) => new()
+        {
+            Origin = player.Id,
+            GameMode = state.GameMode,
+            IsGameJoltPlayer = state.IsGameJoltPlayer,
+            GameJoltId = player.GameJoltId,
+            DecimalSeparator = state.DecimalSeparator,
+            Name = player.Name,
+            LevelFile = state.LevelFile,
+            Position = state.Position,
+            Facing = state.Facing,
+            Moving = state.Moving,
+            Skin = state.Skin,
+            BusyType = state.BusyType,
+            MonsterVisible = state.MonsterVisible,
+            MonsterPosition = state.MonsterPosition,
+            MonsterSkin = state.MonsterSkin,
+            MonsterFacing = state.MonsterFacing
+        };
+
         private bool IsOfficialGameMode =>
             string.Equals(GameMode, "Kolben", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(GameMode, "Pokemon3D", StringComparison.OrdinalIgnoreCase) ||
@@ -36,6 +57,13 @@ namespace P3D.Legacy.Server.Services.Server
             Permissions = permissions;
 
             return Task.CompletedTask;
+        }
+
+        public TFeature? GetFeature<TFeature>()
+        {
+            if (this is TFeature feature)
+                return feature;
+            return default;
         }
 
         private async Task SendPacketAsync(P3DPacket packet, CancellationToken ct) => await _writer.WriteAsync(_protocol, packet, ct);

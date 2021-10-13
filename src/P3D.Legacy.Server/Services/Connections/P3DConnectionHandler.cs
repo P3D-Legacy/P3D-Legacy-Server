@@ -33,7 +33,7 @@ namespace P3D.Legacy.Server.Services.Connections
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
         private readonly HashSet<P3DConnectionContextHandler> _connections = new(new P3DConnectionContextHandlerEqualityComparer());
-        private readonly ConcurrentBag<IServiceScope> _scopes = new();
+        private readonly ConcurrentBag<IServiceScope> _connectionScopes = new();
 
         public P3DConnectionHandler(ILogger<P3DConnectionHandler> logger, IServiceScopeFactory serviceScopeFactory)
         {
@@ -43,10 +43,10 @@ namespace P3D.Legacy.Server.Services.Connections
 
         public override async Task OnConnectedAsync(ConnectionContext connection)
         {
-            var scope = _serviceScopeFactory.CreateScope();
-            _scopes.Add(scope);
+            var connectionScope = _serviceScopeFactory.CreateScope();
+            _connectionScopes.Add(connectionScope);
 
-            var connectionContextHandlerFactory = scope.ServiceProvider.GetRequiredService<ConnectionContextHandlerFactory>();
+            var connectionContextHandlerFactory = connectionScope.ServiceProvider.GetRequiredService<ConnectionContextHandlerFactory>();
 
             if (await connectionContextHandlerFactory.CreateAsync<P3DConnectionContextHandler>(connection) is { } connectionContextHandler)
             {
@@ -66,7 +66,7 @@ namespace P3D.Legacy.Server.Services.Connections
 
         public void Dispose()
         {
-            foreach (var scope in _scopes)
+            foreach (var scope in _connectionScopes)
             {
                 scope.Dispose();
             }

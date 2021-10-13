@@ -4,6 +4,7 @@ using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets.Chat;
 using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Common.Packets.Shared;
+using P3D.Legacy.Server.Models;
 using P3D.Legacy.Server.Notifications;
 
 using System;
@@ -24,7 +25,22 @@ namespace P3D.Legacy.Server.Services.Server
         {
             var (id, name, _) = notification;
 
-            await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerId = id }, ct);
+            if (Id == id)
+            {
+                await foreach (var player in _playerContainer.GetAllAsync(ct))
+                {
+                    if (player.Features.Get<IP3DPlayerState>() is { } state)
+                    {
+                        await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerId = player.Id }, ct);
+                        await SendPacketAsync(GetFromP3DPlayerState(player, state), ct);
+                    }
+                }
+            }
+            else
+            {
+                await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerId = id }, ct);
+            }
+
             await SendServerMessageAsync($"Player {name} joined the game!", ct);
         }
 
