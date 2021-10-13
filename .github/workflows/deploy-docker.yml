@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: 'p3d-backend'
-      url: 'karp.pokemon3d.net:15134'
+      url: 'https://karp.pokemon3d.net'
     steps:
     - uses: appleboy/ssh-action@master
       with:
