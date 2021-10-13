@@ -69,7 +69,7 @@ namespace P3D.Legacy.Server.Services.Server
                 return false;
             }
 
-            _logger.LogInformation("Received a message type {Type}", packet.GetType());
+            _logger.LogTrace("Received a message type {Type}", packet.GetType());
             message = packet;
             return true;
 
@@ -77,7 +77,7 @@ namespace P3D.Legacy.Server.Services.Server
 
         public void WriteMessage(P3DPacket message, IBufferWriter<byte> output)
         {
-            _logger.LogInformation("Sending a message type {Type}", message.GetType());
+            _logger.LogTrace("Sending a message type {Type}", message.GetType());
             var text = $"{message.CreateData()}\r\n";
             output.Write(Encoding.ASCII.GetBytes(text));
         }
