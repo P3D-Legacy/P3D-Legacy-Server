@@ -11,9 +11,10 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment:
-      name: 'p3d-backend'
-      url: 'karp.pokemon3d.net:15134'
+      name: 'next-p3d-backend'
+      url: 'https://karp.pokemon3d.net'
     steps:
+    
     - uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
@@ -23,4 +24,19 @@ jobs:
         script: |
           docker login -u=P3D-Legacy -p=${{ secrets.TOKEN_GPR }} ghcr.io
           docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest;
-          docker stack deploy --prune --resolve-image always -c /deploy/next-p3d-legacy-server/docker-compose.yml nextp3dlegacyserver;
+          docker stack deploy --prune --resolve-image always --with-registry-auth -c /deploy/next-p3d-legacy-server/docker-compose.yml nextp3dlegacyserver;
+          
+    - uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.WEBHOOK }}
+        nocontext: true
+        title: "Deployment of 'P3D Legacy Server Next'"
+        #description: |
+        #  Version `1.2.3-alpha`
+        #  Click [here](https://github.com/sarisia/actions-status-discord) to download!
+          
+    #- uses: appleboy/discord-action@master
+    #  with:
+    #    webhook_id: ${{ secrets.WEBHOOK_ID }}
+    #    webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
+    #    args: "'P3D Legacy Server Next' has been deployed."
