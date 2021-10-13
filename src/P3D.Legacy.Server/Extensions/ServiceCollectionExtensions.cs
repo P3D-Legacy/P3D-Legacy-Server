@@ -10,9 +10,7 @@ using P3D.Legacy.Server.Commands;
 using P3D.Legacy.Server.Notifications;
 using P3D.Legacy.Server.Services;
 using P3D.Legacy.Server.Services.Discord;
-using P3D.Legacy.Server.Services.Server;
 
-using System.Collections.Generic;
 using System.Linq;
 
 namespace P3D.Legacy.Server.Extensions
@@ -34,7 +32,7 @@ namespace P3D.Legacy.Server.Extensions
             services.AddTransient(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentGlobalMessageNotification>>());
             services.AddTransient(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentLocalMessageNotification>>());
 
-            services.AddTransient<INotificationHandler<PlayerSentGlobalMessageNotification>>(sp => sp.GetRequiredService<DiscordPassthroughService>());
+            services.AddTransient(sp => new[] { sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerSentGlobalMessageNotification> }.AsEnumerable());
 
             services.AddTransient(typeof(IRequestPreProcessor<>), typeof(LoggingBehaviour<>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
