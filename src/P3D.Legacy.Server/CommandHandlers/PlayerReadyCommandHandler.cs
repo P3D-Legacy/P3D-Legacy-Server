@@ -28,7 +28,7 @@ namespace P3D.Legacy.Server.CommandHandlers
 
         public async Task<Unit> Handle(PlayerReadyCommand request, CancellationToken ct)
         {
-            var permissions = await _permissionQueries.GetByGameJoltAsync(request.Player.GameJoltId, ct) ?? new PermissionViewModel(Permissions.UnVerified);
+            var permissions = await _permissionQueries.GetByGameJoltAsync(request.Player.GameJoltId, ct);
             await request.Player.AssignPermissionsAsync(permissions.Permissions, ct);
 
             await _playerContainer.AddAsync(request.Player, ct);

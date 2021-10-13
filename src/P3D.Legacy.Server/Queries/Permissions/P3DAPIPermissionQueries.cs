@@ -55,8 +55,10 @@ namespace P3D.Legacy.Server.Queries.Permissions
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
-        public async Task<PermissionViewModel?> GetByGameJoltAsync(ulong id, CancellationToken ct)
+        public async Task<PermissionViewModel> GetByGameJoltAsync(ulong id, CancellationToken ct)
         {
+            var permissions = Models.Permissions.UnVerified;
+
             HttpResponseMessage response;
 
             try
@@ -68,7 +70,7 @@ namespace P3D.Legacy.Server.Queries.Permissions
             }
             catch (Exception e) when (e is TaskCanceledException)
             {
-                return null;
+                return new PermissionViewModel(permissions);
             }
 
             try
@@ -76,9 +78,11 @@ namespace P3D.Legacy.Server.Queries.Permissions
                 if (response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NoContent)
                 {
                     var content = await response.Content.ReadAsStringAsync(ct);
-                    if (JsonConvert.DeserializeObject<GameJoltResponseDTO?>(content) is { } dto)
+                    if (JsonConvert.DeserializeObject<GameJoltResponseDTO?>(content) is { User: { }, GameJolt: { } } dto)
                     {
-                        var permissions = Models.Permissions.User;
+                        permissions &= ~Models.Permissions.UnVerified;
+                        permissions |= Models.Permissions.User;
+
                         foreach (var permissionDto in dto.User.Roles.SelectMany(x => x.Permissions))
                         {
                             if (permissionDto.Name.Equals("gameserver.moderator", StringComparison.OrdinalIgnoreCase))
@@ -90,7 +94,7 @@ namespace P3D.Legacy.Server.Queries.Permissions
                         return new PermissionViewModel(permissions);
                     }
                 }
-                return null;
+                return new PermissionViewModel(permissions);
             }
             finally
             {
