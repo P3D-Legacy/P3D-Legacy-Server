@@ -1,0 +1,26 @@
+name: Deploy Docker Image
+
+on:
+  repository_dispatch:
+    types:
+      - deploy-docker-image
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: 'p3d-backend'
+      url: 'karp.pokemon3d.net:15134'
+    steps:
+    - uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          docker login -u=P3D-Legacy -p=${{ secrets.TOKEN_GPR }} ghcr.io
+          docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest;
+          docker stack deploy --prune --resolve-image always -c /deploy/next-p3d-legacy-server/docker-compose.yml nextp3dlegacyserver;
