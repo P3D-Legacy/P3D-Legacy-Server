@@ -24,3 +24,9 @@ jobs:
           docker login -u=P3D-Legacy -p=${{ secrets.TOKEN_GPR }} ghcr.io
           docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest;
           docker stack deploy --prune --resolve-image always -c /deploy/next-p3d-legacy-server/docker-compose.yml nextp3dlegacyserver;
+          
+    - uses: appleboy/discord-action@master
+      with:
+        webhook_id: ${{ secrets.WEBHOOK_ID }}
+        webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
+        args: "'P3D Legacy Server Next' has been deployed."
