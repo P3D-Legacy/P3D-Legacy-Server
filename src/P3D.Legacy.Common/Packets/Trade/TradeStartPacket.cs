@@ -2,9 +2,9 @@
 {
     public sealed record TradeStartPacket() : P3DPacket(P3DPacketType.TradeStart)
     {
-        public int DestinationPlayerId { get => DataItemStorage.GetInt32(0); init => DataItemStorage.SetInt32(0, value); }
+        public Origin DestinationPlayerId { get => DataItemStorage.GetOrigin(0); init => DataItemStorage.Set(0, value); }
 
-        public void Deconstruct(out int destinationPlayerId)
+        public void Deconstruct(out Origin destinationPlayerId)
         {
             destinationPlayerId = DestinationPlayerId;
         }

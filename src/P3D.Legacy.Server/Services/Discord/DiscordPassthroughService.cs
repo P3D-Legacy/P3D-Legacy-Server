@@ -10,9 +10,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using P3D.Legacy.Common;
+using P3D.Legacy.Server.Commands;
+using P3D.Legacy.Server.Models;
 using P3D.Legacy.Server.Models.Options;
 using P3D.Legacy.Server.Notifications;
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,22 +25,32 @@ namespace P3D.Legacy.Server.Services.Discord
     public sealed class DiscordPassthroughService : CriticalBackgroundService,
         INotificationHandler<PlayerSentGlobalMessageNotification>
     {
+        private record DiscordBotPlayer : IPlayer
+        {
+            public Origin Id { get; } = Origin.Server;
+            public string Name { get; } = "Discord Bot";
+            public ulong GameJoltId { get; } = 0;
+            public string ConnectionId { get; } = "DISCORDBOT";
+
+            public Task AssignIdAsync(long id, CancellationToken ct) => throw new NotSupportedException();
+        }
+
+        private static readonly DiscordBotPlayer DiscordPlayer = new();
+
         private readonly DiscordSocketClient _discordSocketClient;
-        //private readonly CommandService _commands;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger _logger;
+        private readonly IMediator _mediator;
         private readonly DiscordOptions _options;
 
         public DiscordPassthroughService(
             ILogger<DiscordPassthroughService> logger,
             DiscordSocketClient discordSocketClient,
-            //CommandService commands,
             IServiceScopeFactory scopeFactory,
             IOptions<DiscordOptions> options,
             IApplicationEnder applicationEnder) : base(applicationEnder)
         {
             _logger = logger;
-            //_commands = commands;
             _scopeFactory = scopeFactory;
             _options = options.Value;
             _discordSocketClient = discordSocketClient;
@@ -53,7 +67,6 @@ namespace P3D.Legacy.Server.Services.Discord
             }
 
             using var scope = _scopeFactory.CreateScope();
-           // await _commands.AddModulesAsync(typeof(DiscordCommands).Assembly, scope.ServiceProvider);
 
             if (_discordSocketClient.ConnectionState != ConnectionState.Disconnecting && _discordSocketClient.ConnectionState != ConnectionState.Disconnected)
                 return;
@@ -113,28 +126,16 @@ namespace P3D.Legacy.Server.Services.Discord
 
         private async Task BotMessageReceivedAsync(SocketMessage arg)
         {
-            /*
             if (arg is not SocketUserMessage { Source: MessageSource.User } message) return;
             if (message.Channel is IPrivateChannel) return;
 
-            var argPos = 0;
-            if (message.HasStringPrefix("!nmm ", ref argPos) || message.HasMentionPrefix(_discordSocketClient.CurrentUser, ref argPos))
-            {
-                using var scope = _scopeFactory.CreateScope();
-                var context = new SocketCommandContext(_discordSocketClient, message);
-                var result = await _commands.ExecuteAsync(context, argPos, scope.ServiceProvider);
+            var context = new SocketCommandContext(_discordSocketClient, message);
 
-                if (result.Error.HasValue && result.Error.Value != CommandError.UnknownCommand)
-                {
-                    _logger.LogError("Error! {Result}", result.ToString());
-                    await context.Message.AddReactionAsync(new Emoji("⁉️"));
-                }
-                else if (result.Error is CommandError.UnknownCommand)
-                {
-                    await context.Message.AddReactionAsync(new Emoji("❓"));
-                }
-            }
-            */
+            var result = await _mediator.Send(new RawTextCommand(DiscordPlayer, message.Content));
+            if (result.Success)
+                await context.Message.AddReactionAsync(new Emoji("⁉️"));
+            else
+                await context.Message.AddReactionAsync(new Emoji("❓"));
         }
 
         public override void Dispose()

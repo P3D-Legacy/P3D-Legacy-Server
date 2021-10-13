@@ -8,7 +8,7 @@ namespace P3D.Legacy.Server.Services
 {
     public interface IPlayerContainerReader
     {
-        Task<IPlayer?> GetAsync(ulong id, CancellationToken ct);
+        Task<IPlayer?> GetAsync(long id, CancellationToken ct);
         IAsyncEnumerable<IPlayer> GetAllAsync(CancellationToken ct);
     }
 }

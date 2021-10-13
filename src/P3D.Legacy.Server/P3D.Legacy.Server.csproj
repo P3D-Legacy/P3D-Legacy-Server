@@ -12,7 +12,6 @@
     <PackageReference Include="Bedrock.Framework" Version="0.1.62-alpha.g8a965bbcba" />
     <PackageReference Include="BetterHostedServices" Version="2.0.3" />
     <PackageReference Include="CorrelationId" Version="3.0.1" />
-    <PackageReference Include="Discord.Net.Commands" Version="2.4.0" />
     <PackageReference Include="Discord.Net.WebSocket" Version="2.4.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />

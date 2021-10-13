@@ -17,7 +17,7 @@ namespace P3D.Legacy.Server.Queries.Players
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
         }
 
-        public async Task<PlayerViewModel?> GetAsync(ulong id, CancellationToken ct) => await _playerContainer.GetAsync(id, ct) is { } x ? new PlayerViewModel(x.Id, x.Name, x.GameJoltId) : null;
+        public async Task<PlayerViewModel?> GetAsync(long id, CancellationToken ct) => await _playerContainer.GetAsync(id, ct) is { } x ? new PlayerViewModel(x.Id, x.Name, x.GameJoltId) : null;
         public IAsyncEnumerable<PlayerViewModel> GetAllAsync(CancellationToken ct) => _playerContainer.GetAllAsync(ct).Select(x => new PlayerViewModel(x.Id, x.Name, x.GameJoltId));
     }
 }

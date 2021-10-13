@@ -6,7 +6,7 @@ namespace P3D.Legacy.Server.Queries.Players
 {
     public interface IPlayerQueries
     {
-        Task<PlayerViewModel?> GetAsync(ulong id, CancellationToken ct);
+        Task<PlayerViewModel?> GetAsync(long id, CancellationToken ct);
         IAsyncEnumerable<PlayerViewModel> GetAllAsync(CancellationToken ct);
     }
 }

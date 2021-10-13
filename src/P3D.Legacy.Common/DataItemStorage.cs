@@ -47,12 +47,16 @@ namespace P3D.Legacy.Common
         public bool GetBool(int index) => GetInt32(index) == 1;
         public int GetInt32(int index) => int.TryParse(Get(index), out var val) ? val : 0;
         public ulong GetUInt64(int index) => ulong.TryParse(Get(index), out var val) ? val : 0UL;
+        public long GetInt64(int index) => long.TryParse(Get(index), out var val) ? val : 0L;
+        public Origin GetOrigin(int index) => GetInt64(index);
 
         public void Set(int index, in ReadOnlySpan<char> value) => _dataItems[index] = value.ToString();
-        public void SetChar(int index, char value) => Set(index, value.ToString());
-        public void SetBool(int index, bool value) => SetInt32(index, value ? 1 : 0);
-        public void SetInt32(int index, int value) => Set(index, value.ToString());
-        public void SetUInt64(int index, ulong value) => Set(index, value.ToString());
+        public void Set(int index, char value) => Set(index, value.ToString());
+        public void Set(int index, bool value) => Set(index, value ? 1 : 0);
+        public void Set(int index, int value) => Set(index, value.ToString());
+        public void Set(int index, ulong value) => Set(index, value.ToString());
+        public void Set(int index, long value) => Set(index, value.ToString());
+        public void Set(int index, Origin value) => Set(index, (long) value);
 
         public override string ToString() => string.Join("*", _dataItems);
     }

@@ -17,7 +17,7 @@ namespace P3D.Legacy.Server.Services.Server
             string.Equals(GameMode, "Pokemon 3D", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(GameMode, "Pokémon 3D", StringComparison.OrdinalIgnoreCase);
 
-        public Task AssignIdAsync(ulong id, CancellationToken ct)
+        public Task AssignIdAsync(long id, CancellationToken ct)
         {
             if (Id != 0)
                 throw new InvalidOperationException("Id was already assigned!");

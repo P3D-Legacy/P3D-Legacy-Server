@@ -35,7 +35,7 @@ namespace P3D.Legacy.Server.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<IPlayer?> GetAsync(ulong id, CancellationToken ct) => Task.FromResult(_connections.FirstOrDefault(x => x.Id == id));
+        public Task<IPlayer?> GetAsync(long id, CancellationToken ct) => Task.FromResult(_connections.FirstOrDefault(x => x.Id == id));
         public IAsyncEnumerable<IPlayer> GetAllAsync(CancellationToken ct) => _connections.ToAsyncEnumerable();
         public Task AddAsync(IPlayer player, CancellationToken ct)
         {

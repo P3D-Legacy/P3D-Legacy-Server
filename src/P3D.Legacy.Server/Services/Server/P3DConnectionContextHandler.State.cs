@@ -1,4 +1,6 @@
-﻿using System.Numerics;
+﻿using P3D.Legacy.Common;
+
+using System.Numerics;
 
 namespace P3D.Legacy.Server.Services.Server
 {
@@ -6,7 +8,7 @@ namespace P3D.Legacy.Server.Services.Server
     {
         public string ConnectionId { get; private set; } = default!;
 
-        public ulong Id { get; private set; } = default!;
+        public Origin Id { get; private set; } = default!;
         public string Name { get; private set; } = default!;
         public ulong GameJoltId { get; private set; } = default!;
 

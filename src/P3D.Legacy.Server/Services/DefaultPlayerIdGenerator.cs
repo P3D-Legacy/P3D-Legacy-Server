@@ -5,8 +5,8 @@ namespace P3D.Legacy.Server.Services
 {
     public class DefaultPlayerIdGenerator : IPlayerIdGenerator
     {
-        private ulong _globalPlayerIncrement;
+        private long _globalPlayerIncrement;
 
-        public Task<ulong> GenerateAsync(CancellationToken ct) => Task.FromResult(Interlocked.Increment(ref _globalPlayerIncrement));
+        public Task<long> GenerateAsync(CancellationToken ct) => Task.FromResult(Interlocked.Increment(ref _globalPlayerIncrement));
     }
 }
