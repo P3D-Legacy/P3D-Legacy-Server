@@ -1,4 +1,5 @@
 ﻿using P3D.Legacy.Common;
+using P3D.Legacy.Server.Models;
 
 using System.Numerics;
 
@@ -11,6 +12,7 @@ namespace P3D.Legacy.Server.Services.Server
         public Origin Id { get; private set; } = default!;
         public string Name { get; private set; } = default!;
         public ulong GameJoltId { get; private set; } = default!;
+        public Permissions Permissions { get; private set; } = default!;
 
 
         private string GameMode { get; set; } = default!;

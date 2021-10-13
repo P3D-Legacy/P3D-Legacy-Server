@@ -20,6 +20,7 @@ using Microsoft.Extensions.Options;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Server.Extensions;
 using P3D.Legacy.Server.Models.Options;
+using P3D.Legacy.Server.Queries.Permissions;
 using P3D.Legacy.Server.Queries.Players;
 using P3D.Legacy.Server.Services;
 using P3D.Legacy.Server.Services.Connections;
@@ -91,6 +92,7 @@ namespace P3D.Legacy.Server
 
                 services.AddSingleton<IPlayerIdGenerator, DefaultPlayerIdGenerator>();
 
+                services.AddTransient<IPermissionQueries, P3DAPIPermissionQueries>();
                 services.AddTransient<IPlayerQueries, PlayerQueries>();
 
                 services.AddSingleton<DefaultPlayerContainer>();

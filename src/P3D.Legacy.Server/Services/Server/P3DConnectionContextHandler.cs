@@ -11,6 +11,7 @@ using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Server.Commands;
 using P3D.Legacy.Server.Models;
 using P3D.Legacy.Server.Models.Options;
+using P3D.Legacy.Server.Queries.Permissions;
 using P3D.Legacy.Server.Queries.Players;
 using P3D.Legacy.Server.Services.Connections;
 
@@ -26,17 +27,23 @@ namespace P3D.Legacy.Server.Services.Server
         private enum P3DConnectionState { None, Initializing, Intitialized, Finalized }
 
         private readonly ILogger _logger;
-        private readonly P3DProtocol _protocol;
+        private readonly IMediator _mediator;
         private readonly IPlayerQueries _playerQueries;
+        private readonly P3DProtocol _protocol;
         private readonly WorldService _worldService;
         private readonly ServerOptions _serverOptions;
-        private readonly IMediator _mediator;
 
         private IConnectionLifetimeNotificationFeature _lifetimeNotificationFeature = default!;
         private ProtocolWriter _writer = default!;
         private P3DConnectionState _connectionState = P3DConnectionState.None;
 
-        public P3DConnectionContextHandler(ILogger<P3DConnectionContextHandler> logger, P3DProtocol protocol, IPlayerQueries playerQueries, WorldService worldService, IOptions<ServerOptions> serverOptions, IMediator mediator)
+        public P3DConnectionContextHandler(
+            ILogger<P3DConnectionContextHandler> logger,
+            P3DProtocol protocol,
+            IPlayerQueries playerQueries,
+            WorldService worldService,
+            IOptions<ServerOptions> serverOptions,
+            IMediator mediator)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));

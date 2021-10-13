@@ -24,7 +24,8 @@ namespace P3D.Legacy.Server.CommandHandlers
 
         public async Task<Unit> Handle(PlayerInitializingCommand request, CancellationToken ct)
         {
-            await request.Player.AssignIdAsync(await _playerIdGenerator.GenerateAsync(ct), ct);
+            var id = await _playerIdGenerator.GenerateAsync(ct);
+            await request.Player.AssignIdAsync(id, ct);
 
             return Unit.Value;
         }

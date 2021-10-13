@@ -15,6 +15,7 @@ using P3D.Legacy.Server.Commands;
 using P3D.Legacy.Server.Models;
 using P3D.Legacy.Server.Models.Options;
 using P3D.Legacy.Server.Notifications;
+using P3D.Legacy.Server.Queries.Permissions;
 
 using System;
 using System.Threading;
@@ -25,17 +26,20 @@ namespace P3D.Legacy.Server.Services.Discord
     public sealed class DiscordPassthroughService : CriticalBackgroundService,
         INotificationHandler<PlayerSentGlobalMessageNotification>
     {
+        /*
         private record DiscordBotPlayer : IPlayer
         {
             public Origin Id { get; } = Origin.Server;
             public string Name { get; } = "Discord Bot";
             public ulong GameJoltId { get; } = 0;
             public string ConnectionId { get; } = "DISCORDBOT";
+            public Permissions Permissions { get; } = Permissions.Administrator;
 
             public Task AssignIdAsync(long id, CancellationToken ct) => throw new NotSupportedException();
         }
+        */
 
-        private static readonly DiscordBotPlayer DiscordPlayer = new();
+        //private static readonly IPlayer DiscordPlayer = new();
 
         private readonly DiscordSocketClient _discordSocketClient;
         private readonly IServiceScopeFactory _scopeFactory;
@@ -48,11 +52,13 @@ namespace P3D.Legacy.Server.Services.Discord
             DiscordSocketClient discordSocketClient,
             IServiceScopeFactory scopeFactory,
             IOptions<DiscordOptions> options,
+            IMediator mediator,
             IApplicationEnder applicationEnder) : base(applicationEnder)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
             _options = options.Value;
+            _mediator = mediator;
             _discordSocketClient = discordSocketClient;
         }
 
@@ -131,11 +137,11 @@ namespace P3D.Legacy.Server.Services.Discord
 
             var context = new SocketCommandContext(_discordSocketClient, message);
 
-            var result = await _mediator.Send(new RawTextCommand(DiscordPlayer, message.Content));
-            if (result.Success)
-                await context.Message.AddReactionAsync(new Emoji("⁉️"));
-            else
-                await context.Message.AddReactionAsync(new Emoji("❓"));
+            //var result = await _mediator.Send(new RawTextCommand(DiscordPlayer, message.Content));
+            //if (result.Success)
+            //    await context.Message.AddReactionAsync(new Emoji("⁉️"));
+            //else
+            //    await context.Message.AddReactionAsync(new Emoji("❓"));
         }
 
         public override void Dispose()

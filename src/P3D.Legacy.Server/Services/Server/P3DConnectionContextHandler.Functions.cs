@@ -1,6 +1,7 @@
 ﻿using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Chat;
+using P3D.Legacy.Server.Models;
 
 using System;
 using System.Threading;
@@ -23,6 +24,16 @@ namespace P3D.Legacy.Server.Services.Server
                 throw new InvalidOperationException("Id was already assigned!");
 
             Id = id;
+
+            return Task.CompletedTask;
+        }
+
+        public Task AssignPermissionsAsync(Permissions permissions, CancellationToken ct)
+        {
+            if (Permissions != Permissions.None)
+                throw new InvalidOperationException("Permissions were already assigned!");
+
+            Permissions = permissions;
 
             return Task.CompletedTask;
         }
