@@ -22,19 +22,23 @@ namespace P3D.Legacy.Server.Extensions
         {
             ServiceRegistrar.AddRequiredServices(services, new MediatRServiceConfiguration().AsTransient());
 
-            services.AddTransient<IRequestHandler<PlayerFinalizingCommand, Unit>, PlayerFinalizingCommandHandler>();
-            services.AddTransient<IRequestHandler<PlayerInitializingCommand, Unit>, PlayerInitializingCommandHandler>();
-            services.AddTransient<IRequestHandler<PlayerReadyCommand, Unit>, PlayerReadyCommandHandler>();
+            new RequestRegistrar
+            {
+                { typeof(IRequestHandler<PlayerFinalizingCommand, Unit>), typeof(PlayerFinalizingCommandHandler) },
+                { typeof(IRequestHandler<PlayerInitializingCommand, Unit>), typeof(PlayerInitializingCommandHandler) },
+                { typeof(IRequestHandler<PlayerReadyCommand, Unit>), typeof(PlayerReadyCommandHandler) },
+            }.Register(services);
 
             new NotificationRegistrar
             {
-                sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerJoinedNotification>>(),
-                sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerLeavedNotification>>(),
-                sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentGameDataNotification>>(),
-                sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentGlobalMessageNotification>>(),
-                sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentLocalMessageNotification>>(),
+                { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerJoinedNotification>>() },
+                { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerLeavedNotification>>() },
+                { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentGameDataNotification>>() },
+                { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentGlobalMessageNotification>>() },
+                { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentLocalMessageNotification>>() },
 
-                sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerSentGlobalMessageNotification>
+                //{ sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerSentGlobalMessageNotification> },
+                { typeof(INotificationHandler<PlayerSentGlobalMessageNotification>), typeof(DiscordPassthroughService) },
             }.Register(services);
 
             services.AddTransient(typeof(IRequestPreProcessor<>), typeof(LoggingBehaviour<>));

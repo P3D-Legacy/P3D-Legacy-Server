@@ -68,7 +68,7 @@ namespace P3D.Legacy.Server.Queries.Permissions
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);
             }
-            catch (Exception e) when (e is TaskCanceledException)
+            catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
             {
                 return new PermissionViewModel(permissions);
             }
