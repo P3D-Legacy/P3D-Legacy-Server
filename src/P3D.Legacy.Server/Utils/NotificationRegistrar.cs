@@ -41,16 +41,10 @@ namespace P3D.Legacy.Server.Utils
 
         public void Add(Type @base, Type impl)
         {
-            if (!ReflectionUtils.IsAssignableToGenericType(@base, typeof(INotificationHandler<>)))
-                throw new Exception();
-
-            if (!ReflectionUtils.IsAssignableToGenericType(impl, typeof(INotificationHandler<>)))
+            if (!@base.IsInterface || @base.GetGenericTypeDefinition() != typeof(INotificationHandler<>))
                 throw new Exception();
 
             if (!@base.IsAssignableFrom(impl))
-                throw new Exception();
-
-            if (@base.GenericTypeArguments.Length != 1)
                 throw new Exception();
 
             var notificationType = @base.GenericTypeArguments[0];

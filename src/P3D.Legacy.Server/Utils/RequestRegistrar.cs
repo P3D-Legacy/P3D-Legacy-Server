@@ -34,14 +34,14 @@ namespace P3D.Legacy.Server.Utils
 
         public void Add(Type @base, Type impl)
         {
-            if (!ReflectionUtils.IsAssignableToGenericType(@base, typeof(IRequestHandler<,>)))
-                throw new Exception();
-
-            if (!ReflectionUtils.IsAssignableToGenericType(impl, typeof(IRequestHandler<,>)))
+            if (!@base.IsInterface || (@base.GetGenericTypeDefinition() != typeof(IRequestHandler<>) && @base.GetGenericTypeDefinition() != typeof(IRequestHandler<,>)))
                 throw new Exception();
 
             if (!@base.IsAssignableFrom(impl))
                 throw new Exception();
+
+            if (@base.GenericTypeArguments.Length != 2)
+                @base = typeof(IRequestHandler<,>).MakeGenericType(@base.GenericTypeArguments[0], typeof(Unit));
 
             _direct[@base] = impl;
         }

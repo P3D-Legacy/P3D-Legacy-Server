@@ -24,9 +24,9 @@ namespace P3D.Legacy.Server.Extensions
 
             new RequestRegistrar
             {
-                { typeof(IRequestHandler<PlayerFinalizingCommand, Unit>), typeof(PlayerFinalizingCommandHandler) },
-                { typeof(IRequestHandler<PlayerInitializingCommand, Unit>), typeof(PlayerInitializingCommandHandler) },
-                { typeof(IRequestHandler<PlayerReadyCommand, Unit>), typeof(PlayerReadyCommandHandler) },
+                { typeof(IRequestHandler<PlayerFinalizingCommand>), typeof(PlayerFinalizingCommandHandler) },
+                { typeof(IRequestHandler<PlayerInitializingCommand>), typeof(PlayerInitializingCommandHandler) },
+                { typeof(IRequestHandler<PlayerReadyCommand>), typeof(PlayerReadyCommandHandler) },
             }.Register(services);
 
             new NotificationRegistrar
