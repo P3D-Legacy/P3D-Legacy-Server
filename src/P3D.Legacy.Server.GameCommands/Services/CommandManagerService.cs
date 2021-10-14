@@ -1,40 +1,42 @@
-﻿using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.GameCommands.Managers;
+﻿using MediatR;
+
+using Microsoft.Extensions.Logging;
+
+using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Application.Notifications;
+using P3D.Legacy.Server.GameCommands.CommandManagers;
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
-using PCLExt.Config;
-
-using PokeD.Core;
-using PokeD.Core.Data;
-using PokeD.Core.Packets.P3D.Shared;
-using PokeD.Core.Services;
-using PokeD.Server.Chat;
-using PokeD.Server.Clients;
-using PokeD.Server.Commands;
-using PokeD.Server.Data;
-using PokeD.Server.Database;
-using PokeD.Server.Modules;
-
-namespace PokeD.Server.Services
+namespace P3D.Legacy.Server.GameCommands.Services
 {
-    public class CommandManagerService
+    public sealed class CommandManagerService
     {
-        private List<CommandManager> Commands { get; } = new();
+        private readonly ILogger _logger;
+        private readonly IMediator _mediator;
+        private readonly IReadOnlyList<CommandManager> _commandManagers;
 
-        private bool IsDisposed { get; set; }
+        public CommandManagerService(ILogger logger, IMediator mediator, IEnumerable<CommandManager> commandManagers)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _commandManagers = commandManagers.ToList() ?? throw new ArgumentNullException(nameof(commandManagers));
+        }
 
-        public CommandManagerService(IServiceContainer services, ConfigType configType) : base(services, configType) { }
+        private async Task SendMessageAsync(IPlayer player, string message, CancellationToken ct)
+        {
+            await _mediator.Publish(new MessageToPlayerNotification(IPlayer.Server, player, message), ct);
+        }
 
         /// <summary>
-        /// Return <see langword="false"/> if <see cref="Command"/> not found.
+        /// Return <see langword="false"/> if <see cref="CommandManager"/> not found.
         /// </summary>
-        public bool ExecuteClientCommand(IPlayer client, string message)
+        public async Task<bool> ExecuteClientCommandAsync(IPlayer client, string message, CancellationToken ct)
         {
             var commandWithoutSlash = message.TrimStart('/');
 
@@ -47,99 +49,44 @@ namespace PokeD.Server.Services
             var alias = messageArray[0];
             var trimmedMessageArray = messageArray.Skip(1).ToArray();
 
-            if (!Commands.Any(c => c.Name == alias || c.Aliases.Any(a => a == alias)))
+            if (!_commandManagers.Any(c => c.Name == alias || c.Aliases.Any(a => a == alias)))
                 return false; // command not found
 
-            HandleCommand(client, alias, trimmedMessageArray);
+            await HandleCommandAsync(client, alias, trimmedMessageArray, ct);
 
             return true;
         }
 
-        /// <summary>
-        /// Return <see langword="false"/> if <see cref="Command"/> not found.
-        /// </summary>
-        public bool ExecuteServerCommand(string message) => ExecuteClientCommand(new ServerClient(null), message);
-
-        private void HandleCommand(IPlayer client, string alias, string[] arguments)
+        private async Task HandleCommandAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
         {
             var command = FindByName(alias) ?? FindByAlias(alias);
             if (command == null)
             {
-                client.SendServerMessage($@"Invalid command ""{alias}"".");
+                await SendMessageAsync(client, $@"Invalid command ""{alias}"".", ct);
                 return;
             }
 
             if(command.LogCommand && (client.Permissions & PermissionFlags.UnVerified) == 0)
-                Logger.LogCommandMessage(client.Name, $"/{alias} {string.Join(" ", arguments)}");
+                _logger.LogInformation("{PlayerName}: /{CommandAlias} {CommandArgs}", client.Name, alias, string.Join(" ", arguments));
 
             if (command.Permissions == PermissionFlags.None)
             {
-                client.SendServerMessage(@"Command is disabled!");
+                await SendMessageAsync(client, @"Command is disabled!", ct);
                 return;
             }
 
             if ((client.Permissions & command.Permissions) == PermissionFlags.None)
             {
-                client.SendServerMessage(@"You have not the permission to use this command!");
+                await SendMessageAsync(client, @"You have not the permission to use this command!", ct);
                 return;
             }
 
-            command.Handle(client, alias, arguments);
+            await command.HandleAsync(client, alias, arguments, ct);
         }
 
-        public CommandManager FindByName(string name) => Commands.Find(command => command.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        public CommandManager FindByAlias(string alias) => Commands.Find(command => command.Aliases.Contains(alias, StringComparer.OrdinalIgnoreCase));
+        public CommandManager? FindByName(string name) => _commandManagers.FirstOrDefault(command => command.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        public CommandManager? FindByAlias(string alias) => _commandManagers.FirstOrDefault(command => command.Aliases.Contains(alias, StringComparer.OrdinalIgnoreCase));
 
-        public IReadOnlyList<CommandManager> GetCommands() => Commands;
-
-
-        public override bool Start()
-        {
-            Logger.Log(LogType.Debug, "Loading Commands...");
-            LoadCommands();
-            Logger.Log(LogType.Debug, "Loaded Commands.");
-            return true;
-        }
-        public override bool Stop()
-        {
-            Logger.Log(LogType.Debug, "Unloading Commands...");
-            Commands.Clear();
-            Logger.Log(LogType.Debug, "Unloaded Commands.");
-            return true;
-        }
-        private void LoadCommands()
-        {
-            var types = typeof(CommandManagerService).GetTypeInfo().Assembly.DefinedTypes
-                .Where(typeInfo => typeof(CommandManager).GetTypeInfo().IsAssignableFrom(typeInfo) &&
-                !typeInfo.IsDefined(typeof(CommandDisableAutoLoadAttribute), true) &&
-                !typeInfo.IsAbstract);
-
-            foreach (var command in types.Where(type => !Equals(type, typeof(ScriptCommand).GetTypeInfo())).Select(type => (CommandManager) Activator.CreateInstance(type.AsType(), Services)))
-                Commands.Add(command);
-
-
-            var scriptCommandLoaderTypes = typeof(CommandManagerService).GetTypeInfo().Assembly.DefinedTypes
-                .Where(typeInfo => typeof(ScriptCommandLoader).GetTypeInfo().IsAssignableFrom(typeInfo) &&
-                !typeInfo.IsDefined(typeof(CommandDisableAutoLoadAttribute), true) &&
-                !typeInfo.IsAbstract);
-
-            foreach (var scriptCommandLoader in scriptCommandLoaderTypes.Where(type => type != typeof(ScriptCommandLoader).GetTypeInfo()).Select(type => (ScriptCommandLoader) Activator.CreateInstance(type.AsType())))
-                Commands.AddRange(scriptCommandLoader.LoadCommands(Services));
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                if (disposing)
-                {
-                    Commands.Clear();
-                }
-
-
-                IsDisposed = true;
-            }
-            base.Dispose(disposing);
-        }
+        public IReadOnlyList<CommandManager> GetCommands() => _commandManagers;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Common.Packets;
-using P3D.Legacy.Server.Models;
+using P3D.Legacy.Server.Abstractions;
 
 namespace P3D.Legacy.Server.Notifications
 {

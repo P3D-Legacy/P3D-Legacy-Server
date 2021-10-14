@@ -49,9 +49,9 @@ namespace P3D.Legacy.Server.Services.Server
             return Task.CompletedTask;
         }
 
-        public Task AssignPermissionsAsync(Permissions permissions, CancellationToken ct)
+        public Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct)
         {
-            if (Permissions != Permissions.None)
+            if (Permissions != PermissionFlags.None)
                 throw new InvalidOperationException("Permissions were already assigned!");
 
             Permissions = permissions;

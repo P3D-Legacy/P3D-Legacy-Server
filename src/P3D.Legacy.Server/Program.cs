@@ -25,7 +25,6 @@ using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.BackgroundServices;
 using P3D.Legacy.Server.Extensions;
 using P3D.Legacy.Server.Models.Options;
-using P3D.Legacy.Server.Services;
 using P3D.Legacy.Server.Services.Connections;
 using P3D.Legacy.Server.Services.Server;
 using P3D.Legacy.Server.Utils.HttpLogging;

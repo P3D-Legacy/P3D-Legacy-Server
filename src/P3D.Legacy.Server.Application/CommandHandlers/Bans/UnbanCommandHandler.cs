@@ -18,7 +18,7 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Bans
         private readonly IMediator _mediator;
         private readonly BanRepository _banRepository;
 
-        public UnbanCommandHandler(ILogger<BanCommandHandler> logger, IMediator mediator, BanRepository banRepository)
+        public UnbanCommandHandler(ILogger<UnbanCommandHandler> logger, IMediator mediator, BanRepository banRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));

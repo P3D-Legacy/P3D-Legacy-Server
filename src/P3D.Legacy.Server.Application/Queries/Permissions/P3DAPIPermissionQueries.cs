@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using P3D.Legacy.Server.Abstractions;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,7 +59,7 @@ namespace P3D.Legacy.Server.Application.Queries.Permissions
 
         public async Task<PermissionViewModel> GetByGameJoltAsync(ulong id, CancellationToken ct)
         {
-            var permissions = Abstractions.Permissions.UnVerified;
+            var permissions = PermissionFlags.UnVerified;
 
             HttpResponseMessage response;
 
@@ -80,16 +82,16 @@ namespace P3D.Legacy.Server.Application.Queries.Permissions
                     var content = await response.Content.ReadAsStringAsync(ct);
                     if (JsonConvert.DeserializeObject<GameJoltResponseDTO?>(content) is { User: { }, GameJolt: { } } dto)
                     {
-                        permissions &= ~Abstractions.Permissions.UnVerified;
-                        permissions |= Abstractions.Permissions.User;
+                        permissions &= ~PermissionFlags.UnVerified;
+                        permissions |= PermissionFlags.User;
 
                         foreach (var permissionDto in dto.User.Roles.SelectMany(x => x.Permissions))
                         {
                             if (permissionDto.Name.Equals("gameserver.moderator", StringComparison.OrdinalIgnoreCase))
-                                permissions |= Abstractions.Permissions.Administrator;
+                                permissions |= PermissionFlags.Administrator;
 
                             if (permissionDto.Name.Equals("gameserver.admin", StringComparison.OrdinalIgnoreCase))
-                                permissions |= Abstractions.Permissions.Administrator;
+                                permissions |= PermissionFlags.Administrator;
                         }
                         return new PermissionViewModel(permissions);
                     }

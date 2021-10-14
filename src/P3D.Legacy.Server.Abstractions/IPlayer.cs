@@ -17,12 +17,12 @@ namespace P3D.Legacy.Server.Abstractions
         Origin Id { get; }
         string Name { get; }
         GameJoltId GameJoltId { get; }
-        Permissions Permissions { get; }
+        PermissionFlags Permissions { get; }
         IPAddress IPAddress { get; }
 
         IFeatureCollection Features { get; }
 
         Task AssignIdAsync(long id, CancellationToken ct);
-        Task AssignPermissionsAsync(Permissions permissions, CancellationToken ct);
+        Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct);
     }
 }

@@ -4,10 +4,9 @@ using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Application.Commands;
 using P3D.Legacy.Server.GameCommands.Commands;
+using P3D.Legacy.Server.GameCommands.Services;
 
 using System;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,38 +17,21 @@ namespace P3D.Legacy.Server.GameCommands.CommandHandlers
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
+        private readonly CommandManagerService _commandManagerService;
 
-        public RawGameCommandHandler(ILogger<RawGameCommandHandler> logger, IMediator mediator)
+        public RawGameCommandHandler(ILogger<RawGameCommandHandler> logger, IMediator mediator, CommandManagerService commandManagerService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _commandManagerService = commandManagerService ?? throw new ArgumentNullException(nameof(commandManagerService));
         }
 
         public async Task<CommandResult> Handle(RawGameCommand request, CancellationToken ct)
         {
             var (player, command) = request;
 
-            var messageArray = new Regex(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)").Split(command).Select(str => str.TrimStart('"').TrimEnd('"')).ToArray();
-
-            if (messageArray.Length == 0)
-                return new CommandResult(false);
-
-            //if (command.StartsWith("ping", StringComparison.OrdinalIgnoreCase))
-            //    return await _mediator.Send(new PingGameCommand(player), ct);
-
-            if (command.StartsWith("ban", StringComparison.OrdinalIgnoreCase))
-            {
-                //return await _mediator.Send(new BanCommand(player.GameJoltId, player.Name, null, "", DateTimeOffset.Now), ct);
-            }
-
-            if (command.StartsWith("unban", StringComparison.OrdinalIgnoreCase))
-            {
-                //return await _mediator.Send(new UnbanCommand(player), ct);
-            }
-
-            return new CommandResult(true);
-
-            //return await _mediator.Send(request.Player, ct);
+            var result = await _commandManagerService.ExecuteClientCommandAsync(player, command, ct);
+            return new CommandResult(result);
         }
     }
 }

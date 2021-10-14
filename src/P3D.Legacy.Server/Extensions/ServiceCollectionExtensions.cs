@@ -12,12 +12,9 @@ using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Application.Utils;
 using P3D.Legacy.Server.BackgroundServices;
 using P3D.Legacy.Server.Behaviours;
-using P3D.Legacy.Server.GameCommands;
 using P3D.Legacy.Server.GameCommands.CommandHandlers;
 using P3D.Legacy.Server.GameCommands.Commands;
 using P3D.Legacy.Server.GameCommands.NotificationHandlers;
-using P3D.Legacy.Server.Services;
-using P3D.Legacy.Server.Utils;
 
 using System.Linq;
 
@@ -35,7 +32,6 @@ namespace P3D.Legacy.Server.Extensions
                 { typeof(IRequestHandler<PlayerInitializingCommand>), typeof(PlayerInitializingCommandHandler) },
                 { typeof(IRequestHandler<PlayerReadyCommand>), typeof(PlayerReadyCommandHandler) },
                 { typeof(IRequestHandler<RawGameCommand, CommandResult>), typeof(RawGameCommandHandler) },
-                { typeof(IRequestHandler<PingGameCommand, CommandResult>), typeof(PingGameCommandHandler) },
             }.Register(services);
 
             new NotificationRegistrar
@@ -50,7 +46,7 @@ namespace P3D.Legacy.Server.Extensions
 
                 { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerSentGlobalMessageNotification> },
 
-                { typeof(INotificationHandler<PlayerSentGlobalMessageNotification>), typeof(GameCommandsHandler) },
+                { typeof(INotificationHandler<PlayerSentGlobalMessageNotification>), typeof(GameCommandInterceptor) },
             }.Register(services);
 
             services.AddTransient(typeof(IRequestPreProcessor<>), typeof(LoggingBehaviour<>));

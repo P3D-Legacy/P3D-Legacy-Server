@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -18,6 +19,8 @@ namespace P3D.Legacy.Server.Application.Utils
 
             public void Register(Func<IServiceProvider, IEnumerable<INotificationHandler<TNotification>>> func) => _notifications.Add(func);
 
+            [SuppressMessage("ReSharper", "UnusedMember.Local")]
+            [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
             private void RegisterInternal(Func<IServiceProvider, IEnumerable> func)
             {
                 IEnumerable<INotificationHandler<TNotification>> Convert(IServiceProvider sp, Func<IServiceProvider, IEnumerable> func_)

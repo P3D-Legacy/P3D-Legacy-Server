@@ -3,7 +3,7 @@
 namespace P3D.Legacy.Server.Abstractions
 {
     [Flags]
-    public enum Permissions
+    public enum PermissionFlags
     {
         None = 0,
         UnVerified = 1,

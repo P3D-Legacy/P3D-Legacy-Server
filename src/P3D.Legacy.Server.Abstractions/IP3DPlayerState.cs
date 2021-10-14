@@ -1,6 +1,4 @@
-﻿using P3D.Legacy.Common;
-
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace P3D.Legacy.Server.Abstractions
 {

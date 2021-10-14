@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.NotificationHandlers
 {
-    public class GameCommandsHandler : INotificationHandler<PlayerSentGlobalMessageNotification>
+    public class GameCommandInterceptor : INotificationHandler<PlayerSentGlobalMessageNotification>
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
 
-        public GameCommandsHandler(ILogger<GameCommandsHandler> logger, IMediator mediator)
+        public GameCommandInterceptor(ILogger<GameCommandInterceptor> logger, IMediator mediator)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
