@@ -4,12 +4,19 @@ using MediatR.Registration;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using P3D.Legacy.Server.Application.CommandHandlers.Player;
+using P3D.Legacy.Server.Application.Commands;
+using P3D.Legacy.Server.Application.Commands.Player;
+using P3D.Legacy.Server.Application.Notifications;
+using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.Application.Utils;
+using P3D.Legacy.Server.BackgroundServices;
 using P3D.Legacy.Server.Behaviours;
-using P3D.Legacy.Server.CommandHandlers;
-using P3D.Legacy.Server.Commands;
-using P3D.Legacy.Server.Notifications;
+using P3D.Legacy.Server.GameCommands;
+using P3D.Legacy.Server.GameCommands.CommandHandlers;
+using P3D.Legacy.Server.GameCommands.Commands;
+using P3D.Legacy.Server.GameCommands.NotificationHandlers;
 using P3D.Legacy.Server.Services;
-using P3D.Legacy.Server.Services.Discord;
 using P3D.Legacy.Server.Utils;
 
 using System.Linq;
@@ -27,18 +34,23 @@ namespace P3D.Legacy.Server.Extensions
                 { typeof(IRequestHandler<PlayerFinalizingCommand>), typeof(PlayerFinalizingCommandHandler) },
                 { typeof(IRequestHandler<PlayerInitializingCommand>), typeof(PlayerInitializingCommandHandler) },
                 { typeof(IRequestHandler<PlayerReadyCommand>), typeof(PlayerReadyCommandHandler) },
+                { typeof(IRequestHandler<RawGameCommand, CommandResult>), typeof(RawGameCommandHandler) },
+                { typeof(IRequestHandler<PingGameCommand, CommandResult>), typeof(PingGameCommandHandler) },
             }.Register(services);
 
             new NotificationRegistrar
             {
                 { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerJoinedNotification>>() },
                 { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerLeavedNotification>>() },
-                { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentGameDataNotification>>() },
+                { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerUpdatedStateNotification>>() },
                 { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentGlobalMessageNotification>>() },
                 { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentLocalMessageNotification>>() },
+                { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<MessageToPlayerNotification>>() },
+                { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentRawP3DPacketNotification>>() },
 
-                //{ sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerSentGlobalMessageNotification> },
-                { typeof(INotificationHandler<PlayerSentGlobalMessageNotification>), typeof(DiscordPassthroughService) },
+                { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerSentGlobalMessageNotification> },
+
+                { typeof(INotificationHandler<PlayerSentGlobalMessageNotification>), typeof(GameCommandsHandler) },
             }.Register(services);
 
             services.AddTransient(typeof(IRequestPreProcessor<>), typeof(LoggingBehaviour<>));

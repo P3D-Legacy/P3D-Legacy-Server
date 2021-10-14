@@ -38,6 +38,7 @@ namespace P3D.Legacy.Server.Utils
 
 
         private readonly Dictionary<Type, BaseServiceFactory> _containers = new();
+        private readonly Dictionary<Type, Type> _direct = new();
 
         public void Add(Type @base, Type impl)
         {
@@ -69,6 +70,8 @@ namespace P3D.Legacy.Server.Utils
             {
                 container.Register(sp => new[] { sp.GetRequiredService<TImpl>() as INotificationHandler<TNotification> });
             }
+
+            _direct[typeof(TImpl)] = typeof(TImpl);
         }
 
         public void Add<TNotification>(Func<IServiceProvider, INotificationHandler<TNotification>> factory) where TNotification : INotification
@@ -107,6 +110,9 @@ namespace P3D.Legacy.Server.Utils
         {
             foreach (var (type, container) in _containers)
                 services.Add(ServiceDescriptor.Describe(type, sp => container.ServiceFactory(sp), ServiceLifetime.Transient));
+
+            foreach (var (@base, impl) in _direct)
+                services.Add(ServiceDescriptor.Describe(@base, impl, ServiceLifetime.Transient));
 
             return services;
         }

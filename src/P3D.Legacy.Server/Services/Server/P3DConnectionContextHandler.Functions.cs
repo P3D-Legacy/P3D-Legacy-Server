@@ -2,7 +2,7 @@
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Chat;
 using P3D.Legacy.Common.Packets.Shared;
-using P3D.Legacy.Server.Models;
+using P3D.Legacy.Server.Abstractions;
 
 using System;
 using System.Threading;

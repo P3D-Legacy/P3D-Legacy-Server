@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
+using P3D.Legacy.Server.Application.Utils;
 using P3D.Legacy.Server.Utils;
 
 using System;
