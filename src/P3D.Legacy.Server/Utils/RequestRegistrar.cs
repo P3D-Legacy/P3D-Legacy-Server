@@ -5,8 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace P3D.Legacy.Server.Utils
 {
@@ -17,13 +15,6 @@ namespace P3D.Legacy.Server.Utils
             private Func<IServiceProvider, IRequestHandler<TRequest, TResponse>> _command;
 
             public void Register(Func<IServiceProvider, IRequestHandler<TRequest, TResponse>> func) => _command = func;
-
-            private void RegisterInternal(Func<IServiceProvider, object> func)
-            {
-                IRequestHandler<TRequest, TResponse> Func(IServiceProvider sp) => (func(sp) as IRequestHandler<TRequest, TResponse>);
-
-                _command = Func;
-            }
 
             public override IRequestHandler<TRequest, TResponse> ServiceFactory(IServiceProvider sp) => _command(sp);
         }
