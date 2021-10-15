@@ -2,6 +2,7 @@
 
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.Administration;
+using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Collections.Generic;
@@ -18,14 +19,14 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
         public override IEnumerable<string> Aliases => new[] { "b" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
-        public BanCommandManager(IMediator mediator) : base(mediator) { }
+        public BanCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 
         public override async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
         {
             if (arguments.Length == 3)
             {
                 var clientName = arguments[0];
-                var cClient = GetClient(clientName);
+                var cClient = await GetClientAsync(clientName, ct);
                 if (cClient == null)
                 {
                     await SendMessageAsync(client, $"Player {clientName} not found!", ct);
@@ -39,12 +40,12 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
                 }
 
                 var reason = arguments[2].TrimStart('"').TrimEnd('"');
-                await Mediator.Publish(new BanCommand(cClient.GameJoltId, cClient.Name, cClient.IPAddress, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
+                await Mediator.Publish(new BanPlayerCommand(cClient.GameJoltId, cClient.Name, cClient.IPAddress, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
             }
             else if (arguments.Length > 3)
             {
                 var clientName = arguments[0];
-                var cClient = GetClient(clientName);
+                var cClient = await GetClientAsync(clientName, ct);
                 if (cClient == null)
                 {
                     await SendMessageAsync(client, $"Player {clientName} not found!", ct);
@@ -58,7 +59,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
                 }
 
                 var reason = string.Join(" ", arguments.Skip(2).ToArray());
-                await Mediator.Publish(new BanCommand(cClient.GameJoltId, cClient.Name, cClient.IPAddress, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
+                await Mediator.Publish(new BanPlayerCommand(cClient.GameJoltId, cClient.Name, cClient.IPAddress, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
             }
             else
                 await SendMessageAsync(client, "Invalid arguments given.", ct);

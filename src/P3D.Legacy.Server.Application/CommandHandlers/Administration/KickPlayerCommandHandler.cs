@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Application.Commands;
 using P3D.Legacy.Server.Application.Commands.Administration;
-using P3D.Legacy.Server.Infrastructure.Repositories;
+using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Threading;
@@ -12,22 +12,22 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
 {
-    public class UnbanCommandHandler : IRequestHandler<UnbanCommand, CommandResult>
+    public class KickPlayerCommandHandler : IRequestHandler<KickPlayerCommand, CommandResult>
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
-        private readonly BanRepository _banRepository;
+        private readonly IPlayerContainerActions _container;
 
-        public UnbanCommandHandler(ILogger<UnbanCommandHandler> logger, IMediator mediator, BanRepository banRepository)
+        public KickPlayerCommandHandler(ILogger<KickPlayerCommandHandler> logger, IMediator mediator, IPlayerContainerActions container)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
+            _container = container ?? throw new ArgumentNullException(nameof(container));
         }
 
-        public async Task<CommandResult> Handle(UnbanCommand request, CancellationToken ct)
+        public async Task<CommandResult> Handle(KickPlayerCommand request, CancellationToken ct)
         {
-            var result = await _banRepository.DeleteAsync(request.Id, ct);
+            var result = await _container.KickAsync(request.Player, ct);
 
             return new CommandResult(result);
         }

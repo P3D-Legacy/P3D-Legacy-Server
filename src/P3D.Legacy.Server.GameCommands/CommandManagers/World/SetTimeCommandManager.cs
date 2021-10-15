@@ -1,6 +1,7 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Application.Commands.World;
 using P3D.Legacy.Server.Application.Services;
 
 using System;
@@ -17,12 +18,8 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
         public override IEnumerable<string> Aliases => new[] { "st" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
-        private readonly WorldService _worldService;
 
-        public SetTimeCommandManager(IMediator mediator, WorldService worldService) : base(mediator)
-        {
-            _worldService = worldService ?? throw new ArgumentNullException(nameof(worldService));
-        }
+        public SetTimeCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 
         public override async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
         {
@@ -30,7 +27,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
             {
                 if (TimeSpan.TryParseExact(arguments[0], "HH\\:mm\\:ss", null, out var time))
                 {
-                    _worldService.CurrentTime = time;
+                    await Mediator.Publish(new ChangeWorldTimeCommand(time), ct);
                     await SendMessageAsync(client, $"Set time to {time}!", ct);
                     await SendMessageAsync(client, "Disabled Real Time!", ct);
                 }

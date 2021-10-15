@@ -2,9 +2,11 @@
 
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Notifications;
+using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,15 +21,17 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
         public virtual bool LogCommand { get; } = true;
 
         protected IMediator Mediator { get; }
+        private IPlayerContainerReader PlayerContainer { get; }
 
-        protected CommandManager(IMediator mediator)
+        protected CommandManager(IMediator mediator, IPlayerContainerReader playerContainer)
         {
             Mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            PlayerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
         }
 
-        protected IPlayer? GetClient(string name)
+        protected async Task<IPlayer?> GetClientAsync(string name, CancellationToken ct)
         {
-            return null;
+            return await PlayerContainer.GetAllAsync(ct).FirstOrDefaultAsync(x => x.Name.Equals(name, StringComparison.Ordinal), ct);
         }
 
         protected async Task SendMessageAsync(IPlayer player, string message, CancellationToken ct)

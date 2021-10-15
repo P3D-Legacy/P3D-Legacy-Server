@@ -4,9 +4,13 @@ using MediatR.Registration;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using P3D.Legacy.Server.Application.CommandHandlers.Administration;
 using P3D.Legacy.Server.Application.CommandHandlers.Player;
+using P3D.Legacy.Server.Application.CommandHandlers.World;
 using P3D.Legacy.Server.Application.Commands;
+using P3D.Legacy.Server.Application.Commands.Administration;
 using P3D.Legacy.Server.Application.Commands.Player;
+using P3D.Legacy.Server.Application.Commands.World;
 using P3D.Legacy.Server.Application.Notifications;
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Application.Utils;
@@ -14,7 +18,6 @@ using P3D.Legacy.Server.BackgroundServices;
 using P3D.Legacy.Server.Behaviours;
 using P3D.Legacy.Server.GameCommands.CommandHandlers;
 using P3D.Legacy.Server.GameCommands.Commands;
-using P3D.Legacy.Server.GameCommands.NotificationHandlers;
 
 using System;
 using System.Collections.Generic;
@@ -33,12 +36,18 @@ namespace P3D.Legacy.Server.Extensions
                 { typeof(IRequestHandler<PlayerFinalizingCommand>), typeof(PlayerFinalizingCommandHandler) },
                 { typeof(IRequestHandler<PlayerInitializingCommand>), typeof(PlayerInitializingCommandHandler) },
                 { typeof(IRequestHandler<PlayerReadyCommand>), typeof(PlayerReadyCommandHandler) },
+                { typeof(IRequestHandler<PlayerMutedPlayerCommand, CommandResult>), typeof(PlayerMutedPlayerCommandHandler) },
+                { typeof(IRequestHandler<PlayerUnmutedPlayerCommand, CommandResult>), typeof(PlayerUnmutedPlayerCommandHandler) },
 
                 { typeof(IRequestHandler<RawGameCommand, CommandResult>), typeof(RawGameCommandHandler) },
 
-                //{ typeof(IRequestHandler<BanCommand, CommandResult>), typeof(BanCommandHandler) },
-                //{ typeof(IRequestHandler<UnbanCommand, CommandResult>), typeof(UnbanCommandHandler) },
-                //{ typeof(IRequestHandler<KickCommand, CommandResult>), typeof(KickCommandHandler) },
+                { typeof(IRequestHandler<BanPlayerCommand, CommandResult>), typeof(BanPlayerCommandHandler) },
+                { typeof(IRequestHandler<UnbanPlayerCommand, CommandResult>), typeof(UnbanPlayerCommandHandler) },
+                { typeof(IRequestHandler<KickPlayerCommand, CommandResult>), typeof(KickPlayerCommandHandler) },
+
+                { typeof(IRequestHandler<ChangeWorldSeasonCommand, CommandResult>), typeof(ChangeWorldSeasonCommandHandler) },
+                { typeof(IRequestHandler<ChangeWorldTimeCommand, CommandResult>), typeof(ChangeWorldTimeCommandHandler) },
+                { typeof(IRequestHandler<ChangeWorldWeatherCommand, CommandResult>), typeof(ChangeWorldWeatherCommandHandler) },
             }.Register(services);
 
             new NotificationRegistrar

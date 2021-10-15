@@ -2,6 +2,7 @@
 
 using P3D.Legacy.Common.Data;
 using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Application.Commands.World;
 using P3D.Legacy.Server.Application.Services;
 
 using System;
@@ -18,12 +19,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
         public override IEnumerable<string> Aliases => new[] { "ss" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
-        private readonly WorldService _worldService;
-
-        public SetSeasonCommandManager(IMediator mediator, WorldService worldService) : base(mediator)
-        {
-            _worldService = worldService ?? throw new ArgumentNullException(nameof(worldService));
-        }
+        public SetSeasonCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 
         public override async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
         {
@@ -31,11 +27,11 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
             {
                 if (Enum.TryParse(arguments[0], true, out WorldSeason season))
                 {
-                    _worldService.Season = season;
+                    await Mediator.Publish(new ChangeWorldSeasonCommand(season), ct);
                     await SendMessageAsync(client, $"Set Season to {season}!", ct);
                 }
                 else
-                    await SendMessageAsync(client, $"Season '{season}' not found!", ct);
+                    await SendMessageAsync(client, $"Season '{arguments[0]}' not found!", ct);
             }
             else
                 await SendMessageAsync(client, "Invalid arguments given.", ct);

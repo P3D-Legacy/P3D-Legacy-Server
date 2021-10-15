@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Server.Application.Notifications;
-using P3D.Legacy.Server.Models.Options;
+using P3D.Legacy.Server.Options;
 
 using System.Threading;
 using System.Threading.Tasks;

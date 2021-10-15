@@ -1,4 +1,4 @@
-﻿namespace P3D.Legacy.Server.Models.Options
+﻿namespace P3D.Legacy.Server.Options
 {
     /*
     public sealed class DiscordOptionsValidator : AbstractValidator<DiscordOptions>

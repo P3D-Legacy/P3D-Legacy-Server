@@ -13,8 +13,8 @@ using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Queries.Players;
 using P3D.Legacy.Server.Application.Services;
-using P3D.Legacy.Server.Models.Options;
-using P3D.Legacy.Server.Services.Connections;
+using P3D.Legacy.Server.Application.Services.Connections;
+using P3D.Legacy.Server.Options;
 
 using System;
 using System.Diagnostics;

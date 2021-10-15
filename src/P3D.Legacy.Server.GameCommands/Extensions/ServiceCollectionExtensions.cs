@@ -34,9 +34,9 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
 
             services.AddTransient<CommandManager, BanCommandManager>();
             services.AddTransient<CommandManager, KickCommandManager>();
-            //services.AddTransient<CommandManager, MuteCommandManager>();
+            services.AddTransient<CommandManager, MuteCommandManager>();
             services.AddTransient<CommandManager, UnbanCommandManager>();
-            //services.AddTransient<CommandManager, UnmuteCommandManager>();
+            services.AddTransient<CommandManager, UnmuteCommandManager>();
 
             services.AddTransient<CommandManager, ShowPermissionsCommandManager>();
 

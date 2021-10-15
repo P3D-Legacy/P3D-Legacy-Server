@@ -3,6 +3,7 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.GameCommands.Services;
 
 using System;
@@ -22,7 +23,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
 
         private readonly IServiceProvider _serviceProvider;
 
-        public HelpCommandManager(IServiceProvider serviceProvider, IMediator mediator) : base(mediator)
+        public HelpCommandManager(IServiceProvider serviceProvider, IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }

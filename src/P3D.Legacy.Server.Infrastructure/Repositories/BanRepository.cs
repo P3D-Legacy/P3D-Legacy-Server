@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Infrastructure.Repositories
 {
-    public class BanRepository
+    public class BanRepository : IBanRepository
     {
-        public Task<bool> DeleteAsync(GameJoltId id, CancellationToken ct)
+        public async Task<bool> UpsertAsync(GameJoltId id, string name, IPAddress Ip, string reason, DateTimeOffset? expiration, CancellationToken ct)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<bool> Upsert(GameJoltId id, string name, IPAddress Ip, string reason, DateTimeOffset? expiration, CancellationToken ct)
+        public Task<bool> DeleteAsync(GameJoltId id, CancellationToken ct)
         {
             throw new NotImplementedException();
         }

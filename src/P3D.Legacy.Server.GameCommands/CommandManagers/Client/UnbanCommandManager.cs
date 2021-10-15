@@ -2,6 +2,7 @@
 
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.Administration;
+using P3D.Legacy.Server.Application.Services;
 
 using System.Collections.Generic;
 using System.Threading;
@@ -16,21 +17,21 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
         public override IEnumerable<string> Aliases => new[] { "ub" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
-        public UnbanCommandManager(IMediator mediator) : base(mediator) { }
+        public UnbanCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 
         public override async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
         {
             if (arguments.Length == 1)
             {
                 var clientName = arguments[0];
-                var cClient = GetClient(clientName);
+                var cClient = await GetClientAsync(clientName, ct);
                 if (cClient == null)
                 {
                     await SendMessageAsync(client, $"Player {clientName} not found!", ct);
                     return;
                 }
 
-                await Mediator.Publish(new UnbanCommand(cClient.GameJoltId), ct);
+                await Mediator.Publish(new UnbanPlayerCommand(cClient.GameJoltId), ct);
             }
             else
                 await SendMessageAsync(client, "Invalid arguments given.", ct);

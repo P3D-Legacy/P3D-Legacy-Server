@@ -1,6 +1,7 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Threading;
@@ -14,7 +15,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
         public override string Description => "Show available Client permissions.";
         public override PermissionFlags Permissions => PermissionFlags.AdministratorOrHigher;
 
-        public ShowPermissionsCommandManager(IMediator mediator) : base(mediator) { }
+        public ShowPermissionsCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 
         public override async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
         {
@@ -24,7 +25,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
             {
                 var clientName = arguments[0];
 
-                var cClient = GetClient(clientName);
+                var cClient = await GetClientAsync(clientName, ct);
                 if (cClient == null)
                 {
                     await SendMessageAsync(client, $"Player {clientName} not found.", ct);
