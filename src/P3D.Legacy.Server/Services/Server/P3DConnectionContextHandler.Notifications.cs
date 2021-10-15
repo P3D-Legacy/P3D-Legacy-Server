@@ -21,7 +21,8 @@ namespace P3D.Legacy.Server.Services.Server
         INotificationHandler<PlayerSentPrivateMessageNotification>,
         INotificationHandler<MessageToPlayerNotification>,
         INotificationHandler<PlayerSentRawP3DPacketNotification>,
-        INotificationHandler<ServerMessageNotification>
+        INotificationHandler<ServerMessageNotification>,
+        INotificationHandler<PlayerTriggeredEventNotification>
     {
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
         {
@@ -104,8 +105,16 @@ namespace P3D.Legacy.Server.Services.Server
 
         public async Task Handle(ServerMessageNotification notification, CancellationToken ct)
         {
-            await SendServerMessageAsync(notification.Message, ct);
+            var message = notification.Message;
+
+            await SendServerMessageAsync(message, ct);
         }
 
+        public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
+        {
+            var (player, eventMessage) = notification;
+
+            await SendServerMessageAsync($"The player {player.Name} {eventMessage}", ct);
+        }
     }
 }

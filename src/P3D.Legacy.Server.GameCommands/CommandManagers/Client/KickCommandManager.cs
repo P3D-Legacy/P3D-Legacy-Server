@@ -20,40 +20,38 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
 
         public KickCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 
-        public override async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
+        public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
             if (arguments.Length == 1)
             {
-                var clientName = arguments[0];
-                var cClient = await GetClientAsync(clientName, ct);
-                if (cClient == null)
+                var targetName = arguments[0];
+                if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
                 {
-                    await SendMessageAsync(client, $"Player {clientName} not found!", ct);
+                    await SendMessageAsync(player, $"Player {targetName} not found!", ct);
                     return;
                 }
 
-                await Mediator.Publish(new KickPlayerCommand(cClient, "Kicked by a Moderator or Admin."), ct);
+                await Mediator.Publish(new KickPlayerCommand(targetPlayer, "Kicked by a Moderator or Admin."), ct);
             }
             else if (arguments.Length > 1)
             {
-                var clientName = arguments[0];
-                var cClient = await GetClientAsync(clientName, ct);
-                if (cClient == null)
+                var targetName = arguments[0];
+                if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
                 {
-                    await SendMessageAsync(client, $"Player {clientName} not found!", ct);
+                    await SendMessageAsync(player, $"Player {targetName} not found!", ct);
                     return;
                 }
 
                 var reason = string.Join(" ", arguments.Skip(1).ToArray());
-                await Mediator.Publish(new KickPlayerCommand(cClient, reason), ct);
+                await Mediator.Publish(new KickPlayerCommand(targetPlayer, reason), ct);
             }
             else
-                await SendMessageAsync(client, "Invalid arguments given.", ct);
+                await SendMessageAsync(player, "Invalid arguments given.", ct);
         }
 
-        public override async Task HelpAsync(IPlayer client, string alias, CancellationToken ct)
+        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
         {
-            await SendMessageAsync(client, $"Correct usage is /{alias} <PlayerName> [Reason]", ct);
+            await SendMessageAsync(player, $"Correct usage is /{alias} <playername> [<reason>]", ct);
         }
     }
 }

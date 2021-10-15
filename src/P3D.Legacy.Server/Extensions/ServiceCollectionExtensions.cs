@@ -60,8 +60,13 @@ namespace P3D.Legacy.Server.Extensions
                 { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<MessageToPlayerNotification>>() },
                 { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentRawP3DPacketNotification>>() },
                 { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<ServerMessageNotification>>() },
+                { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerTriggeredEventNotification>>() },
 
+                { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerJoinedNotification> },
+                { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerLeavedNotification> },
                 { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerSentGlobalMessageNotification> },
+                { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<ServerMessageNotification> },
+                { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerTriggeredEventNotification> },
 
                 notifications
             }.Register(services);

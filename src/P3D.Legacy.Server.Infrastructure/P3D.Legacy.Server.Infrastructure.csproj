@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\P3D.Legacy.Common\P3D.Legacy.Common.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Abstractions\P3D.Legacy.Server.Abstractions.csproj" />
   </ItemGroup>
 

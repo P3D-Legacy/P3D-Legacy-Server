@@ -32,7 +32,7 @@ namespace P3D.Legacy.Server.GameCommands.Managers.Chat
 
         public override async Task HelpAsync(IPlayer client, string alias, CancellationToken ct)
         {
-            await SendMessage(client, $"Correct usage is /{alias} <global/local/'custom'>", ct);
+            await SendMessage(client, $"Correct usage is /{alias} <global|local|<custom>>", ct);
         }
     }
 }

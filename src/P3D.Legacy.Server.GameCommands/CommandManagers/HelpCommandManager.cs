@@ -28,11 +28,11 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public override async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
+        public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
             if (arguments.Length > 1)
             {
-                await HelpAsync(client, alias, ct);
+                await HelpAsync(player, alias, ct);
                 return;
             }
 
@@ -43,21 +43,21 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
 
             if (commandManagerService.FindByName(helpAlias) is { } foundByName)
             {
-                await foundByName.HelpAsync(client, helpAlias, ct);
+                await foundByName.HelpAsync(player, helpAlias, ct);
                 return;
             }
             if (commandManagerService.FindByAlias(helpAlias) is { } foundByAlias)
             {
-                await foundByAlias.HelpAsync(client, helpAlias, ct);
+                await foundByAlias.HelpAsync(player, helpAlias, ct);
                 return;
             }
 
             if (int.TryParse(helpAlias, out var pageNumber))
             {
-                await HelpPageAsync(client, pageNumber, ct);
+                await HelpPageAsync(player, pageNumber, ct);
                 return;
             }
-            await HelpAsync(client, alias, ct);
+            await HelpAsync(player, alias, ct);
         }
         private async Task HelpPageAsync(IPlayer client, int page, CancellationToken ct)
         {
@@ -86,9 +86,9 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
             }
         }
 
-        public override async Task HelpAsync(IPlayer client, string alias, CancellationToken ct)
+        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
         {
-            await SendMessageAsync(client, $"Correct usage is /{alias} <page#/command> [command arguments]", ct);
+            await SendMessageAsync(player, $"Correct usage is /{alias} <page#|command> [<command arguments>]", ct);
         }
     }
 }

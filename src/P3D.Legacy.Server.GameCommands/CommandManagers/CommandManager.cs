@@ -29,7 +29,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
             PlayerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
         }
 
-        protected async Task<IPlayer?> GetClientAsync(string name, CancellationToken ct)
+        protected async Task<IPlayer?> GetPlayerAsync(string name, CancellationToken ct)
         {
             return await PlayerContainer.GetAllAsync(ct).FirstOrDefaultAsync(x => x.Name.Equals(name, StringComparison.Ordinal), ct);
         }
@@ -44,14 +44,14 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
             await Mediator.Publish(new ServerMessageNotification(message), ct);
         }
 
-        public virtual async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
+        public virtual async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
-            await HelpAsync(client, alias, ct);
+            await HelpAsync(player, alias, ct);
         }
 
-        public virtual async Task HelpAsync(IPlayer client, string alias, CancellationToken ct)
+        public virtual async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
         {
-            await SendMessageAsync(client, $@"Command ""{alias}"" is not functional!", ct);
+            await SendMessageAsync(player, $@"Command ""{alias}"" is not functional!", ct);
         }
     }
 }

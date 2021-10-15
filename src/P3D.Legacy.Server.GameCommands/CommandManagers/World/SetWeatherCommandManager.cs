@@ -21,25 +21,25 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
 
         public SetWeatherCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 
-        public override async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
+        public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
             if (arguments.Length == 1)
             {
                 if (Enum.TryParse(arguments[0], true, out WorldWeather weather))
                 {
                     await Mediator.Publish(new ChangeWorldWeatherCommand(weather), ct);
-                    await SendMessageAsync(client, $"Set Weather to {weather}!", ct);
+                    await SendMessageAsync(player, $"Set Weather to {weather}!", ct);
                 }
                 else
-                    await SendMessageAsync(client, $"Weather '{arguments[0]}' not found!", ct);
+                    await SendMessageAsync(player, $"Weather '{arguments[0]}' not found!", ct);
             }
             else
-                await SendMessageAsync(client, "Invalid arguments given.", ct);
+                await SendMessageAsync(player, "Invalid arguments given.", ct);
         }
 
-        public override async Task HelpAsync(IPlayer client, string alias, CancellationToken ct)
+        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
         {
-            await SendMessageAsync(client, $"Correct usage is /{alias} <Weather>", ct);
+            await SendMessageAsync(player, $"Correct usage is /{alias} <weather>", ct);
         }
     }
 }

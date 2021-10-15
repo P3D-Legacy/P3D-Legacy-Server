@@ -16,7 +16,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Chat
 
         public SayCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 
-        public override async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
+        public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
             if (arguments.Length == 1)
             {
@@ -29,12 +29,12 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Chat
                 await SendServerMessageAsync(message, ct);
             }
             else
-                await SendMessageAsync(client, "Invalid arguments given.", ct);
+                await SendMessageAsync(player, "Invalid arguments given.", ct);
         }
 
-        public override async Task HelpAsync(IPlayer client, string alias, CancellationToken ct)
+        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
         {
-            await SendMessageAsync(client, $"Correct usage is /{alias} <Message>", ct);
+            await SendMessageAsync(player, $"Correct usage is /{alias} <message>", ct);
         }
     }
 }

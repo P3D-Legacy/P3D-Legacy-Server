@@ -19,7 +19,11 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.BackgroundServices
 {
     public sealed class DiscordPassthroughService : CriticalBackgroundService,
-        INotificationHandler<PlayerSentGlobalMessageNotification>
+        INotificationHandler<PlayerJoinedNotification>,
+        INotificationHandler<PlayerLeavedNotification>,
+        INotificationHandler<PlayerSentGlobalMessageNotification>,
+        INotificationHandler<ServerMessageNotification>,
+        INotificationHandler<PlayerTriggeredEventNotification>
     {
         private readonly DiscordSocketClient _discordSocketClient;
         private readonly IServiceScopeFactory _scopeFactory;
@@ -115,7 +119,7 @@ namespace P3D.Legacy.Server.BackgroundServices
             if (arg is not SocketUserMessage { Source: MessageSource.User } message) return;
             if (message.Channel is IPrivateChannel) return;
 
-            var context = new SocketCommandContext(_discordSocketClient, message);
+            //var context = new SocketCommandContext(_discordSocketClient, message);
 
             //var result = await _mediator.Send(new RawTextCommand(DiscordPlayer, message.Content));
             //if (result.Success)
@@ -130,10 +134,34 @@ namespace P3D.Legacy.Server.BackgroundServices
             base.Dispose();
         }
 
+        public async Task Handle(PlayerJoinedNotification notification, CancellationToken cancellationToken)
+        {
+            if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
+                await channel.SendMessageAsync($"> `EVENT  : Player {notification.Player.Name} joined the game!`");
+        }
+
+        public async Task Handle(PlayerLeavedNotification notification, CancellationToken cancellationToken)
+        {
+            if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
+                await channel.SendMessageAsync($"> `EVENT  : Player {notification.Name} leaved the game!`");
+        }
+
         public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken cancellationToken)
         {
             if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
-                await channel.SendMessageAsync($"<{notification.Player.Name}> {notification.Message}");
+                await channel.SendMessageAsync($"> `MESSAGE: <{notification.Player.Name}> {notification.Message}`");
+        }
+
+        public async Task Handle(ServerMessageNotification notification, CancellationToken cancellationToken)
+        {
+            if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
+                await channel.SendMessageAsync($"> `SERVER : {notification.Message}`");
+        }
+
+        public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken cancellationToken)
+        {
+            if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
+                await channel.SendMessageAsync($"> `EVENT  : The player {notification.Player.Name} {notification.EventMessage}`");
         }
     }
 }

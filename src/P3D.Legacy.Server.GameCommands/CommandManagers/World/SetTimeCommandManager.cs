@@ -21,25 +21,25 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
 
         public SetTimeCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 
-        public override async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
+        public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
             if (arguments.Length == 1)
             {
                 if (TimeSpan.TryParseExact(arguments[0], "g", null, out var time))
                 {
                     await Mediator.Publish(new ChangeWorldTimeCommand(time), ct);
-                    await SendMessageAsync(client, $"Set time to {time}!", ct);
+                    await SendMessageAsync(player, $"Set time to {time}!", ct);
                 }
                 else
-                    await SendMessageAsync(client, "Invalid time!", ct);
+                    await SendMessageAsync(player, "Invalid time!", ct);
             }
             else
-                await SendMessageAsync(client, "Invalid arguments given.", ct);
+                await SendMessageAsync(player, "Invalid arguments given.", ct);
         }
 
-        public override async Task HelpAsync(IPlayer client, string alias, CancellationToken ct)
+        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
         {
-            await SendMessageAsync(client, $"Correct usage is /{alias} <Time[HH:mm:ss]/Real>", ct);
+            await SendMessageAsync(player, $"Correct usage is /{alias} <time[HH:mm:ss]>", ct);
         }
     }
 }
