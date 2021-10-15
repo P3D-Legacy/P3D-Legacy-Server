@@ -1,7 +1,7 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Commands.Bans;
+using P3D.Legacy.Server.Application.Commands.Administration;
 
 using System.Collections.Generic;
 using System.Threading;

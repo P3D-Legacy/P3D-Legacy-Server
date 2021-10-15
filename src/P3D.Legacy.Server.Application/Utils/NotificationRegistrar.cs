@@ -59,6 +59,14 @@ namespace P3D.Legacy.Server.Application.Utils
             method.Invoke(this, Array.Empty<object>());
         }
 
+        public void Add(IEnumerable<(Type, Type)> tuples)
+        {
+            foreach (var (@base, impl) in tuples)
+            {
+                Add(@base, impl);
+            }
+        }
+
         public void Add<TImpl, TNotification>() where TNotification : INotification where TImpl : INotificationHandler<TNotification>
         {
             var key = typeof(IEnumerable<INotificationHandler<TNotification>>);

@@ -1,5 +1,7 @@
 ﻿using MediatR;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.GameCommands.Services;
 
@@ -11,18 +13,18 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers
 {
-    public class HelpCommand : CommandManager
+    public class HelpCommandManager : CommandManager
     {
         public override string Name => "help";
         public override string Description => "Command help menu.";
-        public override IEnumerable<string> Aliases => new [] { "h" };
+        public override IEnumerable<string> Aliases => new[] { "h" };
         public override PermissionFlags Permissions => PermissionFlags.UnVerifiedOrHigher;
 
-        private readonly CommandManagerService _commandManagerService;
+        private readonly IServiceProvider _serviceProvider;
 
-        public HelpCommand(CommandManagerService commandManagerService, IMediator mediator) : base(mediator)
+        public HelpCommandManager(IServiceProvider serviceProvider, IMediator mediator) : base(mediator)
         {
-            _commandManagerService = commandManagerService ?? throw new ArgumentNullException(nameof(commandManagerService));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         public override async Task HandleAsync(IPlayer client, string alias, string[] arguments, CancellationToken ct)
@@ -33,14 +35,17 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
                 return;
             }
 
+            // Circumventing circular refs
+            var commandManagerService = _serviceProvider.GetRequiredService<CommandManagerService>();
+
             var helpAlias = arguments.Length == 1 ? arguments[0] : "1";
 
-            if (_commandManagerService.FindByName(helpAlias) is { } foundByName)
+            if (commandManagerService.FindByName(helpAlias) is { } foundByName)
             {
                 await foundByName.HelpAsync(client, helpAlias, ct);
                 return;
             }
-            if (_commandManagerService.FindByAlias(helpAlias) is { } foundByAlias)
+            if (commandManagerService.FindByAlias(helpAlias) is { } foundByAlias)
             {
                 await foundByAlias.HelpAsync(client, helpAlias, ct);
                 return;
@@ -55,8 +60,11 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
         }
         private async Task HelpPageAsync(IPlayer client, int page, CancellationToken ct)
         {
+            // Circumventing circular refs
+            var commandManagerService = _serviceProvider.GetRequiredService<CommandManagerService>();
+
             const int perPage = 5;
-            var commands = _commandManagerService.GetCommands().Where(command => (client.Permissions & command.Permissions) != PermissionFlags.None).ToList();
+            var commands = commandManagerService.GetCommands().Where(command => (client.Permissions & command.Permissions) != PermissionFlags.None).ToList();
             var numPages = (int) Math.Floor((double) commands.Count / perPage);
             if ((commands.Count % perPage) > 0)
                 numPages++;

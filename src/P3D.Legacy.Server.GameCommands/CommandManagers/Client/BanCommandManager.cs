@@ -1,7 +1,7 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Commands.Bans;
+using P3D.Legacy.Server.Application.Commands.Administration;
 
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
     {
         public override string Name => "ban";
         public override string Description => "Ban a Player.";
-        public override IEnumerable<string> Aliases => new [] { "b" };
+        public override IEnumerable<string> Aliases => new[] { "b" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
         public BanCommandManager(IMediator mediator) : base(mediator) { }

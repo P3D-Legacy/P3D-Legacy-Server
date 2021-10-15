@@ -16,13 +16,15 @@ using P3D.Legacy.Server.GameCommands.CommandHandlers;
 using P3D.Legacy.Server.GameCommands.Commands;
 using P3D.Legacy.Server.GameCommands.NotificationHandlers;
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace P3D.Legacy.Server.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddMediatRInternal(this IServiceCollection services)
+        public static IServiceCollection AddMediatRInternal(this IServiceCollection services, IEnumerable<(Type, Type)> notifications)
         {
             ServiceRegistrar.AddRequiredServices(services, new MediatRServiceConfiguration().AsTransient());
 
@@ -31,7 +33,12 @@ namespace P3D.Legacy.Server.Extensions
                 { typeof(IRequestHandler<PlayerFinalizingCommand>), typeof(PlayerFinalizingCommandHandler) },
                 { typeof(IRequestHandler<PlayerInitializingCommand>), typeof(PlayerInitializingCommandHandler) },
                 { typeof(IRequestHandler<PlayerReadyCommand>), typeof(PlayerReadyCommandHandler) },
+
                 { typeof(IRequestHandler<RawGameCommand, CommandResult>), typeof(RawGameCommandHandler) },
+
+                //{ typeof(IRequestHandler<BanCommand, CommandResult>), typeof(BanCommandHandler) },
+                //{ typeof(IRequestHandler<UnbanCommand, CommandResult>), typeof(UnbanCommandHandler) },
+                //{ typeof(IRequestHandler<KickCommand, CommandResult>), typeof(KickCommandHandler) },
             }.Register(services);
 
             new NotificationRegistrar
@@ -46,7 +53,7 @@ namespace P3D.Legacy.Server.Extensions
 
                 { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerSentGlobalMessageNotification> },
 
-                { typeof(INotificationHandler<PlayerSentGlobalMessageNotification>), typeof(GameCommandInterceptor) },
+                notifications
             }.Register(services);
 
             services.AddTransient(typeof(IRequestPreProcessor<>), typeof(LoggingBehaviour<>));

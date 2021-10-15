@@ -1,7 +1,7 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Commands.Bans;
+using P3D.Legacy.Server.Application.Commands.Administration;
 
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
     {
         public override string Name => "kick";
         public override string Description => "Kick a Player.";
-        public override IEnumerable<string> Aliases => new [] { "k" };
+        public override IEnumerable<string> Aliases => new[] { "k" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
         public KickCommandManager(IMediator mediator) : base(mediator) { }

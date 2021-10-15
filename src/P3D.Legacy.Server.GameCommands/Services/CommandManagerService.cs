@@ -21,7 +21,7 @@ namespace P3D.Legacy.Server.GameCommands.Services
         private readonly IMediator _mediator;
         private readonly IReadOnlyList<CommandManager> _commandManagers;
 
-        public CommandManagerService(ILogger logger, IMediator mediator, IEnumerable<CommandManager> commandManagers)
+        public CommandManagerService(ILogger<CommandManagerService> logger, IMediator mediator, IEnumerable<CommandManager> commandManagers)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
@@ -66,7 +66,7 @@ namespace P3D.Legacy.Server.GameCommands.Services
                 return;
             }
 
-            if(command.LogCommand && (client.Permissions & PermissionFlags.UnVerified) == 0)
+            if (command.LogCommand && (client.Permissions & PermissionFlags.UnVerified) == 0)
                 _logger.LogInformation("{PlayerName}: /{CommandAlias} {CommandArgs}", client.Name, alias, string.Join(" ", arguments));
 
             if (command.Permissions == PermissionFlags.None)

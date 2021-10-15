@@ -66,7 +66,7 @@ namespace P3D.Legacy.Server.Application.Queries.Permissions
             try
             {
                 response = await _httpClientFactory.CreateClient("P3D.API").GetAsync(
-                    $"gamejoltaccount/{94314}",
+                    $"gamejoltaccount/{id}",
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);
             }

@@ -15,7 +15,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
     {
         public override string Name => "setweather";
         public override string Description => "Set World Weather.";
-        public override IEnumerable<string> Aliases => new [] { "sw" };
+        public override IEnumerable<string> Aliases => new[] { "sw" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
         private readonly WorldService _worldService;

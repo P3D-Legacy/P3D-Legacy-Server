@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
+using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
 
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Services
 {
-    public class DefaultPlayerContainer : IPlayerContainerWriter, IPlayerContainerReader
+    public class DefaultPlayerContainer : IPlayerContainerWriter, IPlayerContainerReader, IPlayerContainerActions
     {
         private class PlayerEqualityComparer : IEqualityComparer<IPlayer>
         {
@@ -35,7 +36,7 @@ namespace P3D.Legacy.Server.Application.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<IPlayer?> GetAsync(long id, CancellationToken ct) => Task.FromResult(_connections.FirstOrDefault(x => x.Id == id));
+        public Task<IPlayer?> GetAsync(Origin id, CancellationToken ct) => Task.FromResult(_connections.FirstOrDefault(x => x.Id == id));
         public IAsyncEnumerable<IPlayer> GetAllAsync(CancellationToken ct) => _connections.ToAsyncEnumerable();
         public IEnumerable<IPlayer> GetAll() => _connections;
 
@@ -50,6 +51,11 @@ namespace P3D.Legacy.Server.Application.Services
             var oldConnections = _connections;
             _connections = _connections.Remove(player);
             return Task.FromResult(!ReferenceEquals(oldConnections, _connections));
+        }
+
+        public async Task<bool> KickAsync(IPlayer player, CancellationToken ct)
+        {
+            return true;
         }
     }
 }
