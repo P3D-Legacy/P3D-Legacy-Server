@@ -31,7 +31,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
                     return;
                 }
 
-                await Mediator.Publish(new KickPlayerCommand(targetPlayer, "Kicked by a Moderator or Admin."), ct);
+                await Mediator.Send(new KickPlayerCommand(targetPlayer, "Kicked by a Moderator or Admin."), ct);
             }
             else if (arguments.Length > 1)
             {
@@ -43,7 +43,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
                 }
 
                 var reason = string.Join(" ", arguments.Skip(1).ToArray());
-                await Mediator.Publish(new KickPlayerCommand(targetPlayer, reason), ct);
+                await Mediator.Send(new KickPlayerCommand(targetPlayer, reason), ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);

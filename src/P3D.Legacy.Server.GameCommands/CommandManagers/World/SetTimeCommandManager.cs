@@ -27,7 +27,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
             {
                 if (TimeSpan.TryParseExact(arguments[0], "g", null, out var time))
                 {
-                    await Mediator.Publish(new ChangeWorldTimeCommand(time), ct);
+                    await Mediator.Send(new ChangeWorldTimeCommand(time), ct);
                     await SendMessageAsync(player, $"Set time to {time}!", ct);
                 }
                 else

@@ -27,7 +27,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
             {
                 if (Enum.TryParse(arguments[0], true, out WorldSeason season))
                 {
-                    await Mediator.Publish(new ChangeWorldSeasonCommand(season), ct);
+                    await Mediator.Send(new ChangeWorldSeasonCommand(season), ct);
                     await SendMessageAsync(player, $"Set Season to {season}!", ct);
                 }
                 else

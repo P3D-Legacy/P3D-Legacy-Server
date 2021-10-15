@@ -27,7 +27,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
             {
                 if (Enum.TryParse(arguments[0], true, out WorldWeather weather))
                 {
-                    await Mediator.Publish(new ChangeWorldWeatherCommand(weather), ct);
+                    await Mediator.Send(new ChangeWorldWeatherCommand(weather), ct);
                     await SendMessageAsync(player, $"Set Weather to {weather}!", ct);
                 }
                 else

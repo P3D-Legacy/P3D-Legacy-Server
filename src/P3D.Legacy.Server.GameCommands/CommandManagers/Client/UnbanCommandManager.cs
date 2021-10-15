@@ -30,7 +30,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
                     return;
                 }
 
-                await Mediator.Publish(new UnbanPlayerCommand(targetPlayer.GameJoltId), ct);
+                await Mediator.Send(new UnbanPlayerCommand(targetPlayer.GameJoltId), ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
