@@ -1,6 +1,8 @@
 ﻿using MediatR;
 
+using P3D.Legacy.Server.Abstractions;
+
 namespace P3D.Legacy.Server.Notifications
 {
-    public sealed record PlayerSentGlobalMessageNotification(long Id, string Name, ulong GameJoltId, string Message) : INotification;
+    public sealed record PlayerSentGlobalMessageNotification(IPlayer Player, string Message) : INotification;
 }

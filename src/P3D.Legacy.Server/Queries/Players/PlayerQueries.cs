@@ -1,4 +1,5 @@
-﻿using P3D.Legacy.Server.Services;
+﻿using P3D.Legacy.Server.Application.Queries.Players;
+using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Collections.Generic;

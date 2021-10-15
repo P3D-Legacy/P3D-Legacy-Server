@@ -2,7 +2,7 @@
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Chat;
 using P3D.Legacy.Common.Packets.Shared;
-using P3D.Legacy.Server.Models;
+using P3D.Legacy.Server.Abstractions;
 
 using System;
 using System.Threading;
@@ -49,9 +49,9 @@ namespace P3D.Legacy.Server.Services.Server
             return Task.CompletedTask;
         }
 
-        public Task AssignPermissionsAsync(Permissions permissions, CancellationToken ct)
+        public Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct)
         {
-            if (Permissions != Permissions.None)
+            if (Permissions != PermissionFlags.None)
                 throw new InvalidOperationException("Permissions were already assigned!");
 
             Permissions = permissions;

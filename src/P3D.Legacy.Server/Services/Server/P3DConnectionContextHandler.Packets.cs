@@ -9,8 +9,8 @@ using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Common.Packets.Shared;
 using P3D.Legacy.Common.Packets.Trade;
-using P3D.Legacy.Server.Commands;
-using P3D.Legacy.Server.Notifications;
+using P3D.Legacy.Server.Application.Commands.Player;
+using P3D.Legacy.Server.Application.Notifications;
 
 using System.Linq;
 using System.Threading;
@@ -177,7 +177,7 @@ namespace P3D.Legacy.Server.Services.Server
             }
 
             ParseGameData(packet);
-            await _mediator.Publish(new PlayerSentGameDataNotification(Id, Name, GameJoltId, packet.DataItemStorage), ct);
+            await _mediator.Publish(new PlayerUpdatedStateNotification(this), ct);
 
             if (_connectionState != P3DConnectionState.Intitialized)
             {
@@ -199,7 +199,7 @@ namespace P3D.Legacy.Server.Services.Server
                     CurrentTime = $"{_worldService.CurrentTime.Hours:00},{_worldService.CurrentTime.Minutes:00},{_worldService.CurrentTime.Seconds:00}"
                 }, ct);
 
-                await _mediator.Publish(new PlayerJoinedNotification(Id, Name, GameJoltId), ct);
+                await _mediator.Publish(new PlayerJoinedNotification(this), ct);
             }
 
             await SendPacketAsync(GetFromP3DPlayerState(this, this), ct);
@@ -207,71 +207,72 @@ namespace P3D.Legacy.Server.Services.Server
 
         private async Task HandleChatMessageAsync(ChatMessageGlobalPacket packet, CancellationToken ct)
         {
-            await _mediator.Publish(new PlayerSentGlobalMessageNotification(Id, Name, GameJoltId, packet.Message), ct);
+            //await _mediator.Publish(new PlayerSentLocalMessageNotification(this, LevelFile, packet.Message), ct);
+            await _mediator.Publish(new PlayerSentGlobalMessageNotification(this, packet.Message), ct);
         }
         private async Task HandlePrivateMessageAsync(ChatMessagePrivatePacket packet, CancellationToken ct)
         {
-            await _mediator.Publish(new PlayerSentPrivateMessageNotification(Id, Name, GameJoltId, packet.DestinationPlayerName, packet.Message), ct);
+            await _mediator.Publish(new PlayerSentPrivateMessageNotification(this, packet.DestinationPlayerName, packet.Message), ct);
         }
 
 
         private async Task HandleGameStateMessageAsync(GameStateMessagePacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
 
         private async Task HandleTradeRequestAsync(TradeRequestPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleTradeJoinAsync(TradeJoinPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleTradeQuitAsync(TradeQuitPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleTradeOfferAsync(TradeOfferPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleTradeStartAsync(TradeStartPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
 
         private async Task HandleBattleClientDataAsync(BattleClientDataPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleHostDataAsync(BattleHostDataPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleJoinAsync(BattleJoinPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleOfferAsync(BattleOfferPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattlePokemonDataAsync(BattleEndRoundDataPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleQuitAsync(BattleQuitPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleRequestAsync(BattleRequestPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleStartAsync(BattleStartPacket packet, CancellationToken ct)
         {
-
+            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
 
 

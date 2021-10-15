@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http.Features;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Server.Models;
+using P3D.Legacy.Server.Abstractions;
 
+using System.Net;
 using System.Numerics;
 
 namespace P3D.Legacy.Server.Services.Server
@@ -13,8 +14,9 @@ namespace P3D.Legacy.Server.Services.Server
 
         public Origin Id { get; private set; } = default!;
         public string Name { get; private set; } = default!;
-        public ulong GameJoltId { get; private set; } = default!;
-        public Permissions Permissions { get; private set; } = default!;
+        public GameJoltId GameJoltId { get; private set; } = default!;
+        public PermissionFlags Permissions { get; private set; } = default!;
+        public IPAddress IPAddress { get; private set; } = default!;
 
         public IFeatureCollection Features { get; private set; } = new FeatureCollection();
 

@@ -9,10 +9,11 @@ using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets.Client;
-using P3D.Legacy.Server.Commands;
-using P3D.Legacy.Server.Models;
+using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Application.Commands.Player;
+using P3D.Legacy.Server.Application.Queries.Players;
+using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Models.Options;
-using P3D.Legacy.Server.Queries.Players;
 using P3D.Legacy.Server.Services.Connections;
 
 using System;

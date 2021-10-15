@@ -18,13 +18,15 @@ using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common.Packets;
+using P3D.Legacy.Server.Application.Queries.Bans;
+using P3D.Legacy.Server.Application.Queries.Permissions;
+using P3D.Legacy.Server.Application.Queries.Players;
+using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.BackgroundServices;
 using P3D.Legacy.Server.Extensions;
+using P3D.Legacy.Server.GameCommands.Extensions;
 using P3D.Legacy.Server.Models.Options;
-using P3D.Legacy.Server.Queries.Permissions;
-using P3D.Legacy.Server.Queries.Players;
-using P3D.Legacy.Server.Services;
 using P3D.Legacy.Server.Services.Connections;
-using P3D.Legacy.Server.Services.Discord;
 using P3D.Legacy.Server.Services.Server;
 using P3D.Legacy.Server.Utils.HttpLogging;
 
@@ -51,9 +53,13 @@ namespace P3D.Legacy.Server
                 services.Configure<P3DOptions>(ctx.Configuration.GetSection("P3D"));
                 services.Configure<DiscordOptions>(ctx.Configuration.GetSection("Discord"));
 
+                services.AddGameCommands();
+
                 services.AddBetterHostedServices();
 
-                services.AddMediatRInternal();
+                services.AddMediatRInternal(
+                    GameCommands.Extensions.ServiceCollectionExtensions.AddGameCommandsNotifications()
+                    );
 
                 services.AddSingleton<DefaultJsonSerializer>();
 
@@ -92,6 +98,7 @@ namespace P3D.Legacy.Server
 
                 services.AddSingleton<IPlayerIdGenerator, DefaultPlayerIdGenerator>();
 
+                services.AddTransient<IBanQueries, DefaultBanQueries>();
                 services.AddTransient<IPermissionQueries, P3DAPIPermissionQueries>();
                 services.AddTransient<IPlayerQueries, PlayerQueries>();
 

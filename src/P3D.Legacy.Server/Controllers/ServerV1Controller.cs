@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Queries.Players;
+using P3D.Legacy.Server.Application.Queries.Players;
 
 using System;
 using System.Collections.Generic;
