@@ -25,11 +25,10 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
         {
             if (arguments.Length == 1)
             {
-                if (TimeSpan.TryParseExact(arguments[0], "HH\\:mm\\:ss", null, out var time))
+                if (TimeSpan.TryParseExact(arguments[0], "g", null, out var time))
                 {
                     await Mediator.Publish(new ChangeWorldTimeCommand(time), ct);
                     await SendMessageAsync(client, $"Set time to {time}!", ct);
-                    await SendMessageAsync(client, "Disabled Real Time!", ct);
                 }
                 else
                     await SendMessageAsync(client, "Invalid time!", ct);
