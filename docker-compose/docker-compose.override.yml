@@ -3,18 +3,6 @@ version: '3.4'
 services:
   p3d.legacy.server:
     environment:
-      - Server__IP=0.0.0.0
-      - Server__Port=15124
-      - Server__Name=Put Server Name Here
-      - Server__Message=Put Server Description Here
-      - Server__MaxPlayers=1000
-
-      - P3D__APIEndpointV1=https://google.com
-      - P3D__APIToken=PLACEHOLDER
-
-      - Discord__PasstroughChannelId=0
-      - Discord__BotToken=PLACEHOLDER
-
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "80"
