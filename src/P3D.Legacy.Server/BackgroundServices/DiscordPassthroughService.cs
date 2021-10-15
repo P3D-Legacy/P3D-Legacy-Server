@@ -137,13 +137,13 @@ namespace P3D.Legacy.Server.BackgroundServices
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken cancellationToken)
         {
             if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
-                await channel.SendMessageAsync($"> `EVENT  : Player {notification.Player.Name} joined the game!`");
+                await channel.SendMessageAsync($"> `EVENT  : Player {notification.Player.Name} joined the server!`");
         }
 
         public async Task Handle(PlayerLeavedNotification notification, CancellationToken cancellationToken)
         {
             if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
-                await channel.SendMessageAsync($"> `EVENT  : Player {notification.Name} leaved the game!`");
+                await channel.SendMessageAsync($"> `EVENT  : Player {notification.Name} left the server!`");
         }
 
         public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken cancellationToken)

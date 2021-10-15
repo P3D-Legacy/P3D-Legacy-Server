@@ -44,7 +44,7 @@ namespace P3D.Legacy.Server.Services.Server
                 await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerId = player.Id }, ct);
             }
 
-            await SendServerMessageAsync($"Player {player.Name} joined the game!", ct);
+            await SendServerMessageAsync($"Player {player.Name} joined the server!", ct);
         }
 
         public async Task Handle(PlayerLeavedNotification notification, CancellationToken ct)
@@ -53,7 +53,7 @@ namespace P3D.Legacy.Server.Services.Server
 
             if (Id == id) return;
             await SendPacketAsync(new DestroyPlayerPacket { Origin = Origin.Server, PlayerId = id }, ct);
-            await SendServerMessageAsync($"Player {name} leaved the game!", ct);
+            await SendServerMessageAsync($"Player {name} left the server!", ct);
         }
 
         public async Task Handle(PlayerUpdatedStateNotification notification, CancellationToken ct)
@@ -97,10 +97,10 @@ namespace P3D.Legacy.Server.Services.Server
 
         public async Task Handle(PlayerSentRawP3DPacketNotification notification, CancellationToken ct)
         {
-            var player = notification.Player;
+            var (player, p3DPacket) = notification;
 
             if (Id == player.Id) return;
-            await SendPacketAsync(notification.Packet, ct);
+            await SendPacketAsync(p3DPacket, ct);
         }
 
         public async Task Handle(ServerMessageNotification notification, CancellationToken ct)
