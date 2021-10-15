@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  p3d_legacy_server:
+    image: ${DOCKER_REGISTRY-}p3dlegacyserver
+    build:
+      context: ../.
+      dockerfile: src/P3D.Legacy.Server/Dockerfile

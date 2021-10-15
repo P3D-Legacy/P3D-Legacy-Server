@@ -1,7 +1,7 @@
+**/docker-compose
 **/.classpath
 **/.dockerignore
 **/.env
-**/.git
 **/.gitignore
 **/.project
 **/.settings
@@ -23,3 +23,7 @@
 **/values.dev.yaml
 LICENSE
 README.md
+.git
+!.git/HEAD
+!.git/config
+!.git/refs/heads/master

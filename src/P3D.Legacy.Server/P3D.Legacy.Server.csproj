@@ -6,6 +6,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>CS1591;</NoWarn>
+    <DockerComposeProjectPath>..\..\docker-compose\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +26,7 @@
     <ProjectReference Include="..\P3D.Legacy.Server.Application\P3D.Legacy.Server.Application.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.GameCommands\P3D.Legacy.Server.GameCommands.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Infrastructure\P3D.Legacy.Server.Infrastructure.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Statistics\P3D.Legacy.Server.Statistics.csproj" />
   </ItemGroup>
 
 </Project>
