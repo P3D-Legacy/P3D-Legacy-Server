@@ -94,7 +94,7 @@ namespace P3D.Legacy.Server.Services.Server
                         reader.Advance();
                     }
 
-                    if (_connectionState == P3DConnectionState.Intitialized && watch.ElapsedMilliseconds >= 1000)
+                    if (_connectionState == P3DConnectionState.Intitialized && watch.ElapsedMilliseconds >= 5000)
                     {
                         await SendPacketAsync(new PingPacket
                         {

@@ -70,13 +70,6 @@ namespace P3D.Legacy.Server.Services.Server
             lifetimeNotificationFeature.RequestClose();
         }
 
-        public TFeature? GetFeature<TFeature>()
-        {
-            if (this is TFeature feature)
-                return feature;
-            return default;
-        }
-
         private async Task SendPacketAsync(P3DPacket packet, CancellationToken ct) => await _writer.WriteAsync(_protocol, packet, ct);
 
         private async Task SendServerMessageAsync(string text, CancellationToken ct) => await SendPacketAsync(new ChatMessageGlobalPacket
