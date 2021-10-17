@@ -15,7 +15,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Server.Application.Queries.Bans;
@@ -63,8 +68,6 @@ namespace P3D.Legacy.Server
                     GameCommands.Extensions.ServiceCollectionExtensions.AddGameCommandsNotifications()
                     );
 
-                services.AddSingleton<DefaultJsonSerializer>();
-
                 services.AddDefaultCorrelationId(options =>
                 {
                     options.AddToLoggingScope = true;
@@ -90,6 +93,22 @@ namespace P3D.Legacy.Server
                     .GenerateCorrelationId()
                     .AddPolly()
                     .AddCorrelationIdOverrideForwarding();
+
+                services.AddOpenTelemetryMetrics(builder =>
+                {
+                    builder.AddPrometheusExporter();
+                    //builder.AddConsoleExporter();
+                });
+
+                services.AddOpenTelemetryTracing(builder =>
+                {
+                    builder.AddConsoleExporter();
+                    builder.AddSource("P3D.Legacy.Server");
+                    builder.
+                });
+
+                services.AddSingleton<DefaultJsonSerializer>();
+
 
                 services.AddSingleton<P3DPacketFactory>();
 
@@ -141,7 +160,10 @@ namespace P3D.Legacy.Server
                 */
                 .UseStartup<Startup>()
             )
-
+            .ConfigureLogging((ctx, builder) =>
+            {
+                builder.AddOpenTelemetry(options => options.AddConsoleExporter());
+            })
         ;
     }
 }

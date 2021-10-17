@@ -65,6 +65,8 @@ namespace P3D.Legacy.Server
 
             app.UseRouting();
 
+            app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
