@@ -1,6 +1,7 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Application.Commands.Administration;
 using P3D.Legacy.Server.Application.Services;
 
 using System;
@@ -30,15 +31,15 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
                     return;
                 }
 
-                await SendMessageAsync(player, $"Player {targetName} permissions are {targetPlayer.Permissions.ToString()}.", ct);
+                await SendMessageAsync(player, $"Player {targetName} permissions are {targetPlayer.Permissions}.", ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
         }
 
-        public override async Task HelpAsync(IPlayer client, string alias, CancellationToken ct)
+        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
         {
-            await SendMessageAsync(client, $"Correct usage is /{alias} [<playername>]", ct);
+            await SendMessageAsync(player, $"Correct usage is /{alias} [<playername>]", ct);
         }
     }
 }

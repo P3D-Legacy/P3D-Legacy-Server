@@ -207,8 +207,17 @@ namespace P3D.Legacy.Server.Services.Server
 
         private async Task HandleChatMessageAsync(ChatMessageGlobalPacket packet, CancellationToken ct)
         {
-            //await _mediator.Publish(new PlayerSentLocalMessageNotification(this, LevelFile, packet.Message), ct);
-            await _mediator.Publish(new PlayerSentGlobalMessageNotification(this, packet.Message), ct);
+            var message = packet.Message;
+
+            if (message.StartsWith("/"))
+            {
+                await _mediator.Publish(new PlayerSentCommandNotification(this, packet.Message), ct);
+            }
+            else
+            {
+                //await _mediator.Publish(new PlayerSentLocalMessageNotification(this, LevelFile, packet.Message), ct);
+                await _mediator.Publish(new PlayerSentGlobalMessageNotification(this, packet.Message), ct);
+            }
         }
         private async Task HandlePrivateMessageAsync(ChatMessagePrivatePacket packet, CancellationToken ct)
         {

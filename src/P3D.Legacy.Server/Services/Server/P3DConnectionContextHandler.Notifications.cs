@@ -22,7 +22,8 @@ namespace P3D.Legacy.Server.Services.Server
         INotificationHandler<MessageToPlayerNotification>,
         INotificationHandler<PlayerSentRawP3DPacketNotification>,
         INotificationHandler<ServerMessageNotification>,
-        INotificationHandler<PlayerTriggeredEventNotification>
+        INotificationHandler<PlayerTriggeredEventNotification>,
+        INotificationHandler<PlayerSentCommandNotification>
     {
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
         {
@@ -115,6 +116,14 @@ namespace P3D.Legacy.Server.Services.Server
             var (player, eventMessage) = notification;
 
             await SendServerMessageAsync($"The player {player.Name} {eventMessage}", ct);
+        }
+
+        public async Task Handle(PlayerSentCommandNotification notification, CancellationToken ct)
+        {
+            var (player, message) = notification;
+
+            if (Id != player.Id) return;
+            await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Id, Message = message }, ct);
         }
     }
 }

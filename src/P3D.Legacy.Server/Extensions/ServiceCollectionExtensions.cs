@@ -16,8 +16,6 @@ using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Application.Utils;
 using P3D.Legacy.Server.BackgroundServices;
 using P3D.Legacy.Server.Behaviours;
-using P3D.Legacy.Server.GameCommands.CommandHandlers;
-using P3D.Legacy.Server.GameCommands.Commands;
 
 using System;
 using System.Collections.Generic;
@@ -39,8 +37,6 @@ namespace P3D.Legacy.Server.Extensions
                 { typeof(IRequestHandler<PlayerMutedPlayerCommand, CommandResult>), typeof(PlayerMutedPlayerCommandHandler) },
                 { typeof(IRequestHandler<PlayerUnmutedPlayerCommand, CommandResult>), typeof(PlayerUnmutedPlayerCommandHandler) },
 
-                { typeof(IRequestHandler<RawGameCommand, CommandResult>), typeof(RawGameCommandHandler) },
-
                 { typeof(IRequestHandler<BanPlayerCommand, CommandResult>), typeof(BanPlayerCommandHandler) },
                 { typeof(IRequestHandler<UnbanPlayerCommand, CommandResult>), typeof(UnbanPlayerCommandHandler) },
                 { typeof(IRequestHandler<KickPlayerCommand, CommandResult>), typeof(KickPlayerCommandHandler) },
@@ -61,6 +57,7 @@ namespace P3D.Legacy.Server.Extensions
                 { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentRawP3DPacketNotification>>() },
                 { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<ServerMessageNotification>>() },
                 { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerTriggeredEventNotification>>() },
+                { sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentCommandNotification>>() },
 
                 { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerJoinedNotification> },
                 { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerLeavedNotification> },

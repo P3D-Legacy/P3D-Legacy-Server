@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Services;
-using P3D.Legacy.Server.GameCommands.Services;
+using P3D.Legacy.Server.GameCommands.NotificationHandlers;
 
 using System;
 using System.Collections.Generic;
@@ -37,7 +37,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
             }
 
             // Circumventing circular refs
-            var commandManagerService = _serviceProvider.GetRequiredService<CommandManagerService>();
+            var commandManagerService = _serviceProvider.GetRequiredService<CommandManagerHandler>();
 
             var helpAlias = arguments.Length == 1 ? arguments[0] : "1";
 
@@ -62,7 +62,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
         private async Task HelpPageAsync(IPlayer client, int page, CancellationToken ct)
         {
             // Circumventing circular refs
-            var commandManagerService = _serviceProvider.GetRequiredService<CommandManagerService>();
+            var commandManagerService = _serviceProvider.GetRequiredService<CommandManagerHandler>();
 
             const int perPage = 5;
             var commands = commandManagerService.GetCommands().Where(command => (client.Permissions & command.Permissions) != PermissionFlags.None).ToList();

@@ -9,7 +9,6 @@ using P3D.Legacy.Server.GameCommands.CommandManagers.Client;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Permission;
 using P3D.Legacy.Server.GameCommands.CommandManagers.World;
 using P3D.Legacy.Server.GameCommands.NotificationHandlers;
-using P3D.Legacy.Server.GameCommands.Services;
 
 using System;
 using System.Collections.Generic;
@@ -20,7 +19,7 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
     {
         public static IEnumerable<(Type, Type)> AddGameCommandsNotifications()
         {
-            yield return (typeof(INotificationHandler<PlayerSentGlobalMessageNotification>), typeof(GameCommandInterceptor));
+            yield return (typeof(INotificationHandler<PlayerSentCommandNotification>), typeof(CommandManagerHandler));
         }
 
         public static IServiceCollection AddGameCommands(this IServiceCollection services)
@@ -44,7 +43,7 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
             services.AddTransient<CommandManager, SetTimeCommandManager>();
             services.AddTransient<CommandManager, SetWeatherCommandManager>();
 
-            services.AddSingleton<CommandManagerService>();
+            services.AddSingleton<CommandManagerHandler>();
 
             return services;
         }
