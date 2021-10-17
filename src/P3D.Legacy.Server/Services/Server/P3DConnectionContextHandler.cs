@@ -18,6 +18,7 @@ using P3D.Legacy.Server.Options;
 
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -58,6 +59,9 @@ namespace P3D.Legacy.Server.Services.Server
 
         protected override async Task OnCreatedAsync(CancellationToken ct)
         {
+            if (Connection.RemoteEndPoint is IPEndPoint ipEndPoint)
+                IPAddress = ipEndPoint.Address;
+
             Features = new FeatureCollection(Connection.Features);
             Features.Set(this as IP3DPlayerState);
 

@@ -1,6 +1,9 @@
-﻿using P3D.Legacy.Common;
+﻿using Microsoft.AspNetCore.Connections.Features;
+
+using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Chat;
+using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Common.Packets.Shared;
 using P3D.Legacy.Server.Abstractions;
 
@@ -57,6 +60,14 @@ namespace P3D.Legacy.Server.Services.Server
             Permissions = permissions;
 
             return Task.CompletedTask;
+        }
+
+        public async Task KickAsync(string reason, CancellationToken ct)
+        {
+            await SendPacketAsync(new KickedPacket { Reason = reason }, ct);
+
+            var lifetimeNotificationFeature = Features.Get<IConnectionLifetimeNotificationFeature>();
+            lifetimeNotificationFeature.RequestClose();
         }
 
         public TFeature? GetFeature<TFeature>()

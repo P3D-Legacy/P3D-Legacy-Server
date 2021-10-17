@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
+namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
     [Flags]
     public enum MuteStatus

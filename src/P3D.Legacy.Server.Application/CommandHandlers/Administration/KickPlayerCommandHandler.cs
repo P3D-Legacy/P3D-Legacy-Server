@@ -27,9 +27,11 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
 
         public async Task<CommandResult> Handle(KickPlayerCommand request, CancellationToken ct)
         {
-            var result = await _container.KickAsync(request.Player, ct);
+            var (player, reason) = request;
 
-            return new CommandResult(result);
+            await player.KickAsync(reason, ct);
+
+            return new CommandResult(true);
         }
     }
 }

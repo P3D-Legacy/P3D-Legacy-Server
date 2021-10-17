@@ -5,8 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using P3D.Legacy.Server.Application.Notifications;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Chat;
-using P3D.Legacy.Server.GameCommands.CommandManagers.Client;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Permission;
+using P3D.Legacy.Server.GameCommands.CommandManagers.Player;
 using P3D.Legacy.Server.GameCommands.CommandManagers.World;
 using P3D.Legacy.Server.GameCommands.NotificationHandlers;
 
@@ -32,11 +32,13 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
             services.AddTransient<CommandManager, SayCommandManager>();
 
             services.AddTransient<CommandManager, BanCommandManager>();
+            services.AddTransient<CommandManager, GetGameJoltIdCommandManager>();
             services.AddTransient<CommandManager, KickCommandManager>();
             services.AddTransient<CommandManager, MuteCommandManager>();
             services.AddTransient<CommandManager, UnbanCommandManager>();
             services.AddTransient<CommandManager, UnmuteCommandManager>();
 
+            services.AddTransient<CommandManager, SetPermissionCommand>();
             services.AddTransient<CommandManager, ShowPermissionsCommandManager>();
 
             services.AddTransient<CommandManager, SetSeasonCommandManager>();

@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
+namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
     public class BanCommandManager : CommandManager
     {
@@ -39,6 +39,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
                 }
 
                 var reason = arguments[2].TrimStart('"').TrimEnd('"');
+                await Mediator.Send(new KickPlayerCommand(targetPlayer, reason), ct);
                 await Mediator.Send(new BanPlayerCommand(targetPlayer.GameJoltId, targetPlayer.Name, targetPlayer.IPAddress, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
             }
             else if (arguments.Length > 3)
@@ -57,6 +58,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
                 }
 
                 var reason = string.Join(" ", arguments.Skip(2).ToArray());
+                await Mediator.Send(new KickPlayerCommand(targetPlayer, reason), ct);
                 await Mediator.Send(new BanPlayerCommand(targetPlayer.GameJoltId, targetPlayer.Name, targetPlayer.IPAddress, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
             }
             else

@@ -22,5 +22,6 @@ namespace P3D.Legacy.Server.Abstractions
 
         public Task AssignIdAsync(long id, CancellationToken ct) => throw new NotSupportedException();
         public Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct) => throw new NotSupportedException();
+        public Task KickAsync(string reason, CancellationToken ct) => throw new NotSupportedException();
     }
 }

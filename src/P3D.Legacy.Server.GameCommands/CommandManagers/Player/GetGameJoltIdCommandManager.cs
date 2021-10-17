@@ -1,23 +1,22 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Commands.Administration;
 using P3D.Legacy.Server.Application.Services;
 
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
+namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
-    public class UnbanCommandManager : CommandManager
+    public class GetGameJoltIdCommandManager : CommandManager
     {
-        public override string Name => "unban";
-        public override string Description => "Unban a Player.";
-        public override IEnumerable<string> Aliases => new[] { "ub" };
-        public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
+        public override string Name => "getgamejolt";
+        public override string Description => "Returns the player's GameJolt Id";
+        public override IEnumerable<string> Aliases => new [] { "ggj" };
+        public override PermissionFlags Permissions => PermissionFlags.UserOrHigher;
 
-        public UnbanCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
+        public GetGameJoltIdCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
@@ -30,7 +29,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
                     return;
                 }
 
-                await Mediator.Send(new UnbanPlayerCommand(targetPlayer.GameJoltId), ct);
+                await SendMessageAsync(player, $"GameJolt Id: {targetPlayer.GameJoltId}", ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
@@ -38,7 +37,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
 
         public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
         {
-            await SendMessageAsync(player, $"Correct usage is /{alias} <playername> [<reason>]", ct);
+            await SendMessageAsync(player, $"Correct usage is /{alias} <playername>", ct);
         }
     }
 }

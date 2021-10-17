@@ -31,6 +31,7 @@ namespace P3D.Legacy.Server.Extensions
 
             new RequestRegistrar
             {
+                { typeof(IRequestHandler<ChangePlayerPermissionsCommand, CommandResult>), typeof(ChangePlayerPermissionsCommandHandler) },
                 { typeof(IRequestHandler<PlayerFinalizingCommand>), typeof(PlayerFinalizingCommandHandler) },
                 { typeof(IRequestHandler<PlayerInitializingCommand>), typeof(PlayerInitializingCommandHandler) },
                 { typeof(IRequestHandler<PlayerReadyCommand>), typeof(PlayerReadyCommandHandler) },

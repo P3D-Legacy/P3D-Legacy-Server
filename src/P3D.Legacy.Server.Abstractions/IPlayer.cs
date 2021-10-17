@@ -24,5 +24,7 @@ namespace P3D.Legacy.Server.Abstractions
 
         Task AssignIdAsync(long id, CancellationToken ct);
         Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct);
+
+        Task KickAsync(string reason, CancellationToken ct);
     }
 }

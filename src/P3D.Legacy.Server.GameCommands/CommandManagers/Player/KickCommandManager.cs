@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
+namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
     public class KickCommandManager : CommandManager
     {

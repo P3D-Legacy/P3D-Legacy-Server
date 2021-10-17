@@ -8,16 +8,16 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
+namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
-    public class UnmuteCommandManager : CommandManager
+    public class MuteCommandManager : CommandManager
     {
-        public override string Name => "unmute";
+        public override string Name => "mute";
         public override string Description => "Command is disabled";
-        public override IEnumerable<string> Aliases => new [] { "um" };
+        public override IEnumerable<string> Aliases => new [] { "mm" };
         public override PermissionFlags Permissions => PermissionFlags.UserOrHigher;
 
-        public UnmuteCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
+        public MuteCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
@@ -30,7 +30,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Client
                     return;
                 }
 
-                await Mediator.Send(new PlayerMutedPlayerCommand(player, targetPlayer), ct);
+                await Mediator.Send(new PlayerUnmutedPlayerCommand(player, targetPlayer), ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
