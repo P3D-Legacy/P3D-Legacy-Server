@@ -1,7 +1,6 @@
 ﻿using BetterHostedServices;
 
 using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
 
 using MediatR;
@@ -9,6 +8,8 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+using OpenTelemetry.Trace;
 
 using P3D.Legacy.Server.Application.Notifications;
 using P3D.Legacy.Server.Options;
@@ -25,14 +26,16 @@ namespace P3D.Legacy.Server.BackgroundServices
         INotificationHandler<ServerMessageNotification>,
         INotificationHandler<PlayerTriggeredEventNotification>
     {
-        private readonly DiscordSocketClient _discordSocketClient;
-        private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger _logger;
+        private readonly Tracer _tracer;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IMediator _mediator;
+        private readonly DiscordSocketClient _discordSocketClient;
         private readonly DiscordOptions _options;
 
         public DiscordPassthroughService(
             ILogger<DiscordPassthroughService> logger,
+            TracerProvider traceProvider,
             DiscordSocketClient discordSocketClient,
             IServiceScopeFactory scopeFactory,
             IOptions<DiscordOptions> options,
@@ -40,6 +43,7 @@ namespace P3D.Legacy.Server.BackgroundServices
             IApplicationEnder applicationEnder) : base(applicationEnder)
         {
             _logger = logger;
+            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Host");
             _scopeFactory = scopeFactory;
             _options = options.Value;
             _mediator = mediator;
@@ -48,6 +52,8 @@ namespace P3D.Legacy.Server.BackgroundServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            using var span = _tracer.StartActiveSpan("Dicord Bot");
+
             async void OnCancellation(object? _, CancellationToken ct)
             {
                 _discordSocketClient.MessageReceived -= BotMessageReceivedAsync;
