@@ -1,5 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+using OpenTelemetry.Trace;
 
 using P3D.Legacy.Server.Abstractions;
 
@@ -50,15 +54,21 @@ namespace P3D.Legacy.Server.Application.Queries.Permissions
             }
         }
 
+        private readonly ILogger _logger;
+        private readonly Tracer _tracer;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public P3DAPIPermissionQueries(IHttpClientFactory httpClientFactory)
+        public P3DAPIPermissionQueries(ILogger<P3DAPIPermissionQueries> logger, TracerProvider traceProvider, IHttpClientFactory httpClientFactory)
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Application");
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
         public async Task<PermissionViewModel> GetByGameJoltAsync(ulong id, CancellationToken ct)
         {
+            using var span = _tracer.StartActiveSpan("P3DAPIPermissionQueries GetByGameJoltAsync", SpanKind.Client);
+
             var permissions = PermissionFlags.UnVerified;
 
             HttpResponseMessage response;
@@ -88,10 +98,13 @@ namespace P3D.Legacy.Server.Application.Queries.Permissions
                         foreach (var permissionDto in dto.User.Roles.SelectMany(x => x.Permissions))
                         {
                             if (permissionDto.Name.Equals("gameserver.moderator", StringComparison.OrdinalIgnoreCase))
-                                permissions |= PermissionFlags.Administrator;
+                                permissions |= PermissionFlags.Moderator;
 
                             if (permissionDto.Name.Equals("gameserver.admin", StringComparison.OrdinalIgnoreCase))
                                 permissions |= PermissionFlags.Administrator;
+
+                            if (permissionDto.Name.Equals("gameserver.server", StringComparison.OrdinalIgnoreCase))
+                                permissions |= PermissionFlags.Server;
                         }
                         return new PermissionViewModel(permissions);
                     }

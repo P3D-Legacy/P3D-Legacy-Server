@@ -61,11 +61,10 @@ namespace P3D.Legacy.Server
             app.UseSwagger();
             app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", appName));
 
-            app.UseCorrelationId();
-
             app.UseRouting();
 
-            app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
+            app.UseCorrelationId();
 
             app.UseEndpoints(endpoints =>
             {

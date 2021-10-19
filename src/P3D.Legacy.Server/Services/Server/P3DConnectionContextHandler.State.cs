@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace P3D.Legacy.Server.Services.Server
 {
-    public partial class P3DConnectionContextHandler : IP3DPlayerState
+    public sealed partial class P3DConnectionContextHandler : IP3DPlayerState
     {
         public string ConnectionId { get; private set; } = default!;
 

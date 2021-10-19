@@ -2,6 +2,8 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
+using OpenTelemetry.Trace;
+
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.GameCommands.NotificationHandlers;
@@ -22,14 +24,18 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
         public override PermissionFlags Permissions => PermissionFlags.UnVerifiedOrHigher;
 
         private readonly IServiceProvider _serviceProvider;
+        private readonly Tracer _tracer;
 
-        public HelpCommandManager(IServiceProvider serviceProvider, IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer)
+        public HelpCommandManager(IServiceProvider serviceProvider, TracerProvider traceProvider, IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.GameCommands");
         }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
+            using var span = _tracer.StartActiveSpan($"HelpCommandManager Handle");
+
             if (arguments.Length > 1)
             {
                 await HelpAsync(player, alias, ct);
@@ -61,6 +67,8 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
         }
         private async Task HelpPageAsync(IPlayer client, int page, CancellationToken ct)
         {
+            using var span = _tracer.StartActiveSpan($"HelpCommandManager HelpPage");
+
             // Circumventing circular refs
             var commandManagerService = _serviceProvider.GetRequiredService<CommandManagerHandler>();
 

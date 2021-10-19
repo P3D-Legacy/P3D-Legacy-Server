@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using OpenTelemetry.Trace;
+
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Server.Abstractions;
@@ -24,11 +26,12 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Services.Server
 {
-    public partial class P3DConnectionContextHandler : ConnectionContextHandler, IPlayer
+    public sealed partial class P3DConnectionContextHandler : ConnectionContextHandler, IPlayer, IDisposable
     {
         private enum P3DConnectionState { None, Initializing, Intitialized, Finalized }
 
         private readonly ILogger _logger;
+        private readonly Tracer _tracer;
         private readonly IMediator _mediator;
         private readonly IPlayerContainerReader _playerContainer;
         private readonly IPlayerQueries _playerQueries;
@@ -36,11 +39,13 @@ namespace P3D.Legacy.Server.Services.Server
         private readonly WorldService _worldService;
         private readonly ServerOptions _serverOptions;
 
+        private TelemetrySpan _connectionSpan = default!;
         private ProtocolWriter _writer = default!;
         private P3DConnectionState _connectionState = P3DConnectionState.None;
 
         public P3DConnectionContextHandler(
             ILogger<P3DConnectionContextHandler> logger,
+            TracerProvider traceProvider,
             P3DProtocol protocol,
             IPlayerContainerReader playerContainer,
             IPlayerQueries playerQueries,
@@ -55,56 +60,80 @@ namespace P3D.Legacy.Server.Services.Server
             _worldService = worldService ?? throw new ArgumentNullException(nameof(worldService));
             _serverOptions = serverOptions.Value ?? throw new ArgumentNullException(nameof(serverOptions));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Host");
         }
 
         protected override async Task OnCreatedAsync(CancellationToken ct)
         {
-            if (Connection.RemoteEndPoint is IPEndPoint ipEndPoint)
-                IPAddress = ipEndPoint.Address;
+            _connectionSpan = _tracer.StartActiveSpan($"P3D Client Connection", SpanKind.Server);
 
-            Features = new FeatureCollection(Connection.Features);
-            Features.Set(this as IP3DPlayerState);
-
-            ConnectionId = Features.Get<IConnectionIdFeature>().ConnectionId;
-
-            Features.Get<IConnectionCompleteFeature>().OnCompleted(async _ =>
+            try
             {
-                _connectionState = P3DConnectionState.Finalized;
-                await _mediator.Send(new PlayerFinalizingCommand(this), CancellationToken.None);
-            }, default!);
-
-            await using (var reader = Connection.CreateReader())
-            await using (_writer = Connection.CreateWriter())
-            {
-                var watch = Stopwatch.StartNew();
-                while (!ct.IsCancellationRequested)
+                if (Connection.RemoteEndPoint is IPEndPoint ipEndPoint)
                 {
-                    try
-                    {
-                        var result = await reader.ReadAsync(_protocol, ct);
-                        await HandlePacketAsync(result.Message, ct);
+                    IPAddress = ipEndPoint.Address;
+                    _connectionSpan.SetAttribute("p3dclient.ipaddress", IPAddress.ToString());
+                }
 
-                        if (result.IsCompleted)
+                Features = new FeatureCollection(Connection.Features);
+                Features.Set(this as IP3DPlayerState);
+
+                ConnectionId = Features.Get<IConnectionIdFeature>().ConnectionId;
+
+                Features.Get<IConnectionCompleteFeature>().OnCompleted(async _ =>
+                {
+                    _connectionState = P3DConnectionState.Finalized;
+                    var finishSpan = _tracer.StartActiveSpan($"P3D Client Closing", parentContext: _connectionSpan.Context);
+                    await _mediator.Send(new PlayerFinalizingCommand(this), CancellationToken.None);
+                    finishSpan.End();
+                    _connectionSpan.End();
+                    finishSpan.Dispose();
+                }, default!);
+
+                await using (var reader = Connection.CreateReader())
+                await using (_writer = Connection.CreateWriter())
+                {
+                    var watch = Stopwatch.StartNew();
+                    while (!ct.IsCancellationRequested)
+                    {
+                        try
                         {
-                            break;
+                            var result = await reader.ReadAsync(_protocol, ct);
+                            await HandlePacketAsync(result.Message, ct);
+
+                            if (result.IsCompleted)
+                            {
+                                break;
+                            }
                         }
-                    }
-                    finally
-                    {
-                        reader.Advance();
-                    }
-
-                    if (_connectionState == P3DConnectionState.Intitialized && watch.ElapsedMilliseconds >= 5000)
-                    {
-                        await SendPacketAsync(new PingPacket
+                        finally
                         {
-                            Origin = Origin.Server
-                        }, ct);
+                            reader.Advance();
+                        }
 
-                        watch.Restart();
+                        if (_connectionState == P3DConnectionState.Intitialized && watch.ElapsedMilliseconds >= 5000)
+                        {
+                            await SendPacketAsync(new PingPacket
+                            {
+                                Origin = Origin.Server
+                            }, ct);
+
+                            watch.Restart();
+                        }
                     }
                 }
             }
+            catch (Exception)
+            {
+                _connectionSpan.SetStatus(Status.Error);
+                throw;
+            }
+        }
+
+        public override void Dispose()
+        {
+            _connectionSpan.Dispose();
+            base.Dispose();
         }
     }
 }

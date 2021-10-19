@@ -17,9 +17,9 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IEnumerable<(Type, Type)> AddGameCommandsNotifications()
+        public static IEnumerable<(Type, (Type, ServiceLifetime))> AddGameCommandsNotifications()
         {
-            yield return (typeof(INotificationHandler<PlayerSentCommandNotification>), typeof(CommandManagerHandler));
+            yield return (typeof(INotificationHandler<PlayerSentCommandNotification>), (typeof(CommandManagerHandler), ServiceLifetime.Transient));
         }
 
         public static IServiceCollection AddGameCommands(this IServiceCollection services)

@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 
 using Nerdbank.Streams;
 
+using OpenTelemetry.Trace;
+
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets;
 
@@ -13,22 +15,26 @@ using System.Text;
 
 namespace P3D.Legacy.Server.Services.Server
 {
-    public class P3DProtocol : IMessageReader<P3DPacket?>, IMessageWriter<P3DPacket>
+    public sealed class P3DProtocol : IMessageReader<P3DPacket?>, IMessageWriter<P3DPacket>
     {
         private static readonly int NewLineLength = Encoding.ASCII.GetByteCount(new[] { '\r', '\n' });
 
         private readonly ILogger _logger;
+        private readonly Tracer _tracer;
         private readonly P3DPacketFactory _packetFactory;
         private readonly SequenceTextReader _sequenceTextReader = new();
 
-        public P3DProtocol(ILogger<P3DProtocol> logger, P3DPacketFactory packetFactory)
+        public P3DProtocol(ILogger<P3DProtocol> logger, TracerProvider tracerProvider, P3DPacketFactory packetFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _packetFactory = packetFactory ?? throw new ArgumentNullException(nameof(packetFactory));
+            _tracer = tracerProvider.GetTracer("P3D.Legacy.Server.Host");
         }
 
         public bool TryParseMessage(in ReadOnlySequence<byte> input, ref SequencePosition consumed, ref SequencePosition examined, out P3DPacket? message)
         {
+            using var span = _tracer.StartActiveSpan($"P3DProtocol TryParseMessage");
+
             _sequenceTextReader.Initialize(input, Encoding.ASCII);
             if (_sequenceTextReader.ReadLine() is not { } line)
             {
@@ -72,11 +78,12 @@ namespace P3D.Legacy.Server.Services.Server
             _logger.LogTrace("Received a message type {Type}", packet.GetType());
             message = packet;
             return true;
-
         }
 
         public void WriteMessage(P3DPacket message, IBufferWriter<byte> output)
         {
+            using var span = _tracer.StartActiveSpan($"P3DProtocol WriteMessage");
+
             _logger.LogTrace("Sending a message type {Type}", message.GetType());
             var text = $"{message.CreateData()}\r\n";
             output.Write(Encoding.ASCII.GetBytes(text));

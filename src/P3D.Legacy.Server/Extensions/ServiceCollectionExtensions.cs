@@ -25,7 +25,7 @@ namespace P3D.Legacy.Server.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddMediatRInternal(this IServiceCollection services, IEnumerable<(Type, Type)> notifications)
+        public static IServiceCollection AddMediatRInternal(this IServiceCollection services, params IEnumerable<(Type, (Type, ServiceLifetime))>[] notifications)
         {
             ServiceRegistrar.AddRequiredServices(services, new MediatRServiceConfiguration().AsTransient());
 
@@ -66,11 +66,12 @@ namespace P3D.Legacy.Server.Extensions
                 { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<ServerMessageNotification> },
                 { sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerTriggeredEventNotification> },
 
-                notifications
+                notifications.SelectMany(x => x)
             }.Register(services);
 
             services.AddTransient(typeof(IRequestPreProcessor<>), typeof(LoggingBehaviour<>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TracingBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
             //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 

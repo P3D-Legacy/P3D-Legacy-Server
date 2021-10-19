@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Services.Server
 {
-    public partial class P3DConnectionContextHandler
+    public sealed partial class P3DConnectionContextHandler
     {
         private static GameDataPacket GetFromP3DPlayerState(IPlayer player, IP3DPlayerState state) => new()
         {
@@ -70,7 +70,12 @@ namespace P3D.Legacy.Server.Services.Server
             lifetimeNotificationFeature.RequestClose();
         }
 
-        private async Task SendPacketAsync(P3DPacket packet, CancellationToken ct) => await _writer.WriteAsync(_protocol, packet, ct);
+        private async Task SendPacketAsync(P3DPacket packet, CancellationToken ct)
+        {
+            using var span = _tracer.StartActiveSpan($"P3D Client Sending {packet.GetType().Name}");
+            span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
+            await _writer.WriteAsync(_protocol, packet, ct);
+        }
 
         private async Task SendServerMessageAsync(string text, CancellationToken ct) => await SendPacketAsync(new ChatMessageGlobalPacket
         {

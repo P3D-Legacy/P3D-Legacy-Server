@@ -27,7 +27,7 @@ namespace P3D.Legacy.Server.Application.Utils
                 {
                     foreach (var obj in func(sp))
                     {
-                        yield return obj as INotificationHandler<TNotification>;
+                        yield return (obj as INotificationHandler<TNotification>)!;
                     }
                 }
 
@@ -37,13 +37,13 @@ namespace P3D.Legacy.Server.Application.Utils
             public override IEnumerable<INotificationHandler<TNotification>> ServiceFactory(IServiceProvider sp) => _notifications.SelectMany(func => func(sp));
         }
 
-        private static readonly MethodInfo GenericAddMethod = typeof(NotificationRegistrar).GetMethod("Add", Type.EmptyTypes)!;
+        private static readonly MethodInfo GenericAddMethod = typeof(NotificationRegistrar).GetMethod("Add", new Type[] { typeof(ServiceLifetime) })!;
 
 
         private readonly Dictionary<Type, BaseServiceFactory> _containers = new();
-        private readonly Dictionary<Type, Type> _direct = new();
+        private readonly Dictionary<Type, (Type, ServiceLifetime)> _direct = new();
 
-        public void Add(Type @base, Type impl)
+        public void Add(Type @base, Type impl, ServiceLifetime lifetime = ServiceLifetime.Transient)
         {
             if (!@base.IsInterface || @base.GetGenericTypeDefinition() != typeof(INotificationHandler<>))
                 throw new Exception();
@@ -56,18 +56,18 @@ namespace P3D.Legacy.Server.Application.Utils
                 throw new Exception();
 
             var method = GenericAddMethod.MakeGenericMethod(impl, notificationType);
-            method.Invoke(this, Array.Empty<object>());
+            method.Invoke(this, new object?[] { lifetime });
         }
 
-        public void Add(IEnumerable<(Type, Type)> tuples)
+        public void Add(IEnumerable<(Type, (Type, ServiceLifetime))> tuples)
         {
-            foreach (var (@base, impl) in tuples)
+            foreach (var (@base, (impl, lifetime)) in tuples)
             {
-                Add(@base, impl);
+                Add(@base, impl, lifetime);
             }
         }
 
-        public void Add<TImpl, TNotification>() where TNotification : INotification where TImpl : INotificationHandler<TNotification>
+        public void Add<TImpl, TNotification>(ServiceLifetime lifetime = ServiceLifetime.Transient) where TNotification : INotification where TImpl : INotificationHandler<TNotification>
         {
             var key = typeof(IEnumerable<INotificationHandler<TNotification>>);
 
@@ -82,7 +82,7 @@ namespace P3D.Legacy.Server.Application.Utils
                 container.Register(sp => new[] { sp.GetRequiredService<TImpl>() as INotificationHandler<TNotification> });
             }
 
-            _direct[typeof(TImpl)] = typeof(TImpl);
+            _direct[typeof(TImpl)] = (typeof(TImpl), lifetime);
         }
 
         public void Add<TNotification>(Func<IServiceProvider, INotificationHandler<TNotification>> factory) where TNotification : INotification
@@ -122,8 +122,8 @@ namespace P3D.Legacy.Server.Application.Utils
             foreach (var (type, container) in _containers)
                 services.Add(ServiceDescriptor.Describe(type, sp => container.ServiceFactory(sp), ServiceLifetime.Transient));
 
-            foreach (var (@base, impl) in _direct)
-                services.Add(ServiceDescriptor.Describe(@base, impl, ServiceLifetime.Transient));
+            foreach (var (@base, (impl, lifetime)) in _direct)
+                services.Add(ServiceDescriptor.Describe(@base, impl, lifetime));
 
             return services;
         }

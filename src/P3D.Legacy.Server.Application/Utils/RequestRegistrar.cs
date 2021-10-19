@@ -12,7 +12,7 @@ namespace P3D.Legacy.Server.Application.Utils
     {
         private class RequestServiceFactory<TRequest, TResponse> : BaseServiceFactory where TRequest : IRequest<TResponse>
         {
-            private Func<IServiceProvider, IRequestHandler<TRequest, TResponse>> _command;
+            private Func<IServiceProvider, IRequestHandler<TRequest, TResponse>> _command = default!;
 
             public void Register(Func<IServiceProvider, IRequestHandler<TRequest, TResponse>> func) => _command = func;
 

@@ -18,11 +18,12 @@ using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common.Packets;
+using P3D.Legacy.Server.Application.Extensions;
 using P3D.Legacy.Server.Application.Queries.Bans;
 using P3D.Legacy.Server.Application.Queries.Permissions;
 using P3D.Legacy.Server.Application.Queries.Players;
@@ -35,9 +36,11 @@ using P3D.Legacy.Server.Infrastructure.Repositories;
 using P3D.Legacy.Server.Options;
 using P3D.Legacy.Server.Services;
 using P3D.Legacy.Server.Services.Server;
+using P3D.Legacy.Server.Statistics.Extensions;
 using P3D.Legacy.Server.Utils.HttpLogging;
 
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -49,6 +52,11 @@ namespace P3D.Legacy.Server
     {
         public static async Task Main(string[] args)
         {
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
+            Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+            Activity.ForceDefaultIdFormat = true;
+
             await CreateHostBuilder(args).Build().RunAsync();
         }
 
@@ -61,12 +69,14 @@ namespace P3D.Legacy.Server
                 services.Configure<DiscordOptions>(ctx.Configuration.GetSection("Discord"));
 
                 services.AddGameCommands();
+                services.AddStatistics();
 
                 services.AddBetterHostedServices();
 
                 services.AddMediatRInternal(
-                    GameCommands.Extensions.ServiceCollectionExtensions.AddGameCommandsNotifications()
-                    );
+                    GameCommands.Extensions.ServiceCollectionExtensions.AddGameCommandsNotifications(),
+                    Statistics.Extensions.ServiceCollectionExtensions.AddStatisticsNotifications()
+                );
 
                 services.AddDefaultCorrelationId(options =>
                 {
@@ -96,15 +106,37 @@ namespace P3D.Legacy.Server
 
                 services.AddOpenTelemetryMetrics(builder =>
                 {
-                    builder.AddPrometheusExporter();
-                    //builder.AddConsoleExporter();
+                    var options = ctx.Configuration.GetSection("Otlp").Get<OtlpOptions>();
+                    if (options.Enabled)
+                    {
+                        builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
+                        builder.AddAspNetCoreInstrumentation();
+                        builder.AddHttpClientInstrumentation();
+                        builder.AddStatisticsInstrumentation();
+                        builder.AddOtlpExporter(o =>
+                        {
+                            o.Endpoint = new Uri(options.Host);
+                        });
+                    }
                 });
 
                 services.AddOpenTelemetryTracing(builder =>
                 {
-                    builder.AddConsoleExporter();
-                    builder.AddSource("P3D.Legacy.Server");
-                    builder.
+                    var options = ctx.Configuration.GetSection("Otlp").Get<OtlpOptions>();
+                    if (options.Enabled)
+                    {
+                        builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
+                        builder.AddAspNetCoreInstrumentation();
+                        builder.AddHttpClientInstrumentation();
+                        builder.AddHostInstrumentation();
+                        builder.AddApplicationInstrumentation();
+                        builder.AddGameCommandsInstrumentation();
+                        builder.AddStatisticsInstrumentation();
+                        builder.AddOtlpExporter(o =>
+                        {
+                            o.Endpoint = new Uri(options.Host);
+                        });
+                    }
                 });
 
                 services.AddSingleton<DefaultJsonSerializer>();
@@ -128,7 +160,6 @@ namespace P3D.Legacy.Server
                 services.AddSingleton<DefaultPlayerContainer>();
                 services.AddTransient<IPlayerContainerWriter>(sp => sp.GetRequiredService<DefaultPlayerContainer>());
                 services.AddTransient<IPlayerContainerReader>(sp => sp.GetRequiredService<DefaultPlayerContainer>());
-                services.AddTransient<IPlayerContainerActions>(sp => sp.GetRequiredService<DefaultPlayerContainer>());
 
                 services.AddHostedServiceAsSingleton<WorldService>();
 
@@ -162,7 +193,13 @@ namespace P3D.Legacy.Server
             )
             .ConfigureLogging((ctx, builder) =>
             {
-                builder.AddOpenTelemetry(options => options.AddConsoleExporter());
+                builder.AddOpenTelemetry(options =>
+                {
+                    options.IncludeScopes = true;
+                    options.ParseStateValues = true;
+                    options.IncludeFormattedMessage = true;
+                    //options.AddConsoleExporter();
+                });
             })
         ;
     }

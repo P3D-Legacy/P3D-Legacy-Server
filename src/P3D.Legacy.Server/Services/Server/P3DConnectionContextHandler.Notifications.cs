@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Services.Server
 {
-    public partial class P3DConnectionContextHandler :
+    public sealed partial class P3DConnectionContextHandler :
         INotificationHandler<PlayerJoinedNotification>,
         INotificationHandler<PlayerLeavedNotification>,
         INotificationHandler<PlayerUpdatedStateNotification>,
@@ -23,7 +23,8 @@ namespace P3D.Legacy.Server.Services.Server
         INotificationHandler<PlayerSentRawP3DPacketNotification>,
         INotificationHandler<ServerMessageNotification>,
         INotificationHandler<PlayerTriggeredEventNotification>,
-        INotificationHandler<PlayerSentCommandNotification>
+        INotificationHandler<PlayerSentCommandNotification>,
+        INotificationHandler<WorldUpdatedNotification>
     {
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
         {
@@ -124,6 +125,18 @@ namespace P3D.Legacy.Server.Services.Server
 
             if (Id != player.Id) return;
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Id, Message = message }, ct);
+        }
+
+        public async Task Handle(WorldUpdatedNotification notification, CancellationToken ct)
+        {
+            await SendPacketAsync(new WorldDataPacket
+            {
+                Origin = Origin.Server,
+
+                Season = _worldService.Season,
+                Weather = _worldService.Weather,
+                CurrentTime = $"{_worldService.CurrentTime.Hours:00},{_worldService.CurrentTime.Minutes:00},{_worldService.CurrentTime.Seconds:00}"
+            }, ct);
         }
     }
 }

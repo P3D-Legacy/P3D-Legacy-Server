@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Application.Commands;
 using P3D.Legacy.Server.Application.Commands.World;
+using P3D.Legacy.Server.Application.Notifications;
 using P3D.Legacy.Server.Application.Services;
 
 using System;
@@ -25,10 +26,11 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.World
             _world = world ?? throw new ArgumentNullException(nameof(world));
         }
 
-        public Task<CommandResult> Handle(ChangeWorldTimeCommand request, CancellationToken ct)
+        public async Task<CommandResult> Handle(ChangeWorldTimeCommand request, CancellationToken ct)
         {
             _world.CurrentTime = request.Time;
-            return Task.FromResult(new CommandResult(true));
+            await _mediator.Publish(new WorldUpdatedNotification(), ct);
+            return new CommandResult(true);
         }
     }
 }

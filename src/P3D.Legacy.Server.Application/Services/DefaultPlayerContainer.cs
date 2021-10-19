@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Services
 {
-    public class DefaultPlayerContainer : IPlayerContainerWriter, IPlayerContainerReader, IPlayerContainerActions
+    public class DefaultPlayerContainer : IPlayerContainerWriter, IPlayerContainerReader
     {
         private class PlayerEqualityComparer : IEqualityComparer<IPlayer>
         {
@@ -51,11 +51,6 @@ namespace P3D.Legacy.Server.Application.Services
             var oldConnections = _connections;
             _connections = _connections.Remove(player);
             return Task.FromResult(!ReferenceEquals(oldConnections, _connections));
-        }
-
-        public async Task<bool> KickAsync(IPlayer player, CancellationToken ct)
-        {
-            return true;
         }
     }
 }

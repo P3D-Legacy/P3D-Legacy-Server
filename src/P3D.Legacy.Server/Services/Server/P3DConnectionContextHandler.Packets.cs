@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.Extensions.Logging;
 
+using OpenTelemetry.Trace;
+
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Battle;
@@ -18,10 +20,15 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Services.Server
 {
-    public partial class P3DConnectionContextHandler
+    public sealed partial class P3DConnectionContextHandler
     {
         private async Task HandlePacketAsync(P3DPacket? packet, CancellationToken ct)
         {
+            if (packet is null) return;
+
+            using var span = _tracer.StartActiveSpan($"P3D Client Handle {packet.GetType().Name}");
+            span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
+
             switch (packet)
             {
                 case BattleClientDataPacket battleClientDataPacket:
@@ -181,6 +188,7 @@ namespace P3D.Legacy.Server.Services.Server
 
             if (_connectionState != P3DConnectionState.Intitialized)
             {
+                _connectionSpan.UpdateName($"P3D Session {Name}");
                 _connectionState = P3DConnectionState.Intitialized;
                 await _mediator.Send(new PlayerReadyCommand(this), ct);
 

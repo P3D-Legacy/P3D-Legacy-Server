@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Server", "P3D.Legacy.Server\P3D.Legacy.Server.csproj", "{2000C495-3FDC-4238-ACC3-38942B2A8C0E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Common", "P3D.Legacy.Common\P3D.Legacy.Common.csproj", "{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Common.Tests", "..\tests\P3D.Legacy.Common.Tests\P3D.Legacy.Common.Tests.csproj", "{4C2886A3-01CD-48C9-8217-84E3F37E2A8E}"
@@ -17,9 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Server.Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Server.Application", "P3D.Legacy.Server.Application\P3D.Legacy.Server.Application.csproj", "{8600961E-9735-440E-8FF2-5067CD3A2455}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P3D.Legacy.Server.Statistics", "P3D.Legacy.Server.Statistics\P3D.Legacy.Server.Statistics.csproj", "{97EFC538-6A6E-4641-8417-E9D0D12E62F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Server.Statistics", "P3D.Legacy.Server.Statistics\P3D.Legacy.Server.Statistics.csproj", "{97EFC538-6A6E-4641-8417-E9D0D12E62F6}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "..\docker-compose\docker-compose.dcproj", "{D042A472-D107-4824-A01B-CC4A9AB2B561}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Server", "P3D.Legacy.Server\P3D.Legacy.Server.csproj", "{A28DCA3C-FCCA-4170-9F79-0C75F839FC6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,10 +27,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2000C495-3FDC-4238-ACC3-38942B2A8C0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2000C495-3FDC-4238-ACC3-38942B2A8C0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2000C495-3FDC-4238-ACC3-38942B2A8C0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2000C495-3FDC-4238-ACC3-38942B2A8C0E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8CB6A05-E7A8-47CE-9FB5-8910AC58E89B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -63,6 +59,10 @@ Global
 		{D042A472-D107-4824-A01B-CC4A9AB2B561}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D042A472-D107-4824-A01B-CC4A9AB2B561}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D042A472-D107-4824-A01B-CC4A9AB2B561}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A28DCA3C-FCCA-4170-9F79-0C75F839FC6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A28DCA3C-FCCA-4170-9F79-0C75F839FC6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A28DCA3C-FCCA-4170-9F79-0C75F839FC6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A28DCA3C-FCCA-4170-9F79-0C75F839FC6D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
