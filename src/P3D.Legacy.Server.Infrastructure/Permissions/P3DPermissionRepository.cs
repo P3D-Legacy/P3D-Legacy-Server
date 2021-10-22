@@ -5,7 +5,10 @@ using Newtonsoft.Json.Linq;
 
 using OpenTelemetry.Trace;
 
+using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Infrastructure.Models;
+using P3D.Legacy.Server.Infrastructure.Models.Permissions;
 
 using System;
 using System.Collections.Generic;
@@ -17,9 +20,9 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Application.Queries.Permissions
+namespace P3D.Legacy.Server.Infrastructure.Permissions
 {
-    public class P3DAPIPermissionQueries : IPermissionQueries
+    public class P3DPermissionRepository : IPermissionRepository
     {
         // TODO: System.Text.Json https://github.com/dotnet/runtime/issues/38324
         private class JsonPathConverter : JsonConverter
@@ -58,16 +61,16 @@ namespace P3D.Legacy.Server.Application.Queries.Permissions
         private readonly Tracer _tracer;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public P3DAPIPermissionQueries(ILogger<P3DAPIPermissionQueries> logger, TracerProvider traceProvider, IHttpClientFactory httpClientFactory)
+        public P3DPermissionRepository(ILogger<P3DPermissionRepository> logger, TracerProvider traceProvider, IHttpClientFactory httpClientFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Application");
+            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Infrastructure");
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
-        public async Task<PermissionViewModel> GetByGameJoltAsync(ulong id, CancellationToken ct)
+        public async Task<PermissionEntity> GetByGameJoltAsync(GameJoltId id, CancellationToken ct)
         {
-            using var span = _tracer.StartActiveSpan("P3DAPIPermissionQueries GetByGameJoltAsync", SpanKind.Client);
+            using var span = _tracer.StartActiveSpan("P3DPermissionRepository GetByGameJoltAsync", SpanKind.Client);
 
             var permissions = PermissionFlags.UnVerified;
 
@@ -82,7 +85,7 @@ namespace P3D.Legacy.Server.Application.Queries.Permissions
             }
             catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
             {
-                return new PermissionViewModel(permissions);
+                return new PermissionEntity(permissions);
             }
 
             try
@@ -106,10 +109,10 @@ namespace P3D.Legacy.Server.Application.Queries.Permissions
                             if (permissionDto.Name.Equals("gameserver.server", StringComparison.OrdinalIgnoreCase))
                                 permissions |= PermissionFlags.Server;
                         }
-                        return new PermissionViewModel(permissions);
+                        return new PermissionEntity(permissions);
                     }
                 }
-                return new PermissionViewModel(permissions);
+                return new PermissionEntity(permissions);
             }
             finally
             {
@@ -152,7 +155,7 @@ namespace P3D.Legacy.Server.Application.Queries.Permissions
             [property: JsonProperty("updated_at")] DateTime UpdatedAt,
             [property: JsonProperty("deleted_at")] DateTime? DeletedAt);
 
-        public record ForumDTO(
+        private record ForumDTO(
             [property: JsonProperty("user_id")] int UserId,
             [property: JsonProperty("username")] string Username,
             [property: JsonProperty("verified_at")] DateTime VerifiedAt,
@@ -160,14 +163,14 @@ namespace P3D.Legacy.Server.Application.Queries.Permissions
             [property: JsonProperty("updated_at")] DateTime UpdatedAt,
             [property: JsonProperty("deleted_at")] DateTime? DeletedAt);
 
-        public record RoleDTO(
+        private record RoleDTO(
             [property: JsonProperty("id")] int Id,
             [property: JsonProperty("name")] string Name,
             [property: JsonProperty("created_at")] DateTime CreatedAt,
             [property: JsonProperty("updated_at")] DateTime UpdatedAt,
             [property: JsonProperty("permissions")] List<PermissionDTO> Permissions);
 
-        public record PermissionDTO(
+        private record PermissionDTO(
             [property: JsonProperty("id")] int Id,
             [property: JsonProperty("name")] string Name,
             [property: JsonProperty("created_at")] DateTime CreatedAt,

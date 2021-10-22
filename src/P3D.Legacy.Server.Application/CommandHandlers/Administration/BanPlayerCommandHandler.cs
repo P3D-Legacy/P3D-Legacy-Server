@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Application.Commands;
 using P3D.Legacy.Server.Application.Commands.Administration;
+using P3D.Legacy.Server.Infrastructure.Models.Bans;
 using P3D.Legacy.Server.Infrastructure.Repositories;
 
 using System;
@@ -29,7 +30,7 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
         {
             var (id, name, ip, reason, expiration) = request;
 
-            var result = await _banRepository.UpsertAsync(id, name, ip, reason, expiration, ct);
+            var result = await _banRepository.UpsertAsync(new BanEntity(id, name, ip, reason, expiration), ct);
             return new CommandResult(result);
         }
     }

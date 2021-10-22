@@ -4,16 +4,16 @@ namespace P3D.Legacy.Common.Data.P3DData
 {
     public sealed record TradeData : P3DData
     {
-        public MonsterData Monster { get; }
+        public DataItemStorage MonsterData { get; }
 
         public TradeData(in ReadOnlySpan<char> data) : base(in data)
         {
-            Monster = new MonsterData(new DataItemStorage(data.ToString()));
+            MonsterData = new DataItemStorage(data.ToString());
         }
 
-        public void Deconstruct(out MonsterData monster)
+        public void Deconstruct(out DataItemStorage monsterData)
         {
-            monster = Monster;
+            monsterData = MonsterData;
         }
 
         public override string ToP3DString()

@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Extensions.Logging.NUnit" Version="1.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.11" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+    <PackageReference Include="NUnit" Version="3.13.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="coverlet.collector" Version="3.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\P3D.Legacy.Common\P3D.Legacy.Common.csproj" />
+    <ProjectReference Include="..\..\src\P3D.Legacy.Server.Abstractions\P3D.Legacy.Server.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\P3D.Legacy.Server.Application\P3D.Legacy.Server.Application.csproj" />
+    <ProjectReference Include="..\..\src\P3D.Legacy.Server.GameCommands\P3D.Legacy.Server.GameCommands.csproj" />
+    <ProjectReference Include="..\..\src\P3D.Legacy.Server.Infrastructure\P3D.Legacy.Server.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\P3D.Legacy.Server.Statistics\P3D.Legacy.Server.Statistics.csproj" />
+    <ProjectReference Include="..\..\src\P3D.Legacy.Server\P3D.Legacy.Server.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Data\Monsters.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

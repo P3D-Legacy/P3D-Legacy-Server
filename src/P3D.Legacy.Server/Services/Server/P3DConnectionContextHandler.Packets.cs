@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.Extensions.Logging;
 
-using OpenTelemetry.Trace;
-
 using P3D.Legacy.Common;
+using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Battle;
 using P3D.Legacy.Common.Packets.Chat;
@@ -235,7 +234,7 @@ namespace P3D.Legacy.Server.Services.Server
 
         private async Task HandleGameStateMessageAsync(GameStateMessagePacket packet, CancellationToken ct)
         {
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _mediator.Publish(new ServerMessageNotification($"The player {Name} {packet.EventMessage}"), ct);
         }
 
         private async Task HandleTradeRequestAsync(TradeRequestPacket packet, CancellationToken ct)
@@ -252,7 +251,23 @@ namespace P3D.Legacy.Server.Services.Server
         }
         private async Task HandleTradeOfferAsync(TradeOfferPacket packet, CancellationToken ct)
         {
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            var cancel = false;
+            if (_serverOptions.ValidationEnabled)
+            {
+                var monster = await _monsterRepository.GetByDataAsync(packet.TradeData.MonsterData);
+                cancel = !monster.IsValidP3D();
+            }
+
+            if (cancel)
+            {
+                await SendServerMessageAsync("The Pokemon is not valid!", ct);
+                await SendPacketAsync(new TradeQuitPacket { Origin = packet.DestinationPlayerId, DestinationPlayerId = Id }, ct);
+                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, new TradeQuitPacket { Origin = Id, DestinationPlayerId = packet.DestinationPlayerId }), ct);
+            }
+            else
+            {
+                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            }
         }
         private async Task HandleTradeStartAsync(TradeStartPacket packet, CancellationToken ct)
         {
@@ -273,7 +288,29 @@ namespace P3D.Legacy.Server.Services.Server
         }
         private async Task HandleBattleOfferAsync(BattleOfferPacket packet, CancellationToken ct)
         {
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            var cancel = false;
+            if (_serverOptions.ValidationEnabled)
+            {
+                await foreach (var monster in packet.BattleData.MonsterDatas.ToAsyncEnumerable().SelectAwait(async x => await _monsterRepository.GetByDataAsync(x)).WithCancellation(ct))
+                {
+                    if (!monster.IsValidP3D())
+                    {
+                        cancel = true;
+                        break;
+                    }
+                }
+            }
+
+            if (cancel)
+            {
+                await SendServerMessageAsync("One of your Pokemon is not valid!", ct);
+                await SendPacketAsync(new BattleQuitPacket { Origin = packet.DestinationPlayerId, DestinationPlayerId = Id }, ct);
+                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, new BattleQuitPacket { Origin = Id, DestinationPlayerId = packet.DestinationPlayerId }), ct);
+            }
+            else
+            {
+                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            }
         }
         private async Task HandleBattlePokemonDataAsync(BattleEndRoundDataPacket packet, CancellationToken ct)
         {

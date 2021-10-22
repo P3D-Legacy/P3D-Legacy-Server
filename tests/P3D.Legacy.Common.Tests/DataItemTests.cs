@@ -5,7 +5,7 @@ using P3D.Legacy.Common.Packets;
 
 using System.Numerics;
 
-namespace P3D.Legacy.Common.Tests
+namespace P3D.Legacy.Tests
 {
     public class DataItemTests
     {
@@ -28,7 +28,7 @@ namespace P3D.Legacy.Common.Tests
         }
 
         [Test]
-        public void Test1()
+        public void TestBasic()
         {
             var name = "Aragas";
             var isCorrect = true;

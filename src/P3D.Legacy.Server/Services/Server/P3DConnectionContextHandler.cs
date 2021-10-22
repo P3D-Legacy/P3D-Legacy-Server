@@ -16,6 +16,7 @@ using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Queries.Players;
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Application.Services.Connections;
+using P3D.Legacy.Server.Infrastructure.Monsters;
 using P3D.Legacy.Server.Options;
 
 using System;
@@ -38,6 +39,7 @@ namespace P3D.Legacy.Server.Services.Server
         private readonly P3DProtocol _protocol;
         private readonly WorldService _worldService;
         private readonly ServerOptions _serverOptions;
+        private readonly PokeAPIMonsterRepository _monsterRepository;
 
         private TelemetrySpan _connectionSpan = default!;
         private ProtocolWriter _writer = default!;
@@ -51,16 +53,18 @@ namespace P3D.Legacy.Server.Services.Server
             IPlayerQueries playerQueries,
             WorldService worldService,
             IOptions<ServerOptions> serverOptions,
-            IMediator mediator)
+            IMediator mediator,
+            PokeAPIMonsterRepository monsterRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Host");
             _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
             _playerQueries = playerQueries ?? throw new ArgumentNullException(nameof(playerQueries));
             _worldService = worldService ?? throw new ArgumentNullException(nameof(worldService));
             _serverOptions = serverOptions.Value ?? throw new ArgumentNullException(nameof(serverOptions));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Host");
+            _monsterRepository = monsterRepository ?? throw new ArgumentNullException(nameof(monsterRepository));
         }
 
         protected override async Task OnCreatedAsync(CancellationToken ct)
@@ -123,9 +127,9 @@ namespace P3D.Legacy.Server.Services.Server
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                _connectionSpan.SetStatus(Status.Error);
+                _connectionSpan.RecordException(e).SetStatus(Status.Error);
                 throw;
             }
         }

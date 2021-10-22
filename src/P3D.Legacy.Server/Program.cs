@@ -32,6 +32,10 @@ using P3D.Legacy.Server.Application.Services.Connections;
 using P3D.Legacy.Server.BackgroundServices;
 using P3D.Legacy.Server.Extensions;
 using P3D.Legacy.Server.GameCommands.Extensions;
+using P3D.Legacy.Server.Infrastructure.Extensions;
+using P3D.Legacy.Server.Infrastructure.Monsters;
+using P3D.Legacy.Server.Infrastructure.Options;
+using P3D.Legacy.Server.Infrastructure.Permissions;
 using P3D.Legacy.Server.Infrastructure.Repositories;
 using P3D.Legacy.Server.Options;
 using P3D.Legacy.Server.Services;
@@ -64,9 +68,13 @@ namespace P3D.Legacy.Server
             .CreateDefaultBuilder(args)
             .ConfigureServices((ctx, services) =>
             {
+                var validationEnabled = ctx.Configuration.GetSection("Server")["ValidationEnabled"].Equals("true", StringComparison.OrdinalIgnoreCase);
+                var isOfficial = ctx.Configuration.GetSection("Server")["IsOfficial"].Equals("true", StringComparison.OrdinalIgnoreCase);
+
                 services.Configure<ServerOptions>(ctx.Configuration.GetSection("Server"));
                 services.Configure<P3DOptions>(ctx.Configuration.GetSection("P3D"));
                 services.Configure<DiscordOptions>(ctx.Configuration.GetSection("Discord"));
+                services.Configure<LiteDbOptions>(ctx.Configuration.GetSection("LiteDb"));
 
                 services.AddGameCommands();
                 services.AddStatistics();
@@ -92,17 +100,20 @@ namespace P3D.Legacy.Server
                 services.RemoveAll<IHttpMessageHandlerBuilderFilter>();
                 services.AddSingleton<IHttpMessageHandlerBuilderFilter, LoggingHttpMessageHandlerBuilderFilter>();
 
-                services.AddHttpClient("P3D.API")
-                    .ConfigureHttpClient((sp, client) =>
-                    {
-                        var backendOptions = sp.GetRequiredService<IOptions<P3DOptions>>().Value;
-                        client.BaseAddress = new Uri(backendOptions.APIEndpointV1);
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", backendOptions.APIToken);
-                        client.Timeout = Timeout.InfiniteTimeSpan;
-                    })
-                    .GenerateCorrelationId()
-                    .AddPolly()
-                    .AddCorrelationIdOverrideForwarding();
+                if (isOfficial)
+                {
+                    services.AddHttpClient("P3D.API")
+                        .ConfigureHttpClient((sp, client) =>
+                        {
+                            var backendOptions = sp.GetRequiredService<IOptions<P3DOptions>>().Value;
+                            client.BaseAddress = new Uri(backendOptions.APIEndpointV1);
+                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", backendOptions.APIToken);
+                            client.Timeout = Timeout.InfiniteTimeSpan;
+                        })
+                        .GenerateCorrelationId()
+                        .AddPolly()
+                        .AddCorrelationIdOverrideForwarding();
+                }
 
                 services.AddOpenTelemetryMetrics(builder =>
                 {
@@ -130,6 +141,7 @@ namespace P3D.Legacy.Server
                         builder.AddHttpClientInstrumentation();
                         builder.AddHostInstrumentation();
                         builder.AddApplicationInstrumentation();
+                        builder.AddInfrastructureInstrumentation();
                         builder.AddGameCommandsInstrumentation();
                         builder.AddStatisticsInstrumentation();
                         builder.AddOtlpExporter(o =>
@@ -151,11 +163,30 @@ namespace P3D.Legacy.Server
 
                 services.AddSingleton<IPlayerIdGenerator, DefaultPlayerIdGenerator>();
 
-                services.AddTransient<IBanQueries, DefaultBanQueries>();
-                services.AddTransient<IPermissionQueries, P3DAPIPermissionQueries>();
+                services.AddTransient<IBanQueries, BanQueries>();
                 services.AddTransient<IPlayerQueries, PlayerQueries>();
+                services.AddTransient<IPermissionQueries, PermissionQueries>();
 
-                services.AddTransient<IBanRepository, BanRepository>();
+                services.AddTransient<PokeAPIMonsterRepository>();
+                if (isOfficial)
+                {
+                    services.AddTransient<IPermissionRepository, P3DPermissionRepository>();
+                    services.AddTransient<IBanRepository, LiteDbBanRepository>(); // TODO
+                }
+                else
+                {
+                    services.AddTransient<IPermissionRepository, LiteDbPermissionRepository>();
+                    services.AddTransient<IBanRepository, LiteDbBanRepository>();
+                }
+
+                if (validationEnabled)
+                {
+                    services.AddTransient<IMonsterRepository, PokeAPIMonsterRepository>();
+                }
+                else
+                {
+                    services.AddTransient<IMonsterRepository, NopMonsterRepository>();
+                }
 
                 services.AddSingleton<DefaultPlayerContainer>();
                 services.AddTransient<IPlayerContainerWriter>(sp => sp.GetRequiredService<DefaultPlayerContainer>());

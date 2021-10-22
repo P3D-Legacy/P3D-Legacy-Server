@@ -1,42 +1,31 @@
-﻿using LiteDB;
-
-using P3D.Legacy.Common;
+﻿using P3D.Legacy.Common;
+using P3D.Legacy.Server.Infrastructure.Repositories;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Queries.Bans
 {
-    public sealed class DefaultBanQueries : IBanQueries, IDisposable
+    public sealed class BanQueries : IBanQueries
     {
-        private record Ban(ulong GameJoltId, string Name, string IP, string Reason, DateTimeOffset? Expiration);
+        private readonly IBanRepository _banRepository;
 
-        private readonly LiteDatabase _database;
-
-        public DefaultBanQueries()
+        public BanQueries(IBanRepository banRepository)
         {
-            _database = new LiteDatabase("bans.litedb");
+            _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
         }
 
         public async Task<BanViewModel?> GetAsync(GameJoltId id, CancellationToken ct)
         {
-            var bans = _database.GetCollection<Ban>("bans");
-            return bans.FindOne(x => x.GameJoltId == (ulong) id) is { } ban ? new BanViewModel(ban.GameJoltId, ban.Name, IPAddress.Parse(ban.IP), ban.Reason, ban.Expiration) : null;
+            return await _banRepository.GetAsync(id, ct) is { } ban ? new BanViewModel(ban.Id, ban.Name, ban.Ip, ban.Reason, ban.Expiration) : null;
         }
 
         public IAsyncEnumerable<BanViewModel> GetAllAsync(CancellationToken ct)
         {
-            var bans = _database.GetCollection<Ban>("bans");
-            return bans.Find(x => true).ToAsyncEnumerable().Select(ban => new BanViewModel(ban.GameJoltId, ban.Name, IPAddress.Parse(ban.IP), ban.Reason, ban.Expiration));
-        }
-
-        public void Dispose()
-        {
-            _database.Dispose();
+            return _banRepository.GetAllAsync(ct).Select(ban => new BanViewModel(ban.Id, ban.Name, ban.Ip, ban.Reason, ban.Expiration));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Connections.Features;
 
 using P3D.Legacy.Common;
+using P3D.Legacy.Common.Monsters;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Chat;
 using P3D.Legacy.Common.Packets.Server;
@@ -8,6 +9,7 @@ using P3D.Legacy.Common.Packets.Shared;
 using P3D.Legacy.Server.Abstractions;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,12 +37,14 @@ namespace P3D.Legacy.Server.Services.Server
             MonsterFacing = state.MonsterFacing
         };
 
-        private bool IsOfficialGameMode =>
-            string.Equals(GameMode, "Kolben", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(GameMode, "Pokemon3D", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(GameMode, "Pokémon3D", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(GameMode, "Pokemon 3D", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(GameMode, "Pokémon 3D", StringComparison.OrdinalIgnoreCase);
+
+
+        private static bool IsOfficialGameMode(string gamemode) =>
+            string.Equals(gamemode, "Kolben", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(gamemode, "Pokemon3D", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(gamemode, "Pokémon3D", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(gamemode, "Pokemon 3D", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(gamemode, "Pokémon 3D", StringComparison.OrdinalIgnoreCase);
 
         public Task AssignIdAsync(long id, CancellationToken ct)
         {
