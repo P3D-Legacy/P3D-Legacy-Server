@@ -2,9 +2,9 @@
 
 using Microsoft.Extensions.Logging;
 
+using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Application.Commands;
 using P3D.Legacy.Server.Application.Commands.World;
-using P3D.Legacy.Server.Application.Notifications;
 using P3D.Legacy.Server.Application.Services;
 
 using System;

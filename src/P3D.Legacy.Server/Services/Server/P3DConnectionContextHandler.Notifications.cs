@@ -4,7 +4,7 @@ using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets.Chat;
 using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Notifications;
+using P3D.Legacy.Server.Abstractions.Notifications;
 
 using System;
 using System.Threading;

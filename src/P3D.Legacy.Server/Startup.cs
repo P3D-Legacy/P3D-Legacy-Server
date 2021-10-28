@@ -1,12 +1,10 @@
-﻿using CorrelationId;
-
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
-using P3D.Legacy.Server.Utils;
+using P3D.Legacy.Server.DiscordAPI.Controllers;
 
 using System;
 using System.IO;
@@ -40,8 +38,6 @@ namespace P3D.Legacy.Server
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = appName, Version = "v1" });
                 options.SupportNonNullableReferenceTypes();
 
-                options.OperationFilter<CorrelationIdHeaderSwaggerAttribute>();
-
                 var xmlFile = $"{appName}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 options.IncludeXmlComments(xmlPath);
@@ -61,10 +57,9 @@ namespace P3D.Legacy.Server
             app.UseSwagger();
             app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", appName));
 
+            app.UseWebSockets();
+
             app.UseRouting();
-
-
-            app.UseCorrelationId();
 
             app.UseEndpoints(endpoints =>
             {

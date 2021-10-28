@@ -1,8 +1,11 @@
 ﻿using MediatR;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Application.Notifications;
+using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Utils;
+using P3D.Legacy.Server.Application.Utils;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Chat;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Permission;
@@ -10,20 +13,15 @@ using P3D.Legacy.Server.GameCommands.CommandManagers.Player;
 using P3D.Legacy.Server.GameCommands.CommandManagers.World;
 using P3D.Legacy.Server.GameCommands.NotificationHandlers;
 
-using System;
-using System.Collections.Generic;
-
 namespace P3D.Legacy.Server.GameCommands.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IEnumerable<(Type, (Type, ServiceLifetime))> AddGameCommandsNotifications()
+        public static IServiceCollection AddGameCommands(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
         {
-            yield return (typeof(INotificationHandler<PlayerSentCommandNotification>), (typeof(CommandManagerHandler), ServiceLifetime.Transient));
-        }
+            services.AddTransient<CommandManagerHandler>();
+            notificationRegistrar.Add(sp => sp.GetRequiredService<CommandManagerHandler>() as INotificationHandler<PlayerSentCommandNotification>);
 
-        public static IServiceCollection AddGameCommands(this IServiceCollection services)
-        {
             services.AddTransient<CommandManager, HelpCommandManager>();
 
             //services.AddTransient<CommandManager, ChatChannelChangeCommandManager>();

@@ -3,7 +3,7 @@
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Notifications;
+using P3D.Legacy.Server.Abstractions.Notifications;
 
 using System;
 using System.Diagnostics.Metrics;

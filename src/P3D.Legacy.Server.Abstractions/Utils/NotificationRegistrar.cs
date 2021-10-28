@@ -1,0 +1,84 @@
+﻿using MediatR;
+
+using Microsoft.Extensions.DependencyInjection;
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+
+namespace P3D.Legacy.Server.Abstractions.Utils
+{
+    public class NotificationRegistrar : IEnumerable
+    {
+        private class NotificationServiceFactory<TNotification> : BaseServiceFactory where TNotification : INotification
+        {
+            private readonly List<Func<IServiceProvider, IEnumerable<INotificationHandler<TNotification>>>> _notifications = new();
+
+            public void Register(Func<IServiceProvider, IEnumerable<INotificationHandler<TNotification>>> func) => _notifications.Add(func);
+
+            [SuppressMessage("ReSharper", "UnusedMember.Local")]
+            [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
+            private void RegisterInternal(Func<IServiceProvider, IEnumerable> func)
+            {
+                IEnumerable<INotificationHandler<TNotification>> Convert(IServiceProvider sp, Func<IServiceProvider, IEnumerable> func_)
+                {
+                    foreach (var obj in func(sp))
+                    {
+                        yield return (obj as INotificationHandler<TNotification>)!;
+                    }
+                }
+
+                _notifications.Add(sp => Convert(sp, func));
+            }
+
+            public override IEnumerable<INotificationHandler<TNotification>> ServiceFactory(IServiceProvider sp) => _notifications.SelectMany(func => func(sp));
+        }
+
+
+        private readonly Dictionary<Type, BaseServiceFactory> _containers = new();
+
+        public void Add<TNotification>(Func<IServiceProvider, INotificationHandler<TNotification>> factory) where TNotification : INotification
+        {
+            var key = typeof(IEnumerable<INotificationHandler<TNotification>>);
+
+            if (!_containers.TryGetValue(key, out var cont))
+            {
+                cont = new NotificationServiceFactory<TNotification>();
+                _containers.Add(key, cont);
+            }
+
+            if (cont is NotificationServiceFactory<TNotification> container)
+            {
+                container.Register(sp => new[] { factory(sp) });
+            }
+        }
+
+        public void Add<TNotification>(Func<IServiceProvider, IEnumerable<INotificationHandler<TNotification>>> factory) where TNotification : INotification
+        {
+            var key = typeof(IEnumerable<INotificationHandler<TNotification>>);
+
+            if (!_containers.TryGetValue(key, out var cont))
+            {
+                cont = new NotificationServiceFactory<TNotification>();
+                _containers.Add(key, cont);
+            }
+
+            if (cont is NotificationServiceFactory<TNotification> container)
+            {
+                container.Register(factory);
+            }
+        }
+
+        public IServiceCollection Register(IServiceCollection services)
+        {
+            foreach (var (type, container) in _containers)
+                services.Add(ServiceDescriptor.Describe(type, sp => container.ServiceFactory(sp), ServiceLifetime.Transient));
+
+            return services;
+        }
+
+        public IEnumerator GetEnumerator() => _containers.GetEnumerator();
+    }
+}

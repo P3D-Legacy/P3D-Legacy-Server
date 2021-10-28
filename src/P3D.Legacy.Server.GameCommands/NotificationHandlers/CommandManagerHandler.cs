@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Notifications;
+using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
 
 using System;

@@ -39,7 +39,7 @@ namespace P3D.Legacy.Server.Services.Server
         private readonly P3DProtocol _protocol;
         private readonly WorldService _worldService;
         private readonly ServerOptions _serverOptions;
-        private readonly PokeAPIMonsterRepository _monsterRepository;
+        private readonly IMonsterRepository _monsterRepository;
 
         private TelemetrySpan _connectionSpan = default!;
         private ProtocolWriter _writer = default!;
@@ -54,7 +54,7 @@ namespace P3D.Legacy.Server.Services.Server
             WorldService worldService,
             IOptions<ServerOptions> serverOptions,
             IMediator mediator,
-            PokeAPIMonsterRepository monsterRepository)
+            IMonsterRepository monsterRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Host");
@@ -81,8 +81,6 @@ namespace P3D.Legacy.Server.Services.Server
 
                 Features = new FeatureCollection(Connection.Features);
                 Features.Set(this as IP3DPlayerState);
-
-                ConnectionId = Features.Get<IConnectionIdFeature>().ConnectionId;
 
                 Features.Get<IConnectionCompleteFeature>().OnCompleted(async _ =>
                 {

@@ -9,6 +9,7 @@ namespace P3D.Legacy.Server.Application.Services.Connections
 {
     public abstract class ConnectionContextHandler : IDisposable
     {
+        public string ConnectionId => Connection.ConnectionId;
         protected ConnectionContext Connection { get; private set; } = default!;
 
         private CancellationTokenSource? _stoppingCts;

@@ -10,8 +10,6 @@ namespace P3D.Legacy.Server.Services.Server
 {
     public sealed partial class P3DConnectionContextHandler : IP3DPlayerState
     {
-        public string ConnectionId { get; private set; } = default!;
-
         public Origin Id { get; private set; } = default!;
         public string Name { get; private set; } = default!;
         public GameJoltId GameJoltId { get; private set; } = default!;

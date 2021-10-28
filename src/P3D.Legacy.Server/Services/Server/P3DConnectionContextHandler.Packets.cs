@@ -10,8 +10,8 @@ using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Common.Packets.Shared;
 using P3D.Legacy.Common.Packets.Trade;
+using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Application.Commands.Player;
-using P3D.Legacy.Server.Application.Notifications;
 
 using System.Linq;
 using System.Threading;

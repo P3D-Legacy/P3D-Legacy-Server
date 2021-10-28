@@ -10,12 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL.Client" Version="3.2.4" />
-    <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="3.2.4" />
-    <PackageReference Include="LiteDB" Version="5.0.11" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="BetterHostedServices" Version="2.0.3" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="2.4.0" />
+    <PackageReference Include="FluentValidation" Version="10.3.4" />
     <PackageReference Include="OpenTelemetry.Api" Version="1.2.0-beta1" />
-    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -10,9 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BetterHostedServices" Version="2.0.3" />
-    <PackageReference Include="CorrelationId" Version="3.0.1" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="2.4.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="5.0.1" />
@@ -27,9 +24,11 @@
     <ProjectReference Include="..\P3D.Legacy.Common\P3D.Legacy.Common.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Abstractions\P3D.Legacy.Server.Abstractions.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Application\P3D.Legacy.Server.Application.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.DiscordBot\P3D.Legacy.Server.DiscordBot.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.GameCommands\P3D.Legacy.Server.GameCommands.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Infrastructure\P3D.Legacy.Server.Infrastructure.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Statistics\P3D.Legacy.Server.Statistics.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.UI\P3D.Legacy.Server.UI.csproj" />
   </ItemGroup>
 
 </Project>
