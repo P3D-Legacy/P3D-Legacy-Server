@@ -3,12 +3,12 @@
 using Nerdbank.Streams;
 
 using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Buffers;
 using System.Net.WebSockets;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,6 +29,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         private readonly Guid _id = Guid.NewGuid();
         private readonly WebSocket _webSocket;
         private readonly SequenceTextReader _sequenceTextReader = new();
+        private readonly DefaultJsonSerializer _jsonSerializer = new();
 
         public WebSocketWrapper(WebSocket webSocket)
         {
@@ -69,31 +70,31 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
         {
             var msg = $"Player {notification.Player.Name} joined the server!";
-            await _webSocket.SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ResponsePayload(1, msg)), WebSocketMessageType.Text, true, ct);
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new ResponsePayload(1, msg)), WebSocketMessageType.Text, true, ct);
         }
 
         public async Task Handle(PlayerLeavedNotification notification, CancellationToken ct)
         {
             var msg = $"Player {notification.Name} left the server!";
-            await _webSocket.SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ResponsePayload(2, msg)), WebSocketMessageType.Text, true, ct);
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new ResponsePayload(2, msg)), WebSocketMessageType.Text, true, ct);
         }
 
         public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken ct)
         {
             var msg = $"<{notification.Player.Name}> {notification.Message}";
-            await _webSocket.SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ResponsePayload(3, msg)), WebSocketMessageType.Text, true, ct);
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new ResponsePayload(3, msg)), WebSocketMessageType.Text, true, ct);
         }
 
         public async Task Handle(ServerMessageNotification notification, CancellationToken ct)
         {
             var msg = $"{notification.Message}";
-            await _webSocket.SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ResponsePayload(4, msg)), WebSocketMessageType.Text, true, ct);
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new ResponsePayload(4, msg)), WebSocketMessageType.Text, true, ct);
         }
 
         public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
         {
             var msg = $"The player {notification.Player.Name} {notification.EventMessage}";
-            await _webSocket.SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ResponsePayload(5, msg)), WebSocketMessageType.Text, true, ct);
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new ResponsePayload(5, msg)), WebSocketMessageType.Text, true, ct);
         }
 
         public void Dispose()
