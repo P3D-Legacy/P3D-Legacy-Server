@@ -13,6 +13,7 @@ namespace P3D.Legacy.Server.Behaviours
     {
         private readonly ILogger<TRequest> _logger;
 
+        [SuppressMessage("CodeQuality", "IDE0079")]
         [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
         public UnhandledExceptionBehaviour(ILogger<TRequest> logger)
         {

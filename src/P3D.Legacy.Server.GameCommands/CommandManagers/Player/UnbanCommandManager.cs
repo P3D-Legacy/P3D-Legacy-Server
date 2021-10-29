@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
-    public class UnbanCommandManager : CommandManager
+    internal class UnbanCommandManager : CommandManager
     {
         public override string Name => "unban";
         public override string Description => "Unban a Player.";

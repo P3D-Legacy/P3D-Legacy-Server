@@ -1,0 +1,1 @@
+﻿Provides the adapted PokeD command system.

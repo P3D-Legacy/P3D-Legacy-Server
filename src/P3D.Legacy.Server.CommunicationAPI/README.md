@@ -1,0 +1,1 @@
+﻿Provides an API for external tools to listen for server events like chat message via WebSocket.

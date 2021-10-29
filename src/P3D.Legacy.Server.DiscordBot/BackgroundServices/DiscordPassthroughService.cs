@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 {
-    public sealed class DiscordPassthroughService : CriticalBackgroundService,
+    internal sealed class DiscordPassthroughService : CriticalBackgroundService,
         INotificationHandler<PlayerJoinedNotification>,
         INotificationHandler<PlayerLeavedNotification>,
         INotificationHandler<PlayerSentGlobalMessageNotification>,
@@ -120,18 +120,13 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             return Task.CompletedTask;
         }
 
-        private async Task BotMessageReceivedAsync(SocketMessage arg)
+        private Task BotMessageReceivedAsync(SocketMessage arg)
         {
-            if (arg is not SocketUserMessage { Source: MessageSource.User } message) return;
-            if (message.Channel is IPrivateChannel) return;
-
-            //var context = new SocketCommandContext(_discordSocketClient, message);
-
-            //var result = await _mediator.Send(new RawTextCommand(DiscordPlayer, message.Content));
-            //if (result.Success)
-            //    await context.Message.AddReactionAsync(new Emoji("⁉️"));
-            //else
-            //    await context.Message.AddReactionAsync(new Emoji("❓"));
+            if (arg is not SocketUserMessage { Source: MessageSource.User } message)
+                return Task.CompletedTask;
+            if (message.Channel is IPrivateChannel)
+                return Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
         public override void Dispose()

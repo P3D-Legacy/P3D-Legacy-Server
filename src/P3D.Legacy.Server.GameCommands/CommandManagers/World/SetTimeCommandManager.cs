@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
 {
-    public class SetTimeCommandManager : CommandManager
+    internal class SetTimeCommandManager : CommandManager
     {
         public override string Name => "settime";
         public override string Description => "Set World Time.";

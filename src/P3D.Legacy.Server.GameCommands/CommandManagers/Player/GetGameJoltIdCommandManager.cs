@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
-    public class GetGameJoltIdCommandManager : CommandManager
+    internal class GetGameJoltIdCommandManager : CommandManager
     {
         public override string Name => "getgamejolt";
         public override string Description => "Returns the player's GameJolt Id";
-        public override IEnumerable<string> Aliases => new [] { "ggj" };
-        public override PermissionFlags Permissions => PermissionFlags.UserOrHigher;
+        public override IEnumerable<string> Aliases => new[] { "ggj" };
+        public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
         public GetGameJoltIdCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
 

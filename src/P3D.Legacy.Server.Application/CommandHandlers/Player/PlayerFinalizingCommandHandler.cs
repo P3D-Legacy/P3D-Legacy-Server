@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 {
-    public class PlayerFinalizingCommandHandler : IRequestHandler<PlayerFinalizingCommand>
+    internal class PlayerFinalizingCommandHandler : IRequestHandler<PlayerFinalizingCommand>
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;

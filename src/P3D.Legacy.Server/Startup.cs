@@ -4,8 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
-using P3D.Legacy.Server.DiscordAPI.Controllers;
-
 using System;
 using System.IO;
 using System.Reflection;
@@ -22,7 +20,7 @@ namespace P3D.Legacy.Server
         {
             var appName = Assembly.GetEntryAssembly()?.GetName().Name ?? "ERROR";
 
-            services.AddControllers().AddJsonOptions(options =>
+            services.AddControllers().AddControllersAsServices().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
@@ -33,6 +31,7 @@ namespace P3D.Legacy.Server
             {
                 options.LowercaseUrls = true;
             });
+
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = appName, Version = "v1" });
@@ -42,6 +41,15 @@ namespace P3D.Legacy.Server
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 options.IncludeXmlComments(xmlPath);
             });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("Development", builder => builder
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                );
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +58,7 @@ namespace P3D.Legacy.Server
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseCors("Development");
             }
 
             var appName = Assembly.GetEntryAssembly()!.GetName().Name;

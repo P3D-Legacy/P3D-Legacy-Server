@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Services
 {
-    public class DefaultPlayerContainer : IPlayerContainerWriter, IPlayerContainerReader
+    internal class DefaultPlayerContainer : IPlayerContainerWriter, IPlayerContainerReader
     {
         private class PlayerEqualityComparer : IEqualityComparer<IPlayer>
         {

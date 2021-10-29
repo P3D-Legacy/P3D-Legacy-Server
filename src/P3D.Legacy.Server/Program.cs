@@ -1,24 +1,27 @@
-﻿using Bedrock.Framework;
-
-using Microsoft.AspNetCore.Connections;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+
 using P3D.Legacy.Server.Abstractions.Utils;
-using P3D.Legacy.Server.Application.Utils;
-using P3D.Legacy.Server.DiscordAPI.Extensions;
+using P3D.Legacy.Server.Application.Extensions;
+using P3D.Legacy.Server.Client.P3D.Extensions;
+using P3D.Legacy.Server.CommunicationAPI.Extensions;
 using P3D.Legacy.Server.DiscordBot.Extensions;
 using P3D.Legacy.Server.Extensions;
 using P3D.Legacy.Server.GameCommands.Extensions;
+using P3D.Legacy.Server.Infrastructure.Extensions;
+using P3D.Legacy.Server.InternalAPI.Extensions;
 using P3D.Legacy.Server.Options;
-using P3D.Legacy.Server.Services;
 using P3D.Legacy.Server.Statistics.Extensions;
 
 using System;
 using System.Diagnostics;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server
@@ -43,37 +46,74 @@ namespace P3D.Legacy.Server
 
                 var requestRegistrar = new RequestRegistrar();
                 var notificationRegistrar = new NotificationRegistrar();
-                services.AddInternal(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                services.AddGameCommands(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                services.AddStatistics(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                if (useDiscordBot) services.AddDiscordBot(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                services.AddDiscordAPI(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                services.AddHostMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                services.AddApplicationMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                services.AddClientP3DMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                services.AddCommunicationAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                if (useDiscordBot) services.AddDiscordBotMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                services.AddGameCommandsMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                services.AddInfrastructureMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                services.AddInternalAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                services.AddStatisticsMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                 services.AddMediatRInternal(requestRegistrar, notificationRegistrar);
-            })
-            .ConfigureServer((ctx, server) =>
-            {
-                server.UseSockets(sockets =>
+
+                services.AddHost(ctx.Configuration);
+                services.AddApplication(ctx.Configuration);
+                services.AddClientP3D(ctx.Configuration);
+                services.AddCommunicationAPI(ctx.Configuration);
+                if (useDiscordBot) services.AddDiscordBot(ctx.Configuration);
+                services.AddGameCommands(ctx.Configuration);
+                services.AddInfrastructure(ctx.Configuration);
+                services.AddInternalAPI(ctx.Configuration);
+                services.AddStatistics(ctx.Configuration);
+
+                services.AddOpenTelemetryMetrics(builder =>
                 {
-                    var serverOptions = ctx.Configuration.GetSection("Server").Get<ServerOptions>();
-                    sockets.Listen(new IPEndPoint(IPAddress.Parse(serverOptions.IP), serverOptions.Port), builder =>
+                    var options = ctx.Configuration.GetSection("Otlp").Get<OtlpOptions>();
+                    if (options.Enabled)
                     {
-                        builder.UseConnectionLogging().UseConnectionHandler<P3DConnectionHandler>();
-                    });
+                        builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
+
+                        builder.AddAspNetCoreInstrumentation();
+                        builder.AddHttpClientInstrumentation();
+
+                        builder.AddStatisticsInstrumentation();
+
+                        builder.AddOtlpExporter(o =>
+                        {
+                            o.Endpoint = new Uri(options.Host);
+                        });
+                    }
+                });
+                services.AddOpenTelemetryTracing(builder =>
+                {
+                    var options = ctx.Configuration.GetSection("Otlp").Get<OtlpOptions>();
+                    if (options.Enabled)
+                    {
+                        builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
+
+                        builder.AddAspNetCoreInstrumentation();
+                        builder.AddHttpClientInstrumentation();
+
+                        builder.AddHostInstrumentation();
+                        builder.AddApplicationInstrumentation();
+                        builder.AddClientP3DInstrumentation();
+                        builder.AddCommunicationAPIInstrumentation();
+                        if (useDiscordBot) builder.AddDiscordBotInstrumentation();
+                        builder.AddGameCommandsInstrumentation();
+                        builder.AddInfrastructureInstrumentation();
+                        builder.AddInternalAPIInstrumentation();
+                        builder.AddStatisticsInstrumentation();
+
+                        builder.AddOtlpExporter(o =>
+                        {
+                            o.Endpoint = new Uri(options.Host);
+                        });
+                    }
                 });
             })
-            .ConfigureWebHostDefaults(webBuilder => webBuilder
-                /*
-                .UseKestrel((ctx, options) =>
-                {
-                    var serverOptions = ctx.Configuration.GetSection("Server").Get<ServerOptions>();
-                    options.Listen(new IPEndPoint(IPAddress.Parse(serverOptions.IP), serverOptions.Port), builder =>
-                    {
-                        builder.UseConnectionHandler<P3DConnectionHandler>();
-                    });
-                })
-                */
-                .UseStartup<Startup>()
-            )
+            .AddP3DServer()
+            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
             .ConfigureLogging((ctx, builder) =>
             {
                 builder.AddOpenTelemetry(options =>

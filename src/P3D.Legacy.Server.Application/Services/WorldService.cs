@@ -14,9 +14,9 @@ namespace P3D.Legacy.Server.Application.Services
         public WorldWeather Weather { get; set; } = WorldWeather.Sunny;
         public TimeSpan CurrentTime { get; set; }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
+            return Task.CompletedTask;
         }
     }
 }

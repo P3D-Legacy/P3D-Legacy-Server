@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text;
 
 namespace P3D.Legacy.Common.Extensions
@@ -80,7 +79,7 @@ namespace P3D.Legacy.Common.Extensions
             {
                 var attack = monster.Attacks[3];
                 var pp = attack.StaticData.PP;
-                var ppMax =  (int) (attack.PPUps > 0 ? pp + (pp * 0.2D * attack.PPUps) : pp);
+                var ppMax = (int) (attack.PPUps > 0 ? pp + (pp * 0.2D * attack.PPUps) : pp);
                 dict.Add("Attack4", $"[{attack.StaticData.Id},{ppMax},{attack.PPCurrent}]");
             }
             else

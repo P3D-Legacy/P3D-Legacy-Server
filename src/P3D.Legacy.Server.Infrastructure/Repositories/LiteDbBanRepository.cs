@@ -3,7 +3,6 @@
 using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Server.Infrastructure.Models;
 using P3D.Legacy.Server.Infrastructure.Models.Bans;
 using P3D.Legacy.Server.Infrastructure.Options;
 

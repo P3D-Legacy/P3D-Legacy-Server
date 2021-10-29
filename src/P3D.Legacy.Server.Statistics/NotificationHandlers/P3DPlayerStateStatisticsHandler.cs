@@ -30,7 +30,7 @@ namespace P3D.Legacy.Server.Statistics.NotificationHandlers
         public Task Handle(PlayerUpdatedStateNotification notification, CancellationToken cancellationToken)
         {
             var player = notification.Player;
-            if (player.Features.Get<IP3DPlayerState>() is { } state)
+            if (player is IP3DPlayerState state)
             {
                 _counter.Add(1, new KVP("location", state.LevelFile));
                 _counter.Add(1, new KVP("decimal_separator", state.DecimalSeparator));

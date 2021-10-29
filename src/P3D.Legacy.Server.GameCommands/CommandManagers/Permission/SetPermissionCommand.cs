@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
 {
-    public class SetPermissionCommand : CommandManager
+    internal class SetPermissionCommand : CommandManager
     {
         public override string Name => "setperm";
         public override string Description => "Change Client permission.";
-        public override IEnumerable<string> Aliases => new[] {"sperm", "sp"};
+        public override IEnumerable<string> Aliases => new[] { "sperm", "sp" };
         public override PermissionFlags Permissions => PermissionFlags.AdministratorOrHigher;
 
         public SetPermissionCommand(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator,
@@ -63,5 +63,5 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
                     await SendMessageAsync(player, $"Permission {permission} not found.", ct);
             }
         }
-}
+    }
 }

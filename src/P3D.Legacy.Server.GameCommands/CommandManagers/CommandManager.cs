@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers
 {
-    public abstract class CommandManager
+    internal abstract class CommandManager
     {
         public abstract string Name { get; }
         public abstract string Description { get; }

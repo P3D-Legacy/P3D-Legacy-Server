@@ -1,7 +1,6 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Commands.Administration;
 using P3D.Legacy.Server.Application.Services;
 
 using System;
@@ -10,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
 {
-    public class ShowPermissionsCommandManager : CommandManager
+    internal class ShowPermissionsCommandManager : CommandManager
     {
         public override string Name => "showperm";
         public override string Description => "Show available Client permissions.";

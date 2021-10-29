@@ -14,6 +14,7 @@ namespace P3D.Legacy.Server.Behaviours
         private readonly Stopwatch _timer;
         private readonly ILogger<TRequest> _logger;
 
+        [SuppressMessage("CodeQuality", "IDE0079")]
         [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
         public PerformanceBehaviour(ILogger<TRequest> logger)
         {

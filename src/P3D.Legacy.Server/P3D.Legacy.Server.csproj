@@ -24,11 +24,13 @@
     <ProjectReference Include="..\P3D.Legacy.Common\P3D.Legacy.Common.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Abstractions\P3D.Legacy.Server.Abstractions.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Application\P3D.Legacy.Server.Application.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Client.P3D\P3D.Legacy.Server.Client.P3D.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.CommunicationAPI\P3D.Legacy.Server.CommunicationAPI.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.DiscordBot\P3D.Legacy.Server.DiscordBot.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.GameCommands\P3D.Legacy.Server.GameCommands.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Infrastructure\P3D.Legacy.Server.Infrastructure.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.InternalAPI\P3D.Legacy.Server.InternalAPI.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Statistics\P3D.Legacy.Server.Statistics.csproj" />
-    <ProjectReference Include="..\P3D.Legacy.Server.UI\P3D.Legacy.Server.UI.csproj" />
   </ItemGroup>
 
 </Project>

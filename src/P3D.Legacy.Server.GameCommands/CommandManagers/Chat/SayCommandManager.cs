@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Chat
 {
-    public class SayCommandManager : CommandManager
+    internal class SayCommandManager : CommandManager
     {
         public override string Name => "say";
         public override string Description => "Speak as the Server.";

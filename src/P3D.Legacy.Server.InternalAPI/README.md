@@ -1,0 +1,1 @@
+﻿Responsible for exposing an internal API for tools like the UI.

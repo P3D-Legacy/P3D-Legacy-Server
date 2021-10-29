@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Infrastructure.Models;
 using P3D.Legacy.Server.Infrastructure.Models.Permissions;
 using P3D.Legacy.Server.Infrastructure.Options;
 

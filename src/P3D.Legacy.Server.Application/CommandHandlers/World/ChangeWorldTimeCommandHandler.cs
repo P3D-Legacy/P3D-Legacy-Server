@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.World
 {
-    public class ChangeWorldTimeCommandHandler : IRequestHandler<ChangeWorldTimeCommand, CommandResult>
+    internal class ChangeWorldTimeCommandHandler : IRequestHandler<ChangeWorldTimeCommand, CommandResult>
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;

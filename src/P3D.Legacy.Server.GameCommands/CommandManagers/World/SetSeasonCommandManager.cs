@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
 {
-    public class SetSeasonCommandManager : CommandManager
+    internal class SetSeasonCommandManager : CommandManager
     {
         public override string Name => "setseason";
         public override string Description => "Set World Season.";

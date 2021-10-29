@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Services
 {
-    public class DefaultPlayerIdGenerator : IPlayerIdGenerator
+    internal class DefaultPlayerIdGenerator : IPlayerIdGenerator
     {
         private long _globalPlayerIncrement;
 

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
 {
-    public class KickPlayerCommandHandler : IRequestHandler<KickPlayerCommand, CommandResult>
+    internal class KickPlayerCommandHandler : IRequestHandler<KickPlayerCommand, CommandResult>
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;

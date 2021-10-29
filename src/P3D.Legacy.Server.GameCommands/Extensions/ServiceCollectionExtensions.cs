@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Abstractions.Utils;
-using P3D.Legacy.Server.Application.Utils;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Chat;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Permission;
@@ -17,10 +16,16 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddGameCommands(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
+        public static IServiceCollection AddGameCommandsMediatR(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
+        {
+            notificationRegistrar.Add(sp => sp.GetRequiredService<CommandManagerHandler>() as INotificationHandler<PlayerSentCommandNotification>);
+
+            return services;
+        }
+
+        public static IServiceCollection AddGameCommands(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddTransient<CommandManagerHandler>();
-            notificationRegistrar.Add(sp => sp.GetRequiredService<CommandManagerHandler>() as INotificationHandler<PlayerSentCommandNotification>);
 
             services.AddTransient<CommandManager, HelpCommandManager>();
 
@@ -32,6 +37,7 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
             services.AddTransient<CommandManager, BanCommandManager>();
             services.AddTransient<CommandManager, GetGameJoltIdCommandManager>();
             services.AddTransient<CommandManager, KickCommandManager>();
+            services.AddTransient<CommandManager, LoginCommandManager>();
             services.AddTransient<CommandManager, MuteCommandManager>();
             services.AddTransient<CommandManager, UnbanCommandManager>();
             services.AddTransient<CommandManager, UnmuteCommandManager>();

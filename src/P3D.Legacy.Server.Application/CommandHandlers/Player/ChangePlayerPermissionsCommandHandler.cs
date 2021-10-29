@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 {
-    public class ChangePlayerPermissionsCommandHandler : IRequestHandler<ChangePlayerPermissionsCommand, CommandResult>
+    internal class ChangePlayerPermissionsCommandHandler : IRequestHandler<ChangePlayerPermissionsCommand, CommandResult>
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
@@ -22,9 +22,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public async Task<CommandResult> Handle(ChangePlayerPermissionsCommand request, CancellationToken ct)
+        public Task<CommandResult> Handle(ChangePlayerPermissionsCommand request, CancellationToken ct)
         {
-            return new CommandResult(false);
+            return Task.FromResult(new CommandResult(false));
         }
     }
 }

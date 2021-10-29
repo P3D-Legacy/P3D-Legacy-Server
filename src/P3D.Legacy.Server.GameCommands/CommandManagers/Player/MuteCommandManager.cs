@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
-    public class MuteCommandManager : CommandManager
+    internal class MuteCommandManager : CommandManager
     {
         public override string Name => "mute";
         public override string Description => "Command is disabled";
-        public override IEnumerable<string> Aliases => new [] { "mm" };
+        public override IEnumerable<string> Aliases => new[] { "mm" };
         public override PermissionFlags Permissions => PermissionFlags.UserOrHigher;
 
         public MuteCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }

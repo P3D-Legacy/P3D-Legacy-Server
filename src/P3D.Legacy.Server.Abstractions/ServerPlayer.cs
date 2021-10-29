@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.Features;
-
-using P3D.Legacy.Common;
+﻿using P3D.Legacy.Common;
 
 using System;
 using System.Net;
@@ -16,9 +14,7 @@ namespace P3D.Legacy.Server.Abstractions
         public string Name => "Server";
         public GameJoltId GameJoltId => GameJoltId.None;
         public PermissionFlags Permissions => PermissionFlags.Server;
-        public IPAddress IPAddress => IPAddress.Loopback;
-
-        public IFeatureCollection Features { get; } = new FeatureCollection();
+        public IPEndPoint IPEndPoint => new(IPAddress.None, 0);
 
         public Task AssignIdAsync(long id, CancellationToken ct) => throw new NotSupportedException();
         public Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct) => throw new NotSupportedException();

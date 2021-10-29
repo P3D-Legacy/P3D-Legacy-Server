@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
-    public class UnmuteCommandManager : CommandManager
+    internal class UnmuteCommandManager : CommandManager
     {
         public override string Name => "unmute";
         public override string Description => "Command is disabled";
-        public override IEnumerable<string> Aliases => new [] { "um" };
+        public override IEnumerable<string> Aliases => new[] { "um" };
         public override PermissionFlags Permissions => PermissionFlags.UserOrHigher;
 
         public UnmuteCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }

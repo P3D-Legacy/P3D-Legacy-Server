@@ -14,12 +14,13 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.CommunicationAPI.Services
 {
-    public class WebSocketWrapper :
+    public sealed class WebSocketWrapper :
         INotificationHandler<PlayerJoinedNotification>,
         INotificationHandler<PlayerLeavedNotification>,
         INotificationHandler<PlayerSentGlobalMessageNotification>,
         INotificationHandler<ServerMessageNotification>,
-        INotificationHandler<PlayerTriggeredEventNotification>
+        INotificationHandler<PlayerTriggeredEventNotification>,
+        IDisposable
     {
         private sealed record ResponsePayload(int Type, string Response);
         private sealed record ErrorResponsePayload(int Code, string Message);
@@ -93,6 +94,12 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         {
             var msg = $"The player {notification.Player.Name} {notification.EventMessage}";
             await _webSocket.SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ResponsePayload(5, msg)), WebSocketMessageType.Text, true, ct);
+        }
+
+        public void Dispose()
+        {
+            _webSocket.Dispose();
+            _sequenceTextReader.Dispose();
         }
     }
 }

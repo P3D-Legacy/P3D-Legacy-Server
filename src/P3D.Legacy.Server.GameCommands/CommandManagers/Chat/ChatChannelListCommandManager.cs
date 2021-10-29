@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.Managers.Chat
 {
-    public class ChatChannelListCommandManager : CommandManager
+    internal class ChatChannelListCommandManager : CommandManager
     {
         public override string Name => "chatchannellist";
         public override string Description => "Get all Chat Channels.";

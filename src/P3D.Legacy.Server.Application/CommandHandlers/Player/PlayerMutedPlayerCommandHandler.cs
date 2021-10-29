@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 {
-    public class PlayerMutedPlayerCommandHandler : IRequestHandler<PlayerMutedPlayerCommand, CommandResult>
+    internal class PlayerMutedPlayerCommandHandler : IRequestHandler<PlayerMutedPlayerCommand, CommandResult>
     {
         private readonly ILogger _logger;
 
@@ -20,9 +20,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<CommandResult> Handle(PlayerMutedPlayerCommand request, CancellationToken ct)
+        public Task<CommandResult> Handle(PlayerMutedPlayerCommand request, CancellationToken ct)
         {
-            return new CommandResult(true);
+            return Task.FromResult(new CommandResult(true));
         }
     }
 }

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers
 {
-    public class HelpCommandManager : CommandManager
+    internal class HelpCommandManager : CommandManager
     {
         public override string Name => "help";
         public override string Description => "Command help menu.";

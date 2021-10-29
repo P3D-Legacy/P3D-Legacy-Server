@@ -1,6 +1,4 @@
-﻿using P3D.Legacy.Common.Monsters;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace P3D.Legacy.Common.Data.P3DData

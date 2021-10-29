@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
-    public class KickCommandManager : CommandManager
+    internal class KickCommandManager : CommandManager
     {
         public override string Name => "kick";
         public override string Description => "Kick a Player.";

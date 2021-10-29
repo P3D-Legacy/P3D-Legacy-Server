@@ -1,5 +1,4 @@
 ﻿using P3D.Legacy.Common;
-using P3D.Legacy.Server.Infrastructure.Models;
 using P3D.Legacy.Server.Infrastructure.Models.Bans;
 
 using System.Collections.Generic;

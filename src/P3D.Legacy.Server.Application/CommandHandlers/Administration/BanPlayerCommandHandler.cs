@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
 {
-    public class BanPlayerCommandHandler : IRequestHandler<BanPlayerCommand, CommandResult>
+    internal class BanPlayerCommandHandler : IRequestHandler<BanPlayerCommand, CommandResult>
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;

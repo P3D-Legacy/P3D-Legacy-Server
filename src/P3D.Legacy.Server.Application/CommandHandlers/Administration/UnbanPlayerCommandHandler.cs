@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
 {
-    public class UnbanPlayerCommandHandler : IRequestHandler<UnbanPlayerCommand, CommandResult>
+    internal class UnbanPlayerCommandHandler : IRequestHandler<UnbanPlayerCommand, CommandResult>
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;

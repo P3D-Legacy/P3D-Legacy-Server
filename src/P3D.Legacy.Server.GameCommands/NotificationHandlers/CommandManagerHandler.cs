@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.NotificationHandlers
 {
-    public sealed class CommandManagerHandler :
+    internal sealed class CommandManagerHandler :
         INotificationHandler<PlayerSentCommandNotification>
     {
         private readonly ILogger _logger;

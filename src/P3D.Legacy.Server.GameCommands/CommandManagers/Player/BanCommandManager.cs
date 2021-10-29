@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
-    public class BanCommandManager : CommandManager
+    internal class BanCommandManager : CommandManager
     {
         public override string Name => "ban";
         public override string Description => "Ban a Player.";
@@ -40,7 +40,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 
                 var reason = arguments[2].TrimStart('"').TrimEnd('"');
                 await Mediator.Send(new KickPlayerCommand(targetPlayer, reason), ct);
-                await Mediator.Send(new BanPlayerCommand(targetPlayer.GameJoltId, targetPlayer.Name, targetPlayer.IPAddress, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
+                await Mediator.Send(new BanPlayerCommand(targetPlayer.GameJoltId, targetPlayer.Name, targetPlayer.IPEndPoint.Address, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
             }
             else if (arguments.Length > 3)
             {
@@ -59,7 +59,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 
                 var reason = string.Join(" ", arguments.Skip(2).ToArray());
                 await Mediator.Send(new KickPlayerCommand(targetPlayer, reason), ct);
-                await Mediator.Send(new BanPlayerCommand(targetPlayer.GameJoltId, targetPlayer.Name, targetPlayer.IPAddress, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
+                await Mediator.Send(new BanPlayerCommand(targetPlayer.GameJoltId, targetPlayer.Name, targetPlayer.IPEndPoint.Address, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
 {
-    public class SetWeatherCommandManager : CommandManager
+    internal class SetWeatherCommandManager : CommandManager
     {
         public override string Name => "setweather";
         public override string Description => "Set World Weather.";

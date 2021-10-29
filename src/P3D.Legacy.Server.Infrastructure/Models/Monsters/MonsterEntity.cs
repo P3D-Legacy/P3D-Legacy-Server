@@ -3,8 +3,6 @@ using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Common.Monsters;
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace P3D.Legacy.Server.Infrastructure.Models.Monsters
 {

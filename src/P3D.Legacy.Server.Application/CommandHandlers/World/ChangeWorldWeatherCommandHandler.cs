@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.World
 {
-    public class ChangeWorldWeatherCommandHandler : IRequestHandler<ChangeWorldWeatherCommand, CommandResult>
+    internal class ChangeWorldWeatherCommandHandler : IRequestHandler<ChangeWorldWeatherCommand, CommandResult>
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;

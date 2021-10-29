@@ -6,7 +6,7 @@ using System;
 
 namespace P3D.Legacy.Server.Extensions
 {
-    public static class HttpClientBuilderExtensions
+    internal static class HttpClientBuilderExtensions
     {
         public static IHttpClientBuilder GenerateCorrelationId(this IHttpClientBuilder builder)
         {
