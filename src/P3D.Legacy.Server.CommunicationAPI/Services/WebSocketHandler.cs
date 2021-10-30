@@ -1,0 +1,181 @@
+﻿using MediatR;
+
+using Nerdbank.Streams;
+
+using P3D.Legacy.Common;
+using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Application.Commands.Player;
+using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.CommunicationAPI.Models;
+using P3D.Legacy.Server.CommunicationAPI.Utils;
+
+using System;
+using System.Net;
+using System.Net.WebSockets;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace P3D.Legacy.Server.CommunicationAPI.Services
+{
+    public sealed class WebSocketHandler :
+        INotificationHandler<PlayerJoinedNotification>,
+        INotificationHandler<PlayerLeavedNotification>,
+        INotificationHandler<PlayerSentGlobalMessageNotification>,
+        INotificationHandler<ServerMessageNotification>,
+        INotificationHandler<PlayerTriggeredEventNotification>,
+        IDisposable,
+        IAsyncDisposable
+    {
+        private class WebSocketPlayer : IPlayer
+        {
+            private readonly Func<string, CancellationToken, Task>? _kickCallback;
+
+            public string ConnectionId { get; }
+            public Origin Id { get; private set; }
+            public string Name { get; }
+            public GameJoltId GameJoltId => 0;
+            public PermissionFlags Permissions { get; private set; } = PermissionFlags.User;
+            public IPEndPoint IPEndPoint => new(IPAddress.Loopback, 0);
+
+            public WebSocketPlayer(string botName, Func<string, CancellationToken, Task>? kickCallback)
+            {
+                ConnectionId = $"CON_{botName}";
+                Name = $"<BOT> {botName}";
+                _kickCallback = kickCallback;
+            }
+
+            public Task AssignIdAsync(Origin id, CancellationToken ct)
+            {
+                Id = id;
+                return Task.CompletedTask;
+            }
+
+            public Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct)
+            {
+                Permissions = permissions;
+                return Task.CompletedTask;
+            }
+
+            public async Task KickAsync(string reason, CancellationToken ct)
+            {
+                if (_kickCallback is not null)
+                    await _kickCallback(reason, ct);
+            }
+        }
+
+        private readonly Guid _id = Guid.NewGuid();
+        private IPlayer? _bot;
+
+        private readonly WebSocket _webSocket;
+        private readonly IMediator _mediator;
+        private readonly DefaultJsonSerializer _jsonSerializer;
+        private readonly SequenceTextReader _sequenceTextReader = new();
+
+        public WebSocketHandler(WebSocket webSocket, IMediator mediator, DefaultJsonSerializer jsonSerializer)
+        {
+            _webSocket = webSocket ?? throw new ArgumentNullException(nameof(webSocket));
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
+        }
+
+        public async Task ListenAsync(CancellationToken ct)
+        {
+            const int maxMessageSize = 1 * 1024 * 1024;
+            while (!ct.IsCancellationRequested)
+            {
+                await using var reader = new WebSocketMessageReaderStream(_webSocket, maxMessageSize);
+                var payload = await _jsonSerializer.DeserializeAsync<RequestPayload?>(reader, ct);
+                if (payload is not null)
+                    await ProcessPayloadAsync(payload, ct);
+            }
+        }
+
+        private async Task ProcessPayloadAsync(RequestPayload request, CancellationToken ct)
+        {
+            switch (request)
+            {
+                case RegisterBotRequestPayload(var botName, var uid):
+                    if (_bot is not null)
+                    {
+                        await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new ErrorResponsePayload(1, "Bot initialized twice!", uid)), WebSocketMessageType.Text, true, ct);
+                        return;
+                    }
+
+                    _bot = new WebSocketPlayer(botName, KickCallback);
+                    await _mediator.Send(new PlayerInitializingCommand(_bot), ct);
+                    await _mediator.Send(new PlayerReadyCommand(_bot), ct);
+                    await _mediator.Publish(new PlayerUpdatedStateNotification(_bot), ct);
+                    await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid)), WebSocketMessageType.Text, true, ct);
+                    break;
+
+                case MessageRequestPayload(var sender, var message, var uid):
+                    if (_bot is null)
+                    {
+                        await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new ErrorResponsePayload(2, "Bot not initialized!", uid)), WebSocketMessageType.Text, true, ct);
+                        return;
+                    }
+
+                    await _mediator.Publish(new PlayerSentGlobalMessageNotification(_bot, $"{sender}: {message}"), ct);
+                    await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid)), WebSocketMessageType.Text, true, ct);
+                    break;
+            }
+        }
+
+        private async Task KickCallback(string reason, CancellationToken ct)
+        {
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new KickedResponsePayload(reason)), WebSocketMessageType.Text, true, ct);
+            await _webSocket.CloseAsync(WebSocketCloseStatus.Empty, "Kicked", ct);
+        }
+
+        public async Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
+        {
+            var msg = $"Player {notification.Player.Name} joined the server!";
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerJoinedResponsePayload(msg)), WebSocketMessageType.Text, true, ct);
+        }
+
+        public async Task Handle(PlayerLeavedNotification notification, CancellationToken ct)
+        {
+            var msg = $"Player {notification.Name} left the server!";
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerLeavedResponsePayload(msg)), WebSocketMessageType.Text, true, ct);
+        }
+
+        public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken ct)
+        {
+            var msg = $"<{notification.Player.Name}> {notification.Message}";
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerSentGlobalMessageResponsePayload(msg)), WebSocketMessageType.Text, true, ct);
+        }
+
+        public async Task Handle(ServerMessageNotification notification, CancellationToken ct)
+        {
+            var msg = $"{notification.Message}";
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new ServerMessageResponsePayload(msg)), WebSocketMessageType.Text, true, ct);
+        }
+
+        public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
+        {
+            var msg = $"The player {notification.Player.Name} {notification.EventMessage}";
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(msg)), WebSocketMessageType.Text, true, ct);
+        }
+
+        public override int GetHashCode() => _id.GetHashCode();
+
+        public void Dispose()
+        {
+            _webSocket.Dispose();
+            _sequenceTextReader.Dispose();
+
+            if (_bot is not null)
+                _mediator.Send(new PlayerFinalizingCommand(_bot), CancellationToken.None).GetAwaiter().GetResult();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            _webSocket.Dispose();
+            _sequenceTextReader.Dispose();
+
+            if (_bot is not null)
+                await _mediator.Send(new PlayerFinalizingCommand(_bot), CancellationToken.None);
+        }
+    }
+}

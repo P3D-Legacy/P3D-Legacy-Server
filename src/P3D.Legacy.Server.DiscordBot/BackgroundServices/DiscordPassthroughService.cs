@@ -56,6 +56,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 
             async void OnCancellation(object? _, CancellationToken ct)
             {
+                ct.ThrowIfCancellationRequested();
                 _discordSocketClient.MessageReceived -= BotMessageReceivedAsync;
                 _discordSocketClient.Log -= BotLogAsync;
                 await _discordSocketClient.StopAsync();

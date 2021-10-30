@@ -18,7 +18,7 @@ namespace P3D.Legacy.Server.Abstractions
         PermissionFlags Permissions { get; }
         IPEndPoint IPEndPoint { get; }
 
-        Task AssignIdAsync(long id, CancellationToken ct);
+        Task AssignIdAsync(Origin id, CancellationToken ct);
         Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct);
 
         Task KickAsync(string reason, CancellationToken ct);

@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace P3D.Legacy.Server.Abstractions.Utils
 {
-    public class NotificationRegistrar : IEnumerable
+    public sealed class NotificationRegistrar : IEnumerable, IDisposable
     {
         private class NotificationServiceFactory<TNotification> : BaseServiceFactory where TNotification : INotification
         {
@@ -36,8 +36,10 @@ namespace P3D.Legacy.Server.Abstractions.Utils
             public override IEnumerable<INotificationHandler<TNotification>> ServiceFactory(IServiceProvider sp) => _notifications.SelectMany(func => func(sp));
         }
 
-
+        private readonly IServiceCollection _services;
         private readonly Dictionary<Type, BaseServiceFactory> _containers = new();
+
+        public NotificationRegistrar(IServiceCollection services) => _services = services;
 
         public void Add<TNotification>(Func<IServiceProvider, INotificationHandler<TNotification>> factory) where TNotification : INotification
         {
@@ -71,14 +73,12 @@ namespace P3D.Legacy.Server.Abstractions.Utils
             }
         }
 
-        public IServiceCollection Register(IServiceCollection services)
+        public IEnumerator GetEnumerator() => _containers.GetEnumerator();
+
+        public void Dispose()
         {
             foreach (var (type, container) in _containers)
-                services.Add(ServiceDescriptor.Describe(type, sp => container.ServiceFactory(sp), ServiceLifetime.Transient));
-
-            return services;
+                _services.Add(ServiceDescriptor.Describe(type, sp => container.ServiceFactory(sp), ServiceLifetime.Transient));
         }
-
-        public IEnumerator GetEnumerator() => _containers.GetEnumerator();
     }
 }

@@ -16,8 +16,8 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
     [Route("api/v1/server")]
     public class ServerV1Controller : ControllerBase
     {
-        public sealed record StatusResponseV1Player(string Name, string GameJoltId);
-        public sealed record StatusResponseV1(IEnumerable<StatusResponseV1Player> Players);
+        private sealed record StatusResponseV1Player(string Name, string GameJoltId);
+        private sealed record StatusResponseV1(IEnumerable<StatusResponseV1Player> Players);
 
         private readonly ILogger _logger;
 

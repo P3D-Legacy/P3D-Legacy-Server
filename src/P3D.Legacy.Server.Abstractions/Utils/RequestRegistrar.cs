@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace P3D.Legacy.Server.Abstractions.Utils
 {
-    public class RequestRegistrar : IEnumerable
+    public sealed class RequestRegistrar : IEnumerable, IDisposable
     {
         private class RequestServiceFactory<TRequest, TResponse> : BaseServiceFactory where TRequest : IRequest<TResponse>
         {
@@ -19,8 +19,10 @@ namespace P3D.Legacy.Server.Abstractions.Utils
             public override IRequestHandler<TRequest, TResponse> ServiceFactory(IServiceProvider sp) => _command(sp);
         }
 
-
+        private readonly IServiceCollection _services;
         private readonly Dictionary<Type, BaseServiceFactory> _containers = new();
+
+        public RequestRegistrar(IServiceCollection services) => _services = services;
 
         public void Add<TRequest, TResponse>(Func<IServiceProvider, IRequestHandler<TRequest, TResponse>> factory) where TRequest : IRequest<TResponse>
         {
@@ -34,18 +36,38 @@ namespace P3D.Legacy.Server.Abstractions.Utils
 
             if (cont is RequestServiceFactory<TRequest, TResponse> container)
             {
-                container.Register(sp => factory(sp));
+                container.Register(factory);
             }
         }
 
-        public IServiceCollection Register(IServiceCollection services)
+        public void AddWithRegistration<TRequest, TResponse, TService>(ServiceLifetime lifetime = ServiceLifetime.Transient) where TRequest : IRequest<TResponse> where TService : IRequestHandler<TRequest, TResponse>
         {
-            foreach (var (type, container) in _containers)
-                services.Add(ServiceDescriptor.Describe(type, sp => container.ServiceFactory(sp), ServiceLifetime.Transient));
+            var key = typeof(IRequestHandler<TRequest, TResponse>);
 
-            return services;
+            if (!_containers.TryGetValue(key, out var cont))
+            {
+                cont = new RequestServiceFactory<TRequest, TResponse>();
+                _containers.Add(key, cont);
+            }
+
+            if (cont is RequestServiceFactory<TRequest, TResponse> container)
+            {
+                _services.Add(new ServiceDescriptor(typeof(TService), typeof(TService), lifetime));
+                container.Register(sp => sp.GetRequiredService<TService>() as IRequestHandler<TRequest, TResponse>);
+            }
+        }
+
+        public void AddWithRegistration<TRequest, TService>(ServiceLifetime lifetime = ServiceLifetime.Transient) where TRequest : IRequest<Unit> where TService : IRequestHandler<TRequest, Unit>
+        {
+            AddWithRegistration<TRequest, Unit, TService>();
         }
 
         public IEnumerator GetEnumerator() => _containers.GetEnumerator();
+
+        public void Dispose()
+        {
+            foreach (var (type, container) in _containers)
+                _services.Add(ServiceDescriptor.Describe(type, sp => container.ServiceFactory(sp), ServiceLifetime.Transient));
+        }
     }
 }

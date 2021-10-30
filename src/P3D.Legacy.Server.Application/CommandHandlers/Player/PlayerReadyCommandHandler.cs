@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Logging;
 
+using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Queries.Permissions;
 using P3D.Legacy.Server.Application.Services;
@@ -15,17 +16,18 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     internal class PlayerReadyCommandHandler : IRequestHandler<PlayerReadyCommand>
     {
         private readonly ILogger _logger;
-        private readonly IPlayerContainerWriter _playerContainer;
+        private readonly IMediator _mediator;
 
-        public PlayerReadyCommandHandler(ILogger<PlayerReadyCommandHandler> logger, IPlayerContainerWriter playerContainer, IPermissionQueries permissionQueries)
+        public PlayerReadyCommandHandler(ILogger<PlayerReadyCommandHandler> logger, IMediator mediator)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public Task<Unit> Handle(PlayerReadyCommand request, CancellationToken ct)
+        public async Task<Unit> Handle(PlayerReadyCommand request, CancellationToken ct)
         {
-            return Task.FromResult(Unit.Value);
+            await _mediator.Publish(new PlayerJoinedNotification(request.Player), ct);
+            return Unit.Value;
         }
     }
 }

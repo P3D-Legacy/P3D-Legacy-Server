@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Client.P3D
 {
+    // ReSharper disable once ArrangeTypeModifiers
     partial class P3DConnectionContextHandler
     {
         private async Task HandlePacketAsync(P3DPacket? packet, CancellationToken ct)
@@ -209,7 +210,6 @@ namespace P3D.Legacy.Server.Client.P3D
                 {
                     await _mediator.Send(new PlayerReadyCommand(this), ct);
                     _connectionState = P3DConnectionState.Intitialized;
-                    await _mediator.Publish(new PlayerJoinedNotification(this), ct);
                 }
                 else
                 {
@@ -393,7 +393,8 @@ namespace P3D.Legacy.Server.Client.P3D
         }
 
 
-        private async Task HandleServerDataRequestAsync(ServerDataRequestPacket packet, CancellationToken ct)
+        // ReSharper disable once UnusedParameter.Local
+        private async Task HandleServerDataRequestAsync(ServerDataRequestPacket _, CancellationToken ct)
         {
             var clientNames = await _playerContainer.GetAllAsync(ct).Select(x => x.Name).ToArrayAsync(ct);
             await SendPacketAsync(new ServerInfoDataPacket

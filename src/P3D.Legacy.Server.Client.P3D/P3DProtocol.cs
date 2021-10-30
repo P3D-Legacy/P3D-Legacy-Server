@@ -9,11 +9,12 @@ using P3D.Legacy.Common.Packets;
 
 using System;
 using System.Buffers;
+using System.IO;
 using System.Text;
 
 namespace P3D.Legacy.Server.Client.P3D
 {
-    internal sealed class P3DProtocol : IMessageReader<P3DPacket?>, IMessageWriter<P3DPacket>
+    internal sealed class P3DProtocol : IMessageReader<P3DPacket?>, IMessageWriter<P3DPacket>, IDisposable
     {
         private static readonly int NewLineLength = Encoding.ASCII.GetByteCount(new[] { '\r', '\n' });
 
@@ -29,6 +30,10 @@ namespace P3D.Legacy.Server.Client.P3D
 
         public bool TryParseMessage(in ReadOnlySequence<byte> input, ref SequencePosition consumed, ref SequencePosition examined, out P3DPacket? message)
         {
+            const int maxMessageSize = 4 * 1024 * 1024;
+            if (input.Length > maxMessageSize)
+                throw new InternalBufferOverflowException($"Received more than {maxMessageSize} bytes from the client!");
+
             _sequenceTextReader.Initialize(input, Encoding.ASCII);
             if (_sequenceTextReader.ReadLine() is not { } line)
             {
@@ -78,6 +83,11 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             _logger.LogTrace("Sending a message type {Type}", message.GetType());
             output.Write(Encoding.ASCII.GetBytes($"{message.CreateData()}\r\n"));
+        }
+
+        public void Dispose()
+        {
+            _sequenceTextReader.Dispose();
         }
     }
 }

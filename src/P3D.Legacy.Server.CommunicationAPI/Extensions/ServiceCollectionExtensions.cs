@@ -16,11 +16,11 @@ namespace P3D.Legacy.Server.CommunicationAPI.Extensions
     {
         public static IServiceCollection AddCommunicationAPIMediatR(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
         {
-            notificationRegistrar.Add(sp => sp.GetRequiredService<SubscriberManager>().GetActive().OfType<INotificationHandler<PlayerJoinedNotification>>());
-            notificationRegistrar.Add(sp => sp.GetRequiredService<SubscriberManager>().GetActive().OfType<INotificationHandler<PlayerLeavedNotification>>());
-            notificationRegistrar.Add(sp => sp.GetRequiredService<SubscriberManager>().GetActive().OfType<INotificationHandler<PlayerSentGlobalMessageNotification>>());
-            notificationRegistrar.Add(sp => sp.GetRequiredService<SubscriberManager>().GetActive().OfType<INotificationHandler<ServerMessageNotification>>());
-            notificationRegistrar.Add(sp => sp.GetRequiredService<SubscriberManager>().GetActive().OfType<INotificationHandler<PlayerTriggeredEventNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().OfType<INotificationHandler<PlayerJoinedNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().OfType<INotificationHandler<PlayerLeavedNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().OfType<INotificationHandler<PlayerSentGlobalMessageNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().OfType<INotificationHandler<ServerMessageNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().OfType<INotificationHandler<PlayerTriggeredEventNotification>>());
 
             return services;
         }
@@ -29,7 +29,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Extensions
         {
             services.AddTransient<CommunicationController>();
 
-            services.AddSingleton<SubscriberManager>();
+            services.AddSingleton<WebSocketSubscribtionManager>();
 
             return services;
         }

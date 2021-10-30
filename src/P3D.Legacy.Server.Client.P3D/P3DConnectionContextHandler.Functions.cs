@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Client.P3D
 {
+    // ReSharper disable once ArrangeTypeModifiers
     partial class P3DConnectionContextHandler
     {
         private static GameDataPacket GetFromP3DPlayerState(IPlayer player, IP3DPlayerState state) => new()
@@ -46,7 +47,7 @@ namespace P3D.Legacy.Server.Client.P3D
             string.Equals(gamemode, "Pokemon 3D", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(gamemode, "Pokémon 3D", StringComparison.OrdinalIgnoreCase);
 
-        public Task AssignIdAsync(long id, CancellationToken ct)
+        public Task AssignIdAsync(Origin id, CancellationToken ct)
         {
             if (Id != 0)
                 throw new InvalidOperationException("Id was already assigned!");

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using OpenTelemetry.Trace;
@@ -17,13 +18,15 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
     {
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
-        private readonly SubscriberManager _subscriberManager;
+        private readonly WebSocketSubscribtionManager _subscribtionManager;
+        private readonly IServiceProvider _serviceProvider;
 
-        public CommunicationController(ILogger<CommunicationController> logger, TracerProvider traceProvider, SubscriberManager subscriberManager)
+        public CommunicationController(ILogger<CommunicationController> logger, TracerProvider traceProvider, WebSocketSubscribtionManager subscribtionManager, IServiceProvider serviceProvider)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.CommunicationAPI");
-            _subscriberManager = subscriberManager ?? throw new ArgumentNullException(nameof(subscriberManager));
+            _subscribtionManager = subscribtionManager ?? throw new ArgumentNullException(nameof(subscribtionManager));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         [HttpGet("listener/ws")]
@@ -31,14 +34,16 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
-                using var connectionSpan = _tracer.StartActiveSpan($"Communication WebSocket Connection", SpanKind.Server);
+                _logger.LogTrace("WebSocket connection received at 'listener/ws'");
 
-                var wrapper = new WebSocketWrapper(await HttpContext.WebSockets.AcceptWebSocketAsync("json"));
-                _subscriberManager.Add(wrapper);
+                using var connectionSpan = _tracer.StartActiveSpan("Communication WebSocket Connection", SpanKind.Server);
+
+                await using var handler = ActivatorUtilities.CreateInstance<WebSocketHandler>(_serviceProvider, await HttpContext.WebSockets.AcceptWebSocketAsync("json"));
+                _subscribtionManager.Add(handler);
 
                 try
                 {
-                    await wrapper.ListenAsync(ct);
+                    await handler.ListenAsync(ct);
                 }
                 catch (Exception e)
                 {
@@ -46,7 +51,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
                 }
                 finally
                 {
-                    _subscriberManager.Remove(wrapper);
+                    _subscribtionManager.Remove(handler);
                 }
             }
             else

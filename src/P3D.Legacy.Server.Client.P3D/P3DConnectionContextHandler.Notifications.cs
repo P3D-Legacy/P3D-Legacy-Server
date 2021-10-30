@@ -8,11 +8,13 @@ using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Application.Commands.Player;
 
 using System;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Client.P3D
 {
+    // ReSharper disable once ArrangeTypeModifiers
     partial class P3DConnectionContextHandler :
         INotificationHandler<PlayerJoinedNotification>,
         INotificationHandler<PlayerLeavedNotification>,
@@ -36,11 +38,9 @@ namespace P3D.Legacy.Server.Client.P3D
             {
                 await foreach (var connectedPlayer in _playerContainer.GetAllAsync(ct))
                 {
-                    if (connectedPlayer is IP3DPlayerState state)
-                    {
-                        await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerId = connectedPlayer.Id }, ct);
-                        await SendPacketAsync(GetFromP3DPlayerState(connectedPlayer, state), ct);
-                    }
+                    await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerId = connectedPlayer.Id }, ct);
+                    var state = connectedPlayer as IP3DPlayerState ?? IP3DPlayerState.Empty;
+                    await SendPacketAsync(GetFromP3DPlayerState(connectedPlayer, state), ct);
                 }
             }
             else
@@ -65,8 +65,8 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var player = notification.Player;
 
-            if (player is IP3DPlayerState state)
-                await SendPacketAsync(GetFromP3DPlayerState(player, state), ct);
+            var state = player as IP3DPlayerState ?? IP3DPlayerState.Empty;
+            await SendPacketAsync(GetFromP3DPlayerState(player, state), ct);
         }
 
         public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken ct)
@@ -160,7 +160,6 @@ namespace P3D.Legacy.Server.Client.P3D
             {
                 await _mediator.Send(new PlayerReadyCommand(this), ct);
                 _connectionState = P3DConnectionState.Intitialized;
-                await _mediator.Publish(new PlayerJoinedNotification(this), ct);
             }
         }
     }

@@ -16,7 +16,7 @@ namespace P3D.Legacy.Server.Abstractions
         public PermissionFlags Permissions => PermissionFlags.Server;
         public IPEndPoint IPEndPoint => new(IPAddress.None, 0);
 
-        public Task AssignIdAsync(long id, CancellationToken ct) => throw new NotSupportedException();
+        public Task AssignIdAsync(Origin id, CancellationToken ct) => throw new NotSupportedException();
         public Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct) => throw new NotSupportedException();
         public Task KickAsync(string reason, CancellationToken ct) => throw new NotSupportedException();
     }

@@ -63,7 +63,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
         protected override async Task OnCreatedAsync(CancellationToken ct)
         {
-            _connectionSpan = _tracer.StartActiveSpan("P3D Session UNKNOWN", SpanKind.Internal);
+            _connectionSpan = _tracer.StartActiveSpan("P3D Session UNKNOWN");
 
             try
             {
@@ -127,12 +127,18 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             base.Dispose();
             _connectionState = P3DConnectionState.None;
+            _protocol.Dispose();
             _connectionSpan.Dispose();
+            _writer.DisposeAsync().GetAwaiter().GetResult();
+
         }
 
         public override async ValueTask DisposeAsync()
         {
             await base.DisposeAsync();
+            _connectionState = P3DConnectionState.None;
+            _protocol.Dispose();
+            _connectionSpan.Dispose();
             await _writer.DisposeAsync();
         }
     }

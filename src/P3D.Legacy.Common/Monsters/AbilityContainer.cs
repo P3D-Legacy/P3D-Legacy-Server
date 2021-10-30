@@ -6,9 +6,9 @@ namespace P3D.Legacy.Common.Monsters
 {
     public class AbilityContainer
     {
-        public IAbilityInstance First { get; }
-        public IAbilityInstance? Second { get; }
-        public IAbilityInstance? Hidden { get; }
+        public IAbilityInstance First { get; } = default!;
+        public IAbilityInstance? Second { get; } = default!;
+        public IAbilityInstance? Hidden { get; } = default!;
 
         public AbilityContainer(params IAbilityInstance[] abilities)
         {

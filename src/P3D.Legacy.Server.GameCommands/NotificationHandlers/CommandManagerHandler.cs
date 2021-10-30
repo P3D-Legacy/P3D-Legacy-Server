@@ -29,7 +29,7 @@ namespace P3D.Legacy.Server.GameCommands.NotificationHandlers
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            _commandManagers = commandManagers.ToList() ?? throw new ArgumentNullException(nameof(commandManagers));
+            _commandManagers = commandManagers.ToList();
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.GameCommands");
         }
 

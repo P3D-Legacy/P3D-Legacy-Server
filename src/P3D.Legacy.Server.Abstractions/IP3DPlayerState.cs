@@ -2,8 +2,13 @@
 
 namespace P3D.Legacy.Server.Abstractions
 {
+    internal record P3DPlayerState(string GameMode, bool IsGameJoltPlayer, char DecimalSeparator, string LevelFile, Vector3 Position, int Facing, bool Moving, string Skin, string BusyType, bool MonsterVisible, Vector3 MonsterPosition, string MonsterSkin, int MonsterFacing) : IP3DPlayerState;
+    internal sealed record EmptyP3DPlayerState() : P3DPlayerState("", false, '.', "", Vector3.Zero, 0, false, "", "", false, Vector3.Zero, "", 0);
+
     public interface IP3DPlayerState
     {
+        public static IP3DPlayerState Empty { get; } = new EmptyP3DPlayerState();
+
         string GameMode { get; }
         bool IsGameJoltPlayer { get; }
         char DecimalSeparator { get; }

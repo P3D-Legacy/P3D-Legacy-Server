@@ -59,6 +59,7 @@ namespace P3D.Legacy.Server.Application.Services
 
         public virtual ValueTask DisposeAsync()
         {
+            _stoppingCts?.Dispose();
             return ValueTask.CompletedTask;
         }
     }

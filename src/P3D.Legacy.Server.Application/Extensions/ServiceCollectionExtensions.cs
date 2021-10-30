@@ -27,20 +27,20 @@ namespace P3D.Legacy.Server.Application.Extensions
     {
         public static IServiceCollection AddApplicationMediatR(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
         {
-            requestRegistrar.Add(sp => sp.GetRequiredService<ChangePlayerPermissionsCommandHandler>() as IRequestHandler<ChangePlayerPermissionsCommand, CommandResult>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<PlayerAuthenticateDefaultCommandHandler>() as IRequestHandler<PlayerAuthenticateDefaultCommand, CommandResult>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<PlayerAuthenticateGameJoltCommandHandler>() as IRequestHandler<PlayerAuthenticateGameJoltCommand, CommandResult>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<PlayerFinalizingCommandHandler>() as IRequestHandler<PlayerFinalizingCommand>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<PlayerInitializingCommandHandler>() as IRequestHandler<PlayerInitializingCommand>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<PlayerReadyCommandHandler>() as IRequestHandler<PlayerReadyCommand>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<PlayerMutedPlayerCommandHandler>() as IRequestHandler<PlayerMutedPlayerCommand, CommandResult>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<PlayerUnmutedPlayerCommandHandler>() as IRequestHandler<PlayerUnmutedPlayerCommand, CommandResult>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<BanPlayerCommandHandler>() as IRequestHandler<BanPlayerCommand, CommandResult>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<UnbanPlayerCommandHandler>() as IRequestHandler<UnbanPlayerCommand, CommandResult>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<KickPlayerCommandHandler>() as IRequestHandler<KickPlayerCommand, CommandResult>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<ChangeWorldSeasonCommandHandler>() as IRequestHandler<ChangeWorldSeasonCommand, CommandResult>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<ChangeWorldTimeCommandHandler>() as IRequestHandler<ChangeWorldTimeCommand, CommandResult>);
-            requestRegistrar.Add(sp => sp.GetRequiredService<ChangeWorldWeatherCommandHandler>() as IRequestHandler<ChangeWorldWeatherCommand, CommandResult>);
+            requestRegistrar.AddWithRegistration<ChangePlayerPermissionsCommand, CommandResult, ChangePlayerPermissionsCommandHandler>();
+            requestRegistrar.AddWithRegistration<PlayerAuthenticateDefaultCommand, CommandResult, PlayerAuthenticateDefaultCommandHandler>();
+            requestRegistrar.AddWithRegistration<PlayerAuthenticateGameJoltCommand, CommandResult, PlayerAuthenticateGameJoltCommandHandler>();
+            requestRegistrar.AddWithRegistration<PlayerFinalizingCommand, PlayerFinalizingCommandHandler>();
+            requestRegistrar.AddWithRegistration<PlayerInitializingCommand, PlayerInitializingCommandHandler>();
+            requestRegistrar.AddWithRegistration<PlayerReadyCommand, PlayerReadyCommandHandler>();
+            requestRegistrar.AddWithRegistration<PlayerMutedPlayerCommand, CommandResult, PlayerMutedPlayerCommandHandler>();
+            requestRegistrar.AddWithRegistration<PlayerUnmutedPlayerCommand, CommandResult, PlayerUnmutedPlayerCommandHandler>();
+            requestRegistrar.AddWithRegistration<BanPlayerCommand, CommandResult, BanPlayerCommandHandler>();
+            requestRegistrar.AddWithRegistration<UnbanPlayerCommand, CommandResult, UnbanPlayerCommandHandler>();
+            requestRegistrar.AddWithRegistration<KickPlayerCommand, CommandResult, KickPlayerCommandHandler>();
+            requestRegistrar.AddWithRegistration<ChangeWorldSeasonCommand, CommandResult, ChangeWorldSeasonCommandHandler>();
+            requestRegistrar.AddWithRegistration<ChangeWorldTimeCommand, CommandResult, ChangeWorldTimeCommandHandler>();
+            requestRegistrar.AddWithRegistration<ChangeWorldWeatherCommand, CommandResult, ChangeWorldWeatherCommandHandler>();
 
             notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerJoinedNotification>>());
             notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerLeavedNotification>>());
@@ -60,7 +60,6 @@ namespace P3D.Legacy.Server.Application.Extensions
         {
             services.Configure<ServerOptions>(configuration.GetSection("Server"));
 
-
             services.AddSingleton<DefaultJsonSerializer>();
 
             services.AddSingleton<P3DPacketFactory>();
@@ -79,22 +78,6 @@ namespace P3D.Legacy.Server.Application.Extensions
 
             services.AddSingleton<WorldService>();
             services.AddHostedService<WorldService>(sp => sp.GetRequiredService<WorldService>());
-
-
-            services.AddTransient<ChangePlayerPermissionsCommandHandler>();
-            services.AddTransient<PlayerAuthenticateDefaultCommandHandler>();
-            services.AddTransient<PlayerAuthenticateGameJoltCommandHandler>();
-            services.AddTransient<PlayerFinalizingCommandHandler>();
-            services.AddTransient<PlayerInitializingCommandHandler>();
-            services.AddTransient<PlayerReadyCommandHandler>();
-            services.AddTransient<PlayerMutedPlayerCommandHandler>();
-            services.AddTransient<PlayerUnmutedPlayerCommandHandler>();
-            services.AddTransient<BanPlayerCommandHandler>();
-            services.AddTransient<UnbanPlayerCommandHandler>();
-            services.AddTransient<KickPlayerCommandHandler>();
-            services.AddTransient<ChangeWorldSeasonCommandHandler>();
-            services.AddTransient<ChangeWorldTimeCommandHandler>();
-            services.AddTransient<ChangeWorldWeatherCommandHandler>();
 
             return services;
         }

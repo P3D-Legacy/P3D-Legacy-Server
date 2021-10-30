@@ -44,18 +44,20 @@ namespace P3D.Legacy.Server
             {
                 var useDiscordBot = ctx.Configuration["Server:UseDiscordBot"]?.Equals("true", StringComparison.OrdinalIgnoreCase) == true;
 
-                var requestRegistrar = new RequestRegistrar();
-                var notificationRegistrar = new NotificationRegistrar();
-                services.AddHostMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                services.AddApplicationMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                services.AddClientP3DMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                services.AddCommunicationAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                if (useDiscordBot) services.AddDiscordBotMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                services.AddGameCommandsMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                services.AddInfrastructureMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                services.AddInternalAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                services.AddStatisticsMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                services.AddMediatRInternal(requestRegistrar, notificationRegistrar);
+                services.AddMediatRInternal();
+                using (var requestRegistrar = new RequestRegistrar(services))
+                using (var notificationRegistrar = new NotificationRegistrar(services))
+                {
+                    services.AddHostMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                    services.AddApplicationMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                    services.AddClientP3DMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                    services.AddCommunicationAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                    if (useDiscordBot) services.AddDiscordBotMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                    services.AddGameCommandsMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                    services.AddInfrastructureMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                    services.AddInternalAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                    services.AddStatisticsMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                }
 
                 services.AddHost(ctx.Configuration);
                 services.AddApplication(ctx.Configuration);

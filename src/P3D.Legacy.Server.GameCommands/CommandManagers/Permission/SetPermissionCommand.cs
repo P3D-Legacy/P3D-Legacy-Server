@@ -29,7 +29,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
         {
             if (arguments.Length >= 2)
             {
-                var permissions = arguments.Skip(1).Where(arg => arg != "," || arg != "|").ToArray();
+                var permissions = arguments.Skip(1).Where(arg => arg != "," && arg != "|").ToArray();
 
                 var targetName = arguments[0];
                 if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)

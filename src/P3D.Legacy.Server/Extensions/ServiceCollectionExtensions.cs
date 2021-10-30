@@ -53,12 +53,9 @@ namespace P3D.Legacy.Server.Extensions
             return services;
         }
 
-        public static IServiceCollection AddMediatRInternal(this IServiceCollection services, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
+        public static IServiceCollection AddMediatRInternal(this IServiceCollection services)
         {
             ServiceRegistrar.AddRequiredServices(services, new MediatRServiceConfiguration().AsTransient());
-
-            requestRegistrar.Register(services);
-            notificationRegistrar.Register(services);
 
             services.AddTransient(typeof(IRequestPreProcessor<>), typeof(LoggingBehaviour<>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
