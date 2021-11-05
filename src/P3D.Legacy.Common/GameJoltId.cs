@@ -4,12 +4,11 @@ namespace P3D.Legacy.Common
 {
     public readonly struct GameJoltId : IEquatable<GameJoltId>
     {
-        public static GameJoltId None { get; } = new(0);
+        public static GameJoltId Parse(string id) => new(ulong.Parse(id));
 
-        public static implicit operator GameJoltId(int value) => new((ulong) value);
-        public static implicit operator GameJoltId(long value) => new((ulong) value);
-        public static implicit operator GameJoltId(uint value) => new(value);
-        public static implicit operator GameJoltId(ulong value) => new(value);
+        public static GameJoltId None { get; } = new(0);
+        public static GameJoltId FromNumber(ulong gameJoltId) => new(gameJoltId);
+
         public static implicit operator ulong(GameJoltId value) => value._value;
 
         public static bool operator ==(GameJoltId left, GameJoltId right) => left.Equals(right);

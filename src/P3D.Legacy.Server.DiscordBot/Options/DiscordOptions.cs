@@ -2,7 +2,7 @@
 
 namespace P3D.Legacy.Server.DiscordBot.Options
 {
-    internal sealed class DiscordOptionsValidator : AbstractValidator<DiscordOptions>
+    public sealed class DiscordOptionsValidator : AbstractValidator<DiscordOptions>
     {
         public DiscordOptionsValidator()
         {
@@ -12,7 +12,7 @@ namespace P3D.Legacy.Server.DiscordBot.Options
         }
     }
 
-    internal sealed record DiscordOptions
+    public sealed record DiscordOptions
     {
         public ulong PasstroughChannelId { get; init; } = default!;
         public string BotToken { get; init; } = default!;

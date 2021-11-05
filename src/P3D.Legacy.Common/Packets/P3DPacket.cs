@@ -8,7 +8,5 @@
         public P3DPacketType Id => _rawPacketData.Id;
         public Origin Origin { get => _rawPacketData.Origin; set => _rawPacketData = _rawPacketData with { Origin = value }; }
         public DataItemStorage DataItemStorage { get => _rawPacketData.DataItems; private set => _rawPacketData = _rawPacketData with { DataItems = value }; }
-
-        public string CreateData() => _rawPacketData.Build();
     }
 }

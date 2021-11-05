@@ -5,8 +5,8 @@ using Nerdbank.Streams;
 using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Application.Commands.Player;
-using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.CommunicationAPI.Models;
 using P3D.Legacy.Server.CommunicationAPI.Utils;
 
@@ -29,25 +29,32 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
     {
         private class WebSocketPlayer : IPlayer
         {
-            private readonly Func<string, CancellationToken, Task>? _kickCallback;
+            private readonly Func<string, CancellationToken, Task>? _kickCallbackAsync;
 
             public string ConnectionId { get; }
-            public Origin Id { get; private set; }
+            public PlayerId Id { get; private set; }
+            public Origin Origin { get; private set; }
             public string Name { get; }
-            public GameJoltId GameJoltId => 0;
+            public GameJoltId GameJoltId => GameJoltId.None;
             public PermissionFlags Permissions { get; private set; } = PermissionFlags.User;
             public IPEndPoint IPEndPoint => new(IPAddress.Loopback, 0);
 
-            public WebSocketPlayer(string botName, Func<string, CancellationToken, Task>? kickCallback)
+            public WebSocketPlayer(string botName, Func<string, CancellationToken, Task>? kickCallbackAsync)
             {
                 ConnectionId = $"CON_{botName}";
                 Name = $"<BOT> {botName}";
-                _kickCallback = kickCallback;
+                _kickCallbackAsync = kickCallbackAsync;
             }
 
-            public Task AssignIdAsync(Origin id, CancellationToken ct)
+            public Task AssignIdAsync(PlayerId id, CancellationToken ct)
             {
                 Id = id;
+                return Task.CompletedTask;
+            }
+
+            public Task AssignOriginAsync(Origin origin, CancellationToken ct)
+            {
+                Origin = origin;
                 return Task.CompletedTask;
             }
 
@@ -59,8 +66,8 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
 
             public async Task KickAsync(string reason, CancellationToken ct)
             {
-                if (_kickCallback is not null)
-                    await _kickCallback(reason, ct);
+                if (_kickCallbackAsync is not null)
+                    await _kickCallbackAsync(reason, ct);
             }
         }
 
@@ -82,6 +89,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         public async Task ListenAsync(CancellationToken ct)
         {
             const int maxMessageSize = 1 * 1024 * 1024;
+            var buffer = new byte[4 * 1024 * 1024];
             while (!ct.IsCancellationRequested)
             {
                 await using var reader = new WebSocketMessageReaderStream(_webSocket, maxMessageSize);
@@ -102,7 +110,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                         return;
                     }
 
-                    _bot = new WebSocketPlayer(botName, KickCallback);
+                    _bot = new WebSocketPlayer(botName, KickCallbackAsync);
                     await _mediator.Send(new PlayerInitializingCommand(_bot), ct);
                     await _mediator.Send(new PlayerReadyCommand(_bot), ct);
                     await _mediator.Publish(new PlayerUpdatedStateNotification(_bot), ct);
@@ -122,7 +130,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
             }
         }
 
-        private async Task KickCallback(string reason, CancellationToken ct)
+        private async Task KickCallbackAsync(string reason, CancellationToken ct)
         {
             await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new KickedResponsePayload(reason)), WebSocketMessageType.Text, true, ct);
             await _webSocket.CloseAsync(WebSocketCloseStatus.Empty, "Kicked", ct);

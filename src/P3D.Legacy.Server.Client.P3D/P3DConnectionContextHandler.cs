@@ -11,10 +11,10 @@ using OpenTelemetry.Trace;
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Application.Commands.Player;
-using P3D.Legacy.Server.Application.Options;
 using P3D.Legacy.Server.Application.Services;
-using P3D.Legacy.Server.Infrastructure.Monsters;
+using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
 
 using System;
 using System.Diagnostics;

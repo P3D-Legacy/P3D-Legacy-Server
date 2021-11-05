@@ -2,7 +2,7 @@
 {
     public record JwtOptions
     {
-        public string SignKey { get; init; } = default!;
-        public string EncryptionKey { get; init; } = default!;
+        public string RsaPrivateKey { get; init; } = default!;
+        public string RsaPublicKey { get; init; } = default!;
     }
 }

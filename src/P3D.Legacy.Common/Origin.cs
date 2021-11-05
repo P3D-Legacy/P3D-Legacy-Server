@@ -4,17 +4,18 @@ namespace P3D.Legacy.Common
 {
     public readonly struct Origin : IEquatable<Origin>
     {
-        public static Origin Server { get; } = new(-1);
+        public static Origin Parse(string id) => new(long.Parse(id));
 
-        public static implicit operator Origin(int value) => new(value);
-        public static implicit operator Origin(long value) => new(value);
-        public static implicit operator Origin(uint value) => new((int) value);
-        public static implicit operator Origin(ulong value) => new((int) value);
+        public static Origin None { get; } = new(0);
+        public static Origin Server { get; } = new(-1);
+        public static Origin FromNumber(long origin) => new(origin);
+
         public static implicit operator long(Origin value) => value._value;
 
         public static bool operator ==(Origin left, Origin right) => left.Equals(right);
         public static bool operator !=(Origin left, Origin right) => !(left == right);
 
+        public bool IsNone => this == None;
         public bool IsServer => this == Server;
         public bool IsPlayer => _value > 0;
 

@@ -8,15 +8,20 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
+using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.Application.Extensions;
 using P3D.Legacy.Server.Client.P3D.Extensions;
+using P3D.Legacy.Server.Client.P3D.Options;
 using P3D.Legacy.Server.CommunicationAPI.Extensions;
 using P3D.Legacy.Server.DiscordBot.Extensions;
+using P3D.Legacy.Server.DiscordBot.Options;
 using P3D.Legacy.Server.Extensions;
 using P3D.Legacy.Server.GameCommands.Extensions;
 using P3D.Legacy.Server.Infrastructure.Extensions;
+using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.InternalAPI.Extensions;
+using P3D.Legacy.Server.InternalAPI.Options;
 using P3D.Legacy.Server.Options;
 using P3D.Legacy.Server.Statistics.Extensions;
 
@@ -42,7 +47,14 @@ namespace P3D.Legacy.Server
             .CreateDefaultBuilder(args)
             .ConfigureServices((ctx, services) =>
             {
-                var useDiscordBot = ctx.Configuration["Server:UseDiscordBot"]?.Equals("true", StringComparison.OrdinalIgnoreCase) == true;
+                services.Configure<ServerOptions>(ctx.Configuration.GetSection("Server"));
+                services.Configure<P3DSiteOptions>(ctx.Configuration.GetSection("OfficialSite"));
+                services.Configure<P3DServerOptions>(ctx.Configuration.GetSection("P3DServer"));
+                services.Configure<DiscordOptions>(ctx.Configuration.GetSection("DiscordBot"));
+                services.Configure<LiteDbOptions>(ctx.Configuration.GetSection("LiteDb"));
+                services.Configure<JwtOptions>(ctx.Configuration.GetSection("Jwt"));
+
+                var otlpSection = ctx.Configuration.GetSection("Otlp");
 
                 services.AddMediatRInternal();
                 using (var requestRegistrar = new RequestRegistrar(services))
@@ -52,7 +64,7 @@ namespace P3D.Legacy.Server
                     services.AddApplicationMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                     services.AddClientP3DMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                     services.AddCommunicationAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                    if (useDiscordBot) services.AddDiscordBotMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                    services.AddDiscordBotMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                     services.AddGameCommandsMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                     services.AddInfrastructureMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                     services.AddInternalAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
@@ -63,7 +75,7 @@ namespace P3D.Legacy.Server
                 services.AddApplication(ctx.Configuration);
                 services.AddClientP3D(ctx.Configuration);
                 services.AddCommunicationAPI(ctx.Configuration);
-                if (useDiscordBot) services.AddDiscordBot(ctx.Configuration);
+                services.AddDiscordBot(ctx.Configuration);
                 services.AddGameCommands(ctx.Configuration);
                 services.AddInfrastructure(ctx.Configuration);
                 services.AddInternalAPI(ctx.Configuration);
@@ -71,7 +83,7 @@ namespace P3D.Legacy.Server
 
                 services.AddOpenTelemetryMetrics(builder =>
                 {
-                    var options = ctx.Configuration.GetSection("Otlp").Get<OtlpOptions>();
+                    var options = otlpSection.Get<OtlpOptions>();
                     if (options.Enabled)
                     {
                         builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
@@ -89,7 +101,7 @@ namespace P3D.Legacy.Server
                 });
                 services.AddOpenTelemetryTracing(builder =>
                 {
-                    var options = ctx.Configuration.GetSection("Otlp").Get<OtlpOptions>();
+                    var options = otlpSection .Get<OtlpOptions>();
                     if (options.Enabled)
                     {
                         builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
@@ -101,7 +113,7 @@ namespace P3D.Legacy.Server
                         builder.AddApplicationInstrumentation();
                         builder.AddClientP3DInstrumentation();
                         builder.AddCommunicationAPIInstrumentation();
-                        if (useDiscordBot) builder.AddDiscordBotInstrumentation();
+                        builder.AddDiscordBotInstrumentation();
                         builder.AddGameCommandsInstrumentation();
                         builder.AddInfrastructureInstrumentation();
                         builder.AddInternalAPIInstrumentation();

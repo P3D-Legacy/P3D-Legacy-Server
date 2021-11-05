@@ -29,7 +29,7 @@ namespace P3D.Legacy.Common.Monsters
                 Hidden = abilities[2];
 
             if (abilities.Length > 3)
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(abilities));
         }
 
         public override string ToString()

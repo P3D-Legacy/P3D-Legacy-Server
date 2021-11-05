@@ -13,7 +13,6 @@ using P3D.Legacy.Server.Application.Commands;
 using P3D.Legacy.Server.Application.Commands.Administration;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Commands.World;
-using P3D.Legacy.Server.Application.Options;
 using P3D.Legacy.Server.Application.Queries.Bans;
 using P3D.Legacy.Server.Application.Queries.Permissions;
 using P3D.Legacy.Server.Application.Queries.Players;
@@ -42,31 +41,28 @@ namespace P3D.Legacy.Server.Application.Extensions
             requestRegistrar.AddWithRegistration<ChangeWorldTimeCommand, CommandResult, ChangeWorldTimeCommandHandler>();
             requestRegistrar.AddWithRegistration<ChangeWorldWeatherCommand, CommandResult, ChangeWorldWeatherCommandHandler>();
 
+            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<MessageToPlayerNotification>>());
             notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerJoinedNotification>>());
             notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerLeavedNotification>>());
-            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerUpdatedStateNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentCommandNotification>>());
             notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentGlobalMessageNotification>>());
             notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentLocalMessageNotification>>());
-            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<MessageToPlayerNotification>>());
-            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentRawP3DPacketNotification>>());
-            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<ServerMessageNotification>>());
-            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerTriggeredEventNotification>>());
-            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentCommandNotification>>());
             notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentLoginNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentPrivateMessageNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerSentRawP3DPacketNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerTriggeredEventNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<PlayerUpdatedStateNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<INotificationHandler<ServerMessageNotification>>());
 
             return services;
         }
         public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<ServerOptions>(configuration.GetSection("Server"));
-
-            services.AddSingleton<DefaultJsonSerializer>();
-
             services.AddSingleton<P3DPacketFactory>();
 
             services.AddScoped<ConnectionContextHandlerFactory>();
 
-            services.AddSingleton<IPlayerIdGenerator, DefaultPlayerIdGenerator>();
+            services.AddSingleton<IPlayerOriginGenerator, DefaultPlayerOriginGenerator>();
 
             services.AddTransient<IBanQueries, BanQueries>();
             services.AddTransient<IPlayerQueries, PlayerQueries>();

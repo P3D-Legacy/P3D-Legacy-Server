@@ -48,7 +48,7 @@ namespace P3D.Legacy.Common
         public int GetInt32(int index) => int.TryParse(Get(index), out var val) ? val : 0;
         public ulong GetUInt64(int index) => ulong.TryParse(Get(index), out var val) ? val : 0UL;
         public long GetInt64(int index) => long.TryParse(Get(index), out var val) ? val : 0L;
-        public Origin GetOrigin(int index) => GetInt64(index);
+        public Origin GetOrigin(int index) => Origin.FromNumber(GetInt64(index));
 
         public void Set(int index, in ReadOnlySpan<char> value) => _dataItems[index] = value.ToString();
         public void Set(int index, char value) => Set(index, value.ToString());

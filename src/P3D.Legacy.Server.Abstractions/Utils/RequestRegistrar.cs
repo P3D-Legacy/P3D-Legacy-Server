@@ -59,7 +59,7 @@ namespace P3D.Legacy.Server.Abstractions.Utils
 
         public void AddWithRegistration<TRequest, TService>(ServiceLifetime lifetime = ServiceLifetime.Transient) where TRequest : IRequest<Unit> where TService : IRequestHandler<TRequest, Unit>
         {
-            AddWithRegistration<TRequest, Unit, TService>();
+            AddWithRegistration<TRequest, Unit, TService>(lifetime);
         }
 
         public IEnumerator GetEnumerator() => _containers.GetEnumerator();

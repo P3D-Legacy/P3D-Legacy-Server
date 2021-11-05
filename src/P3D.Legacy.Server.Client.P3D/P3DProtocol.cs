@@ -20,12 +20,14 @@ namespace P3D.Legacy.Server.Client.P3D
 
         private readonly ILogger _logger;
         private readonly P3DPacketFactory _packetFactory;
+        private readonly IP3DPacketBuilder _packetBuilder;
         private readonly SequenceTextReader _sequenceTextReader = new();
 
-        public P3DProtocol(ILogger<P3DProtocol> logger, P3DPacketFactory packetFactory)
+        public P3DProtocol(ILogger<P3DProtocol> logger, P3DPacketFactory packetFactory, IP3DPacketBuilder packetBuilder)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _packetFactory = packetFactory ?? throw new ArgumentNullException(nameof(packetFactory));
+            _packetBuilder = packetBuilder ?? throw new ArgumentNullException(nameof(packetBuilder));
         }
 
         public bool TryParseMessage(in ReadOnlySequence<byte> input, ref SequencePosition consumed, ref SequencePosition examined, out P3DPacket? message)
@@ -82,7 +84,7 @@ namespace P3D.Legacy.Server.Client.P3D
         public void WriteMessage(P3DPacket message, IBufferWriter<byte> output)
         {
             _logger.LogTrace("Sending a message type {Type}", message.GetType());
-            output.Write(Encoding.ASCII.GetBytes($"{message.CreateData()}\r\n"));
+            output.Write(_packetBuilder.CreateData(message));
         }
 
         public void Dispose()

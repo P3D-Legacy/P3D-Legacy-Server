@@ -1,14 +1,15 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Common;
+using P3D.Legacy.Common.Packets.Battle;
 using P3D.Legacy.Common.Packets.Chat;
 using P3D.Legacy.Common.Packets.Server;
+using P3D.Legacy.Common.Packets.Trade;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Application.Commands.Player;
 
 using System;
-using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,18 +35,18 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var player = notification.Player;
 
-            if (Id == player.Id)
+            if (Origin == player.Origin)
             {
                 await foreach (var connectedPlayer in _playerContainer.GetAllAsync(ct))
                 {
-                    await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerId = connectedPlayer.Id }, ct);
+                    await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerOrigin = connectedPlayer.Origin }, ct);
                     var state = connectedPlayer as IP3DPlayerState ?? IP3DPlayerState.Empty;
                     await SendPacketAsync(GetFromP3DPlayerState(connectedPlayer, state), ct);
                 }
             }
             else
             {
-                await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerId = player.Id }, ct);
+                await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerOrigin = player.Origin }, ct);
             }
 
             await SendServerMessageAsync($"Player {player.Name} joined the server!", ct);
@@ -53,11 +54,11 @@ namespace P3D.Legacy.Server.Client.P3D
 
         public async Task Handle(PlayerLeavedNotification notification, CancellationToken ct)
         {
-            var (id, name, _) = notification;
+            var (_, origin, name) = notification;
 
-            if (Id == id) return;
+            if (Origin == origin) return;
 
-            await SendPacketAsync(new DestroyPlayerPacket { Origin = Origin.Server, PlayerId = id }, ct);
+            await SendPacketAsync(new DestroyPlayerPacket { Origin = Origin.Server, PlayerOrigin = origin }, ct);
             await SendServerMessageAsync($"Player {name} left the server!", ct);
         }
 
@@ -73,7 +74,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var (player, message) = notification;
 
-            await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Id, Message = message }, ct);
+            await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
 
         public async Task Handle(PlayerSentLocalMessageNotification notification, CancellationToken ct)
@@ -82,7 +83,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (!LevelFile.Equals(location, StringComparison.OrdinalIgnoreCase)) return;
 
-            await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Id, Message = message }, ct);
+            await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
 
         public async Task Handle(PlayerSentPrivateMessageNotification notification, CancellationToken ct)
@@ -91,26 +92,46 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (!Name.Equals(receiverName, StringComparison.OrdinalIgnoreCase)) return;
 
-            await SendPacketAsync(new ChatMessagePrivatePacket { Origin = player.Id, DestinationPlayerName = receiverName, Message = message }, ct);
+            await SendPacketAsync(new ChatMessagePrivatePacket { Origin = player.Origin, DestinationPlayerName = receiverName, Message = message }, ct);
         }
 
         public async Task Handle(MessageToPlayerNotification notification, CancellationToken ct)
         {
             var (from, to, message) = notification;
 
-            if (Id != to.Id) return;
+            if (Origin != to.Origin) return;
 
-            await SendPacketAsync(new ChatMessageGlobalPacket { Origin = from.Id, Message = message }, ct);
+            await SendPacketAsync(new ChatMessageGlobalPacket { Origin = from.Origin, Message = message }, ct);
         }
 
         public async Task Handle(PlayerSentRawP3DPacketNotification notification, CancellationToken ct)
         {
-            var (player, p3DPacket) = notification;
+            var (player, p3dPacket) = notification;
 
-            if (Id == player.Id) return;
-            if (GameJoltId.IsNone != player.GameJoltId.IsNone) return;
+            if (Origin == player.Origin) return;
+            if (GameJoltId.IsNone != player.GameJoltId.IsNone)
+            {
+                switch (p3dPacket)
+                {
+                    case TradeRequestPacket:
+                        await _mediator.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
+                        await _mediator.Publish(new PlayerSentRawP3DPacketNotification(player, new TradeQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
+                        break;
+                    case BattleRequestPacket:
+                        await _mediator.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
+                        await _mediator.Publish(new PlayerSentRawP3DPacketNotification(player, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
+                        break;
+                    case TradeQuitPacket:
+                        await SendPacketAsync(p3dPacket, ct);
+                        break;
+                    case BattleQuitPacket:
+                        await SendPacketAsync(p3dPacket, ct);
+                        break;
+                }
+                return;
+            }
 
-            await SendPacketAsync(p3DPacket, ct);
+            await SendPacketAsync(p3dPacket, ct);
         }
 
         public async Task Handle(ServerMessageNotification notification, CancellationToken ct)
@@ -131,10 +152,10 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var (player, message) = notification;
 
-            if (Id != player.Id) return;
+            if (Origin != player.Origin) return;
             if (message.StartsWith("/login", StringComparison.OrdinalIgnoreCase)) return;
 
-            await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Id, Message = message }, ct);
+            await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
 
         public async Task Handle(WorldUpdatedNotification notification, CancellationToken ct)
@@ -153,7 +174,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var (player, password) = notification;
 
-            if (Id != player.Id) return;
+            if (Origin != player.Origin) return;
             if (_connectionState != P3DConnectionState.Authentication) return;
 
             if (await _mediator.Send(new PlayerAuthenticateDefaultCommand(this, password), ct) is { Success: true })

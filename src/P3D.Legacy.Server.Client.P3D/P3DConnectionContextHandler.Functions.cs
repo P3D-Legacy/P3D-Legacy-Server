@@ -20,7 +20,7 @@ namespace P3D.Legacy.Server.Client.P3D
     {
         private static GameDataPacket GetFromP3DPlayerState(IPlayer player, IP3DPlayerState state) => new()
         {
-            Origin = player.Id,
+            Origin = player.Origin,
             GameMode = state.GameMode,
             IsGameJoltPlayer = state.IsGameJoltPlayer,
             GameJoltId = player.GameJoltId,
@@ -47,9 +47,9 @@ namespace P3D.Legacy.Server.Client.P3D
             string.Equals(gamemode, "Pokemon 3D", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(gamemode, "Pokémon 3D", StringComparison.OrdinalIgnoreCase);
 
-        public Task AssignIdAsync(Origin id, CancellationToken ct)
+        public Task AssignIdAsync(PlayerId id, CancellationToken ct)
         {
-            if (Id != 0)
+            if (!Id.IsEmpty)
                 throw new InvalidOperationException("Id was already assigned!");
 
             Id = id;
@@ -57,10 +57,20 @@ namespace P3D.Legacy.Server.Client.P3D
             return Task.CompletedTask;
         }
 
+        public Task AssignOriginAsync(Origin origin, CancellationToken ct)
+        {
+            if (Origin.IsPlayer)
+                throw new InvalidOperationException("Origin was already assigned!");
+
+            Origin = origin;
+
+            return Task.CompletedTask;
+        }
+
         public Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Authentication)
-                throw new InvalidOperationException("Permissions can't be assigned at this stage!");
+            //if (_connectionState != P3DConnectionState.Authentication)
+            //    throw new InvalidOperationException("Permissions can't be assigned at this stage!");
 
             Permissions = permissions;
 

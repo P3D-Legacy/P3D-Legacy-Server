@@ -30,8 +30,6 @@ namespace P3D.Legacy.Server.DiscordBot.Extensions
 
         public static IServiceCollection AddDiscordBot(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<DiscordOptions>(configuration.GetSection("DiscordBot"));
-
             services.AddHostedServiceAsSingleton<DiscordPassthroughService>();
             services.AddSingleton<DiscordSocketClient>();
             services.AddSingleton<IDiscordClient, DiscordSocketClient>(sp => sp.GetRequiredService<DiscordSocketClient>());

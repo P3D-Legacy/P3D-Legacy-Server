@@ -22,7 +22,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
             if (arguments.Length == 1)
-                await Mediator.Publish(new PlayerSentLoginNotification(player, arguments[0] + "A!"), ct);
+                await Mediator.Publish(new PlayerSentLoginNotification(player, arguments[0]), ct);
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
         }

@@ -1,4 +1,5 @@
-﻿using P3D.Legacy.Server.Application.Services;
+﻿using P3D.Legacy.Common;
+using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,22 @@ namespace P3D.Legacy.Server.Application.Queries.Players
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
         }
 
-        public async Task<PlayerViewModel?> GetAsync(long id, CancellationToken ct) => await _playerContainer.GetAsync(id, ct) is { } x ? new PlayerViewModel(x.Id, x.Name, x.GameJoltId) : null;
-        public IAsyncEnumerable<PlayerViewModel> GetAllAsync(CancellationToken ct) => _playerContainer.GetAllAsync(ct).Select(x => new PlayerViewModel(x.Id, x.Name, x.GameJoltId));
+        public async Task<PlayerViewModel?> GetAsync(long origin, CancellationToken ct)
+        {
+            return await _playerContainer.GetAsync(Origin.FromNumber(origin), ct) is { } x ? new PlayerViewModel(x.Origin, x.Name, x.GameJoltId) : null;
+        }
+
+        public async Task<(long Count, IReadOnlyList<PlayerViewModel> Models)> GetAllAsync(int skip, int take, CancellationToken ct)
+        {
+            return (
+                await _playerContainer.GetAllAsync(ct).CountAsync(ct),
+                await _playerContainer.GetAllAsync(ct).Skip(skip).Take(take).Select(x => new PlayerViewModel(x.Origin, x.Name, x.GameJoltId)).ToListAsync(ct)
+            );
+        }
+
+        public IAsyncEnumerable<PlayerViewModel> GetAllAsync(CancellationToken ct)
+        {
+            return _playerContainer.GetAllAsync(ct).Select(x => new PlayerViewModel(x.Origin, x.Name, x.GameJoltId));
+        }
     }
 }

@@ -1,19 +1,16 @@
-﻿using LiteDB.Identity.Database;
-using LiteDB.Identity.Models;
-using LiteDB.Identity.Stores;
-
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Identity;
+using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Abstractions.Utils;
-using P3D.Legacy.Server.Infrastructure.Monsters;
-using P3D.Legacy.Server.Infrastructure.Permissions;
-using P3D.Legacy.Server.Infrastructure.Repositories;
-
-using System;
+using P3D.Legacy.Server.Infrastructure.Options;
+using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
+using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
+using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
+using P3D.Legacy.Server.Infrastructure.Services.Bans;
+using P3D.Legacy.Server.Infrastructure.Services.Mutes;
+using P3D.Legacy.Server.Infrastructure.Services.Permissions;
+using P3D.Legacy.Server.Infrastructure.Services.Users;
 
 namespace P3D.Legacy.Server.Infrastructure.Extensions
 {
@@ -25,35 +22,28 @@ namespace P3D.Legacy.Server.Infrastructure.Extensions
         }
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            var validationEnabled = configuration["Server:ValidationEnabled"]?.Equals("true", StringComparison.OrdinalIgnoreCase) == true;
-            var isOfficial = configuration["Server:IsOfficial"]?.Equals("true", StringComparison.OrdinalIgnoreCase) == true;
+            services.AddOptions<PasswordOptions>();
+            services.AddOptions<LockoutOptions>();
 
-            if (isOfficial)
-            {
-                services.AddTransient<IPermissionRepository, P3DPermissionRepository>();
-                services.AddTransient<IBanRepository, LiteDbBanRepository>(); // TODO
-            }
-            else
-            {
-                services.AddTransient<IPermissionRepository, DefaultPermissionRepository>();
-                services.AddTransient<IBanRepository, LiteDbBanRepository>();
-            }
+            services.AddSingleton<DefaultJsonSerializer>();
 
-            if (validationEnabled)
-            {
-                services.AddTransient<IMonsterRepository, PokeAPIMonsterRepository>();
-            }
-            else
-            {
-                services.AddTransient<IMonsterRepository, NopMonsterRepository>();
-            }
+            services.AddHttpClient();
 
-            services.AddScoped<ILiteDbIdentityContext, LiteDbIdentityContext>(c => new LiteDbIdentityContext("Filename=./database.litedb;Connection=Shared"));
+            services.AddTransient<IUserManager, LiteDbUserManager>();
 
-            services.AddIdentity<ServerIdentity, ServerRole>()
-                .AddUserStore<UserStore<ServerIdentity, ServerRole, ServerIdentityRole, ServerIdentityClaim, ServerIdentityLogin, ServerIdentityToken>>()
-                .AddRoleStore<RoleStore<ServerRole, ServerRoleClaim>>()
-                .AddDefaultTokenProviders();
+            services.AddTransient<IMuteManager, LiteDbMuteManager>();
+
+            services.AddTransient<IPermissionManager, DefaultPermissionManager>();
+            services.AddTransient<P3DPermissionRepository>();
+            services.AddTransient<LiteDbPermissionRepository>();
+
+            services.AddTransient<IBanManager, DefaultBanManager>();
+            services.AddTransient<P3DBanRepository>();
+            services.AddTransient<LiteDbBanRepository>();
+
+            services.AddTransient<IMonsterRepository, MonsterRepository>();
+            services.AddTransient<PokeAPIMonsterRepository>();
+            services.AddTransient<NopMonsterRepository>();
 
             return services;
         }

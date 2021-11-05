@@ -9,11 +9,12 @@ namespace P3D.Legacy.Server.Client.P3D
     // ReSharper disable once ArrangeTypeModifiers
     partial class P3DConnectionContextHandler : IP3DPlayerState
     {
-        public Origin Id { get; private set; } = default!;
-        public string Name { get; private set; } = default!;
-        public GameJoltId GameJoltId { get; private set; } = default!;
-        public PermissionFlags Permissions { get; private set; } = default!;
-        public IPEndPoint IPEndPoint { get; private set; } = default!;
+        public PlayerId Id { get; private set; } = PlayerId.None;
+        public Origin Origin { get; private set; } = Origin.None;
+        public string Name { get; private set; } = string.Empty;
+        public GameJoltId GameJoltId { get; private set; } = GameJoltId.None;
+        public PermissionFlags Permissions { get; private set; } = PermissionFlags.UnVerified;
+        public IPEndPoint IPEndPoint { get; private set; } = new IPEndPoint(IPAddress.None, 0);
 
 
         public string GameMode { get; private set; } = default!;

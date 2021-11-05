@@ -1,26 +1,42 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace P3D.Legacy.Common.Extensions
 {
     public static class DataItemsExtensions
     {
-        //public static Monster[] DataItemsToMonsters(this DataItemStorage data) => data.ToString().Split('|').Select(str => str).Select(items => new Monster(new DataItemStorage(items))).ToArray();
-
-        public static Dictionary<string, string> ToDictionary(this DataItemStorage data)
+        public static Dictionary<string, string> MonsterDataToDictionary(this ReadOnlySpan<char> monsterData)
         {
             var dict = new Dictionary<string, string>();
-            var str = data.ToString();
-            str = str.Replace("{", "");
-            //str = str.Replace("}", ",");
-            var array = str.Split('}');
-            foreach (var s in array.Reverse().Skip(1))
+            while (monsterData.IndexOf('}') is var entryIndex && entryIndex != -1)
             {
-                var v = s.Split('"');
-                dict.Add(v[1], v[2].Replace("[", "").Replace("]", ""));
-            }
+                var entry = monsterData.Slice(0, entryIndex);
+                monsterData = monsterData.Slice(entryIndex + 1);
 
+                if (entry.IndexOf('"') is var idStartIndex && idStartIndex == -1)
+                    continue;
+
+                var idSpan = entry.Slice(idStartIndex + 1);
+                if (idSpan.IndexOf('"') is var idEndIndex && idEndIndex == -1)
+                    continue;
+
+                idSpan = idSpan.Slice(0, idEndIndex);
+
+                var valueIndex = idStartIndex + 1 + idEndIndex + 1;
+                var key = idSpan.ToString();
+                var value = entry[(valueIndex + 1)..^1].ToString();
+                dict.Add(key, value);
+            }
             return dict;
+        }
+
+        public static string DictionaryToMonsterData(this Dictionary<string, string> dictionary)
+        {
+            var sb = new StringBuilder();
+            foreach (var (key, value) in dictionary)
+                sb.Append("{\"").Append(key).Append("\"").Append('[').Append(value).Append("]}");
+            return sb.ToString();
         }
     }
 }

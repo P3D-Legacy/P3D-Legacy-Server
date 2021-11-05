@@ -1,13 +1,13 @@
-﻿using LiteDB;
+﻿using Microsoft.AspNetCore.Mvc;
 
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-
-using P3D.Legacy.Server.Abstractions.Identity;
+using P3D.Legacy.Common;
+using P3D.Legacy.Server.Infrastructure.Models.Users;
+using P3D.Legacy.Server.Infrastructure.Services.Users;
 using P3D.Legacy.Server.UI.Shared.Models;
 
+using System;
 using System.Linq;
-using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.InternalAPI.Controllers
@@ -16,24 +16,23 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
     [ApiController]
     public class AccountsController : ControllerBase
     {
-        private readonly UserManager<ServerIdentity> _userManager;
+        private readonly IUserManager _userManager;
 
-        public AccountsController(UserManager<ServerIdentity> userManager)
+        public AccountsController(IUserManager userManager)
         {
-            _userManager = userManager;
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] RegisterModel model)
+        public async Task<IActionResult> Post([FromBody] RegisterModel model, CancellationToken ct)
         {
-            var newUser = new ServerIdentity { Id = ObjectId.NewObjectId(), UserName = model.Email, Email = model.Email };
+            var newUser = new UserEntity(PlayerId.FromName(model.Username), model.Username);
 
-            var result = await _userManager.CreateAsync(newUser, model.Password);
-            //var claimResult = await _userManager.AddClaimAsync(newUser, new Claim("server:gamejoltid", model.GameJoltId));
+            var result = await _userManager.CreateAsync(newUser, model.Password, false, ct);
 
-            if (!result.Succeeded/* || !claimResult.Succeeded*/)
+            if (!result.Succeeded)
             {
-                var errors = result.Errors.Select(x => x.Description)/*.Concat(claimResult.Errors.Select(x => x.Description))*/;
+                var errors = result.Errors.Select(x => x.Description);
 
                 return Ok(new RegisterResult { Successful = false, Errors = errors });
             }

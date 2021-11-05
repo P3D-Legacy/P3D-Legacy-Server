@@ -31,6 +31,12 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                     return;
                 }
 
+                if (targetPlayer.Id == player.Id)
+                {
+                    await SendMessageAsync(player, "You can't kick yourself!", ct);
+                    return;
+                }
+
                 await Mediator.Send(new KickPlayerCommand(targetPlayer, "Kicked by a Moderator or Admin."), ct);
             }
             else if (arguments.Length > 1)
@@ -39,6 +45,12 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                 if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
                 {
                     await SendMessageAsync(player, $"Player {targetName} not found!", ct);
+                    return;
+                }
+
+                if (targetPlayer.Id == player.Id)
+                {
+                    await SendMessageAsync(player, "You can't kick yourself!", ct);
                     return;
                 }
 

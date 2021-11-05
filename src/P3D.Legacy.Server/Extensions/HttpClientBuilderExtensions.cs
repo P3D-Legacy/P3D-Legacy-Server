@@ -8,21 +8,6 @@ namespace P3D.Legacy.Server.Extensions
 {
     internal static class HttpClientBuilderExtensions
     {
-        public static IHttpClientBuilder GenerateCorrelationId(this IHttpClientBuilder builder)
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-
-            builder.ConfigureHttpClient((sp, client) =>
-            {
-
-            });
-
-            return builder;
-        }
-
         public static IHttpClientBuilder AddPolly(this IHttpClientBuilder builder)
         {
             if (builder == null)

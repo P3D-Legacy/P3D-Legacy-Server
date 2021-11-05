@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Application.Commands;
 using P3D.Legacy.Server.Application.Commands.Administration;
-using P3D.Legacy.Server.Infrastructure.Repositories;
+using P3D.Legacy.Server.Infrastructure.Services.Bans;
 
 using System;
 using System.Threading;
@@ -16,18 +16,18 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
-        private readonly IBanRepository _banRepository;
+        private readonly IBanManager _banManager;
 
-        public UnbanPlayerCommandHandler(ILogger<UnbanPlayerCommandHandler> logger, IMediator mediator, IBanRepository banRepository)
+        public UnbanPlayerCommandHandler(ILogger<UnbanPlayerCommandHandler> logger, IMediator mediator, IBanManager banManager)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
+            _banManager = banManager ?? throw new ArgumentNullException(nameof(banManager));
         }
 
         public async Task<CommandResult> Handle(UnbanPlayerCommand request, CancellationToken ct)
         {
-            var result = await _banRepository.DeleteAsync(request.Id, ct);
+            var result = await _banManager.UnbanAsync(request.Id, ct);
 
             return new CommandResult(result);
         }

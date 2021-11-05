@@ -2,6 +2,6 @@
 {
     public record LiteDbOptions
     {
-        public string Path { get; init; } = default!;
+        public string ConnectionString { get; init; } = default!;
     }
 }

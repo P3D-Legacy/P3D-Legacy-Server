@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Application.Commands;
 using P3D.Legacy.Server.Application.Commands.Player;
+using P3D.Legacy.Server.Infrastructure.Services.Permissions;
 
 using System;
 using System.Threading;
@@ -15,16 +16,24 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
+        private readonly IPermissionManager _permissionManager;
 
-        public ChangePlayerPermissionsCommandHandler(ILogger<ChangePlayerPermissionsCommandHandler> logger, IMediator mediator)
+        public ChangePlayerPermissionsCommandHandler(ILogger<ChangePlayerPermissionsCommandHandler> logger, IMediator mediator, IPermissionManager permissionManager)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _permissionManager = permissionManager ?? throw new ArgumentNullException(nameof(permissionManager));
         }
 
-        public Task<CommandResult> Handle(ChangePlayerPermissionsCommand request, CancellationToken ct)
+        public async Task<CommandResult> Handle(ChangePlayerPermissionsCommand request, CancellationToken ct)
         {
-            return Task.FromResult(new CommandResult(false));
+            var result = await _permissionManager.SetPermissionsAsync(request.Player.Id, request.Permissions, ct);
+            if (result)
+            {
+                await request.Player.AssignPermissionsAsync(request.Permissions, ct);
+            }
+
+            return new CommandResult(result);
         }
     }
 }

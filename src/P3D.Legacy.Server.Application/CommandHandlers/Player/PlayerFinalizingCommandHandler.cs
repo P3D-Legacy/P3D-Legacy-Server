@@ -29,7 +29,7 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
         {
             if (await _playerContainer.RemoveAsync(request.Player, ct))
             {
-                await _mediator.Publish(new PlayerLeavedNotification(request.Player.Id, request.Player.Name, request.Player.GameJoltId), ct);
+                await _mediator.Publish(new PlayerLeavedNotification(request.Player.Id, request.Player.Origin, request.Player.Name), ct);
             }
 
             return Unit.Value;

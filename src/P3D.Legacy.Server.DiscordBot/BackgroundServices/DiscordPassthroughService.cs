@@ -14,6 +14,7 @@ using OpenTelemetry.Trace;
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.DiscordBot.Options;
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,7 +31,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
         private readonly Tracer _tracer;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IMediator _mediator;
-        private readonly DiscordSocketClient _discordSocketClient;
+        private readonly DiscordSocketClient? _discordSocketClient;
         private readonly DiscordOptions _options;
 
         public DiscordPassthroughService(
@@ -42,12 +43,14 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             IMediator mediator,
             IApplicationEnder applicationEnder) : base(applicationEnder)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.DiscordBot");
-            _scopeFactory = scopeFactory;
-            _options = options.Value;
-            _mediator = mediator;
-            _discordSocketClient = discordSocketClient;
+            _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
+            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _discordSocketClient = options.Value.PasstroughChannelId != 0
+                ? discordSocketClient ?? throw new ArgumentNullException(nameof(discordSocketClient))
+                : null;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -62,6 +65,9 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
                 await _discordSocketClient.StopAsync();
                 _logger.LogWarning("Stopped Discord Bot");
             }
+
+            if (_discordSocketClient is null)
+                return;
 
             using var scope = _scopeFactory.CreateScope();
 
@@ -132,37 +138,37 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 
         public override void Dispose()
         {
-            _discordSocketClient.Dispose();
+            _discordSocketClient?.Dispose();
             base.Dispose();
         }
 
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken cancellationToken)
         {
-            if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
+            if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
                 await channel.SendMessageAsync($"> `EVENT  : Player {notification.Player.Name} joined the server!`");
         }
 
         public async Task Handle(PlayerLeavedNotification notification, CancellationToken cancellationToken)
         {
-            if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
+            if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
                 await channel.SendMessageAsync($"> `EVENT  : Player {notification.Name} left the server!`");
         }
 
         public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken cancellationToken)
         {
-            if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
+            if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
                 await channel.SendMessageAsync($"> `MESSAGE: <{notification.Player.Name}> {notification.Message}`");
         }
 
         public async Task Handle(ServerMessageNotification notification, CancellationToken cancellationToken)
         {
-            if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
+            if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
                 await channel.SendMessageAsync($"> `SERVER : {notification.Message}`");
         }
 
         public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken cancellationToken)
         {
-            if (_discordSocketClient.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
+            if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
                 await channel.SendMessageAsync($"> `EVENT  : The player {notification.Player.Name} {notification.EventMessage}`");
         }
     }

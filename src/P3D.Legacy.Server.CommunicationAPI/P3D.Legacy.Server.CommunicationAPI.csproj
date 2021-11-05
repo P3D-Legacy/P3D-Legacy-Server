@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\P3D.Legacy.Server.Application\P3D.Legacy.Server.Application.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.UI.Shared\P3D.Legacy.Server.UI.Shared.csproj" />
   </ItemGroup>
 
 </Project>

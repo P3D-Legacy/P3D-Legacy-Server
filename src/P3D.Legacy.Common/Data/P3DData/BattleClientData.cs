@@ -11,7 +11,7 @@ namespace P3D.Legacy.Common.Data.P3DData
         {
             var idxAction = data.IndexOf('|');
             Action = data.Slice(0, idxAction).ToString();
-            ActionValue = data.Slice(idxAction).ToString();
+            ActionValue = data.Slice(idxAction + 1).ToString();
         }
 
         public override string ToP3DString() => $"{Action}|{ActionValue}";

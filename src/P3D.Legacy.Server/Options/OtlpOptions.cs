@@ -2,7 +2,7 @@
 {
     public sealed record OtlpOptions
     {
-        public bool Enabled { get; set; } = default!;
+        public bool Enabled { get; init; } = default!;
         public string Host { get; init; } = default!;
     }
 }

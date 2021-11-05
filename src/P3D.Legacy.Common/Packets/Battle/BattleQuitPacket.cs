@@ -2,11 +2,11 @@
 {
     public sealed record BattleQuitPacket() : P3DPacket(P3DPacketType.BattleQuit)
     {
-        public Origin DestinationPlayerId { get => DataItemStorage.GetOrigin(0); init => DataItemStorage.Set(0, value); }
+        public Origin DestinationPlayerOrigin { get => DataItemStorage.GetOrigin(0); init => DataItemStorage.Set(0, value); }
 
-        public void Deconstruct(out Origin destinationPlayerId)
+        public void Deconstruct(out Origin destinationPlayerOrigin)
         {
-            destinationPlayerId = DestinationPlayerId;
+            destinationPlayerOrigin = DestinationPlayerOrigin;
         }
     }
 }

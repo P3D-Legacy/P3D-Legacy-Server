@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using P3D.Legacy.Server.Application.Commands;
 using P3D.Legacy.Server.Application.Commands.Administration;
 using P3D.Legacy.Server.Infrastructure.Models.Bans;
-using P3D.Legacy.Server.Infrastructure.Repositories;
+using P3D.Legacy.Server.Infrastructure.Services.Bans;
 
 using System;
 using System.Threading;
@@ -17,9 +17,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
-        private readonly IBanRepository _banRepository;
+        private readonly IBanManager _banRepository;
 
-        public BanPlayerCommandHandler(ILogger<BanPlayerCommandHandler> logger, IMediator mediator, IBanRepository banRepository)
+        public BanPlayerCommandHandler(ILogger<BanPlayerCommandHandler> logger, IMediator mediator, IBanManager banRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
@@ -28,9 +28,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
 
         public async Task<CommandResult> Handle(BanPlayerCommand request, CancellationToken ct)
         {
-            var (id, name, ip, reason, expiration) = request;
+            var (bannerId, id, ip, reason, expiration) = request;
 
-            var result = await _banRepository.UpsertAsync(new BanEntity(id, name, ip, reason, expiration), ct);
+            var result = await _banRepository.BanAsync(new BanEntity(bannerId, id, ip, reason, expiration), ct);
             return new CommandResult(result);
         }
     }

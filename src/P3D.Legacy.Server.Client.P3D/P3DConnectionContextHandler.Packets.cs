@@ -120,7 +120,7 @@ namespace P3D.Legacy.Server.Client.P3D
                         break;
 
                     case 2:
-                        GameJoltId = packet.GameJoltId;
+                        GameJoltId = GameJoltId.FromNumber(packet.GameJoltId);
                         break;
 
                     case 3:
@@ -193,7 +193,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 await SendPacketAsync(new IdPacket
                 {
                     Origin = Origin.Server,
-                    PlayerId = Id
+                    PlayerOrigin = Origin
 
                 }, ct);
                 await SendPacketAsync(new WorldDataPacket
@@ -206,19 +206,26 @@ namespace P3D.Legacy.Server.Client.P3D
                 }, ct);
 
                 _connectionState = P3DConnectionState.Authentication;
-                if (await _mediator.Send(new PlayerAuthenticateGameJoltCommand(this, GameJoltId), ct) is { Success: true })
+
+                switch (Id.IdType)
                 {
-                    await _mediator.Send(new PlayerReadyCommand(this), ct);
-                    _connectionState = P3DConnectionState.Intitialized;
-                }
-                else
-                {
-                    Permissions = Abstractions.PermissionFlags.UnVerified;
-                    await SendServerMessageAsync("Please use /login %PASSWORD% for logging in or registering", ct);
-                    await SendServerMessageAsync("Please note that chat data  isn't sent secure to the server", ct);
-                    await SendServerMessageAsync("So it can be seen via traffic sniffing", ct);
-                    await SendServerMessageAsync("The standard game client sends a SHA-512 hashed password", ct);
-                    await SendServerMessageAsync("Don't use your regular passwords!", ct);
+                    case PlayerIdType.Name:
+                        await SendServerMessageAsync("Please use /login %PASSWORD% for logging in or registering.", ct);
+                        await SendServerMessageAsync("Please note that chat messages are not sent secure to the server.", ct);
+                        await SendServerMessageAsync("The game client sends a SHA-512 hash instead of the raw password.", ct);
+                        await SendServerMessageAsync("Don't use your regular passwords!", ct);
+                        break;
+                    case PlayerIdType.GameJolt:
+                        if (await _mediator.Send(new PlayerAuthenticateGameJoltCommand(this, GameJoltId), ct) is { Success: true })
+                        {
+                            await _mediator.Send(new PlayerReadyCommand(this), ct);
+                            _connectionState = P3DConnectionState.Intitialized;
+                        }
+                        else
+                        {
+                            await KickAsync("Failed to verify your GameJolt Id!", ct);
+                        }
+                        break;
                 }
             }
 
@@ -297,8 +304,8 @@ namespace P3D.Legacy.Server.Client.P3D
             if (cancel)
             {
                 await SendServerMessageAsync("The Pokemon is not valid!", ct);
-                await SendPacketAsync(new TradeQuitPacket { Origin = packet.DestinationPlayerId, DestinationPlayerId = Id }, ct);
-                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, new TradeQuitPacket { Origin = Id, DestinationPlayerId = packet.DestinationPlayerId }), ct);
+                await SendPacketAsync(new TradeQuitPacket { Origin = packet.DestinationPlayerOrigin, DestinationPlayerOrigin = Origin }, ct);
+                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, new TradeQuitPacket { Origin = Origin, DestinationPlayerOrigin = packet.DestinationPlayerOrigin }), ct);
             }
             else
             {
@@ -355,8 +362,8 @@ namespace P3D.Legacy.Server.Client.P3D
             if (cancel)
             {
                 await SendServerMessageAsync("One of your Pokemon is not valid!", ct);
-                await SendPacketAsync(new BattleQuitPacket { Origin = packet.DestinationPlayerId, DestinationPlayerId = Id }, ct);
-                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, new BattleQuitPacket { Origin = Id, DestinationPlayerId = packet.DestinationPlayerId }), ct);
+                await SendPacketAsync(new BattleQuitPacket { Origin = packet.DestinationPlayerOrigin, DestinationPlayerOrigin = Origin }, ct);
+                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = packet.DestinationPlayerOrigin }), ct);
             }
             else
             {

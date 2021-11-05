@@ -5,5 +5,5 @@ using System.Net;
 
 namespace P3D.Legacy.Server.Application.Queries.Bans
 {
-    public record BanViewModel(GameJoltId Id, string Name, IPAddress IP, string Reason, DateTimeOffset? Expiration);
+    public record BanViewModel(PlayerId BannerId, PlayerId Id, IPAddress IP, string Reason, DateTimeOffset? Expiration);
 }

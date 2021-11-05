@@ -47,7 +47,7 @@ namespace P3D.Legacy.Common.Packets
             if (!int.TryParse(ParseSection(in sequence, ref position), out var origin))
                 return false;
 
-            Origin = origin;
+            Origin = Origin.FromNumber(origin);
 
 
             if (!int.TryParse(ParseSection(in sequence, ref position), out var dataItemsCount))

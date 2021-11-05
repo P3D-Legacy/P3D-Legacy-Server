@@ -32,6 +32,12 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                     return;
                 }
 
+                if (targetPlayer.Id == player.Id)
+                {
+                    await SendMessageAsync(player, "You can't ban yourself!", ct);
+                    return;
+                }
+
                 if (!int.TryParse(arguments[1], out var minutes))
                 {
                     await SendMessageAsync(player, "Invalid minutes given.", ct);
@@ -40,7 +46,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 
                 var reason = arguments[2].TrimStart('"').TrimEnd('"');
                 await Mediator.Send(new KickPlayerCommand(targetPlayer, reason), ct);
-                await Mediator.Send(new BanPlayerCommand(targetPlayer.GameJoltId, targetPlayer.Name, targetPlayer.IPEndPoint.Address, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
+                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
             }
             else if (arguments.Length > 3)
             {
@@ -48,6 +54,12 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                 if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
                 {
                     await SendMessageAsync(player, $"Player {targetName} not found!", ct);
+                    return;
+                }
+
+                if (targetPlayer.Id == player.Id)
+                {
+                    await SendMessageAsync(player, "You can't ban yourself!", ct);
                     return;
                 }
 
@@ -59,7 +71,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 
                 var reason = string.Join(" ", arguments.Skip(2).ToArray());
                 await Mediator.Send(new KickPlayerCommand(targetPlayer, reason), ct);
-                await Mediator.Send(new BanPlayerCommand(targetPlayer.GameJoltId, targetPlayer.Name, targetPlayer.IPEndPoint.Address, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
+                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);

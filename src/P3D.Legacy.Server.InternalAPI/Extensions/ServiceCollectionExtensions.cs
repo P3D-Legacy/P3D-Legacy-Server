@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 using P3D.Legacy.Server.Abstractions.Utils;
-using P3D.Legacy.Server.InternalAPI.Controllers;
 using P3D.Legacy.Server.InternalAPI.Options;
 
 using System;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace P3D.Legacy.Server.InternalAPI.Extensions
@@ -19,24 +20,24 @@ namespace P3D.Legacy.Server.InternalAPI.Extensions
         }
         public static IServiceCollection AddInternalAPI(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
-            services.AddAuthentication(options =>
-                {
-                    options.AddScheme<GameJoltAuthenticationHandler>("gamejolt", "GameJolt");
-                })
+            services.AddAuthentication()
                 .AddJwtBearer(options =>
                 {
                     var jwtOptions = configuration.GetSection("Jwt").Get<JwtOptions>();
+
+                    var rsa = RSA.Create();
+                    rsa.ImportFromPem(Encoding.UTF8.GetString(Convert.FromBase64String(jwtOptions.RsaPrivateKey)));
+
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuer = false,
+                        ValidIssuer = "P3D Legacy Server",
+                        ValidateIssuer = true,
                         ValidateAudience = false,
                         ValidateLifetime = true,
-                        ValidateIssuerSigningKey = false,
+                        ValidateIssuerSigningKey = true,
                         ValidateActor = false,
                         ValidateTokenReplay = false,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SignKey)),
-                        TokenDecryptionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.EncryptionKey)),
+                        IssuerSigningKey = new RsaSecurityKey(rsa),
                         ClockSkew = TimeSpan.FromMinutes(5),
                     };
                 });

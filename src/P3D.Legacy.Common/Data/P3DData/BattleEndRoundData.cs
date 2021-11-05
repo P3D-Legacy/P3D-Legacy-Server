@@ -5,44 +5,13 @@ namespace P3D.Legacy.Common.Data.P3DData
 {
     public sealed record BattleEndRoundData : P3DData
     {
-        private static IReadOnlyList<string> ParseEndRoundData(ReadOnlySpan<char> data)
-        {
-            var newQueries = new List<string>();
-            var tempData = string.Empty;
-
-            //Converts the single string received as data into a list of string 
-            while (data.Length > 0)
-            {
-                if (data[0] == '|' && tempData[^1] == '}')
-                {
-                    newQueries.Add(tempData);
-                    tempData = "";
-                }
-                else
-                {
-                    tempData += data[0].ToString();
-                }
-                data = data.Slice(1);
-            }
-
-            if (tempData.StartsWith("{") && tempData.EndsWith("}"))
-            {
-                newQueries.Add(tempData);
-            }
-
-            return newQueries;
-        }
-
         public IReadOnlyList<string> Queries { get; }
 
         public BattleEndRoundData(in ReadOnlySpan<char> data) : base(in data)
         {
-            Queries = ParseEndRoundData(data);
+            Queries = ParseSeparatedData(data);
         }
 
-        public override string ToP3DString()
-        {
-            throw new NotImplementedException();
-        }
+        public override string ToP3DString() => ToSeparatedData(Queries);
     }
 }

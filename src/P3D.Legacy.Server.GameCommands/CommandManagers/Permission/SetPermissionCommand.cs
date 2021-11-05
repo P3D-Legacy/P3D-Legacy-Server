@@ -43,6 +43,8 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
                 var result = await Mediator.Send(new ChangePlayerPermissionsCommand(targetPlayer, permissionFlags), ct);
                 if (result.Success)
                     await SendMessageAsync(player, $"Changed {targetName} permissions!", ct);
+                else
+                    await SendMessageAsync(player, $"Failed to change {targetName} permissions!", ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);

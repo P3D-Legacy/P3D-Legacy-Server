@@ -8,7 +8,7 @@ namespace P3D.Legacy.Server.Application.Queries.Bans
 {
     public interface IBanQueries
     {
-        Task<BanViewModel?> GetAsync(GameJoltId id, CancellationToken ct);
+        Task<BanViewModel?> GetAsync(PlayerId id, CancellationToken ct);
         IAsyncEnumerable<BanViewModel> GetAllAsync(CancellationToken ct);
     }
 }

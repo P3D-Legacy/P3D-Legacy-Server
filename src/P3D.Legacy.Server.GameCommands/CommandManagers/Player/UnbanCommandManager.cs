@@ -30,7 +30,13 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                     return;
                 }
 
-                await Mediator.Send(new UnbanPlayerCommand(targetPlayer.GameJoltId), ct);
+                if (targetPlayer.Id == player.Id)
+                {
+                    await SendMessageAsync(player, "You can't unban yourself!", ct);
+                    return;
+                }
+
+                await Mediator.Send(new UnbanPlayerCommand(targetPlayer.Id), ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);

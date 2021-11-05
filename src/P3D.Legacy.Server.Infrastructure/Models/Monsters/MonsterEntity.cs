@@ -2,6 +2,7 @@
 using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Common.Monsters;
 
+using System;
 using System.Collections.Generic;
 
 namespace P3D.Legacy.Server.Infrastructure.Models.Monsters
@@ -26,11 +27,11 @@ namespace P3D.Legacy.Server.Infrastructure.Models.Monsters
         public IItemInstance? HeldItem { get; }
         public IDictionary<string, string> Metadata { get; } = new Dictionary<string, string>();
 
-        public MonsterEntity(DataItemStorage dataItems, IMonsterStaticData monsterStaticData, IReadOnlyList<IAttackInstance> attacks, IItemInstance? heldItem)
+        public MonsterEntity(in ReadOnlySpan<char> monsterData, IMonsterStaticData monsterStaticData, IReadOnlyList<IAttackInstance> attacks, IItemInstance? heldItem)
         {
             StaticData = monsterStaticData;
 
-            var dict = dataItems.ToDictionary();
+            var dict = monsterData.MonsterDataToDictionary();
 
             Gender = int.Parse(dict["Gender"]) switch
             {
@@ -104,6 +105,6 @@ namespace P3D.Legacy.Server.Infrastructure.Models.Monsters
             Metadata.Add("Status", dict["Status"]);
         }
 
-        public override string? ToString() => !string.IsNullOrWhiteSpace(CatchInfo.Nickname) ? CatchInfo.Nickname : StaticData.Name;
+        public override string ToString() => !string.IsNullOrWhiteSpace(CatchInfo.Nickname) ? CatchInfo.Nickname : StaticData.Name;
     }
 }

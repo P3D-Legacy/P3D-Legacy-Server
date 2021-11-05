@@ -1,113 +1,87 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-using P3D.Legacy.Server.Abstractions.Identity;
+using P3D.Legacy.Common;
+using P3D.Legacy.Server.Infrastructure.Models.Users;
+using P3D.Legacy.Server.Infrastructure.Services.Users;
 using P3D.Legacy.Server.InternalAPI.Options;
 using P3D.Legacy.Server.UI.Shared.Models;
 
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.InternalAPI.Controllers
 {
-    public class GameJoltAuthenticationHandler : IAuthenticationHandler
-    {
-        /// <summary>
-        /// Gets or sets the <see cref="AuthenticationScheme"/> asssociated with this authentication handler.
-        /// </summary>
-        public AuthenticationScheme Scheme { get; private set; } = default!;
-
-        public Task InitializeAsync(AuthenticationScheme scheme, HttpContext context)
-        {
-            if (scheme is null)
-            {
-                throw new ArgumentNullException(nameof(scheme));
-            }
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            Scheme = scheme;
-            return Task.CompletedTask;
-        }
-
-        public Task<AuthenticateResult> AuthenticateAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task ChallengeAsync(AuthenticationProperties? properties)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task ForbidAsync(AuthenticationProperties? properties)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     [Route("api/[controller]")]
     [ApiController]
     public class LoginController : ControllerBase
     {
         private readonly JwtOptions _jwtOptions;
-        private readonly UserManager<ServerIdentity> _userManager;
-        private readonly SignInManager<ServerIdentity> _signInManager;
+        private readonly IUserManager _userManager;
 
-        public LoginController(IOptions<JwtOptions> jwtOptions, UserManager<ServerIdentity> userManager, SignInManager<ServerIdentity> signInManager)
+        public LoginController(IOptions<JwtOptions> jwtOptions, IUserManager userManager)
         {
             _jwtOptions = jwtOptions.Value ?? throw new ArgumentNullException(nameof(jwtOptions));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-            _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginModel login)
+        public async Task<IActionResult> Login([FromBody] LoginModel login, CancellationToken ct)
         {
-            var result = await _signInManager.PasswordSignInAsync(login.Email, login.Password, false, false);
+            var user = await _userManager.FindByIdAsync(PlayerId.FromName(login.Username), ct);
 
-            if (!result.Succeeded) return BadRequest(new LoginResult { Successful = false, Error = "Username and password are invalid." });
+            if (user is null) return BadRequest(new LoginResult { Successful = false, Error = "User does not exists." });
 
-            return Ok(new LoginResult { Successful = true, Token = GenerateJsonWebToken(login) });
+            var result = await _userManager.CheckPasswordSignInAsync(user, login.Password, false, true, ct);
+            if (!result.Succeeded)
+            {
+                return BadRequest(new LoginResult { Successful = false, Error = "Username and password are invalid." });
+            }
+
+            return Ok(new LoginResult { Successful = true, Token = GenerateJsonWebToken(user) });
         }
 
-        private string GenerateJsonWebToken(LoginModel loginModel)
+        private string GenerateJsonWebToken(UserEntity user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenDescriptor = GetTokenDescriptor(loginModel);
-            return tokenHandler.CreateEncodedJwt(tokenDescriptor);
+            var securityToken = GetSecurityToken(user);
+            return tokenHandler.WriteToken(securityToken);
         }
-        private SecurityTokenDescriptor GetTokenDescriptor(LoginModel loginModel)
+        private SecurityToken GetSecurityToken(UserEntity user)
         {
-            const int expiringDays = 7;
-            var signingCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SignKey)), SecurityAlgorithms.HmacSha256Signature);
-            var encryptingCredentials = new EncryptingCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.EncryptionKey)), SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256);
+            var privateKey = Encoding.UTF8.GetString(Convert.FromBase64String(_jwtOptions.RsaPrivateKey));
+            var rsa = RSA.Create();
+            rsa.ImportFromPem(privateKey);
 
-            return new SecurityTokenDescriptor
+            var signingCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha512Signature)
             {
-                Claims = new Dictionary<string, object>
-                {
-                    { ClaimTypes.Name, loginModel.Email },
-                    { ClaimTypes.NameIdentifier, loginModel.Email },
-                    { JwtRegisteredClaimNames.Sub, loginModel.Email },
-                    { JwtRegisteredClaimNames.Email, loginModel.Email },
-                },
-                SigningCredentials = signingCredentials,
-                EncryptingCredentials = encryptingCredentials,
-                Expires = DateTime.UtcNow.AddDays(expiringDays),
+                CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false }
             };
+
+            var now = DateTime.UtcNow;
+            var unixTimeSeconds = new DateTimeOffset(now).ToUnixTimeSeconds();
+
+            const int expiringDays = 7;
+
+            return new JwtSecurityToken(
+                issuer: "P3D Legacy Server",
+                claims: new Claim[]
+                {
+                    new(JwtRegisteredClaimNames.Iat, unixTimeSeconds.ToString(), ClaimValueTypes.Integer64),
+                    new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new(nameof(user.Id), user.Id.ToString()),
+                    new(nameof(user.Name), user.Name),
+                },
+                notBefore: now,
+                expires: now.AddDays(expiringDays),
+                signingCredentials: signingCredentials
+            );
         }
     }
 }
