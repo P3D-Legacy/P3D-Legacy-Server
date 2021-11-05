@@ -1,15 +1,17 @@
 ﻿using Microsoft.Extensions.Logging;
 
+using Newtonsoft.Json;
+
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Infrastructure.Models.Bans;
-using P3D.Legacy.Server.Infrastructure.Services.Bans;
+using P3D.Legacy.Server.Infrastructure.Models.P3D;
+using P3D.Legacy.Server.Infrastructure.Utils;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -59,15 +61,18 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             {
                 if (response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NoContent)
                 {
-                    var data = await response.Content.ReadFromJsonAsync<BanRequestData?>(cancellationToken: ct);
-                    return data is null
-                        ? null
-                        : new BanEntity(
-                            PlayerId.FromGameJolt(GameJoltId.FromNumber(data.BannedByGameJoltId)),
-                            PlayerId.FromGameJolt(GameJoltId.FromNumber(data.GameJoltId)),
+                    var content = await response.Content.ReadAsStringAsync(ct);
+                    var responseData = JsonConvert.DeserializeObject<BanUserResponse?>(content);
+                    if (responseData is null || responseData.Entry is null || responseData.Entry.UserGameJolt is null || responseData.Entry.User is null)
+                        return null;
+
+                    return new BanEntity(
+                            PlayerId.FromGameJolt(GameJoltId.FromNumber(responseData.Entry.Banner.Id)),
+                            PlayerId.FromGameJolt(GameJoltId.FromNumber(responseData.Entry.UserGameJolt.Id)),
                             IPAddress.None,
-                            data.ReasonId.ToString(),
-                            data.ExpiresAt);
+                            0,
+                            responseData.Entry.Reason,
+                            responseData.Entry.ExpireAt);
                 }
                 return null;
             }
@@ -101,15 +106,23 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             {
                 if (response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NoContent)
                 {
-                    var datas = await response.Content.ReadFromJsonAsync<BanRequestData[]?>(cancellationToken: ct);
-                    foreach (var data in datas ?? Enumerable.Empty<BanRequestData>())
+                    var content = await response.Content.ReadAsStringAsync(ct);
+                    var responseData = JsonConvert.DeserializeObject<BanListResponse?>(content);
+                    if (responseData is null || responseData.Entries is null)
+                        yield break;
+
+                    foreach (var data in responseData.Entries)
                     {
+                        if (data is null || data.UserGameJolt is null || data.User is null)
+                            continue;
+
                         yield return new BanEntity(
-                            PlayerId.FromGameJolt(GameJoltId.FromNumber(data.BannedByGameJoltId)),
-                            PlayerId.FromGameJolt(GameJoltId.FromNumber(data.GameJoltId)),
+                            PlayerId.FromGameJolt(GameJoltId.FromNumber(data.Banner.Id)),
+                            PlayerId.FromGameJolt(GameJoltId.FromNumber(data.UserGameJolt.Id)),
                             IPAddress.None,
-                            data.ReasonId.ToString(),
-                            data.ExpiresAt);
+                            0,
+                            data.Reason,
+                            data.ExpireAt);
                     }
                 }
             }
@@ -125,7 +138,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
             using var span = _tracer.StartActiveSpan("P3DBanRepository BanAsync", SpanKind.Client);
 
-            var (bannerId, id, ip, reason, expiration) = banEntity;
+            var (bannerId, id, ip, reasonId, reason, expiration) = banEntity;
 
             HttpResponseMessage response;
 
@@ -191,6 +204,23 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             }
         }
 
+        [Newtonsoft.Json.JsonConverter(typeof(JsonPathConverter))]
+        private record BanUserResponse(
+            [property: JsonProperty("data[0]")] BanResponseEntry Entry);
+
+        private record BanListResponse(
+            [property: JsonProperty("data")] IReadOnlyList<BanResponseEntry> Entries);
+
+        [Newtonsoft.Json.JsonConverter(typeof(JsonPathConverter))]
+        private record BanResponseEntry(
+            [property: JsonProperty("gamejoltaccount")] GameJoltDTO UserGameJolt,
+            [property: JsonProperty("gamejoltaccount.user")] UserDTO User,
+            [property: JsonProperty("banned_by")] UserDTO Banner,
+            [property: JsonProperty("reason.name")] string Reason,
+            [property: JsonProperty("updated_at")] DateTimeOffset UpdatedAt,
+            [property: JsonProperty("expire_at")] DateTimeOffset? ExpireAt);
+
+
 
         private record BanRequestData(
             [property: JsonPropertyName("gamejoltaccount_id")] ulong GameJoltId,
@@ -206,7 +236,12 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             {
                 Data = new BanRequestData(gameJoltId, reasonId, expiresAt, bannedByGameJoltId);
             }
-        };
+        }
+
+        private record BanResponseData(
+            [property: JsonPropertyName("expires_at")] DateTimeOffset? ExpiresAt);
+        private sealed record BanResponse(
+            [property: JsonPropertyName("data")] BanResponseData[] Data);
 
         private sealed record TextReasonBanRequest
         {

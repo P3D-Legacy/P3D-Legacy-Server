@@ -18,7 +18,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 {
     public class LiteDbBanRepository
     {
-        private record Ban(string Id, string BannerId, string Ip, string Reason, DateTimeOffset? Expiration);
+        private record Ban(string Id, string BannerId, string Ip, ulong ReasonId, string Reason, DateTimeOffset? Expiration);
 
         private readonly LiteDbOptions _options;
 
@@ -39,7 +39,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
-            var entry = await collection.FindOneAsync(x => x.Id == idStr) is { } ban ? new BanEntity(PlayerId.Parse(ban.BannerId), PlayerId.Parse(ban.Id), IPAddress.Parse(ban.Ip), ban.Reason, ban.Expiration) : null;
+            var entry = await collection.FindOneAsync(x => x.Id == idStr) is { } ban ? new BanEntity(PlayerId.Parse(ban.BannerId), PlayerId.Parse(ban.Id), IPAddress.Parse(ban.Ip), ban.ReasonId, ban.Reason, ban.Expiration) : null;
 
             return entry;
         }
@@ -56,7 +56,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
             ct.ThrowIfCancellationRequested();
             var entries = await collection.FindAsync(x => true);
-            foreach (var banEntity in entries.Select(ban => new BanEntity(PlayerId.Parse(ban.BannerId), PlayerId.Parse(ban.Id), IPAddress.Parse(ban.Ip), ban.Reason, ban.Expiration)))
+            foreach (var banEntity in entries.Select(ban => new BanEntity(PlayerId.Parse(ban.BannerId), PlayerId.Parse(ban.Id), IPAddress.Parse(ban.Ip), ban.ReasonId, ban.Reason, ban.Expiration)))
             {
                 yield return banEntity;
             }
@@ -66,7 +66,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
         {
             ct.ThrowIfCancellationRequested();
 
-            var (bannerId, id, ip, reason, expiration) = banEntity;
+            var (bannerId, id, ip, reasonId, reason, expiration) = banEntity;
 
             using var db = new LiteDatabaseAsync(_options.ConnectionString);
             var collection = db.GetCollection<Ban>("bans");
@@ -77,7 +77,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             var idStr = id.ToString();
             var bannerIdStr = bannerId.ToString();
             ct.ThrowIfCancellationRequested();
-            var entry = await collection.UpsertAsync(new Ban(idStr, bannerIdStr, ip.ToString(), reason, expiration));
+            var entry = await collection.UpsertAsync(new Ban(idStr, bannerIdStr, ip.ToString(), reasonId, reason, expiration));
 
             return entry;
         }

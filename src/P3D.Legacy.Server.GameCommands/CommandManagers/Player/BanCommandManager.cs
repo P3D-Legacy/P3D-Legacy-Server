@@ -45,8 +45,12 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                 }
 
                 var reason = arguments[2].TrimStart('"').TrimEnd('"');
-                await Mediator.Send(new KickPlayerCommand(targetPlayer, reason), ct);
-                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
+
+                if (ulong.TryParse(reason, out var reasonId))
+                    reason = string.Empty;
+
+                await Mediator.Send(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
+                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
             }
             else if (arguments.Length > 3)
             {
@@ -70,8 +74,12 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                 }
 
                 var reason = string.Join(" ", arguments.Skip(2).ToArray());
-                await Mediator.Send(new KickPlayerCommand(targetPlayer, reason), ct);
-                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
+
+                if (ulong.TryParse(reason, out var reasonId))
+                    reason = string.Empty;
+
+                await Mediator.Send(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
+                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);

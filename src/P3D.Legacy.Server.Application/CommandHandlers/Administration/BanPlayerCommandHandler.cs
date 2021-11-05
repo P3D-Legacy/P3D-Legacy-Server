@@ -28,9 +28,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
 
         public async Task<CommandResult> Handle(BanPlayerCommand request, CancellationToken ct)
         {
-            var (bannerId, id, ip, reason, expiration) = request;
+            var (bannerId, id, ip, reasonId, reason, expiration) = request;
 
-            var result = await _banRepository.BanAsync(new BanEntity(bannerId, id, ip, reason, expiration), ct);
+            var result = await _banRepository.BanAsync(new BanEntity(bannerId, id, ip, reasonId, reason, expiration), ct);
             return new CommandResult(result);
         }
     }
