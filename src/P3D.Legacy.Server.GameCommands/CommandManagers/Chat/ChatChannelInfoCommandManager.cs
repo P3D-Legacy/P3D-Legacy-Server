@@ -24,7 +24,7 @@ namespace P3D.Legacy.Server.GameCommands.Managers.Chat
             {
                 var channelName = arguments[0].ToLower();
                 var channel = ChatChannelManager.FindByAlias(channelName);
-                await SendMessage(client, channel != null ? $"{channel.Name}: {channel.Description}" : $"Channel '{channelName}' not found!", ct);
+                await SendMessage(client, channel is not null ? $"{channel.Name}: {channel.Description}" : $"Channel '{channelName}' not found!", ct);
             }
             else
                 await SendMessage(client, "Invalid arguments given.", ct);

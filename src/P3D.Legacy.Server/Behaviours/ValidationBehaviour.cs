@@ -26,7 +26,7 @@ namespace P3D.Legacy.Server.Behaviours
                 var context = new ValidationContext<TRequest>(request);
 
                 var validationResults = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, ct)));
-                var failures = validationResults.SelectMany(r => r.Errors).Where(f => f != null).ToImmutableArray();
+                var failures = validationResults.SelectMany(r => r.Errors).Where(f => f is not null).ToImmutableArray();
 
                 if (failures.Any())
                     throw new ValidationException(failures);

@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
-using P3D.Legacy.Common;
 using P3D.Legacy.Common.Data.P3DData;
 using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Server.Infrastructure.Options;
@@ -12,7 +11,6 @@ using P3D.Legacy.Tests.Utils;
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Tests

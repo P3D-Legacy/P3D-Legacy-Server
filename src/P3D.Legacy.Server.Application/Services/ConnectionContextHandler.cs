@@ -32,7 +32,7 @@ namespace P3D.Legacy.Server.Application.Services
 
         public virtual async Task StopAsync(CancellationToken ct)
         {
-            if (_stoppingCts == null || _executingTask == null)
+            if (_stoppingCts is null || _executingTask is null)
             {
                 return;
             }

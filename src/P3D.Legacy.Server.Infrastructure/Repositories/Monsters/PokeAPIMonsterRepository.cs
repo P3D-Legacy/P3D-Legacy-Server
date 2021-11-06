@@ -5,7 +5,6 @@ using GraphQL.Client.Serializer.SystemTextJson;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using P3D.Legacy.Common;
 using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Common.Monsters;
 using P3D.Legacy.Server.Infrastructure.Models.Monsters;

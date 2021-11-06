@@ -236,7 +236,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             SecureArray<byte>? hashB = null;
             try
             {
-                if (configOfPasswordToVerify.DecodeString(hash, out hashB) && hashB != null)
+                if (configOfPasswordToVerify.DecodeString(hash, out hashB) && hashB is not null)
                 {
                     using var argon2ToVerify = new Argon2(configOfPasswordToVerify);
                     using var hashToVerify = argon2ToVerify.Hash();

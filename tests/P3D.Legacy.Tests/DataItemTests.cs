@@ -1,6 +1,4 @@
-﻿using Isopoh.Cryptography.Argon2;
-
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Common.Packets;

@@ -24,7 +24,7 @@ namespace P3D.Legacy.Server.GameCommands.Managers.Chat
             {
                 var channelName = arguments[0].ToLower();
                 var channel = ChatChannelManager.FindByAlias(channelName);
-                if(channel != null)
+                if(channel is not null)
                     await SendMessage(client, channel.Subscribe(client) ? $"Changed chat channel to {channel.Name}!" : $"Failed to change chat channel to {channel.Name}!", ct);
                 else
                     await SendMessage(client, $"Channel '{channelName}' not found!", ct);

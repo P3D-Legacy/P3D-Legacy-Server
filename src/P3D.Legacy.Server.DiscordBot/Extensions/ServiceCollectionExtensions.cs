@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.DiscordBot.BackgroundServices;
-using P3D.Legacy.Server.DiscordBot.Options;
 
 namespace P3D.Legacy.Server.DiscordBot.Extensions
 {

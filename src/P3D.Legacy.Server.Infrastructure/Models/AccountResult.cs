@@ -9,7 +9,7 @@ namespace P3D.Legacy.Server.Infrastructure.Models
         public static AccountResult Failed(params GenericError[] errors)
         {
             var result = new AccountResult { Succeeded = false };
-            if (errors != null)
+            if (errors is not null)
             {
                 result._errors.AddRange(errors);
             }

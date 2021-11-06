@@ -43,7 +43,7 @@ namespace P3D.Legacy.Server.GameCommands.NotificationHandlers
             using var span = _tracer.StartActiveSpan($"CommandManagerHandler HandleCommand");
 
             var command = FindByName(alias) ?? FindByAlias(alias);
-            if (command == null)
+            if (command is null)
             {
                 await SendMessageAsync(player, $@"Invalid command ""{alias}"".", ct);
                 return;

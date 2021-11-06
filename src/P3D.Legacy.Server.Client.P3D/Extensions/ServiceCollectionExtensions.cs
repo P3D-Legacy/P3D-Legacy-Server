@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using P3D.Legacy.Server.Abstractions.Utils;
-using P3D.Legacy.Server.Client.P3D.Options;
 
 namespace P3D.Legacy.Server.Client.P3D.Extensions
 {

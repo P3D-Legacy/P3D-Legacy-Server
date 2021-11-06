@@ -10,7 +10,7 @@ namespace P3D.Legacy.Server.Extensions
     {
         public static IHttpClientBuilder AddPolly(this IHttpClientBuilder builder)
         {
-            if (builder == null)
+            if (builder is null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }

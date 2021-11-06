@@ -1,5 +1,4 @@
-﻿using P3D.Legacy.Common;
-using P3D.Legacy.Common.Monsters;
+﻿using P3D.Legacy.Common.Monsters;
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
