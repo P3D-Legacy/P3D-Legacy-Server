@@ -1,4 +1,5 @@
-﻿using LiteDB.Async;
+﻿using LiteDB;
+using LiteDB.Async;
 
 using Microsoft.Extensions.Options;
 
@@ -33,17 +34,33 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Mutes
             var collection = db.GetCollection<Mute>("mutes");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
-            if (await collection.FindOneAsync(x => x.Id == idStr) is { } entry)
+            if (await collection.FindByIdAsync(idStr) is { } entry)
             {
                 foreach (var playerId in entry.MutedIds.Select(PlayerId.Parse))
                 {
                     yield return playerId;
                 }
             }
+        }
+
+        public async Task<bool> IsMutedAsync(PlayerId id, PlayerId toCheckId, CancellationToken ct)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            var collection = db.GetCollection<Mute>("mutes");
+
+            ct.ThrowIfCancellationRequested();
+            await collection.EnsureIndexAsync(x => x.Id, true);
+
+            var idStr = id.ToString();
+            var toCheckIdStr = toCheckId.ToString();
+            ct.ThrowIfCancellationRequested();
+            return await collection.ExistsAsync(Query.And(Query.EQ(nameof(Mute.Id), idStr), Query.In(nameof(Mute.MutedIds), toCheckIdStr)));
         }
 
         public async Task<bool> MuteAsync(PlayerId id, PlayerId toMuteId, CancellationToken ct)
@@ -54,11 +71,11 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Mutes
             var collection = db.GetCollection<Mute>("mutes");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
-            if (await collection.FindOneAsync(x => x.Id == idStr) is { } entry)
+            if (await collection.FindByIdAsync(idStr) is { } entry)
             {
                 ct.ThrowIfCancellationRequested();
                 entry.MutedIds.Add(toMuteId.ToString());
@@ -79,11 +96,11 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Mutes
             var collection = db.GetCollection<Mute>("mutes");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
-            if (await collection.FindOneAsync(x => x.Id == idStr) is { } entry)
+            if (await collection.FindByIdAsync(idStr) is { } entry)
             {
                 ct.ThrowIfCancellationRequested();
                 return entry.MutedIds.Remove(toUnmuteId.ToString()) && await collection.UpdateAsync(entry);

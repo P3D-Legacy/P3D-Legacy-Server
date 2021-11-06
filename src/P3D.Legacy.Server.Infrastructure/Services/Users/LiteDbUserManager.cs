@@ -45,17 +45,17 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             var collection = db.GetCollection<User>("users");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
-            return await collection.FindOneAsync(x => x.Id == idStr) is { } entry
-                ? new UserEntity(PlayerId.Parse(entry.Id), entry.Name)
-                : null;
+            return await collection.FindByIdAsync(idStr) is { } entry ? new UserEntity(PlayerId.Parse(entry.Id), entry.Name) : null;
         }
 
         public async Task<AccountResult> CreateAsync(UserEntity userEntity, string password, bool isSha512 = false, CancellationToken ct = default)
         {
+            var (playerId, name) = userEntity;
+
             ct.ThrowIfCancellationRequested();
 
             if (isSha512) password += "A!";
@@ -64,14 +64,14 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             var collection = db.GetCollection<User>("users");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             var validationResult = await ValidateAsync(password, ct);
 
             ct.ThrowIfCancellationRequested();
             if (!isSha512) password = BitConverter.ToString(new SHA512Managed().ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower() + "A!";
             var pwHash = GetPasswordHash(password);
-            var user = new User(userEntity.Id.ToString(), userEntity.Name, pwHash);
+            var user = new User(playerId.ToString(), name, pwHash);
 
             ct.ThrowIfCancellationRequested();
             var result = await collection.InsertAsync(user);
@@ -79,8 +79,10 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             return validationResult;
         }
 
-        public async Task<DateTimeOffset?> GetLockoutEndDateAsync(UserEntity user, CancellationToken ct)
+        public async Task<DateTimeOffset?> GetLockoutEndDateAsync(UserEntity userEntity, CancellationToken ct)
         {
+            var (id, _) = userEntity;
+
             ct.ThrowIfCancellationRequested();
 
             using var db = new LiteDatabaseAsync(_options.ConnectionString);
@@ -90,19 +92,21 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             await collection.DeleteManyAsync(x => x.LockoutEnd < DateTimeOffset.UtcNow);
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.UserId);
+            await collection.EnsureIndexAsync(x => x.UserId, false);
 
-            var idStr = user.Id.ToString();
+            var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
             var minValue = await collection.Query().Where(x => x.UserId == idStr).OrderBy(x => x.LockoutEnd).FirstOrDefaultAsync();
             return minValue?.LockoutEnd;
         }
 
-        public async Task<int> GetAccessFailedCountAsync(UserEntity user, CancellationToken ct)
+        public async Task<int> GetAccessFailedCountAsync(UserEntity userEntity, CancellationToken ct)
         {
+            var (id, _) = userEntity;
+
             ct.ThrowIfCancellationRequested();
 
             using var db = new LiteDatabaseAsync(_options.ConnectionString);
@@ -112,20 +116,22 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             await collection.DeleteManyAsync(x => x.LockoutEnd < DateTimeOffset.UtcNow);
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.UserId);
+            await collection.EnsureIndexAsync(x => x.UserId, false);
 
-            var idStr = user.Id.ToString();
+            var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
-            var entryCount = await collection.Query().Where(x => x.UserId == idStr).CountAsync();
+            var entryCount = await collection.CountAsync(Query.EQ(nameof(Lockout.UserId), idStr));
 
             return entryCount;
         }
 
-        public async Task<SignInResult> CheckPasswordSignInAsync(UserEntity user, string password, bool isSha512 = false, bool lockoutOnFailure = true, CancellationToken ct = default)
+        public async Task<SignInResult> CheckPasswordSignInAsync(UserEntity userEntity, string password, bool isSha512 = false, bool lockoutOnFailure = true, CancellationToken ct = default)
         {
+            var (id, _) = userEntity;
+
             ct.ThrowIfCancellationRequested();
 
             if (isSha512) password += "A!";
@@ -135,14 +141,14 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             var locksCollection = db.GetCollection<Lockout>("lockouts");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
-            if (await GetAccessFailedCountAsync(user, ct) >= _lockoutOptions.MaxFailedAccessAttempts)
+            if (await GetAccessFailedCountAsync(userEntity, ct) >= _lockoutOptions.MaxFailedAccessAttempts)
                 return SignInResult.LockedOut;
 
-            var idStr = user.Id.ToString();
+            var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
-            var entry = await collection.Query().Where(x => x.Id == idStr).FirstOrDefaultAsync();
+            var entry = await collection.FindByIdAsync(idStr);
 
             ct.ThrowIfCancellationRequested();
             if (!isSha512) password = BitConverter.ToString(new SHA512Managed().ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower() + "A!";
@@ -159,56 +165,6 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             return SignInResult.Success;
         }
 
-        private string GetPasswordHash(string password)
-        {
-            var salt = new byte[16];
-            {
-                using var randomNumberGenerator = RandomNumberGenerator.Create();
-                randomNumberGenerator.GetBytes(salt);
-            }
-            var config = new Argon2Config
-            {
-                Type = Argon2Type.DataIndependentAddressing,
-                Version = Argon2Version.Nineteen,
-                TimeCost = 10,
-                MemoryCost = 32768,
-                Lanes = 5,
-                Threads = Environment.ProcessorCount, // higher than "Lanes" doesn't help (or hurt)
-                Password = Encoding.UTF8.GetBytes(password),
-                Salt = salt, // >= 8 bytes if not null
-                //Secret = secret, // from somewhere
-                //AssociatedData = associatedData, // from somewhere
-                HashLength = 20 // >= 4
-            };
-            var argon2A = new Argon2(config);
-            using var hashA = argon2A.Hash();
-            return config.EncodeString(hashA.Buffer);
-        }
-
-        private bool VerifyPassword(string hash, string password)
-        {
-            var configOfPasswordToVerify = new Argon2Config
-            {
-                Password = Encoding.UTF8.GetBytes(password),
-                Threads = Environment.ProcessorCount
-            };
-            SecureArray<byte>? hashB = null;
-            try
-            {
-                if (configOfPasswordToVerify.DecodeString(hash, out hashB) && hashB != null)
-                {
-                    var argon2ToVerify = new Argon2(configOfPasswordToVerify);
-                    using var hashToVerify = argon2ToVerify.Hash();
-                    return Argon2.FixedTimeEquals(hashB, hashToVerify);
-                }
-            }
-            finally
-            {
-                hashB?.Dispose();
-            }
-
-            return false;
-        }
 
         private Task<AccountResult> ValidateAsync(string password, CancellationToken ct)
         {
@@ -244,6 +200,55 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
                 errors.Add(ErrorDescriber.PasswordRequiresUniqueChars(_passwordOptions.RequiredUniqueChars));
             }
             return Task.FromResult(errors.Count == 0 ? AccountResult.Success : AccountResult.Failed(errors.ToArray()));
+        }
+
+        private static string GetPasswordHash(string password)
+        {
+            var salt = new byte[16];
+            using var randomNumberGenerator = RandomNumberGenerator.Create();
+            randomNumberGenerator.GetBytes(salt);
+            var config = new Argon2Config
+            {
+                Type = Argon2Type.DataIndependentAddressing,
+                Version = Argon2Version.Nineteen,
+                TimeCost = 10,
+                MemoryCost = 32768,
+                Lanes = 5,
+                Threads = Environment.ProcessorCount, // higher than "Lanes" doesn't help (or hurt)
+                Password = Encoding.UTF8.GetBytes(password),
+                Salt = salt, // >= 8 bytes if not null
+                //Secret = secret, // from somewhere
+                //AssociatedData = associatedData, // from somewhere
+                HashLength = 20 // >= 4
+            };
+            using var argon2A = new Argon2(config);
+            using var hashA = argon2A.Hash();
+            return config.EncodeString(hashA.Buffer);
+        }
+
+        private static bool VerifyPassword(string hash, string password)
+        {
+            var configOfPasswordToVerify = new Argon2Config
+            {
+                Password = Encoding.UTF8.GetBytes(password),
+                Threads = Environment.ProcessorCount
+            };
+            SecureArray<byte>? hashB = null;
+            try
+            {
+                if (configOfPasswordToVerify.DecodeString(hash, out hashB) && hashB != null)
+                {
+                    using var argon2ToVerify = new Argon2(configOfPasswordToVerify);
+                    using var hashToVerify = argon2ToVerify.Hash();
+                    return Argon2.FixedTimeEquals(hashB, hashToVerify);
+                }
+            }
+            finally
+            {
+                hashB?.Dispose();
+            }
+
+            return false;
         }
     }
 }

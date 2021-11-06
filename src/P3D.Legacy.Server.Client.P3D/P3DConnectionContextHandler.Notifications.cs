@@ -74,6 +74,8 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var (player, message) = notification;
 
+            if (await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
+
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
 
@@ -82,6 +84,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var (player, location, message) = notification;
 
             if (!LevelFile.Equals(location, StringComparison.OrdinalIgnoreCase)) return;
+            if (await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
 
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
@@ -91,6 +94,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var (player, receiverName, message) = notification;
 
             if (!Name.Equals(receiverName, StringComparison.OrdinalIgnoreCase)) return;
+            if (await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
 
             await SendPacketAsync(new ChatMessagePrivatePacket { Origin = player.Origin, DestinationPlayerName = receiverName, Message = message }, ct);
         }
@@ -100,6 +104,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var (from, to, message) = notification;
 
             if (Origin != to.Origin) return;
+            if (await _muteManager.IsMutedAsync(Id, from.Id, ct)) return;
 
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = from.Origin, Message = message }, ct);
         }

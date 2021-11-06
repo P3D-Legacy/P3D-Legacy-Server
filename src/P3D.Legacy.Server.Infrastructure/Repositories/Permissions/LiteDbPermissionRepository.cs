@@ -1,4 +1,5 @@
-﻿using LiteDB.Async;
+﻿using LiteDB;
+using LiteDB.Async;
 
 using Microsoft.Extensions.Options;
 
@@ -32,11 +33,11 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
             var collection = db.GetCollection<Permission>("permissions");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             var idStr = PlayerId.FromName(name).ToString();
             ct.ThrowIfCancellationRequested();
-            var entry = await collection.FindOneAsync(x => x.Id == idStr);
+            var entry = await collection.FindByIdAsync(idStr);
 
             return new PermissionEntity(entry?.Permissions ?? PermissionFlags.User);
         }
@@ -49,11 +50,11 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
             var collection = db.GetCollection<Permission>("permissions");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             var idStr = PlayerId.FromGameJolt(gameJoltId).ToString();
             ct.ThrowIfCancellationRequested();
-            var entry = await collection.FindOneAsync(x => x.Id == idStr);
+            var entry = await collection.FindByIdAsync(idStr);
 
             return new PermissionEntity(entry?.Permissions ?? PermissionFlags.User);
         }
@@ -66,11 +67,11 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
             var collection = db.GetCollection<Permission>("permissions");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
-            return await collection.ExistsAsync(x => x.Id == idStr) || await collection.UpsertAsync(new Permission(idStr, permissions));
+            return await collection.ExistsAsync(Query.EQ(nameof(Permission.Id), idStr)) || await collection.UpsertAsync(new Permission(idStr, permissions));
         }
     }
 }

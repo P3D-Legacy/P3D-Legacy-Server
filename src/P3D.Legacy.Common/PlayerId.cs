@@ -37,5 +37,11 @@ namespace P3D.Legacy.Common
         public override bool Equals(object? obj) => obj is Origin other && Equals(other);
 
         public override int GetHashCode() => HashCode.Combine(_idType, _id);
+
+        public void Deconstruct(out PlayerIdType idType, out string id)
+        {
+            idType = _idType;
+            id = _id;
+        }
     }
 }

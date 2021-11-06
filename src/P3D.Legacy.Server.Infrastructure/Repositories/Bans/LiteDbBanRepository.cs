@@ -1,4 +1,5 @@
-﻿using LiteDB.Async;
+﻿using LiteDB;
+using LiteDB.Async;
 
 using Microsoft.Extensions.Options;
 
@@ -35,11 +36,11 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             var collection = db.GetCollection<Ban>("bans");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
-            var entry = await collection.FindOneAsync(x => x.Id == idStr) is { } ban ? new BanEntity(PlayerId.Parse(ban.BannerId), PlayerId.Parse(ban.Id), IPAddress.Parse(ban.Ip), ban.ReasonId, ban.Reason, ban.Expiration) : null;
+            var entry = await collection.FindByIdAsync(idStr) is { } ban ? new BanEntity(PlayerId.Parse(ban.BannerId), PlayerId.Parse(ban.Id), IPAddress.Parse(ban.Ip), ban.ReasonId, ban.Reason, ban.Expiration) : null;
 
             return entry;
         }
@@ -52,10 +53,10 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             var collection = db.GetCollection<Ban>("bans");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             ct.ThrowIfCancellationRequested();
-            var entries = await collection.FindAsync(x => true);
+            var entries = await collection.FindAllAsync();
             foreach (var banEntity in entries.Select(ban => new BanEntity(PlayerId.Parse(ban.BannerId), PlayerId.Parse(ban.Id), IPAddress.Parse(ban.Ip), ban.ReasonId, ban.Reason, ban.Expiration)))
             {
                 yield return banEntity;
@@ -72,7 +73,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             var collection = db.GetCollection<Ban>("bans");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             var idStr = id.ToString();
             var bannerIdStr = bannerId.ToString();
@@ -90,11 +91,11 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             var collection = db.GetCollection<Ban>("bans");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id);
+            await collection.EnsureIndexAsync(x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
-            var count = await collection.DeleteManyAsync(x => x.Id == idStr);
+            var count = await collection.DeleteManyAsync(Query.EQ(nameof(Ban.Id), idStr));
 
             return count > 0;
         }

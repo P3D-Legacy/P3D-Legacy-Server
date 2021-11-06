@@ -3,6 +3,7 @@
 using MediatR;
 
 using Microsoft.AspNetCore.Connections.Features;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -15,6 +16,7 @@ using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
+using P3D.Legacy.Server.Infrastructure.Services.Mutes;
 
 using System;
 using System.Diagnostics;
@@ -36,6 +38,8 @@ namespace P3D.Legacy.Server.Client.P3D
         private readonly WorldService _worldService;
         private readonly ServerOptions _serverOptions;
         private readonly IMonsterRepository _monsterRepository;
+        private readonly IMuteManager _muteManager;
+        private readonly IMemoryCache _memoryCache;
 
         private TelemetrySpan _connectionSpan = default!;
         private ProtocolWriter _writer = default!;
@@ -49,7 +53,9 @@ namespace P3D.Legacy.Server.Client.P3D
             WorldService worldService,
             IOptions<ServerOptions> serverOptions,
             IMediator mediator,
-            IMonsterRepository monsterRepository)
+            IMonsterRepository monsterRepository,
+            IMuteManager muteManager,
+            IMemoryCache memoryCache)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Client.P3D");
@@ -59,6 +65,8 @@ namespace P3D.Legacy.Server.Client.P3D
             _serverOptions = serverOptions.Value ?? throw new ArgumentNullException(nameof(serverOptions));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _monsterRepository = monsterRepository ?? throw new ArgumentNullException(nameof(monsterRepository));
+            _muteManager = muteManager ?? throw new ArgumentNullException(nameof(muteManager));
+            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
         }
 
         protected override async Task OnCreatedAsync(CancellationToken ct)
