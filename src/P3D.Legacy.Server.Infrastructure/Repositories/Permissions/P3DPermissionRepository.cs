@@ -76,6 +76,13 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
                         return new PermissionEntity(permissions);
                     }
                 }
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    permissions &= ~PermissionFlags.UnVerified;
+                    permissions |= PermissionFlags.User;
+                }
+
                 return new PermissionEntity(permissions);
             }
             finally

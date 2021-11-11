@@ -27,9 +27,14 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 
         public async Task<Unit> Handle(PlayerFinalizingCommand request, CancellationToken ct)
         {
-            if (await _playerContainer.RemoveAsync(request.Player, ct))
+            var player = request.Player;
+
+            if (await _playerContainer.RemoveAsync(player, ct))
             {
-                await _mediator.Publish(new PlayerLeavedNotification(request.Player.Id, request.Player.Origin, request.Player.Name), ct);
+                if (!player.Id.IsEmpty)
+                {
+                    await _mediator.Publish(new PlayerLeavedNotification(player.Id, player.Origin, player.Name), ct);
+                }
             }
 
             return Unit.Value;
