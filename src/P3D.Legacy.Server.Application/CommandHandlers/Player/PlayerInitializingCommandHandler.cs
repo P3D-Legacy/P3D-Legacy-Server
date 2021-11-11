@@ -39,6 +39,7 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
             if (await _banManager.GetAsync(playerId, ct) is { } banEntity)
             {
                 await request.Player.KickAsync($"You are banned: {banEntity.Reason}", ct);
+                return Unit.Value;
             }
 
             await request.Player.AssignIdAsync(playerId, ct);
