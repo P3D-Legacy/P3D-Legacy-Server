@@ -19,7 +19,7 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
         {
             services.AddMemoryCache();
 
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<KestrelServerOptions>, P3DServerOptionsSetup>());
+            //services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<KestrelServerOptions>, P3DServerOptionsSetup>());
 
             services.AddSingleton<IP3DPacketBuilder, DefaultP3DPacketBuilder>();
             services.AddScoped<P3DConnectionContextHandler>();

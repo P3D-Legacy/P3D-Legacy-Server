@@ -128,7 +128,7 @@ namespace P3D.Legacy.Server
                     }
                 });
             })
-            //.AddP3DServer()
+            .AddP3DServer()
             .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
             .ConfigureLogging((ctx, builder) =>
             {
