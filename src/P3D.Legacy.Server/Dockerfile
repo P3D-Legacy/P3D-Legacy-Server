@@ -42,7 +42,7 @@ RUN /bin/bash -c 'set -ex && \
        dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output --arch x64 --os debian --self-contained true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true; \
     elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then \
        echo "aarch64" && \
-       dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output --arch arm64 --os debian- --self-contained true; \
+       dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output --arch arm64 --os debian --self-contained true; \
     else \
        echo "unknown arch" && \
        dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output --arch $ARCH --os debian --self-contained true; \
