@@ -7,6 +7,7 @@ using OpenTelemetry.Trace;
 using P3D.Legacy.Server.CommunicationAPI.Services;
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,7 +40,9 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
                 using var connectionSpan = _tracer.StartActiveSpan("Communication WebSocket Connection", SpanKind.Server);
 
                 await using var handler = ActivatorUtilities.CreateInstance<WebSocketHandler>(_serviceProvider, await HttpContext.WebSockets.AcceptWebSocketAsync("json"));
-                _subscribtionManager.Add(handler);
+                // ReSharper disable AccessToDisposedClosure
+                _subscribtionManager.AddOrUpdate(HttpContext.Connection.Id, _ => handler, (_, _) => handler);
+                // ReSharper restore AccessToDisposedClosure
 
                 try
                 {
@@ -51,7 +54,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
                 }
                 finally
                 {
-                    _subscribtionManager.Remove(handler);
+                    _subscribtionManager.Remove(HttpContext.Connection.Id, out _);
                 }
             }
             else
