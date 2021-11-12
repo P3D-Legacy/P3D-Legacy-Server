@@ -31,7 +31,7 @@ namespace P3D.Legacy.Server.Application.Services
         public async Task ListenAsync()
         {
             try { await (_executingTask ?? Task.CompletedTask); }
-            catch (TaskCanceledException) { }
+            catch (Exception e) when (e is TaskCanceledException or OperationCanceledException) { }
         }
 
         public virtual async Task StopAsync(CancellationToken ct)

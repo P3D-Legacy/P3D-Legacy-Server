@@ -89,7 +89,6 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         public async Task ListenAsync(CancellationToken ct)
         {
             const int maxMessageSize = 1 * 1024 * 1024;
-            var buffer = new byte[4 * 1024 * 1024];
             while (!ct.IsCancellationRequested && _webSocket.CloseStatus is null)
             {
                 await using var reader = new WebSocketMessageReaderStream(_webSocket, maxMessageSize);
