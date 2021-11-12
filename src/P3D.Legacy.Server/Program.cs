@@ -47,6 +47,8 @@ namespace P3D.Legacy.Server
             .CreateDefaultBuilder(args)
             .ConfigureServices((ctx, services) =>
             {
+                services.Configure<ConsoleLifetimeOptions>(opts => opts.SuppressStatusMessages = true);
+
                 services.Configure<ServerOptions>(ctx.Configuration.GetSection("Server"));
                 services.Configure<P3DSiteOptions>(ctx.Configuration.GetSection("OfficialSite"));
                 services.Configure<P3DServerOptions>(ctx.Configuration.GetSection("P3DServer"));
@@ -101,7 +103,7 @@ namespace P3D.Legacy.Server
                 });
                 services.AddOpenTelemetryTracing(builder =>
                 {
-                    var options = otlpSection .Get<OtlpOptions>();
+                    var options = otlpSection.Get<OtlpOptions>();
                     if (options.Enabled)
                     {
                         builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
@@ -126,7 +128,7 @@ namespace P3D.Legacy.Server
                     }
                 });
             })
-            .AddP3DServer()
+            //.AddP3DServer()
             .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
             .ConfigureLogging((ctx, builder) =>
             {

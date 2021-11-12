@@ -37,7 +37,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
             Ok(new StatusResponseV2(await playerQueries.GetAllAsync(ct).Select(x => new StatusResponseV2Player(x.Name, x.GameJoltId)).ToArrayAsync(ct)));
 
         [HttpGet("status/paginated")]
-        public async Task<ActionResult> GetAll([FromQuery] StatusRequestV2Query query, [FromServices] IPlayerQueries playerQueries, CancellationToken ct)
+        public async Task<ActionResult> GetAllAsync([FromQuery] StatusRequestV2Query query, [FromServices] IPlayerQueries playerQueries, CancellationToken ct)
         {
             var page = query.Page;
             var pageSize = Math.Max(Math.Min(query.PageSize, 100), 5);

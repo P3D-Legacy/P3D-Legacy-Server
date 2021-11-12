@@ -20,7 +20,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
 {
     public sealed class WebSocketHandler :
         INotificationHandler<PlayerJoinedNotification>,
-        INotificationHandler<PlayerLeavedNotification>,
+        INotificationHandler<PlayerLeftNotification>,
         INotificationHandler<PlayerSentGlobalMessageNotification>,
         INotificationHandler<ServerMessageNotification>,
         INotificationHandler<PlayerTriggeredEventNotification>,
@@ -138,32 +138,27 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
 
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
         {
-            var msg = $"Player {notification.Player.Name} joined the server!";
-            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerJoinedResponsePayload(msg)), WebSocketMessageType.Text, true, ct);
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerJoinedResponsePayload(notification.Player.Name)), WebSocketMessageType.Text, true, ct);
         }
 
-        public async Task Handle(PlayerLeavedNotification notification, CancellationToken ct)
+        public async Task Handle(PlayerLeftNotification notification, CancellationToken ct)
         {
-            var msg = $"Player {notification.Name} left the server!";
-            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerLeavedResponsePayload(msg)), WebSocketMessageType.Text, true, ct);
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerLeftResponsePayload(notification.Name)), WebSocketMessageType.Text, true, ct);
         }
 
         public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken ct)
         {
-            var msg = $"<{notification.Player.Name}> {notification.Message}";
-            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerSentGlobalMessageResponsePayload(msg)), WebSocketMessageType.Text, true, ct);
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerSentGlobalMessageResponsePayload(notification.Player.Name, notification.Message)), WebSocketMessageType.Text, true, ct);
         }
 
         public async Task Handle(ServerMessageNotification notification, CancellationToken ct)
         {
-            var msg = $"{notification.Message}";
-            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new ServerMessageResponsePayload(msg)), WebSocketMessageType.Text, true, ct);
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new ServerMessageResponsePayload(notification.Message)), WebSocketMessageType.Text, true, ct);
         }
 
         public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
         {
-            var msg = $"The player {notification.Player.Name} {notification.EventMessage}";
-            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(msg)), WebSocketMessageType.Text, true, ct);
+            await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(notification.Player.Name, notification.EventMessage)), WebSocketMessageType.Text, true, ct);
         }
 
         public override int GetHashCode() => _id.GetHashCode();
@@ -174,7 +169,9 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
             _sequenceTextReader.Dispose();
 
             if (_bot is not null)
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
                 _mediator.Send(new PlayerFinalizingCommand(_bot), CancellationToken.None).GetAwaiter().GetResult();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
         }
 
         public async ValueTask DisposeAsync()

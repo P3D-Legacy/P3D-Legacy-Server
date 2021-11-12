@@ -22,7 +22,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 {
     internal sealed class DiscordPassthroughService : CriticalBackgroundService,
         INotificationHandler<PlayerJoinedNotification>,
-        INotificationHandler<PlayerLeavedNotification>,
+        INotificationHandler<PlayerLeftNotification>,
         INotificationHandler<PlayerSentGlobalMessageNotification>,
         INotificationHandler<ServerMessageNotification>,
         INotificationHandler<PlayerTriggeredEventNotification>
@@ -148,7 +148,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
                 await channel.SendMessageAsync($"> `EVENT  : Player {notification.Player.Name} joined the server!`");
         }
 
-        public async Task Handle(PlayerLeavedNotification notification, CancellationToken cancellationToken)
+        public async Task Handle(PlayerLeftNotification notification, CancellationToken cancellationToken)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
                 await channel.SendMessageAsync($"> `EVENT  : Player {notification.Name} left the server!`");

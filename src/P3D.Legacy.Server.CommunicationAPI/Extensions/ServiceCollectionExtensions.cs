@@ -17,7 +17,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Extensions
         public static IServiceCollection AddCommunicationAPIMediatR(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
         {
             notificationRegistrar.Add(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().OfType<INotificationHandler<PlayerJoinedNotification>>());
-            notificationRegistrar.Add(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().OfType<INotificationHandler<PlayerLeavedNotification>>());
+            notificationRegistrar.Add(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().OfType<INotificationHandler<PlayerLeftNotification>>());
             notificationRegistrar.Add(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().OfType<INotificationHandler<PlayerSentGlobalMessageNotification>>());
             notificationRegistrar.Add(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().OfType<INotificationHandler<ServerMessageNotification>>());
             notificationRegistrar.Add(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().OfType<INotificationHandler<PlayerTriggeredEventNotification>>());

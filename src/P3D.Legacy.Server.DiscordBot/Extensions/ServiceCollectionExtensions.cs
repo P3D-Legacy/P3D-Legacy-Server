@@ -19,7 +19,7 @@ namespace P3D.Legacy.Server.DiscordBot.Extensions
         public static IServiceCollection AddDiscordBotMediatR(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
         {
             notificationRegistrar.Add(sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerJoinedNotification>);
-            notificationRegistrar.Add(sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerLeavedNotification>);
+            notificationRegistrar.Add(sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerLeftNotification>);
             notificationRegistrar.Add(sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerSentGlobalMessageNotification>);
             notificationRegistrar.Add(sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<ServerMessageNotification>);
             notificationRegistrar.Add(sp => sp.GetRequiredService<DiscordPassthroughService>() as INotificationHandler<PlayerTriggeredEventNotification>);

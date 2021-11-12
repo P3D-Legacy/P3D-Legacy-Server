@@ -35,7 +35,7 @@ namespace P3D.Legacy.Common.Extensions
         {
             var sb = new StringBuilder();
             foreach (var (key, value) in dictionary)
-                sb.Append("{\"").Append(key).Append("\"").Append('[').Append(value).Append("]}");
+                sb.Append("{\"").Append(key).Append('"').Append('[').Append(value).Append("]}");
             return sb.ToString();
         }
     }

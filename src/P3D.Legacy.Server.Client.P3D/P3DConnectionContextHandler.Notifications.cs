@@ -18,7 +18,7 @@ namespace P3D.Legacy.Server.Client.P3D
     // ReSharper disable once ArrangeTypeModifiers
     partial class P3DConnectionContextHandler :
         INotificationHandler<PlayerJoinedNotification>,
-        INotificationHandler<PlayerLeavedNotification>,
+        INotificationHandler<PlayerLeftNotification>,
         INotificationHandler<PlayerUpdatedStateNotification>,
         INotificationHandler<PlayerSentGlobalMessageNotification>,
         INotificationHandler<PlayerSentLocalMessageNotification>,
@@ -52,7 +52,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendServerMessageAsync($"Player {player.Name} joined the server!", ct);
         }
 
-        public async Task Handle(PlayerLeavedNotification notification, CancellationToken ct)
+        public async Task Handle(PlayerLeftNotification notification, CancellationToken ct)
         {
             var (_, origin, name) = notification;
 

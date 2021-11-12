@@ -33,7 +33,7 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
             {
                 if (!player.Id.IsEmpty)
                 {
-                    await _mediator.Publish(new PlayerLeavedNotification(player.Id, player.Origin, player.Name), ct);
+                    await _mediator.Publish(new PlayerLeftNotification(player.Id, player.Origin, player.Name), ct);
                 }
             }
 
