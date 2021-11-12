@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -11,10 +11,10 @@
 
   <ItemGroup>
     <PackageReference Include="Bedrock.Framework" Version="0.1.62-alpha.g8a965bbcba" />
-    <PackageReference Include="Nerdbank.Streams" Version="2.8.46" />
+    <PackageReference Include="Nerdbank.Streams" Version="2.8.50" />
     <PackageReference Include="OpenTelemetry.Api" Version="1.2.0-beta1" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
-    <PackageReference Include="Wivuu.JsonPolymorphism" Version="1.0.6" />
+    <PackageReference Include="Wivuu.JsonPolymorphism" Version="1.0.7" />
   </ItemGroup>
 
   <ItemGroup>

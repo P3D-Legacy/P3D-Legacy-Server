@@ -1,5 +1,5 @@
 # Stage 1: Build application
-FROM mcr.microsoft.com/dotnet/sdk:5.0-bullseye-slim AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS build-env
 
 WORKDIR /build
 
@@ -39,17 +39,17 @@ RUN /bin/bash -c 'set -ex && \
     ARCH=`uname -m` && \
     if [[ "$ARCH" == "amd64" || "$ARCH" == "x86_64" ]]; then \
        echo "x86_64" && \
-       dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output -r debian-x64 --self-contained true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true; \
+       dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output --arch x64 --os debian --self-contained true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true; \
     elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then \
        echo "aarch64" && \
-       dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output -r debian-arm64 --self-contained true; \
+       dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output --arch arm64 --os debian- --self-contained true; \
     else \
        echo "unknown arch" && \
-       dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output --os debian --arch $ARCH --self-contained true; \
+       dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output --arch $ARCH --os debian --self-contained true; \
     fi'
 
 # Stage 2: Copy application artifacts into a smaller runtime environment, which is then used as our final image
-FROM mcr.microsoft.com/dotnet/runtime-deps:5.0-bullseye-slim
+FROM mcr.microsoft.com/dotnet/runtime-deps:6.0-bullseye-slim
 
 WORKDIR /app
 
@@ -63,7 +63,7 @@ LABEL org.opencontainers.image.title="P3D Legacy Server" \
       org.opencontainers.image.author="Aragas <personal@aragas.org>" \
       org.opencontainers.image.vendor="P3D-Legacy Team" \
       org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/runtime-deps:5.0-alpine"
+      org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine"
 
 EXPOSE 80/tcp
 EXPOSE 15124/tcp
