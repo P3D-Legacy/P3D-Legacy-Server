@@ -28,7 +28,11 @@ namespace P3D.Legacy.Server.Application.Services
 
         protected abstract Task OnCreatedAsync(CancellationToken ct);
 
-        public async Task ListenAsync() => await (_executingTask ?? Task.CompletedTask);
+        public async Task ListenAsync()
+        {
+            try { await (_executingTask ?? Task.CompletedTask); }
+            catch (TaskCanceledException) { }
+        }
 
         public virtual async Task StopAsync(CancellationToken ct)
         {

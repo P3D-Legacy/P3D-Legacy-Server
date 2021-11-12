@@ -90,7 +90,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         {
             const int maxMessageSize = 1 * 1024 * 1024;
             var buffer = new byte[4 * 1024 * 1024];
-            while (!ct.IsCancellationRequested)
+            while (!ct.IsCancellationRequested && _webSocket.CloseStatus is null)
             {
                 await using var reader = new WebSocketMessageReaderStream(_webSocket, maxMessageSize);
                 var payload = await _jsonSerializer.DeserializeAsync<RequestPayload?>(reader, ct);
@@ -101,6 +101,8 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
 
         private async Task ProcessPayloadAsync(RequestPayload request, CancellationToken ct)
         {
+            if (_webSocket.CloseStatus is not null) return;
+
             switch (request)
             {
                 case RegisterBotRequestPayload(var botName, var uid):
@@ -138,26 +140,31 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
 
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
         {
+            if (_webSocket.CloseStatus is not null) return;
             await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerJoinedResponsePayload(notification.Player.Name)), WebSocketMessageType.Text, true, ct);
         }
 
         public async Task Handle(PlayerLeftNotification notification, CancellationToken ct)
         {
+            if (_webSocket.CloseStatus is not null) return;
             await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerLeftResponsePayload(notification.Name)), WebSocketMessageType.Text, true, ct);
         }
 
         public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken ct)
         {
+            if (_webSocket.CloseStatus is not null) return;
             await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerSentGlobalMessageResponsePayload(notification.Player.Name, notification.Message)), WebSocketMessageType.Text, true, ct);
         }
 
         public async Task Handle(ServerMessageNotification notification, CancellationToken ct)
         {
+            if (_webSocket.CloseStatus is not null) return;
             await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new ServerMessageResponsePayload(notification.Message)), WebSocketMessageType.Text, true, ct);
         }
 
         public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
         {
+            if (_webSocket.CloseStatus is not null) return;
             await _webSocket.SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(notification.Player.Name, notification.EventMessage)), WebSocketMessageType.Text, true, ct);
         }
 
