@@ -29,7 +29,9 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - uses: nebularg/actions-discord-webhook@v1
+    - name: Notify
       if: always()
-      with:
-        webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
+      env:
+        BUILD_STATUS: ${{ job.status }}
+        WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+      run: curl -s https://raw.githubusercontent.com/nebularg/actions-discord-webhook/95e7fbbd5c40116edd9ccee7a5703618ee30e3b6/send.sh | bash
