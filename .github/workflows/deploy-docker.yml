@@ -34,4 +34,4 @@ jobs:
       env:
         BUILD_STATUS: ${{ job.status }}
         WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
-      run: curl -s ./.github/workflows/discord.sh | bash
+      run: bash ./.github/workflows/discord.sh
