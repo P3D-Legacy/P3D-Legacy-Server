@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Application.Commands;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Infrastructure.Models.Users;
@@ -20,18 +21,18 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     internal class PlayerAuthenticateDefaultCommandHandler : IRequestHandler<PlayerAuthenticateDefaultCommand, CommandResult>
     {
         private readonly ILogger _logger;
-        private readonly IMediator _mediator;
+        private readonly NotificationPublisher _notificationPublisher;
         private readonly IUserManager _userManager;
         private readonly LockoutOptions _lockoutOptions;
 
         public PlayerAuthenticateDefaultCommandHandler(
             ILogger<PlayerAuthenticateDefaultCommandHandler> logger,
-            IMediator mediator,
+            NotificationPublisher notificationPublisher,
             IUserManager userManager,
             IOptions<LockoutOptions> lockoutOptions)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _lockoutOptions = lockoutOptions.Value ?? throw new ArgumentNullException(nameof(lockoutOptions));
         }
@@ -48,7 +49,7 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
                 {
                     foreach (var error in createResult.Errors)
                     {
-                        await _mediator.Publish(new MessageToPlayerNotification(IPlayer.Server, player, error.Description), ct);
+                        await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, error.Description), ct);
                     }
 
                     return new CommandResult(false);
@@ -63,15 +64,15 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
                     var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user, ct) ?? DateTimeOffset.Now;
                     var duration = lockoutEnd - DateTimeOffset.Now;
 
-                    await _mediator.Publish(new MessageToPlayerNotification(IPlayer.Server, player, $"You are locked out for {duration.Seconds} seconds!"), ct);
+                    await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, $"You are locked out for {duration.Seconds} seconds!"), ct);
                     return new CommandResult(false);
                 }
 
                 var failedCount = await _userManager.GetAccessFailedCountAsync(user, ct);
                 var attemptsLeft = _lockoutOptions.MaxFailedAccessAttempts - failedCount;
 
-                await _mediator.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "Invalid Password!"), ct);
-                await _mediator.Publish(new MessageToPlayerNotification(IPlayer.Server, player, $"You have {attemptsLeft} attempts left before lockout!"), ct);
+                await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "Invalid Password!"), ct);
+                await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, $"You have {attemptsLeft} attempts left before lockout!"), ct);
                 return new CommandResult(false);
             }
 

@@ -76,14 +76,16 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
 
         private readonly WebSocket _webSocket;
         private readonly IMediator _mediator;
+        private readonly NotificationPublisher _notificationPublisher;
         private readonly DefaultJsonSerializer _jsonSerializer;
         private readonly SequenceTextReader _sequenceTextReader = new();
         private readonly CancellationTokenSource _cts = new();
 
-        public WebSocketHandler(WebSocket webSocket, IMediator mediator, DefaultJsonSerializer jsonSerializer)
+        public WebSocketHandler(WebSocket webSocket, IMediator mediator, NotificationPublisher notificationPublisher, DefaultJsonSerializer jsonSerializer)
         {
             _webSocket = webSocket ?? throw new ArgumentNullException(nameof(webSocket));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
             _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
         }
 
@@ -148,7 +150,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                     _bot = new WebSocketPlayer(botName, KickCallbackAsync);
                     await _mediator.Send(new PlayerInitializingCommand(_bot), ct);
                     await _mediator.Send(new PlayerReadyCommand(_bot), ct);
-                    await _mediator.Publish(new PlayerUpdatedStateNotification(_bot), ct);
+                    await _notificationPublisher.Publish(new PlayerUpdatedStateNotification(_bot), ct);
                     await SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid)), ct);
                     break;
 
@@ -159,7 +161,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                         return;
                     }
 
-                    await _mediator.Publish(new PlayerSentGlobalMessageNotification(_bot, $"{sender}: {message}"), ct);
+                    await _notificationPublisher.Publish(new PlayerSentGlobalMessageNotification(_bot, $"{sender}: {message}"), ct);
                     await SendAsync(_jsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid)), ct);
                     break;
             }

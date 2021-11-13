@@ -3,6 +3,7 @@
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Services;
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
         public override IEnumerable<string> Aliases => new[] { "ggj" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
-        public GetGameJoltIdCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
+        public GetGameJoltIdCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {

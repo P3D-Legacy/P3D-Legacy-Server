@@ -19,7 +19,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
 
-        public SetTimeCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
+        public SetTimeCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {

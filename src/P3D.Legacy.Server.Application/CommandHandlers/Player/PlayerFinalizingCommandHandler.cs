@@ -3,6 +3,7 @@
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Services;
 
@@ -15,13 +16,13 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     internal class PlayerFinalizingCommandHandler : IRequestHandler<PlayerFinalizingCommand>
     {
         private readonly ILogger _logger;
-        private readonly IMediator _mediator;
+        private readonly NotificationPublisher _notificationPublisher;
         private readonly IPlayerContainerWriter _playerContainer;
 
-        public PlayerFinalizingCommandHandler(ILogger<PlayerFinalizingCommandHandler> logger, IMediator mediator, IPlayerContainerWriter playerContainer)
+        public PlayerFinalizingCommandHandler(ILogger<PlayerFinalizingCommandHandler> logger, NotificationPublisher notificationPublisher, IPlayerContainerWriter playerContainer)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
         }
 
@@ -33,7 +34,7 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
             {
                 if (!player.Id.IsEmpty)
                 {
-                    await _mediator.Publish(new PlayerLeftNotification(player.Id, player.Origin, player.Name), ct);
+                    await _notificationPublisher.Publish(new PlayerLeftNotification(player.Id, player.Origin, player.Name), ct);
                 }
             }
 

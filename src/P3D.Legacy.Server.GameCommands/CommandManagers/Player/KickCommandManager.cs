@@ -4,6 +4,7 @@ using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.Administration;
 using P3D.Legacy.Server.Application.Services;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -18,7 +19,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
         public override IEnumerable<string> Aliases => new[] { "k" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
-        public KickCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
+        public KickCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {

@@ -4,6 +4,7 @@ using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.Administration;
 using P3D.Legacy.Server.Application.Services;
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
         public override IEnumerable<string> Aliases => new[] { "ub" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
-        public UnbanCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
+        public UnbanCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {

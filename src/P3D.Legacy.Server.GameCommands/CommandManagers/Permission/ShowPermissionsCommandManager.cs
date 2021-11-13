@@ -15,7 +15,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
         public override string Description => "Show available Client permissions.";
         public override PermissionFlags Permissions => PermissionFlags.AdministratorOrHigher;
 
-        public ShowPermissionsCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
+        public ShowPermissionsCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {

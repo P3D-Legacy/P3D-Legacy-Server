@@ -26,7 +26,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
         private readonly IServiceProvider _serviceProvider;
         private readonly Tracer _tracer;
 
-        public HelpCommandManager(IServiceProvider serviceProvider, TracerProvider traceProvider, IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer)
+        public HelpCommandManager(IServiceProvider serviceProvider, TracerProvider traceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.GameCommands");

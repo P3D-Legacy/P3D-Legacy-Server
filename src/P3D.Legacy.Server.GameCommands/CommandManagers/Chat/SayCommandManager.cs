@@ -3,6 +3,7 @@
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Services;
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Chat
         public override string Description => "Speak as the Server.";
         public override PermissionFlags Permissions => PermissionFlags.AdministratorOrHigher;
 
-        public SayCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
+        public SayCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {

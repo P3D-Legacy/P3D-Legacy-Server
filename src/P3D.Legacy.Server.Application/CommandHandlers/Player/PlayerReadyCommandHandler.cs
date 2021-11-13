@@ -3,6 +3,7 @@
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Infrastructure.Services.Permissions;
 
@@ -15,13 +16,13 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     internal class PlayerReadyCommandHandler : IRequestHandler<PlayerReadyCommand>
     {
         private readonly ILogger _logger;
-        private readonly IMediator _mediator;
+        private readonly NotificationPublisher _notificationPublisher;
         private readonly IPermissionManager _permissionManager;
 
-        public PlayerReadyCommandHandler(ILogger<PlayerReadyCommandHandler> logger, IMediator mediator, IPermissionManager permissionManager)
+        public PlayerReadyCommandHandler(ILogger<PlayerReadyCommandHandler> logger, NotificationPublisher notificationPublisher, IPermissionManager permissionManager)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
             _permissionManager = permissionManager ?? throw new ArgumentNullException(nameof(permissionManager));
         }
 
@@ -30,7 +31,7 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
             var permissions = await _permissionManager.GetByIdAsync(request.Player.Id, ct);
             await request.Player.AssignPermissionsAsync(permissions.Permissions, ct);
 
-            await _mediator.Publish(new PlayerJoinedNotification(request.Player), ct);
+            await _notificationPublisher.Publish(new PlayerJoinedNotification(request.Player), ct);
             return Unit.Value;
         }
     }

@@ -231,7 +231,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (_connectionState == P3DConnectionState.Intitialized)
             {
-                await _mediator.Publish(new PlayerUpdatedStateNotification(this), ct);
+                await _notificationPublisher.Publish(new PlayerUpdatedStateNotification(this), ct);
             }
 
             await SendPacketAsync(GetFromP3DPlayerState(this, this), ct);
@@ -243,12 +243,12 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (message.StartsWith("/"))
             {
-                await _mediator.Publish(new PlayerSentCommandNotification(this, packet.Message), ct);
+                await _notificationPublisher.Publish(new PlayerSentCommandNotification(this, packet.Message), ct);
             }
             else if (_connectionState == P3DConnectionState.Intitialized)
             {
-                //await _mediator.Publish(new PlayerSentLocalMessageNotification(this, LevelFile, packet.Message), ct);
-                await _mediator.Publish(new PlayerSentGlobalMessageNotification(this, packet.Message), ct);
+                //await _notificationPublisher.Publish(new PlayerSentLocalMessageNotification(this, LevelFile, packet.Message), ct);
+                await _notificationPublisher.Publish(new PlayerSentGlobalMessageNotification(this, packet.Message), ct);
             }
         }
         private async Task HandlePrivateMessageAsync(ChatMessagePrivatePacket packet, CancellationToken ct)
@@ -256,7 +256,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentPrivateMessageNotification(this, packet.DestinationPlayerName, packet.Message), ct);
+            await _notificationPublisher.Publish(new PlayerSentPrivateMessageNotification(this, packet.DestinationPlayerName, packet.Message), ct);
         }
 
 
@@ -265,7 +265,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new ServerMessageNotification($"The player {Name} {packet.EventMessage}"), ct);
+            await _notificationPublisher.Publish(new ServerMessageNotification($"The player {Name} {packet.EventMessage}"), ct);
         }
 
         private async Task HandleTradeRequestAsync(TradeRequestPacket packet, CancellationToken ct)
@@ -273,21 +273,21 @@ namespace P3D.Legacy.Server.Client.P3D
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleTradeJoinAsync(TradeJoinPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleTradeQuitAsync(TradeQuitPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleTradeOfferAsync(TradeOfferPacket packet, CancellationToken ct)
         {
@@ -305,11 +305,11 @@ namespace P3D.Legacy.Server.Client.P3D
             {
                 await SendServerMessageAsync("The Pokemon is not valid!", ct);
                 await SendPacketAsync(new TradeQuitPacket { Origin = packet.DestinationPlayerOrigin, DestinationPlayerOrigin = Origin }, ct);
-                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, new TradeQuitPacket { Origin = Origin, DestinationPlayerOrigin = packet.DestinationPlayerOrigin }), ct);
+                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, new TradeQuitPacket { Origin = Origin, DestinationPlayerOrigin = packet.DestinationPlayerOrigin }), ct);
             }
             else
             {
-                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
             }
         }
         private async Task HandleTradeStartAsync(TradeStartPacket packet, CancellationToken ct)
@@ -317,7 +317,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
 
         private async Task HandleBattleClientDataAsync(BattleClientDataPacket packet, CancellationToken ct)
@@ -325,21 +325,21 @@ namespace P3D.Legacy.Server.Client.P3D
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleHostDataAsync(BattleHostDataPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleJoinAsync(BattleJoinPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleOfferAsync(BattleOfferPacket packet, CancellationToken ct)
         {
@@ -363,11 +363,11 @@ namespace P3D.Legacy.Server.Client.P3D
             {
                 await SendServerMessageAsync("One of your Pokemon is not valid!", ct);
                 await SendPacketAsync(new BattleQuitPacket { Origin = packet.DestinationPlayerOrigin, DestinationPlayerOrigin = Origin }, ct);
-                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = packet.DestinationPlayerOrigin }), ct);
+                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = packet.DestinationPlayerOrigin }), ct);
             }
             else
             {
-                await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
             }
         }
         private async Task HandleBattlePokemonDataAsync(BattleEndRoundDataPacket packet, CancellationToken ct)
@@ -375,28 +375,28 @@ namespace P3D.Legacy.Server.Client.P3D
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleQuitAsync(BattleQuitPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleRequestAsync(BattleRequestPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleStartAsync(BattleStartPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _mediator.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
 
 

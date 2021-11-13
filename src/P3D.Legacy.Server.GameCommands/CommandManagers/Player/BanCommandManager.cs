@@ -19,7 +19,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
         public override IEnumerable<string> Aliases => new[] { "b" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
-        public BanCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
+        public BanCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {

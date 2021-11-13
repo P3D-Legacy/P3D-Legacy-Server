@@ -13,6 +13,7 @@ using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Options;
+using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
@@ -33,6 +34,7 @@ namespace P3D.Legacy.Server.Client.P3D
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
         private readonly IMediator _mediator;
+        private readonly NotificationPublisher _notificationPublisher;
         private readonly IPlayerContainerReader _playerContainer;
         private readonly P3DProtocol _protocol;
         private readonly WorldService _worldService;
@@ -53,6 +55,7 @@ namespace P3D.Legacy.Server.Client.P3D
             WorldService worldService,
             IOptions<ServerOptions> serverOptions,
             IMediator mediator,
+            NotificationPublisher notificationPublisher,
             IMonsterRepository monsterRepository,
             IMuteManager muteManager,
             IMemoryCache memoryCache)
@@ -64,6 +67,7 @@ namespace P3D.Legacy.Server.Client.P3D
             _worldService = worldService ?? throw new ArgumentNullException(nameof(worldService));
             _serverOptions = serverOptions.Value ?? throw new ArgumentNullException(nameof(serverOptions));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
             _monsterRepository = monsterRepository ?? throw new ArgumentNullException(nameof(monsterRepository));
             _muteManager = muteManager ?? throw new ArgumentNullException(nameof(muteManager));
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));

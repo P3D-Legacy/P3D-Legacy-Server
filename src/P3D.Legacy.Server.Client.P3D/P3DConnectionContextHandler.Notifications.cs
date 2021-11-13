@@ -119,12 +119,12 @@ namespace P3D.Legacy.Server.Client.P3D
                 switch (p3dPacket)
                 {
                     case TradeRequestPacket:
-                        await _mediator.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
-                        await _mediator.Publish(new PlayerSentRawP3DPacketNotification(player, new TradeQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
+                        await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
+                        await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(player, new TradeQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
                         break;
                     case BattleRequestPacket:
-                        await _mediator.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
-                        await _mediator.Publish(new PlayerSentRawP3DPacketNotification(player, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
+                        await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
+                        await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(player, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
                         break;
                     case TradeQuitPacket:
                         await SendPacketAsync(p3dPacket, ct);

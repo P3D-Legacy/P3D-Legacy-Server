@@ -1,7 +1,10 @@
 ﻿using MediatR;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Application.Services;
 
 using System;
@@ -21,12 +24,17 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
         public virtual bool LogCommand { get; } = true;
 
         protected IMediator Mediator { get; }
+        protected NotificationPublisher NotificationPublisher { get; }
         private IPlayerContainerReader PlayerContainer { get; }
 
-        protected CommandManager(IMediator mediator, IPlayerContainerReader playerContainer)
+        protected CommandManager(IServiceProvider serviceProvider)
         {
-            Mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            PlayerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
+            if (serviceProvider is null)
+                throw new ArgumentNullException(nameof(serviceProvider));
+
+            Mediator = serviceProvider.GetRequiredService<IMediator>();
+            NotificationPublisher = serviceProvider.GetRequiredService<NotificationPublisher>();
+            PlayerContainer = serviceProvider.GetRequiredService<IPlayerContainerReader>();
         }
 
         protected async Task<IPlayer?> GetPlayerAsync(string name, CancellationToken ct)
@@ -36,12 +44,12 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
 
         protected async Task SendMessageAsync(IPlayer player, string message, CancellationToken ct)
         {
-            await Mediator.Publish(new MessageToPlayerNotification(IPlayer.Server, player, message), ct);
+            await NotificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, message), ct);
         }
 
         protected async Task SendServerMessageAsync(string message, CancellationToken ct)
         {
-            await Mediator.Publish(new ServerMessageNotification(message), ct);
+            await NotificationPublisher.Publish(new ServerMessageNotification(message), ct);
         }
 
         public virtual async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)

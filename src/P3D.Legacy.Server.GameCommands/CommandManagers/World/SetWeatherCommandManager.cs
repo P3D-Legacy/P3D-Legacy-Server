@@ -19,7 +19,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
         public override IEnumerable<string> Aliases => new[] { "sw" };
         public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
 
-        public SetWeatherCommandManager(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator, playerContainer) { }
+        public SetWeatherCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {

@@ -20,10 +20,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
         public override IEnumerable<string> Aliases => new[] { "sperm", "sp" };
         public override PermissionFlags Permissions => PermissionFlags.AdministratorOrHigher;
 
-        public SetPermissionCommand(IMediator mediator, IPlayerContainerReader playerContainer) : base(mediator,
-            playerContainer)
-        {
-        }
+        public SetPermissionCommand(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {

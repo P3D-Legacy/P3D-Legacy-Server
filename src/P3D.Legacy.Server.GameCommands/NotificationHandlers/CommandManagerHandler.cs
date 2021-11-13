@@ -6,6 +6,7 @@ using OpenTelemetry.Trace;
 
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
 
 using System;
@@ -23,19 +24,21 @@ namespace P3D.Legacy.Server.GameCommands.NotificationHandlers
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
         private readonly IMediator _mediator;
+        private readonly NotificationPublisher _notificationPublisher;
         private readonly IReadOnlyList<CommandManager> _commandManagers;
 
-        public CommandManagerHandler(ILogger<CommandManagerHandler> logger, TracerProvider traceProvider, IMediator mediator, IEnumerable<CommandManager> commandManagers)
+        public CommandManagerHandler(ILogger<CommandManagerHandler> logger, TracerProvider traceProvider, IMediator mediator, NotificationPublisher notificationPublisher, IEnumerable<CommandManager> commandManagers)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
             _commandManagers = commandManagers.ToList();
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.GameCommands");
         }
 
         private async Task SendMessageAsync(IPlayer player, string message, CancellationToken ct)
         {
-            await _mediator.Publish(new MessageToPlayerNotification(IPlayer.Server, player, message), ct);
+            await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, message), ct);
         }
 
         private async Task HandleCommandAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
