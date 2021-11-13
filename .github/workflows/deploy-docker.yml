@@ -34,4 +34,4 @@ jobs:
       env:
         BUILD_STATUS: ${{ job.status }}
         WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
-      run: curl -s https://raw.githubusercontent.com/nebularg/actions-discord-webhook/95e7fbbd5c40116edd9ccee7a5703618ee30e3b6/send.sh | bash
+      run: curl -s ./.github/workflows/discord.sh | bash
