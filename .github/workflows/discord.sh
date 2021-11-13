@@ -102,4 +102,5 @@ EOF
 )
 
 echo -n "Sending status to Discord..."
-curl -sf -H "Content-Type: application/json" -d "$PAYLOAD_DATA" "$WEBHOOK_URL"
+OUTPUT=$(curl -sf -H "Content-Type: application/json" -d "$PAYLOAD_DATA" "$WEBHOOK_URL")
+echo "${OUTPUT}"
