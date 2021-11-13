@@ -101,6 +101,6 @@ cat <<EOF
 EOF
 )
 
-echo -n "Sending status to Discord..."
-echo -n "$PAYLOAD_DATA"
-curl -s -H "Content-Type: application/json" -d "$PAYLOAD_DATA" "$WEBHOOK_URL"
+echo "Sending status to Discord..."
+echo "$PAYLOAD_DATA"
+curl -s -H "Content-Type: application/json" -d "$PAYLOAD_DATA" "$WEBHOOK_URL" && echo "success!" || echo "failure!"
