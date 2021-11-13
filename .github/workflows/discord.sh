@@ -58,6 +58,9 @@ else
 		DESCRIPTION=$( echo -ne "$COMMIT_BODY\n\n$COMMITTER" | jq -sR '.' )
 	fi
 	CONTENT_URL=$( jq -r '.compare' "$GITHUB_EVENT_PATH" )
+	if [ "$CONTENT_URL" = "null" ]; then
+		CONTENT_URL=""
+	fi
 	STATUS_URL="https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA/checks"
 	COMMIT_URL="[\`${GITHUB_SHA:0:7}\`](https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA)"
 	_BRANCH=${GITHUB_REF##*/}
