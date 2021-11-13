@@ -12,6 +12,7 @@ using P3D.Legacy.Server.Infrastructure.Utils;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -43,43 +44,16 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
             using var span = _tracer.StartActiveSpan("P3DBanRepository UnbanAsync", SpanKind.Client);
 
-            HttpResponseMessage response;
-
-            try
-            {
-                response = await _httpClientFactory.CreateClient("P3D.API").GetAsync(
-                    $"ban/gamejoltaccount/{id.Id}",
-                    HttpCompletionOption.ResponseHeadersRead,
-                    ct);
-            }
-            catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
-            {
-                return null;
-            }
-
-            try
-            {
-                if (response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NoContent)
-                {
-                    var content = await response.Content.ReadAsStringAsync(ct);
-                    var responseData = JsonConvert.DeserializeObject<BanUserResponse?>(content);
-                    if (responseData is null || responseData.Entry is null || responseData.Entry.UserGameJolt is null || responseData.Entry.User is null)
-                        return null;
-
-                    return new BanEntity(
-                            PlayerId.FromGameJolt(GameJoltId.FromNumber(responseData.Entry.Banner.Id)),
-                            PlayerId.FromGameJolt(GameJoltId.FromNumber(responseData.Entry.UserGameJolt.Id)),
-                            IPAddress.None,
-                            0,
-                            responseData.Entry.Reason,
-                            responseData.Entry.ExpireAt);
-                }
-                return null;
-            }
-            finally
-            {
-                response.Dispose();
-            }
+            var actualEntry = await GetInternal(id, ct);
+            return actualEntry is null
+                ? null
+                : new BanEntity(
+                    PlayerId.FromGameJolt(GameJoltId.FromNumber(actualEntry.Banner.Id)),
+                    PlayerId.FromGameJolt(GameJoltId.FromNumber(actualEntry.UserGameJolt.Id)),
+                    IPAddress.None,
+                    0,
+                    actualEntry.Reason,
+                    actualEntry.ExpireAt);
         }
 
         public async IAsyncEnumerable<BanEntity> GetAllAsync([EnumeratorCancellation] CancellationToken ct)
@@ -177,26 +151,37 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
             using var span = _tracer.StartActiveSpan("P3DBanRepository UnbanAsync", SpanKind.Client);
 
+            return await UnbanInternal(id, ct);
+        }
+
+        private async Task<BanResponseEntry?> GetInternal(PlayerId id, CancellationToken ct)
+        {
             HttpResponseMessage response;
 
             try
             {
-                response = await _httpClientFactory.CreateClient("P3D.API").DeleteAsync(
+                response = await _httpClientFactory.CreateClient("P3D.API").GetAsync(
                     $"ban/gamejoltaccount/{id.Id}",
+                    HttpCompletionOption.ResponseHeadersRead,
                     ct);
             }
             catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
             {
-                return false;
+                return null;
             }
 
             try
             {
                 if (response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NoContent)
                 {
-                    return true;
+                    var content = await response.Content.ReadAsStringAsync(ct);
+                    var responseData = JsonConvert.DeserializeObject<BanListResponse?>(content);
+                    if (responseData is null || responseData.Entries is null)
+                        return null;
+
+                    return responseData.Entries.FirstOrDefault(x => x.ExpireAt is null || x.ExpireAt > DateTimeOffset.UtcNow);
                 }
-                return false;
+                return null;
             }
             finally
             {
@@ -204,15 +189,49 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             }
         }
 
-        [Newtonsoft.Json.JsonConverter(typeof(JsonPathConverter))]
-        private record BanUserResponse(
-            [property: JsonProperty("data[0]")] BanResponseEntry Entry);
+        private async Task<bool> UnbanInternal(PlayerId id, CancellationToken ct)
+        {
+            while (true)
+            {
+                var currentBan = await GetInternal(id, ct);
+                if (currentBan is null)
+                    return true;
+
+
+                HttpResponseMessage response;
+
+                try
+                {
+                    response = await _httpClientFactory.CreateClient("P3D.API").DeleteAsync(
+                        $"ban/gamejoltaccount/{currentBan.Uid}",
+                        ct);
+                }
+                catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
+                {
+                    return false;
+                }
+
+                try
+                {
+                    if (response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NoContent)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+                finally
+                {
+                    response.Dispose();
+                }
+            }
+        }
 
         private record BanListResponse(
             [property: JsonProperty("data")] IReadOnlyList<BanResponseEntry> Entries);
 
         [Newtonsoft.Json.JsonConverter(typeof(JsonPathConverter))]
         private record BanResponseEntry(
+            [property: JsonProperty("uuid")] Guid Uid,
             [property: JsonProperty("gamejoltaccount")] GameJoltDTO UserGameJolt,
             [property: JsonProperty("gamejoltaccount.user")] UserDTO User,
             [property: JsonProperty("banned_by")] UserDTO Banner,
@@ -221,43 +240,18 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             [property: JsonProperty("expire_at")] DateTimeOffset? ExpireAt);
 
 
-
-        private record BanRequestData(
+        private sealed record BanRequest(
             [property: JsonPropertyName("gamejoltaccount_id")] ulong GameJoltId,
             [property: JsonPropertyName("reason_id")] ulong ReasonId,
             [property: JsonPropertyName("expires_at")] DateTimeOffset? ExpiresAt,
             [property: JsonPropertyName("banned_by_gamejoltaccount_id")] ulong BannedByGameJoltId
         );
-        private sealed record BanRequest
-        {
-            [JsonPropertyName("data")] public BanRequestData Data { get; init; }
 
-            public BanRequest(ulong gameJoltId, ulong reasonId, DateTimeOffset? expiresAt, ulong bannedByGameJoltId)
-            {
-                Data = new BanRequestData(gameJoltId, reasonId, expiresAt, bannedByGameJoltId);
-            }
-        }
-
-        private record BanResponseData(
-            [property: JsonPropertyName("expires_at")] DateTimeOffset? ExpiresAt);
-        private sealed record BanResponse(
-            [property: JsonPropertyName("data")] BanResponseData[] Data);
-
-        private sealed record TextReasonBanRequest
-        {
-            public record BanRequestData(
-                [property: JsonPropertyName("gamejoltaccount_id")] ulong GameJoltId,
-                [property: JsonPropertyName("reason")] string Reason,
-                [property: JsonPropertyName("expires_at")] DateTimeOffset? ExpiresAt,
-                [property: JsonPropertyName("banned_by_gamejoltaccount_id")] ulong BannedByGameJoltId
-            );
-
-            [JsonPropertyName("data")] public BanRequestData Data { get; init; }
-
-            public TextReasonBanRequest(ulong gameJoltId, string reason, DateTimeOffset? expiresAt, ulong bannedByGameJoltId)
-            {
-                Data = new BanRequestData(gameJoltId, reason, expiresAt, bannedByGameJoltId);
-            }
-        };
+        private sealed record TextReasonBanRequest(
+            [property: JsonPropertyName("gamejoltaccount_id")] ulong GameJoltId,
+            [property: JsonPropertyName("reason")] string Reason,
+            [property: JsonPropertyName("expires_at")] DateTimeOffset? ExpiresAt,
+            [property: JsonPropertyName("banned_by_gamejoltaccount_id")] ulong BannedByGameJoltId
+        );
     }
 }
