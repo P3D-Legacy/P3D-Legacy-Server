@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
+using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.Behaviours;
 using P3D.Legacy.Server.Options;
@@ -46,6 +47,8 @@ namespace P3D.Legacy.Server.Extensions
         public static IServiceCollection AddMediatRInternal(this IServiceCollection services)
         {
             ServiceRegistrar.AddRequiredServices(services, new MediatRServiceConfiguration().AsTransient());
+
+            services.AddTransient<NotificationPublisher>();
 
             services.AddTransient(typeof(IRequestPreProcessor<>), typeof(LoggingBehaviour<>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
