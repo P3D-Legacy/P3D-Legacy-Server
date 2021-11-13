@@ -25,13 +25,14 @@ jobs:
           docker login -u=P3D-Legacy -p=${{ secrets.TOKEN_GPR }} ghcr.io
           docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest;
           docker stack deploy --prune --resolve-image always --with-registry-auth -c /deploy/next-p3d-legacy-server/docker-compose.yml nextp3dlegacyserver;
-          
+
     - uses: sarisia/actions-status-discord@v1
       if: always()
       with:
         webhook: ${{ secrets.WEBHOOK }}
-        nocontext: true
+        nocontext: false
         title: "Deployment of 'P3D Legacy Server Next'"
+        description: "Build and deploy to {{ environment.url }}"
         #description: |
         #  Version `1.2.3-alpha`
         #  Click [here](https://github.com/sarisia/actions-status-discord) to download!
