@@ -1,4 +1,4 @@
-name: "Deploy 'P3D Legacy Server Next'"
+name: "Deploy P3D Legacy Server Next"
 
 on:
   repository_dispatch:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    name: "Deploy 'P3D Legacy Server Next'"
+    name: "Deploy P3D Legacy Server Next"
     runs-on: ubuntu-latest
     environment:
       name: 'next-p3d-backend'
