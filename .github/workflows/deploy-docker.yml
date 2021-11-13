@@ -26,6 +26,9 @@ jobs:
           docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest;
           docker stack deploy --prune --resolve-image always --with-registry-auth -c /deploy/next-p3d-legacy-server/docker-compose.yml nextp3dlegacyserver;
 
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
     - uses: nebularg/actions-discord-webhook@v1
       if: always()
       with:
