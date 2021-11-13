@@ -1,4 +1,4 @@
-name: Deploy Docker Image
+name: "Deploy 'P3D Legacy Server Next'"
 
 on:
   repository_dispatch:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy
+    name: "Deploy 'P3D Legacy Server Next'"
     runs-on: ubuntu-latest
     environment:
       name: 'next-p3d-backend'
@@ -25,19 +25,13 @@ jobs:
           docker login -u=P3D-Legacy -p=${{ secrets.TOKEN_GPR }} ghcr.io
           docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest;
           docker stack deploy --prune --resolve-image always --with-registry-auth -c /deploy/next-p3d-legacy-server/docker-compose.yml nextp3dlegacyserver;
-          
-    - uses: sarisia/actions-status-discord@v1
+
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Notify
       if: always()
-      with:
-        webhook: ${{ secrets.WEBHOOK }}
-        nocontext: true
-        title: "Deployment of 'P3D Legacy Server Next'"
-        #description: |
-        #  Version `1.2.3-alpha`
-        #  Click [here](https://github.com/sarisia/actions-status-discord) to download!
-          
-    #- uses: appleboy/discord-action@master
-    #  with:
-    #    webhook_id: ${{ secrets.WEBHOOK_ID }}
-    #    webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
-    #    args: "'P3D Legacy Server Next' has been deployed."
+      env:
+        BUILD_STATUS: ${{ job.status }}
+        WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+      run: bash ./.github/workflows/discord.sh
