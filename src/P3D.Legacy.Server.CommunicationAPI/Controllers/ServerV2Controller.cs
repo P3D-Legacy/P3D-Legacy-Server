@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Application.Queries.Players;
+using P3D.Legacy.Server.CommunicationAPI.Utils;
 using P3D.Legacy.Server.UI.Shared.Models;
 
 using System;
@@ -72,9 +73,9 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
             static IEnumerable<string> Metadata()
             {
                 var assembly = typeof(ServerV2Controller).Assembly;
-                var buildDateTime = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(a => a.Key == "BuildDateTime")?.Value ?? "ERROR";
+                var buildDateTime = assembly.GetCustomAttributes<BuildDateTimeAttribute>().FirstOrDefault()?.DateTime ?? DateTime.MinValue;
 
-                yield return $"Build Date: {buildDateTime}";
+                yield return $"Build Date: {buildDateTime:O}";
                 yield return $"Git Repository: {ThisAssembly.Git.RepositoryUrl}";
                 yield return $"Git Branch: {ThisAssembly.Git.Branch}";
                 yield return $"Git Commit: {ThisAssembly.Git.Commit}";
