@@ -38,6 +38,9 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
             Ok(new StatusResponseV2(await playerQueries.GetAllAsync(ct).Select(x => new StatusResponseV2Player(x.Name, x.GameJoltId)).ToArrayAsync(ct)));
 
         [HttpGet("status/paginated")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(PagingResponse<StatusResponseV2Player>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> GetAllAsync([FromQuery] StatusRequestV2Query query, [FromServices] IPlayerQueries playerQueries, CancellationToken ct)
         {
             var page = query.Page;
@@ -61,6 +64,9 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         }
 
         [HttpGet("metadata")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
         public ActionResult GetMetadata()
         {
             static IEnumerable<string> Metadata()
