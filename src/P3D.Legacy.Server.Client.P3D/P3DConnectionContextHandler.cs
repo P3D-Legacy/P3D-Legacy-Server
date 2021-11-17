@@ -84,7 +84,7 @@ namespace P3D.Legacy.Server.Client.P3D
                     IPEndPoint = ipEndPoint;
                 }
 
-                Connection.Features.Get<IConnectionCompleteFeature>().OnCompleted(async _ =>
+                Connection.Features.Get<IConnectionCompleteFeature>()?.OnCompleted(async _ =>
                 {
                     using var finishSpan = _tracer.StartActiveSpan("P3D Client Closing", parentContext: _connectionSpan.Context);
                     _connectionState = P3DConnectionState.Finalized;

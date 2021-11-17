@@ -15,10 +15,10 @@ namespace P3D.Legacy.Server.Infrastructure.Utils
         public override bool CanConvert(Type objectType) => false;
 
         public override bool CanWrite => false;
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => throw new NotImplementedException();
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) => throw new NotImplementedException();
 
         public override bool CanRead => true;
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             var jo = JObject.Load(reader);
             var targetObj = FormatterServices.GetUninitializedObject(objectType);
@@ -27,7 +27,8 @@ namespace P3D.Legacy.Server.Infrastructure.Utils
             {
                 var att = prop.GetCustomAttribute<JsonPropertyAttribute>(true);
 
-                var jsonPath = (att is not null ? att.PropertyName : prop.Name);
+                var jsonPath = att is not null ? att.PropertyName : prop.Name;
+                if (string.IsNullOrEmpty(jsonPath)) continue;
                 var token = jo.SelectToken(jsonPath);
 
                 if (token is not null && token.Type != JTokenType.Null)

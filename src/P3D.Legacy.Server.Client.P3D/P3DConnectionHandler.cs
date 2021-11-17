@@ -41,7 +41,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 _connections.Add(connectionContextHandler);
 
                 var lifetimeNotificationFeature = connection.Features.Get<IConnectionLifetimeNotificationFeature>();
-                var stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed, lifetimeNotificationFeature.ConnectionClosedRequested);
+                var stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed, lifetimeNotificationFeature?.ConnectionClosedRequested ?? CancellationToken.None);
 
                 var _ = stoppingCts.Token.Register(() =>
                 {
