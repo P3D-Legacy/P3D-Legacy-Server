@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -57,6 +58,26 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
                 Items = models.Select(x => new StatusResponseV2Player(x.Name, x.GameJoltId)),
                 Metadata = metadata
             });
+        }
+
+        [HttpGet("metadata")]
+        public ActionResult GetMetadata()
+        {
+            static IEnumerable<string> Metadata()
+            {
+                var assembly = typeof(ServerV2Controller).Assembly;
+                var buildDateTime = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(a => a.Key == "BuildDateTime")?.Value ?? "ERROR";
+
+                yield return $"Build Date: {buildDateTime}";
+                yield return $"Git Repository: {ThisAssembly.Git.RepositoryUrl}";
+                yield return $"Git Branch: {ThisAssembly.Git.Branch}";
+                yield return $"Git Commit: {ThisAssembly.Git.Commit}";
+                yield return $"Git Sha: {ThisAssembly.Git.Sha}";
+                yield return $"Git BaseTag: {ThisAssembly.Git.BaseTag}";
+                yield return $"Git Tag: {ThisAssembly.Git.Tag}";
+                yield return $"Git Commit Date: {ThisAssembly.Git.CommitDate}";
+            }
+            return Ok(Metadata());
         }
     }
 }

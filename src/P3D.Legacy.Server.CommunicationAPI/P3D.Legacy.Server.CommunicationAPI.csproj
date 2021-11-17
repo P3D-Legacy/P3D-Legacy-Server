@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bedrock.Framework" Version="0.1.62-alpha.g8a965bbcba" />
+    <PackageReference Include="GitInfo" Version="2.2.0" />
     <PackageReference Include="Nerdbank.Streams" Version="2.8.50" />
     <PackageReference Include="OpenTelemetry.Api" Version="1.2.0-beta1" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
@@ -21,5 +22,14 @@
     <ProjectReference Include="..\P3D.Legacy.Server.Application\P3D.Legacy.Server.Application.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.UI.Shared\P3D.Legacy.Server.UI.Shared.csproj" />
   </ItemGroup>
+
+  <Target Name="AddBuildTime" BeforeTargets="CoreGenerateAssemblyInfo">
+    <ItemGroup>
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" >
+        <_Parameter1>BuildDateTime</_Parameter1>
+        <_Parameter2>$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss")</_Parameter2>
+      </AssemblyAttribute>
+    </ItemGroup>
+  </Target>
 
 </Project>
