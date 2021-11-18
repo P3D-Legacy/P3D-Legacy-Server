@@ -1,0 +1,46 @@
+name: Publish OpenAPI
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/deploy-openapi.yml'
+      - 'src/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-publish-docker:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Setup .NET 6
+      uses: actions/setup-dotnet@master
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Build
+      run: dotnet build src/P3D.Legacy.Server.sln
+      shell: pwsh
+
+    - name: Install dotnet-format
+      run: dotnet tool install -g SwashBuckle.AspNetCore.Cli
+      shell: pwsh
+          
+    - name: Generate OpenAPI spec
+      run: dotnet swagger tofile --output ./openapi.json ./src/P3D.Legacy.Server/bin/Debug/net6.0/P3D.Legacy.Server.dll v1
+      shell: pwsh
+      
+     - name: Generate Swagger UI
+       uses: Legion2/swagger-ui-action@v1
+       with:
+         output: swagger-ui
+         spec-file: ./openapi.json
+         
+     - name: Deploy to GitHub Pages
+       uses: peaceiris/actions-gh-pages@v3
+       with:
+         github_token: ${{ secrets.GITHUB_TOKEN }}
+         publish_dir: swagger-ui
