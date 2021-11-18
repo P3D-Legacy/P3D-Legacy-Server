@@ -82,7 +82,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new KickedPacket { Reason = reason }, ct);
 
             var lifetimeNotificationFeature = Connection.Features.Get<IConnectionLifetimeNotificationFeature>();
-            lifetimeNotificationFeature.RequestClose();
+            lifetimeNotificationFeature?.RequestClose();
         }
 
         private async Task SendPacketAsync(P3DPacket packet, CancellationToken ct)

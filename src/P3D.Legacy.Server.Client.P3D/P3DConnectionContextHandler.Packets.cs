@@ -417,7 +417,7 @@ namespace P3D.Legacy.Server.Client.P3D
             }, ct);
 
             var lifetimeNotificationFeature = Connection.Features.Get<IConnectionLifetimeNotificationFeature>();
-            lifetimeNotificationFeature.RequestClose();
+            lifetimeNotificationFeature?.RequestClose();
         }
     }
 }

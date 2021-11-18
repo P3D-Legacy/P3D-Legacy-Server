@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Application.Queries.Players;
+using P3D.Legacy.Server.CommunicationAPI.Utils;
 using P3D.Legacy.Server.UI.Shared.Models;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,6 +39,9 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
             Ok(new StatusResponseV2(await playerQueries.GetAllAsync(ct).Select(x => new StatusResponseV2Player(x.Name, x.GameJoltId)).ToArrayAsync(ct)));
 
         [HttpGet("status/paginated")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(PagingResponse<StatusResponseV2Player>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> GetAllAsync([FromQuery] StatusRequestV2Query query, [FromServices] IPlayerQueries playerQueries, CancellationToken ct)
         {
             var page = query.Page;
@@ -57,6 +62,29 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
                 Items = models.Select(x => new StatusResponseV2Player(x.Name, x.GameJoltId)),
                 Metadata = metadata
             });
+        }
+
+        [HttpGet("metadata")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
+        public ActionResult GetMetadata()
+        {
+            static IEnumerable<string> Metadata()
+            {
+                var assembly = typeof(ServerV2Controller).Assembly;
+                var buildDateTime = assembly.GetCustomAttributes<BuildDateTimeAttribute>().FirstOrDefault()?.DateTime ?? DateTime.MinValue;
+
+                yield return $"Build Date: {buildDateTime:O}";
+                yield return $"Git Repository: {ThisAssembly.Git.RepositoryUrl}";
+                yield return $"Git Branch: {ThisAssembly.Git.Branch}";
+                yield return $"Git Commit: {ThisAssembly.Git.Commit}";
+                yield return $"Git Sha: {ThisAssembly.Git.Sha}";
+                yield return $"Git BaseTag: {ThisAssembly.Git.BaseTag}";
+                yield return $"Git Tag: {ThisAssembly.Git.Tag}";
+                yield return $"Git Commit Date: {ThisAssembly.Git.CommitDate}";
+            }
+            return Ok(Metadata());
         }
     }
 }

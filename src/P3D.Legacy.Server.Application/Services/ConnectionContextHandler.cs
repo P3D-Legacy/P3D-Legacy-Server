@@ -20,7 +20,7 @@ namespace P3D.Legacy.Server.Application.Services
             Connection = connectionContext;
 
             var lifetimeNotificationFeature = Connection.Features.Get<IConnectionLifetimeNotificationFeature>();
-            _stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(Connection.ConnectionClosed, lifetimeNotificationFeature.ConnectionClosedRequested);
+            _stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(Connection.ConnectionClosed, lifetimeNotificationFeature?.ConnectionClosedRequested ?? CancellationToken.None);
             _executingTask = OnCreatedAsync(_stoppingCts.Token);
 
             return Task.FromResult(this);

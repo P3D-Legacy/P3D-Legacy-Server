@@ -18,10 +18,6 @@ COPY ["src/P3D.Legacy.Server/P3D.Legacy.Server.csproj", "src/P3D.Legacy.Server/"
 
 RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj"
 
-COPY [".git/HEAD", ".git/HEAD"]
-COPY [".git/config", ".git/config"]
-COPY [".git/refs/heads/master", ".git/refs/heads/master"]
-
 COPY ["src/P3D.Legacy.Common/", "src/P3D.Legacy.Common/"]
 COPY ["src/P3D.Legacy.Server.Abstractions/", "src/P3D.Legacy.Server.Abstractions/"]
 COPY ["src/P3D.Legacy.Server.Application/", "src/P3D.Legacy.Server.Application/"]
@@ -34,6 +30,8 @@ COPY ["src/P3D.Legacy.Server.InternalAPI/", "src/P3D.Legacy.Server.InternalAPI/"
 COPY ["src/P3D.Legacy.Server.Statistics/", "src/P3D.Legacy.Server.Statistics/"]
 COPY ["src/P3D.Legacy.Server.UI.Shared/", "src/P3D.Legacy.Server.UI.Shared/"]
 COPY ["src/P3D.Legacy.Server/", "src/P3D.Legacy.Server/"]
+
+COPY [".git", ".git"]
 
 RUN /bin/bash -c 'set -ex && \
     ARCH=`uname -m` && \

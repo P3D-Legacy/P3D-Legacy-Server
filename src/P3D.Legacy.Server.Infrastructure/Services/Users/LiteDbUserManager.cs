@@ -69,7 +69,11 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             var validationResult = await ValidateAsync(password, ct);
 
             ct.ThrowIfCancellationRequested();
-            if (!isSha512) password = BitConverter.ToString(new SHA512Managed().ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower() + "A!";
+            if (!isSha512)
+            {
+                using var sha512 = SHA512.Create();
+                password = BitConverter.ToString(sha512.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower() + "A!";
+            }
             var pwHash = GetPasswordHash(password);
             var user = new User(playerId.ToString(), name, pwHash);
 
@@ -151,7 +155,11 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             var entry = await collection.FindByIdAsync(idStr);
 
             ct.ThrowIfCancellationRequested();
-            if (!isSha512) password = BitConverter.ToString(new SHA512Managed().ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower() + "A!";
+            if (!isSha512)
+            {
+                using var sha512 = SHA512.Create();
+                password = BitConverter.ToString(sha512.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower() + "A!";
+            }
             var result = VerifyPassword(entry.PasswordHash, password);
 
             if (!result)
