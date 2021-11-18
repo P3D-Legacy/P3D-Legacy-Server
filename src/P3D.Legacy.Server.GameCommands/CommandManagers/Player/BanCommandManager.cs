@@ -50,7 +50,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                     reason = string.Empty;
 
                 await Mediator.Send(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
-                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
+                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
             }
             else if (arguments.Length > 3)
             {
@@ -79,7 +79,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                     reason = string.Empty;
 
                 await Mediator.Send(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
-                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), ct);
+                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);

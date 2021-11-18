@@ -16,7 +16,7 @@ namespace P3D.Legacy.Server
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            var appName = Assembly.GetEntryAssembly()?.GetName().Name ?? "ERROR";
+            var appName = typeof(Startup).Assembly.GetName().Name ?? "ERROR";
 
             services.AddControllers().AddControllersAsServices().AddJsonOptions(options =>
             {
