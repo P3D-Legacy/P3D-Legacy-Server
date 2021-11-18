@@ -26,12 +26,12 @@ jobs:
 
       shell: pwsh
 
-    - name: Install dotnet-format
+    - name: Install SwashBuckle.AspNetCore.Cli
       run: dotnet tool install -g SwashBuckle.AspNetCore.Cli
       shell: pwsh
           
     - name: Generate OpenAPI spec
-      run: dotnet swagger tofile --output ./openapi.json ./src/P3D.Legacy.Server/bin/Debug/net6.0/P3D.Legacy.Server.dll v1
+      run: swagger tofile --output ./openapi.json ./src/P3D.Legacy.Server/bin/Debug/net6.0/P3D.Legacy.Server.dll v1
       shell: pwsh
       
     - name: Generate Swagger UI
