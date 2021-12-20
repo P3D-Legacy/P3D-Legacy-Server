@@ -13,7 +13,7 @@
     <PackageReference Include="Bedrock.Framework" Version="0.1.62-alpha.g8a965bbcba" />
     <PackageReference Include="GitInfo" Version="2.2.0" />
     <PackageReference Include="Nerdbank.Streams" Version="2.8.54" />
-    <PackageReference Include="OpenTelemetry.Api" Version="1.2.0-beta1" />
+    <PackageReference Include="OpenTelemetry.Api" Version="1.2.0-rc1" />
     <PackageReference Include="System.Linq.Async" Version="5.1.0" />
     <PackageReference Include="Wivuu.JsonPolymorphism" Version="1.0.7" />
   </ItemGroup>
