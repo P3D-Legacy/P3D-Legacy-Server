@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="BetterHostedServices" Version="2.0.3" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="3.0.0" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="3.4.1" />
     <PackageReference Include="FluentValidation" Version="10.3.6" />
     <PackageReference Include="OpenTelemetry.Api" Version="1.2.0-beta1" />
   </ItemGroup>
