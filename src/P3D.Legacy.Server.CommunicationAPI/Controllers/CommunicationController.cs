@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -59,7 +60,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
             }
             else
             {
-                HttpContext.Response.StatusCode = 400;
+                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             }
         }
     }

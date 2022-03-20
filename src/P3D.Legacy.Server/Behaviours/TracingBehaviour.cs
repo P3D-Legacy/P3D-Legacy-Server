@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Behaviours
 {
-    internal class TracingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+    internal class TracingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
         private readonly Tracer _tracer;
 

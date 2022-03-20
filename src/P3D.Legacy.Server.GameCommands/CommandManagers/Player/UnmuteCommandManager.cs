@@ -1,8 +1,5 @@
-﻿using MediatR;
-
-using P3D.Legacy.Server.Abstractions;
+﻿using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.Player;
-using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Collections.Generic;
@@ -37,7 +34,9 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                     return;
                 }
 
-                await Mediator.Send(new PlayerMutedPlayerCommand(player.Id, targetPlayer.Id), ct);
+                var result = await Mediator.Send(new PlayerUnmutedPlayerCommand(player.Id, targetPlayer.Id), ct);
+                if (!result.Success)
+                    await SendMessageAsync(player, $"Failed to unmute player {targetName}!", ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);

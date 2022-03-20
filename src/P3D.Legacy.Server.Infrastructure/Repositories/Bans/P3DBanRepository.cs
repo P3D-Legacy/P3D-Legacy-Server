@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Infrastructure.Models.Bans;
 using P3D.Legacy.Server.Infrastructure.Models.P3D;
 using P3D.Legacy.Server.Infrastructure.Utils;
@@ -17,6 +17,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,14 +29,14 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly DefaultJsonSerializer _defaultJsonSerializer;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
 
-        public P3DBanRepository(ILogger<P3DBanRepository> logger, TracerProvider traceProvider, IHttpClientFactory httpClientFactory, DefaultJsonSerializer defaultJsonSerializer)
+        public P3DBanRepository(ILogger<P3DBanRepository> logger, TracerProvider traceProvider, IHttpClientFactory httpClientFactory, IOptionsMonitor<JsonSerializerOptions> jsonSerializerOptions)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Infrastructure");
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
-            _defaultJsonSerializer = defaultJsonSerializer ?? throw new ArgumentNullException(nameof(defaultJsonSerializer));
+            _jsonSerializerOptions = jsonSerializerOptions.Get("P3D") ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
         }
 
         public async Task<BanEntity?> GetAsync(PlayerId id, CancellationToken ct)
@@ -119,11 +120,11 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             try
             {
                 response = await _httpClientFactory.CreateClient("P3D.API").PostAsJsonAsync(
-                    $"ban/gamejoltaccount/{id.Id}",
-                    ulong.TryParse(reason, out var reasonInt)
-                        ? (object) new BanRequest(GameJoltId.Parse(id.Id), reasonInt, expiration, GameJoltId.Parse(bannerId.Id))
+                    $"ban/gamejoltaccount",
+                    string.IsNullOrEmpty(reason)
+                        ? (object) new BanRequest(GameJoltId.Parse(id.Id), reasonId, expiration, GameJoltId.Parse(bannerId.Id))
                         : (object) new TextReasonBanRequest(GameJoltId.Parse(id.Id), reason, expiration, GameJoltId.Parse(bannerId.Id)),
-                    _defaultJsonSerializer.Options,
+                    _jsonSerializerOptions,
                     ct);
             }
             catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
@@ -243,14 +244,14 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
         private sealed record BanRequest(
             [property: JsonPropertyName("gamejoltaccount_id")] ulong GameJoltId,
             [property: JsonPropertyName("reason_id")] ulong ReasonId,
-            [property: JsonPropertyName("expires_at")] DateTimeOffset? ExpiresAt,
+            [property: JsonPropertyName("expire_at")] DateTimeOffset? ExpiresAt,
             [property: JsonPropertyName("banned_by_gamejoltaccount_id")] ulong BannedByGameJoltId
         );
 
         private sealed record TextReasonBanRequest(
             [property: JsonPropertyName("gamejoltaccount_id")] ulong GameJoltId,
             [property: JsonPropertyName("reason")] string Reason,
-            [property: JsonPropertyName("expires_at")] DateTimeOffset? ExpiresAt,
+            [property: JsonPropertyName("expire_at")] DateTimeOffset? ExpiresAt,
             [property: JsonPropertyName("banned_by_gamejoltaccount_id")] ulong BannedByGameJoltId
         );
     }

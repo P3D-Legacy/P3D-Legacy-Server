@@ -1,8 +1,5 @@
-﻿using MediatR;
-
-using P3D.Legacy.Server.Abstractions;
+﻿using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.Administration;
-using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Collections.Generic;
@@ -56,7 +53,9 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                 }
 
                 var reason = string.Join(" ", arguments.Skip(1).ToArray());
-                await Mediator.Send(new KickPlayerCommand(targetPlayer, reason), ct);
+                var result = await Mediator.Send(new KickPlayerCommand(targetPlayer, reason), ct);
+                if (!result.Success)
+                    await SendMessageAsync(player, $"Failed to kick player {targetName}!", ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);

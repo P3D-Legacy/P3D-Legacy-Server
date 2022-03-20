@@ -1,8 +1,5 @@
-﻿using MediatR;
-
-using P3D.Legacy.Server.Abstractions;
+﻿using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.Administration;
-using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Collections.Generic;
@@ -49,8 +46,11 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                 if (ulong.TryParse(reason, out var reasonId))
                     reason = string.Empty;
 
-                await Mediator.Send(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
-                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
+                var result = await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
+                if (result.Success)
+                    await Mediator.Send(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
+                else
+                    await SendMessageAsync(player, $"Failed to ban player {targetName}!", ct);
             }
             else if (arguments.Length > 3)
             {
@@ -78,8 +78,11 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                 if (ulong.TryParse(reason, out var reasonId))
                     reason = string.Empty;
 
-                await Mediator.Send(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
-                await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
+                var result = await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
+                if (result.Success)
+                    await Mediator.Send(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
+                else
+                    await SendMessageAsync(player, $"Failed to ban player {targetName}!", ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);

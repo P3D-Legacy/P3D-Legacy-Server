@@ -12,6 +12,8 @@ using P3D.Legacy.Server.Infrastructure.Services.Mutes;
 using P3D.Legacy.Server.Infrastructure.Services.Permissions;
 using P3D.Legacy.Server.Infrastructure.Services.Users;
 
+using System.Text.Json;
+
 namespace P3D.Legacy.Server.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
@@ -22,10 +24,9 @@ namespace P3D.Legacy.Server.Infrastructure.Extensions
         }
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddOptions<JsonSerializerOptions>();
             services.AddOptions<PasswordOptions>();
             services.AddOptions<LockoutOptions>();
-
-            services.AddSingleton<DefaultJsonSerializer>();
 
             services.AddHttpClient();
 

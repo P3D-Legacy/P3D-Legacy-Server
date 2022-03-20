@@ -4,26 +4,45 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
+using P3D.Legacy.Server.Abstractions.Utils;
+
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Unicode;
 
 namespace P3D.Legacy.Server
 {
     public class Startup
     {
+        private static JsonSerializerOptions ConfigureSite(JsonSerializerOptions opt)
+        {
+            opt.Converters.Add(new DateTimeOffsetSerializer());
+            opt.Converters.Add(new DateTimeOffsetNullableSerializer());
+            return Configure(opt);
+        }
+        private static JsonSerializerOptions Configure(JsonSerializerOptions opt)
+        {
+            opt.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            opt.PropertyNameCaseInsensitive = true;
+            opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+            opt.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            opt.Converters.Add(new DateTimeOffsetSerializer());
+            opt.Converters.Add(new DateTimeOffsetNullableSerializer());
+            return opt;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<JsonSerializerOptions>(options => Configure(options));
+            services.Configure<JsonSerializerOptions>("P3D", options => ConfigureSite(options));
+
             var appName = typeof(Startup).Assembly.GetName().Name ?? "ERROR";
 
-            services.AddControllers().AddControllersAsServices().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-            });
+            services.AddControllers().AddControllersAsServices().AddJsonOptions(options => Configure(options.JsonSerializerOptions));
 
             services.AddRouting(options =>
             {

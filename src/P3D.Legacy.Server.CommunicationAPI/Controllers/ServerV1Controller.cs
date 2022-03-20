@@ -27,6 +27,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         }
 
         [HttpGet("status")]
+        [Produces("application/json")]
         [ProducesResponseType(typeof(StatusResponseV1), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> GetStatusAsync([FromServices] IPlayerQueries playerQueries, CancellationToken ct) =>

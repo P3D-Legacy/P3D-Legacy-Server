@@ -1,8 +1,5 @@
-﻿using MediatR;
-
-using P3D.Legacy.Server.Abstractions;
+﻿using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
-using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Collections.Generic;

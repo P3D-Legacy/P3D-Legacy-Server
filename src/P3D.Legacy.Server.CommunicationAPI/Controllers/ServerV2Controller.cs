@@ -57,7 +57,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
                 TotalPages = (int) Math.Ceiling((double) count / (double) pageSize),
             };
 
-            return StatusCode((int) HttpStatusCode.OK, new PagingResponse<StatusResponseV2Player>
+            return StatusCode(StatusCodes.Status200OK, new PagingResponse<StatusResponseV2Player>
             {
                 Items = models.Select(x => new StatusResponseV2Player(x.Name, x.GameJoltId)),
                 Metadata = metadata
