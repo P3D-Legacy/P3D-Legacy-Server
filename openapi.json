@@ -88,17 +88,7 @@
           "200": {
             "description": "Success",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/StatusResponseV1"
-                }
-              },
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StatusResponseV1"
-                }
-              },
-              "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StatusResponseV1"
                 }
