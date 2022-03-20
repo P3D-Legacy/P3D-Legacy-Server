@@ -16,7 +16,10 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 {
     public class LiteDbPermissionRepository
     {
-        private record Permission(string Id, PermissionFlags Permissions);
+        private record Permission(string Id, PermissionFlags Permissions)
+        {
+            public Permission() : this(default, default) { }
+        }
 
         private readonly LiteDbOptions _options;
 

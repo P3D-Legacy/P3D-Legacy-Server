@@ -19,7 +19,10 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 {
     public class LiteDbBanRepository
     {
-        private record Ban(string Id, string BannerId, string Ip, ulong ReasonId, string Reason, DateTimeOffset? Expiration);
+        private record Ban(string Id, string BannerId, string Ip, ulong ReasonId, string Reason, DateTimeOffset? Expiration)
+        {
+            public Ban() : this(default, default, default, default, default, default) { }
+        }
 
         private readonly LiteDbOptions _options;
 
