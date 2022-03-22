@@ -29,8 +29,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.World
 
         public async Task<CommandResult> Handle(ChangeWorldTimeCommand request, CancellationToken ct)
         {
+            var oldState = _world.State;
             _world.CurrentTime = request.Time;
-            await _notificationPublisher.Publish(new WorldUpdatedNotification(), ct);
+            await _notificationPublisher.Publish(new WorldUpdatedNotification(_world.State, oldState), ct);
             return new CommandResult(true);
         }
     }

@@ -13,13 +13,20 @@ namespace P3D.Legacy.Server.Statistics.Extensions
     {
         public static IServiceCollection AddStatisticsMediatR(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
         {
-            notificationRegistrar.Add(sp => sp.GetRequiredService<P3DPlayerStateStatisticsHandler>() as INotificationHandler<PlayerUpdatedStateNotification>);
+            notificationRegistrar.Add(sp => sp.GetRequiredService<StatisticsHandler>() as INotificationHandler<PlayerUpdatedStateNotification>);
+            notificationRegistrar.Add(sp => sp.GetRequiredService<StatisticsHandler>() as INotificationHandler<PlayerTriggeredEventNotification>);
+            notificationRegistrar.Add(sp => sp.GetRequiredService<StatisticsHandler>() as INotificationHandler<PlayerSentGlobalMessageNotification>);
+            notificationRegistrar.Add(sp => sp.GetRequiredService<StatisticsHandler>() as INotificationHandler<PlayerSentLocalMessageNotification>);
+            notificationRegistrar.Add(sp => sp.GetRequiredService<StatisticsHandler>() as INotificationHandler<PlayerSentPrivateMessageNotification>);
+            notificationRegistrar.Add(sp => sp.GetRequiredService<StatisticsHandler>() as INotificationHandler<PlayerSentCommandNotification>);
+            notificationRegistrar.Add(sp => sp.GetRequiredService<StatisticsHandler>() as INotificationHandler<PlayerJoinedNotification>);
+            notificationRegistrar.Add(sp => sp.GetRequiredService<StatisticsHandler>() as INotificationHandler<PlayerLeftNotification>);
 
             return services;
         }
         public static IServiceCollection AddStatistics(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient<P3DPlayerStateStatisticsHandler>();
+            services.AddTransient<StatisticsHandler>();
 
             return services;
         }
