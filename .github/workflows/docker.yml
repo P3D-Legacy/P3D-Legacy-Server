@@ -58,7 +58,7 @@ jobs:
       run: echo ${{ steps.docker_build.outputs.digest }}
 
     - name: Trigger Deploy
-      uses: peter-evans/repository-dispatch@v1
+      uses: peter-evans/repository-dispatch@v2
       with:
         token: ${{ secrets.TOKEN_GPR }}
         repository: P3D-Legacy/P3D-Legacy-Server
