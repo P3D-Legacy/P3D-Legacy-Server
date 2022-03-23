@@ -6,7 +6,7 @@ namespace P3D.Legacy.Common
 
     public readonly struct Protocol : IEquatable<Protocol>
     {
-        private static readonly ReadOnlyMemory<char> SequenceV1 = "0.5".AsMemory();
+        private static readonly char[] SequenceV1 = { '0', '.', '5' };
 
         public static implicit operator Protocol(ProtocolEnum value) => new(value);
         public static implicit operator ProtocolEnum(Protocol value) => value._value;
@@ -18,12 +18,7 @@ namespace P3D.Legacy.Common
 
         public Protocol(in ReadOnlySpan<char> protocol)
         {
-            if (protocol.SequenceEqual(SequenceV1.Span))
-                _value = ProtocolEnum.V1;
-            else
-            {
-                _value = ProtocolEnum.Invalid;
-            }
+            _value = protocol.SequenceEqual(SequenceV1) ? ProtocolEnum.V1 : ProtocolEnum.Invalid;
         }
         public Protocol(ProtocolEnum value)
         {
