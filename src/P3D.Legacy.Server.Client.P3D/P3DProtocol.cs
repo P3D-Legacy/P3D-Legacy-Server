@@ -20,10 +20,10 @@ namespace P3D.Legacy.Server.Client.P3D
 
         private readonly ILogger _logger;
         private readonly P3DPacketFactory _packetFactory;
-        private readonly IP3DPacketBuilder _packetBuilder;
+        private readonly IP3DPacketWriter _packetBuilder;
         private readonly SequenceTextReader _sequenceTextReader = new();
 
-        public P3DProtocol(ILogger<P3DProtocol> logger, P3DPacketFactory packetFactory, IP3DPacketBuilder packetBuilder)
+        public P3DProtocol(ILogger<P3DProtocol> logger, P3DPacketFactory packetFactory, IP3DPacketWriter packetBuilder)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _packetFactory = packetFactory ?? throw new ArgumentNullException(nameof(packetFactory));
@@ -57,14 +57,14 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (!P3DPacket.TryParseId(in sequence, ref position, out var id))
             {
-                _logger.LogCritical("Line is not a P3D packet! {Line}", line);
+                _logger.LogCritical("Line is not a P3D packet! Invalid Packet Id! {Line}", line);
                 message = null;
                 return false;
             }
 
             if (_packetFactory.GetFromId(id) is not { } packet)
             {
-                _logger.LogCritical("Line is not a P3D packet! Invalid Packet Id! {Line}", line);
+                _logger.LogCritical("Line is not a P3D packet! Packet Id Out of Range! {Line}", line);
                 message = null;
                 return false;
             }
@@ -84,7 +84,7 @@ namespace P3D.Legacy.Server.Client.P3D
         public void WriteMessage(P3DPacket message, IBufferWriter<byte> output)
         {
             _logger.LogTrace("Sending a message type {Type}", message.GetType());
-            output.Write(_packetBuilder.CreateData(message));
+            _packetBuilder.WriteData(message, output);
         }
 
         public void Dispose()

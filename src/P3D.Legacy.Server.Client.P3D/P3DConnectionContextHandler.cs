@@ -3,7 +3,6 @@
 using MediatR;
 
 using Microsoft.AspNetCore.Connections.Features;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -41,7 +40,6 @@ namespace P3D.Legacy.Server.Client.P3D
         private readonly ServerOptions _serverOptions;
         private readonly IMonsterRepository _monsterRepository;
         private readonly IMuteManager _muteManager;
-        private readonly IMemoryCache _memoryCache;
 
         private TelemetrySpan _connectionSpan = default!;
         private ProtocolWriter _writer = default!;
@@ -57,8 +55,7 @@ namespace P3D.Legacy.Server.Client.P3D
             IMediator mediator,
             NotificationPublisher notificationPublisher,
             IMonsterRepository monsterRepository,
-            IMuteManager muteManager,
-            IMemoryCache memoryCache)
+            IMuteManager muteManager)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Client.P3D");
@@ -70,7 +67,6 @@ namespace P3D.Legacy.Server.Client.P3D
             _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
             _monsterRepository = monsterRepository ?? throw new ArgumentNullException(nameof(monsterRepository));
             _muteManager = muteManager ?? throw new ArgumentNullException(nameof(muteManager));
-            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
         }
 
         protected override async Task OnCreatedAsync(CancellationToken ct)

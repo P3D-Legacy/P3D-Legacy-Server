@@ -14,7 +14,7 @@ using KVP = System.Collections.Generic.KeyValuePair<string, object?>;
 
 namespace P3D.Legacy.Server.Statistics.NotificationHandlers
 {
-    internal sealed class StatisticsHandler :
+    internal sealed class MetricsHandler :
         INotificationHandler<PlayerUpdatedStateNotification>,
         INotificationHandler<PlayerTriggeredEventNotification>,
         INotificationHandler<PlayerSentGlobalMessageNotification>,
@@ -34,7 +34,7 @@ namespace P3D.Legacy.Server.Statistics.NotificationHandlers
         private readonly Counter<long> _queueCounter;
         private readonly Counter<long> _worldCounter;
 
-        public StatisticsHandler(ILogger<StatisticsHandler> logger)
+        public MetricsHandler(ILogger<MetricsHandler> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _meter = new Meter("P3D.Legacy.Server.Statistics");

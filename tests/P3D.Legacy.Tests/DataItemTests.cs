@@ -4,6 +4,7 @@ using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Server.Client.P3D;
 
+using System.Buffers;
 using System.Numerics;
 using System.Text;
 
@@ -56,8 +57,10 @@ namespace P3D.Legacy.Tests
             Assert.AreEqual(idInt, packet.IdInt);
             Assert.AreEqual(position, packet.GetPosition());
 
-            var builder = new DefaultP3DPacketBuilder();
-            Assert.AreEqual("0.5|1|0|6|0|6|7|21|22|27|Aragas115124000000000j151241|1|1\r\n", Encoding.ASCII.GetString(builder.CreateData(packet)));
+            var packetWriter = new DefaultP3DPacketWriter();
+            var writer = new ArrayBufferWriter<byte>();
+            packetWriter.WriteData(packet, writer);
+            Assert.AreEqual("0.5|1|0|6|0|6|7|21|22|27|Aragas115124000000000j151241|1|1\r\n", Encoding.ASCII.GetString(writer.WrittenSpan));
         }
     }
 }

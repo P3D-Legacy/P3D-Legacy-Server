@@ -40,7 +40,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Mutes
             ct.ThrowIfCancellationRequested();
             if (await collection.FindByIdAsync(idStr) is { } entry)
             {
-                foreach (var playerId in entry.MutedIds.Select(PlayerId.Parse))
+                foreach (var playerId in entry.MutedIds.Select(x => PlayerId.Parse(x)))
                 {
                     yield return playerId;
                 }

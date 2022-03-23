@@ -1,11 +1,7 @@
-﻿using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Server.Abstractions.Utils;
-using P3D.Legacy.Server.Client.P3D.Options;
 
 namespace P3D.Legacy.Server.Client.P3D.Extensions
 {
@@ -21,7 +17,7 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
 
             //services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<KestrelServerOptions>, P3DServerOptionsSetup>());
 
-            services.AddSingleton<IP3DPacketBuilder, DefaultP3DPacketBuilder>();
+            services.AddSingleton<IP3DPacketWriter, DefaultP3DPacketWriter>();
             services.AddScoped<P3DConnectionContextHandler>();
             services.AddScoped<P3DProtocol>();
 

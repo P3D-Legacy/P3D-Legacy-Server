@@ -21,7 +21,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
     {
         private record Ban(string Id, string BannerId, string Ip, ulong ReasonId, string Reason, DateTimeOffset? Expiration)
         {
-            public Ban() : this(default, default, default, default, default, default) { }
+            public Ban() : this(default!, default!, default!, default, default!, default) { }
         }
 
         private readonly LiteDbOptions _options;

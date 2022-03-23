@@ -165,14 +165,14 @@ namespace P3D.Legacy.Server.Client.P3D
 
         public async Task Handle(WorldUpdatedNotification notification, CancellationToken ct)
         {
-            var state = notification.State;
+            var (time, season, weather) = notification.State;
             await SendPacketAsync(new WorldDataPacket
             {
                 Origin = Origin.Server,
 
-                Season = state.Season,
-                Weather = state.Weather,
-                CurrentTime = $"{state.Time.Hours:00},{state.Time.Minutes:00},{state.Time.Seconds:00}"
+                Season = season,
+                Weather = weather,
+                CurrentTime = $"{time.Hours:00},{time.Minutes:00},{time.Seconds:00}"
             }, ct);
         }
 
