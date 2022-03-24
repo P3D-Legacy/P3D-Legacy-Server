@@ -4,12 +4,13 @@ using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Application.Queries.Players;
 using P3D.Legacy.Server.CommunicationAPI.Utils;
+using P3D.Legacy.Server.Infrastructure.Services.Statistics;
 using P3D.Legacy.Server.UI.Shared.Models;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,13 +33,6 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         }
 
         [HttpGet("status")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(StatusResponseV2), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetStatusAsync([FromServices] IPlayerQueries playerQueries, CancellationToken ct) =>
-            Ok(new StatusResponseV2(await playerQueries.GetAllAsync(ct).Select(x => new StatusResponseV2Player(x.Name, x.GameJoltId)).ToArrayAsync(ct)));
-
-        [HttpGet("status/paginated")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(PagingResponse<StatusResponseV2Player>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
@@ -72,10 +66,12 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         {
             static IEnumerable<string> Metadata()
             {
-                var assembly = typeof(ServerV2Controller).Assembly;
-                var buildDateTime = assembly.GetCustomAttributes<BuildDateTimeAttribute>().FirstOrDefault()?.DateTime ?? DateTime.MinValue;
+                var assembly = Assembly.GetEntryAssembly();
+                var buildDateTime = assembly?.GetCustomAttributes<BuildDateTimeAttribute>().FirstOrDefault()?.DateTime ?? DateTime.MinValue;
 
-                yield return $"Build Date: {buildDateTime:O}";
+                yield return $"Binary Build Date: {buildDateTime:O}";
+                yield return $"Binary Name: {assembly?.GetName().Name}";
+                yield return $"Binary Version: {assembly?.GetName().Version}";
                 yield return $"Git Repository: {ThisAssembly.Git.RepositoryUrl}";
                 yield return $"Git Branch: {ThisAssembly.Git.Branch}";
                 yield return $"Git Commit: {ThisAssembly.Git.Commit}";
@@ -85,6 +81,34 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
                 yield return $"Git Commit Date: {ThisAssembly.Git.CommitDate}";
             }
             return Ok(Metadata());
+        }
+
+        [HttpGet("statistics/server")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetServerStatisticsAsync([FromServices] IPlayerQueries playerQueries, CancellationToken ct)
+        {
+            var process = Process.GetCurrentProcess();
+            var (onlineCount, _) = await playerQueries.GetAllAsync(0, 0, ct);
+
+            return Ok(new
+            {
+                Uptime = DateTime.UtcNow - process.StartTime.ToUniversalTime(),
+                Online = onlineCount,
+            });
+        }
+
+        [HttpGet("statistics/player")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> GetPlayerStatisticsAsync([FromServices] IStatisticsManager statisticsManager, CancellationToken ct)
+        {
+            return Ok(new
+            {
+                Unique = await statisticsManager.GetAllAsync("player_joined", ct).CountAsync(ct)
+            });
         }
     }
 }
