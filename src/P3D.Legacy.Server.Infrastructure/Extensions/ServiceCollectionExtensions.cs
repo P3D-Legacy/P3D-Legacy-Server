@@ -1,15 +1,16 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
 using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
 using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
+using P3D.Legacy.Server.Infrastructure.Repositories.Statistics;
 using P3D.Legacy.Server.Infrastructure.Services.Bans;
 using P3D.Legacy.Server.Infrastructure.Services.Mutes;
 using P3D.Legacy.Server.Infrastructure.Services.Permissions;
+using P3D.Legacy.Server.Infrastructure.Services.Statistics;
 using P3D.Legacy.Server.Infrastructure.Services.Users;
 
 using System.Text.Json;
@@ -45,6 +46,9 @@ namespace P3D.Legacy.Server.Infrastructure.Extensions
             services.AddTransient<IMonsterRepository, MonsterRepository>();
             services.AddTransient<PokeAPIMonsterRepository>();
             services.AddTransient<NopMonsterRepository>();
+
+            services.AddTransient<IStatisticsManager, DefaultStatisticsManager>();
+            services.AddTransient<LiteDbStatisticsRepository>();
 
             return services;
         }
