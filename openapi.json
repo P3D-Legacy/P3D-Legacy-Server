@@ -106,28 +106,6 @@
         "tags": [
           "ServerV2"
         ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StatusResponseV2"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server Error"
-          }
-        }
-      }
-    },
-    "/api/v2/server/status/paginated": {
-      "get": {
-        "tags": [
-          "ServerV2"
-        ],
         "parameters": [
           {
             "name": "Page",
@@ -164,6 +142,56 @@
       }
     },
     "/api/v2/server/metadata": {
+      "get": {
+        "tags": [
+          "ServerV2"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/v2/server/statistics/server": {
+      "get": {
+        "tags": [
+          "ServerV2"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/v2/server/statistics/player": {
       "get": {
         "tags": [
           "ServerV2"
@@ -295,18 +323,6 @@
           },
           "gameJoltId": {
             "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "StatusResponseV2": {
-        "type": "object",
-        "properties": {
-          "players": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/StatusResponseV2Player"
-            }
           }
         },
         "additionalProperties": false
