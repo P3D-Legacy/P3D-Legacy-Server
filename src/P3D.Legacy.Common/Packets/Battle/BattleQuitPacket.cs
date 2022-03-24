@@ -2,7 +2,8 @@
 {
     public sealed partial record BattleQuitPacket() : P3DPacket(P3DPacketType.BattleQuit)
     {
-        public Origin DestinationPlayerOrigin { get => DataItemStorage.GetOrigin(0); init => DataItemStorage.Set(0, value); }
+        [P3DPacketDataItem(0, DataItemType.Origin)]
+        public Origin DestinationPlayerOrigin { get; set; }
 
         public void Deconstruct(out Origin destinationPlayerOrigin)
         {

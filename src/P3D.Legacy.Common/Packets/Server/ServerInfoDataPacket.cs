@@ -4,10 +4,15 @@ namespace P3D.Legacy.Common.Packets.Server
 {
     public sealed partial record ServerInfoDataPacket() : P3DPacket(P3DPacketType.ServerInfoData)
     {
-        public int CurrentPlayers { get => DataItemStorage.GetInt32(0); init => DataItemStorage.Set(0, value); }
-        public int MaxPlayers { get => DataItemStorage.GetInt32(1); init => DataItemStorage.Set(1, value); }
-        public string ServerName { get => DataItemStorage.Get(2); init => DataItemStorage.Set(2, value); }
-        public string ServerMessage { get => DataItemStorage.Get(3); init => DataItemStorage.Set(3, value); }
+        [P3DPacketDataItem(0, DataItemType.Int32)]
+        public int CurrentPlayers { get; set; }
+        [P3DPacketDataItem(1, DataItemType.Int32)]
+        public int MaxPlayers { get; set; }
+        [P3DPacketDataItem(2, DataItemType.String)]
+        public string ServerName { get; set; }
+        [P3DPacketDataItem(3, DataItemType.String)]
+        public string ServerMessage { get; set; }
+        [P3DPacketDataItem(4, DataItemType.StringArray)]
         public string[] PlayerNames
         {
             get => DataItemStorage.Skip(4).ToArray();

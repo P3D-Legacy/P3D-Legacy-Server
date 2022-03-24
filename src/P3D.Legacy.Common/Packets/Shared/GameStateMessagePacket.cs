@@ -2,7 +2,8 @@
 {
     public sealed partial record GameStateMessagePacket() : P3DPacket(P3DPacketType.GameStateMessage)
     {
-        public string EventMessage { get => DataItemStorage.Get(0); init => DataItemStorage.Set(0, value); }
+        [P3DPacketDataItem(0, DataItemType.String)]
+        public string EventMessage { get; set; }
 
         public void Deconstruct(out string eventMessage)
         {

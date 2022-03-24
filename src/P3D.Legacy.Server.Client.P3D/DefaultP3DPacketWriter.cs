@@ -22,32 +22,35 @@ namespace P3D.Legacy.Server.Client.P3D
             writer.Write(Separator);
             writer.Write(packet.Origin.ToString(), encoder);
 
+            packet.WriteDataItems(writer);
+
+            /*
             if (packet.DataItemStorage.Count == 0)
             {
                 writer.Write(Separator2);
-                writer.Write(Newline);
-                return;
             }
-
-            writer.Write(Separator);
-            writer.Write(packet.DataItemStorage.Count, encoder);
-            writer.Write(Separator2);
-
-            for (int i = 0, pos = 0; i < packet.DataItemStorage.Count - 1; i++)
+            else
             {
-                // We skip writing 0, it's obvious. Start with the second item
-                pos += packet.DataItemStorage.Get(i).Length;
-                writer.Write(pos, encoder);
                 writer.Write(Separator);
-            }
+                writer.Write(packet.DataItemStorage.Count, encoder);
+                writer.Write(Separator2);
 
-            foreach (var dataItem in packet.DataItemStorage)
-            {
-                writer.Write(dataItem, encoder);
+                for (int i = 0, pos = 0; i < packet.DataItemStorage.Count - 1; i++)
+                {
+                    // We skip writing 0, it's obvious. Start with the second item
+                    pos += packet.DataItemStorage.Get(i).Length;
+                    writer.Write(pos, encoder);
+                    writer.Write(Separator);
+                }
+
+                foreach (var dataItem in packet.DataItemStorage)
+                {
+                    writer.Write(dataItem, encoder);
+                }
             }
+            */
 
             writer.Write(Newline);
-            return;
         }
     }
 }

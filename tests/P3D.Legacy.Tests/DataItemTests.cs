@@ -10,21 +10,27 @@ using System.Text;
 
 namespace P3D.Legacy.Tests
 {
+    internal sealed partial record Container() : P3DPacket(P3DPacketType.NotUsed)
+    {
+        [P3DPacketDataItem(0, DataItemType.String)]
+        public string Name { get; set; }
+        [P3DPacketDataItem(1, DataItemType.Bool)]
+        public bool IsCorrect { get; set; }
+        [P3DPacketDataItem(2, DataItemType.UInt64)]
+        public ulong IdLong { get; set; }
+        [P3DPacketDataItem(3, DataItemType.Char)]
+        public char Char { get; set; }
+        [P3DPacketDataItem(4, DataItemType.Int32)]
+        public int IdInt { get; set; }
+        [P3DPacketDataItem(5, DataItemType.String)]
+        private string Position { get => DataItemStorage.Get(5); set => DataItemStorage.Set(5, value); }
+
+        public Vector3 GetPosition() => Vector3Extensions.FromP3DString(Position, '.');
+        public void SetPosition(Vector3 position) => Position = position.ToP3DString('.');
+    }
+
     public class DataItemTests
     {
-        private sealed record Container() : P3DPacket(P3DPacketType.NotUsed)
-        {
-            public string Name { get => DataItemStorage.Get(0); set => DataItemStorage.Set(0, value); }
-            public bool IsCorrect { get => DataItemStorage.GetBool(1); set => DataItemStorage.Set(1, value); }
-            public ulong IdLong { get => DataItemStorage.GetUInt64(2); set => DataItemStorage.Set(2, value); }
-            public char Char { get => DataItemStorage.GetChar(3); set => DataItemStorage.Set(3, value); }
-            public int IdInt { get => DataItemStorage.GetInt32(4); set => DataItemStorage.Set(4, value); }
-
-            private string Position { get => DataItemStorage.Get(5); set => DataItemStorage.Set(5, value); }
-            public Vector3 GetPosition() => Vector3Extensions.FromP3DString(Position, '.');
-            public void SetPosition(Vector3 position) => Position = position.ToP3DString('.');
-        }
-
         [SetUp]
         public void Setup()
         {

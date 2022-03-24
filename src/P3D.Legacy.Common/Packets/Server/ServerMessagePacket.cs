@@ -2,7 +2,8 @@
 {
     public sealed partial record ServerMessagePacket() : P3DPacket(P3DPacketType.ServerMessage)
     {
-        public string Message { get => DataItemStorage.Get(0); init => DataItemStorage.Set(0, value); }
+        [P3DPacketDataItem(0, DataItemType.String)]
+        public string Message { get; set; }
 
         public void Deconstruct(out string message)
         {

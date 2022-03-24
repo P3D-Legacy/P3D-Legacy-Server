@@ -4,8 +4,10 @@ namespace P3D.Legacy.Common.Packets.Battle
 {
     public sealed partial record BattleOfferPacket() : P3DPacket(P3DPacketType.BattleOffer)
     {
-        public Origin DestinationPlayerOrigin { get => DataItemStorage.GetOrigin(0); init => DataItemStorage.Set(0, value); }
-        public BattleOfferData BattleData { get => new(DataItemStorage.Get(1)); init => DataItemStorage.Set(1, value.ToP3DString()); }
+        [P3DPacketDataItem(0, DataItemType.Origin)]
+        public Origin DestinationPlayerOrigin { get; set; }
+        [P3DPacketDataItem(1, DataItemType.P3DData)]
+        public BattleOfferData BattleData { get; set; }
 
         public void Deconstruct(out Origin destinationPlayerOrigin, out BattleOfferData battleData)
         {

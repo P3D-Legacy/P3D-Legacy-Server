@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 
 namespace P3D.Legacy.Common.Packets
 {
@@ -10,16 +11,27 @@ namespace P3D.Legacy.Common.Packets
         Int32,
         Bool,
         Char,
+        P3DData,
         String,
+        StringArray,
+        Vector3,
     }
     public sealed class P3DPacketDataItemAttribute : Attribute
     {
-        public int Position { get; set; }
+        public Range Position { get; set; }
         public DataItemType DataItemType { get; set; }
 
         public P3DPacketDataItemAttribute(int position, DataItemType dataItemType)
         {
-            Position = position;
+            Position = Range.StartAt(0);
+            DataItemType = dataItemType;
+        }
+        public P3DPacketDataItemAttribute(int start, int end, DataItemType dataItemType)
+        {
+            if (dataItemType != DataItemType.StringArray)
+                throw new ArgumentException("Invalid type!", nameof(dataItemType));
+
+            Position = new Range(start, end);
             DataItemType = dataItemType;
         }
     }
@@ -32,5 +44,7 @@ namespace P3D.Legacy.Common.Packets
         public P3DPacketType Id => _rawPacketData.Id;
         public Origin Origin { get => _rawPacketData.Origin; set => _rawPacketData = _rawPacketData with { Origin = value }; }
         public DataItemStorage DataItemStorage { get => _rawPacketData.DataItems; private set => _rawPacketData = _rawPacketData with { DataItems = value }; }
+
+        public abstract void WriteDataItems(IBufferWriter<byte> writer);
     }
 }

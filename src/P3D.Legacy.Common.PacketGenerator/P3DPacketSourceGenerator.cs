@@ -9,6 +9,20 @@ using System.Text;
 
 namespace P3D.Legacy.Common.PacketGenerator
 {
+    public enum DataItemType
+    {
+        Origin,
+        Int64,
+        UInt64,
+        Int32,
+        Bool,
+        Char,
+        P3DData,
+        String,
+        StringArray,
+        Vector3,
+    }
+
     [Generator]
     public class P3DPacketSourceGenerator : ISourceGenerator
     {
@@ -37,6 +51,27 @@ namespace P3D.Legacy.Common.PacketGenerator
 
         public void Execute(GeneratorExecutionContext context)
         {
+            static IEnumerable<(int Index, string PropertyName, DataItemType Type)> GetValid(IEnumerable<PropertyDeclarationSyntax> enumerable)
+            {
+                foreach (var property in enumerable)
+                {
+                    var attribute = property.AttributeLists.SelectMany(a => a.Attributes).FirstOrDefault(a => a.Name.ToString() is "P3DPacketDataItem" or "P3DPacketDataItemAttribute");
+                    if (attribute is null)
+                        continue;
+
+                    if (attribute.ArgumentList is not { Arguments: { Count: 2 } args })
+                        continue;
+
+                    if (args[0].Expression is not LiteralExpressionSyntax { Token.Value: int index } || args[1].Expression is not MemberAccessExpressionSyntax arg2)
+                        continue;
+
+                    if (!Enum.TryParse<DataItemType>(arg2.Name.Identifier.ToString(), out var dataItemType))
+                        continue;
+
+                    yield return (index, property.Identifier.ToString(), dataItemType);
+                }
+            }
+
             var syntaxReceiver = (P3DPacketFinder?) context.SyntaxReceiver;
             foreach (var packet in syntaxReceiver?.P3DPackets ?? Enumerable.Empty<RecordDeclarationSyntax>())
             {
@@ -47,16 +82,84 @@ namespace P3D.Legacy.Common.PacketGenerator
                     @namespace = nds.Name.ToString();
                 }
 
-                var members = packet.Members.Where(m => m.AttributeLists.SelectMany(a => a.Attributes).Any(a => a.Name.ToString() == "P3DPacketDataItemAttribute"))
+                var members = GetValid(packet.Members.OfType<PropertyDeclarationSyntax>()).OrderBy(x => x.Index).ToList();
+
+                static string BuildForProperty((int Index, string PropertyName, DataItemType Type) kvp) => kvp.Type switch
+                {
+                    DataItemType.Origin  => $"encoder.Convert(((long) {kvp.PropertyName}).ToString(), writer, false, out _, out _);",
+                    DataItemType.Int64   => $"encoder.Convert({kvp.PropertyName}.ToString(), writer, false, out _, out _);",
+                    DataItemType.UInt64  => $"encoder.Convert({kvp.PropertyName}.ToString(), writer, false, out _, out _);",
+                    DataItemType.Int32   => $"encoder.Convert({kvp.PropertyName}.ToString(), writer, false, out _, out _);",
+                    DataItemType.Bool    => $"encoder.Convert(({kvp.PropertyName} ? 1 : 0).ToString(), writer, false, out _, out _);",
+                    DataItemType.Char    => $"encoder.Convert({kvp.PropertyName}.ToString(), writer, false, out _, out _);",
+                    DataItemType.P3DData => $"encoder.Convert({kvp.PropertyName}.ToP3DString(), writer, false, out _, out _);",
+                    DataItemType.Vector3 => $"encoder.Convert({kvp.PropertyName}.ToP3DString(DecimalSeparator), writer, false, out _, out _);",
+                    DataItemType.String => $"encoder.Convert({kvp.PropertyName}, writer, false, out _, out _);",
+                    DataItemType.StringArray => $@"foreach (var entry in {kvp.PropertyName}) encoder.Convert(entry, writer, false, out _, out _);",
+                    _ => string.Empty
+                };
+                static string BuildForProperty2(IEnumerable<(int Index, string PropertyName, DataItemType Type)> enumerable)
+                {
+
+                }
+
+                /*
+                if (packet.DataItemStorage.Count == 0)
+                {
+                    writer.Write(Separator2);
+                }
+                else
+                {
+                    writer.Write(Separator);
+                    writer.Write(packet.DataItemStorage.Count, encoder);
+                    writer.Write(Separator2);
+
+                    for (int i = 0, pos = 0; i < packet.DataItemStorage.Count - 1; i++)
+                    {
+                        // We skip writing 0, it's obvious. Start with the second item
+                        pos += packet.DataItemStorage.Get(i).Length;
+                        writer.Write(pos, encoder);
+                        writer.Write(Separator);
+                    }
+
+                    foreach (var dataItem in packet.DataItemStorage)
+                    {
+                        writer.Write(dataItem, encoder);
+                    }
+                }
+                */
 
                 var sourceText = SourceText.From($@"
 namespace {@namespace}
 {{
+    using System;
+    using System.Buffers;
+    using System.Text;
+
+    using P3D.Legacy.Common.Extensions;
+
     partial record {packet.Identifier.ValueText}
     {{
-        public void WriteDataItems(IBufferWriter<byte> writer)
+        public override void WriteDataItems(IBufferWriter<byte> writer)
         {{
-            // generated code
+            var encoder = Encoding.ASCII.GetEncoder();
+
+            {(members.Count == 0 ? "writer.Write(Encoding.ASCII.GetBytes(\"|0|\"));" : "")}
+            {(members.Count == 0 ? "return;" : "")}
+
+            writer.Write(Encoding.ASCII.GetBytes(""|""));
+            writer.Write({members.Count}, encoder);
+            writer.Write(Encoding.ASCII.GetBytes(""|0|""));
+
+            for (int i = 0, pos = 0; i < {members.Count} - 1; i++)
+            {{
+                // We skip writing 0, it's obvious. Start with the second item
+                pos += packet.DataItemStorage.Get(i).Length;
+                writer.Write(pos, encoder);
+                writer.Write(Separator);
+            }}
+
+            {string.Join($"{Environment.NewLine}            ", members.Select(BuildForProperty))}
         }}
     }}
 }}
@@ -67,6 +170,13 @@ namespace {@namespace}
 
         public void Initialize(GeneratorInitializationContext context)
         {
+#if DEBUG
+            //if (!Debugger.IsAttached)
+            //{
+            //    Debugger.Launch();
+            //}
+#endif
+
             context.RegisterForSyntaxNotifications(() => new P3DPacketFinder());
         }
     }

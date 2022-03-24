@@ -2,7 +2,8 @@
 {
     public sealed partial record CreatePlayerPacket() : P3DPacket(P3DPacketType.CreatePlayer)
     {
-        public Origin PlayerOrigin { get => DataItemStorage.GetOrigin(0); init => DataItemStorage.Set(0, value); }
+        [P3DPacketDataItem(0, DataItemType.Origin)]
+        public Origin PlayerOrigin { get; set; }
 
         public void Deconstruct(out Origin playerOrigin)
         {
