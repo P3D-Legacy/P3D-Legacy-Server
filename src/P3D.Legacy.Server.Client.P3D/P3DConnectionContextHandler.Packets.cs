@@ -268,56 +268,45 @@ namespace P3D.Legacy.Server.Client.P3D
             await _notificationPublisher.Publish(new ServerMessageNotification($"The player {Name} {packet.EventMessage}"), ct);
         }
 
+        // 1. TradeRequestPacket
+        // 2. TradeJoinPacket
+        // 1. TradeOfferPacket
+        // 2. TradeOfferPacket
+
         private async Task HandleTradeRequestAsync(TradeRequestPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerTradeInitiatedNotification(this, packet.DestinationPlayerOrigin), ct);
         }
         private async Task HandleTradeJoinAsync(TradeJoinPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerTradeAcceptedNotification(this, packet.DestinationPlayerOrigin), ct);
         }
         private async Task HandleTradeQuitAsync(TradeQuitPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerTradeAbortedNotification(this, packet.DestinationPlayerOrigin), ct);
         }
         private async Task HandleTradeOfferAsync(TradeOfferPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            var cancel = false;
-            if (_serverOptions.ValidationEnabled)
-            {
-                var monster = await _monsterRepository.GetByDataAsync(packet.TradeData.MonsterData);
-                cancel = !monster.IsValidP3D();
-            }
-
-            if (cancel)
-            {
-                await SendServerMessageAsync("The Pokemon is not valid!", ct);
-                await SendPacketAsync(new TradeQuitPacket { Origin = packet.DestinationPlayerOrigin, DestinationPlayerOrigin = Origin }, ct);
-                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, new TradeQuitPacket { Origin = Origin, DestinationPlayerOrigin = packet.DestinationPlayerOrigin }), ct);
-            }
-            else
-            {
-                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
-            }
+            await _notificationPublisher.Publish(new PlayerTradeOfferedPokemonNotification(this, packet.DestinationPlayerOrigin, packet.TradeData), ct);
         }
         private async Task HandleTradeStartAsync(TradeStartPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationPublisher.Publish(new PlayerTradeConfirmedNotification(this, packet.DestinationPlayerOrigin), ct);
         }
 
         private async Task HandleBattleClientDataAsync(BattleClientDataPacket packet, CancellationToken ct)

@@ -9,7 +9,7 @@ namespace P3D.Legacy.Common
         {
             if (chars.IndexOf(':') is var idx && idx == -1)
                 return None;
-            return new PlayerId(Enum.Parse<PlayerIdType>(chars.Slice(0, idx)), chars.Slice(idx));
+            return new PlayerId(Enum.Parse<PlayerIdType>(chars.Slice(0, idx)), chars.Slice(idx + 1));
         }
 
         public static PlayerId None => new(PlayerIdType.None, string.Empty);

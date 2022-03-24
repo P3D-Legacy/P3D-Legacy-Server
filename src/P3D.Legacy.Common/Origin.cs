@@ -2,7 +2,7 @@
 
 namespace P3D.Legacy.Common
 {
-    public readonly struct Origin : IEquatable<Origin>
+    public readonly struct Origin : IEquatable<Origin>, IComparable<Origin>
     {
         public static Origin Parse(string id) => new(long.Parse(id));
 
@@ -11,9 +11,6 @@ namespace P3D.Legacy.Common
         public static Origin FromNumber(long origin) => new(origin);
 
         public static implicit operator long(Origin value) => value._value;
-
-        public static bool operator ==(Origin left, Origin right) => left.Equals(right);
-        public static bool operator !=(Origin left, Origin right) => !(left == right);
 
         public bool IsNone => this == None;
         public bool IsServer => this == Server;
@@ -24,9 +21,18 @@ namespace P3D.Legacy.Common
 
         public override string ToString() => _value.ToString();
 
+        public override int GetHashCode() => HashCode.Combine(_value);
+
         public bool Equals(Origin other) => _value == other._value;
         public override bool Equals(object? obj) => obj is Origin other && Equals(other);
+        public static bool operator ==(Origin left, Origin right) => left.Equals(right);
+        public static bool operator !=(Origin left, Origin right) => !(left == right);
 
-        public override int GetHashCode() => HashCode.Combine(_value);
+
+        public int CompareTo(Origin other) => _value.CompareTo(other._value);
+        public static bool operator <(Origin left, Origin right) => left.CompareTo(right) < 0;
+        public static bool operator >(Origin left, Origin right) => left.CompareTo(right) > 0;
+        public static bool operator <=(Origin left, Origin right) => left.CompareTo(right) <= 0;
+        public static bool operator >=(Origin left, Origin right) => left.CompareTo(right) >= 0;
     }
 }

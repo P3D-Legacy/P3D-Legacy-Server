@@ -1,6 +1,7 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Common;
+using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Common.Packets.Battle;
 using P3D.Legacy.Common.Packets.Chat;
 using P3D.Legacy.Common.Packets.Server;
@@ -29,8 +30,13 @@ namespace P3D.Legacy.Server.Client.P3D
         INotificationHandler<PlayerTriggeredEventNotification>,
         INotificationHandler<PlayerSentCommandNotification>,
         INotificationHandler<WorldUpdatedNotification>,
-        INotificationHandler<PlayerSentLoginNotification>
-    {
+        INotificationHandler<PlayerSentLoginNotification>,
+        INotificationHandler<PlayerTradeInitiatedNotification>,
+        INotificationHandler<PlayerTradeAcceptedNotification>,
+        INotificationHandler<PlayerTradeAbortedNotification>,
+        INotificationHandler<PlayerTradeOfferedPokemonNotification>,
+        INotificationHandler<PlayerTradeConfirmedNotification>
+        {
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
         {
             var player = notification.Player;
@@ -74,7 +80,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var (player, message) = notification;
 
-            if (await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
+            if (Id != player.Id && await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
 
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
@@ -84,7 +90,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var (player, location, message) = notification;
 
             if (!LevelFile.Equals(location, StringComparison.OrdinalIgnoreCase)) return;
-            if (await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
+            if (Id != player.Id && await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
 
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
@@ -94,7 +100,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var (player, receiverName, message) = notification;
 
             if (!Name.Equals(receiverName, StringComparison.OrdinalIgnoreCase)) return;
-            if (await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
+            if (Id != player.Id && await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
 
             await SendPacketAsync(new ChatMessagePrivatePacket { Origin = player.Origin, DestinationPlayerName = receiverName, Message = message }, ct);
         }
@@ -104,7 +110,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var (from, to, message) = notification;
 
             if (Origin != to.Origin) return;
-            if (await _muteManager.IsMutedAsync(Id, from.Id, ct)) return;
+            if (Id != from.Id && await _muteManager.IsMutedAsync(Id, from.Id, ct)) return;
 
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = from.Origin, Message = message }, ct);
         }
@@ -188,6 +194,92 @@ namespace P3D.Legacy.Server.Client.P3D
                 await _mediator.Send(new PlayerReadyCommand(this), ct);
                 _connectionState = P3DConnectionState.Intitialized;
             }
+        }
+
+        public async Task Handle(PlayerTradeInitiatedNotification notification, CancellationToken ct)
+        {
+            var (initiator, target) = notification;
+
+            if (Origin != target) return;
+
+            if (GameJoltId.IsNone != initiator.GameJoltId.IsNone)
+            {
+                await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, initiator, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
+                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
+            }
+            else
+            {
+                if (await _tradeManager.OfferTrade(initiator, this))
+                    await SendPacketAsync(new TradeRequestPacket { Origin = initiator.Origin, DestinationPlayerOrigin = target }, ct);
+                else
+                {
+                    await _tradeManager.AbortTrade(initiator, this);
+                    await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
+                }
+            }
+        }
+
+        public async Task Handle(PlayerTradeAcceptedNotification notification, CancellationToken ct)
+        {
+            var (target, initiator) = notification;
+
+            if (Origin != initiator) return;
+
+            if (await _tradeManager.AcceptTrade(target, this))
+                await SendPacketAsync(new TradeJoinPacket { Origin = target.Origin, DestinationPlayerOrigin = initiator }, ct);
+            else
+            {
+                await _tradeManager.AbortTrade(target, this);
+                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(target, new TradeQuitPacket {Origin = initiator, DestinationPlayerOrigin = target.Origin}), ct);
+            }
+        }
+
+        public async Task Handle(PlayerTradeAbortedNotification notification, CancellationToken ct)
+        {
+            var (player, partner) = notification;
+
+            if (Origin != partner) return;
+
+            await _tradeManager.AbortTrade(player, this);
+            await SendPacketAsync(new TradeQuitPacket { Origin = player.Origin, DestinationPlayerOrigin = partner }, ct);
+        }
+
+        public async Task Handle(PlayerTradeOfferedPokemonNotification notification, CancellationToken ct)
+        {
+            var (player, target, data) = notification;
+
+            if (Origin != target) return;
+
+            var cancel = false;
+            if (_serverOptions.ValidationEnabled)
+            {
+                var monster = await _monsterRepository.GetByDataAsync(data.MonsterData);
+                cancel = !monster.IsValidP3D();
+            }
+
+            if (cancel)
+            {
+                await _tradeManager.AbortTrade(player, this);
+                await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "The Pokemon is not valid!"), ct);
+                await SendPacketAsync(new TradeQuitPacket { Origin = player.Origin, DestinationPlayerOrigin = target }, ct);
+                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = player.Origin }), ct);
+            }
+            else
+            {
+                await SendPacketAsync(new TradeOfferPacket { Origin = player.Origin, DestinationPlayerOrigin = target, TradeData = data }, ct);
+            }
+        }
+
+        public async Task Handle(PlayerTradeConfirmedNotification notification, CancellationToken ct)
+        {
+            var (player, target) = notification;
+
+            if (Origin != target) return;
+
+            if (await _tradeManager.ConfirmTrade(player, this))
+                await SendPacketAsync(new TradeStartPacket() { Origin = player.Origin, DestinationPlayerOrigin = target }, ct);
+            else
+                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(player, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = player.Origin }), ct);
         }
     }
 }
