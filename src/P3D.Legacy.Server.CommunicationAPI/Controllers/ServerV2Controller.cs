@@ -107,7 +107,8 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         {
             return Ok(new
             {
-                Unique = await statisticsManager.GetAllAsync("player_joined", ct).CountAsync(ct)
+                Unique = await statisticsManager.GetAllAsync("player_joined", ct).CountAsync(ct),
+                SentMessages = await statisticsManager.GetAllAsync("message_global", ct).SumAsync(x => x.Count, ct),
             });
         }
     }
