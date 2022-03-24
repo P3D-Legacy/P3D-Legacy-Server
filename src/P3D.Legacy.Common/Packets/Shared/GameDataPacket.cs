@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace P3D.Legacy.Common.Packets.Shared
 {
-    public sealed record GameDataPacket() : P3DPacket(P3DPacketType.GameData)
+    public sealed partial record GameDataPacket() : P3DPacket(P3DPacketType.GameData)
     {
         public string GameMode { get => DataItemStorage.Get(0); init => DataItemStorage.Set(0, value); }
         public bool IsGameJoltPlayer { get => DataItemStorage.GetBool(1); init => DataItemStorage.Set(1, value); }

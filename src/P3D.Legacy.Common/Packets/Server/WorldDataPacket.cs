@@ -2,7 +2,7 @@
 
 namespace P3D.Legacy.Common.Packets.Server
 {
-    public sealed record WorldDataPacket() : P3DPacket(P3DPacketType.WorldData)
+    public sealed partial record WorldDataPacket() : P3DPacket(P3DPacketType.WorldData)
     {
         public WorldSeason Season { get => (WorldSeason) DataItemStorage.GetInt32(0); init => DataItemStorage.Set(0, (int) value); }
         public WorldWeather Weather { get => (WorldWeather) DataItemStorage.GetInt32(1); init => DataItemStorage.Set(1, (int) value); }

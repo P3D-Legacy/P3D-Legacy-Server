@@ -1,6 +1,6 @@
 ﻿namespace P3D.Legacy.Common.Packets.Battle
 {
-    public sealed record BattleRequestPacket() : P3DPacket(P3DPacketType.BattleRequest)
+    public sealed partial record BattleRequestPacket() : P3DPacket(P3DPacketType.BattleRequest)
     {
         public Origin DestinationPlayerOrigin { get => DataItemStorage.GetOrigin(0); init => DataItemStorage.Set(0, value); }
 

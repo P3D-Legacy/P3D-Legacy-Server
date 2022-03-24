@@ -2,7 +2,7 @@
 
 namespace P3D.Legacy.Common.Packets.Server
 {
-    public sealed record ServerInfoDataPacket() : P3DPacket(P3DPacketType.ServerInfoData)
+    public sealed partial record ServerInfoDataPacket() : P3DPacket(P3DPacketType.ServerInfoData)
     {
         public int CurrentPlayers { get => DataItemStorage.GetInt32(0); init => DataItemStorage.Set(0, value); }
         public int MaxPlayers { get => DataItemStorage.GetInt32(1); init => DataItemStorage.Set(1, value); }

@@ -1,5 +1,29 @@
-﻿namespace P3D.Legacy.Common.Packets
+﻿using System;
+
+namespace P3D.Legacy.Common.Packets
 {
+    public enum DataItemType
+    {
+        Origin,
+        Int64,
+        UInt64,
+        Int32,
+        Bool,
+        Char,
+        String,
+    }
+    public sealed class P3DPacketDataItemAttribute : Attribute
+    {
+        public int Position { get; set; }
+        public DataItemType DataItemType { get; set; }
+
+        public P3DPacketDataItemAttribute(int position, DataItemType dataItemType)
+        {
+            Position = position;
+            DataItemType = dataItemType;
+        }
+    }
+
     public abstract partial record P3DPacket(P3DPacketType Id)
     {
         private RawPacketData _rawPacketData = new(ProtocolEnum.V1, Id, default, new());

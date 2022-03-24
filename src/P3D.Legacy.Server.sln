@@ -41,6 +41,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Tests", "..\test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Server.UI", "P3D.Legacy.Server.UI\P3D.Legacy.Server.UI.csproj", "{DDECE8B1-618F-4213-A090-FEE1E105F880}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P3D.Legacy.Common.PacketGenerator", "P3D.Legacy.Common.PacketGenerator\P3D.Legacy.Common.PacketGenerator.csproj", "{266C5CAE-2A8A-451F-BD60-F40244656430}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,10 @@ Global
 		{DDECE8B1-618F-4213-A090-FEE1E105F880}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDECE8B1-618F-4213-A090-FEE1E105F880}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDECE8B1-618F-4213-A090-FEE1E105F880}.Release|Any CPU.Build.0 = Release|Any CPU
+		{266C5CAE-2A8A-451F-BD60-F40244656430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{266C5CAE-2A8A-451F-BD60-F40244656430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{266C5CAE-2A8A-451F-BD60-F40244656430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{266C5CAE-2A8A-451F-BD60-F40244656430}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +132,7 @@ Global
 		{139AD976-3851-45CA-8EE8-D59DE564E83F} = {B8171225-FEA8-47E8-AE9E-96DD1AFE76D2}
 		{49A18DFC-5C5D-46D6-93ED-7D20BCDA5F1E} = {139AD976-3851-45CA-8EE8-D59DE564E83F}
 		{DDECE8B1-618F-4213-A090-FEE1E105F880} = {F0716B24-F9B5-4240-B10E-5B164618001A}
+		{266C5CAE-2A8A-451F-BD60-F40244656430} = {679B78EF-C627-49A7-B49E-D54B4FAF1F08}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE1E891D-648F-4AD9-981D-5743A83ACDD2}
