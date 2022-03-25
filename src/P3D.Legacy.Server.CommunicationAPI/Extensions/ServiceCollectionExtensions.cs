@@ -29,6 +29,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Extensions
         {
             services.AddTransient<CommunicationController>();
 
+            services.AddScoped<WebSocketHandlerFactory>();
             services.AddSingleton<WebSocketSubscribtionManager>();
 
             return services;

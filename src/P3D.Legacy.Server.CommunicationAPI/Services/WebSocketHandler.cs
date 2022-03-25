@@ -1,7 +1,5 @@
 ﻿using MediatR;
 
-using Microsoft.Extensions.Options;
-
 using Nerdbank.Streams;
 
 using P3D.Legacy.Common;
@@ -84,12 +82,12 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         private readonly SequenceTextReader _sequenceTextReader = new();
         private readonly CancellationTokenSource _cts = new();
 
-        public WebSocketHandler(WebSocket webSocket, IMediator mediator, NotificationPublisher notificationPublisher, IOptions<JsonSerializerOptions> jsonSerializerOptions)
+        public WebSocketHandler(WebSocket webSocket, IMediator mediator, NotificationPublisher notificationPublisher, JsonSerializerOptions jsonSerializerOptions)
         {
             _webSocket = webSocket ?? throw new ArgumentNullException(nameof(webSocket));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
-            _jsonSerializerOptions = jsonSerializerOptions.Value ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
+            _jsonSerializerOptions = jsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
         }
 
         private ValueTask CheckWebSocketStateAsync(CancellationToken ct)
