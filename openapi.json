@@ -177,10 +177,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "$ref": "#/components/schemas/ServerStatisticsResponse"
                 }
               }
             }
@@ -202,10 +199,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "$ref": "#/components/schemas/PlayerStatisticsResponse"
                 }
               }
             }
@@ -280,6 +274,20 @@
         },
         "additionalProperties": false
       },
+      "PlayerStatisticsResponse": {
+        "type": "object",
+        "properties": {
+          "unique": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sentMessages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "RegisterModel": {
         "required": [
           "password",
@@ -299,6 +307,19 @@
           "confirmPassword": {
             "type": "string",
             "format": "password"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ServerStatisticsResponse": {
+        "type": "object",
+        "properties": {
+          "uptime": {
+            "$ref": "#/components/schemas/TimeSpan"
+          },
+          "online": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -351,6 +372,66 @@
           },
           "metadata": {
             "$ref": "#/components/schemas/PagingMetadata"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TimeSpan": {
+        "type": "object",
+        "properties": {
+          "ticks": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "days": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "hours": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "milliseconds": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "minutes": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "seconds": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "totalDays": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
+          },
+          "totalHours": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
+          },
+          "totalMilliseconds": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
+          },
+          "totalMinutes": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
+          },
+          "totalSeconds": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
           }
         },
         "additionalProperties": false
