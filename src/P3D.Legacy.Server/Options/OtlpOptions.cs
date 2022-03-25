@@ -8,9 +8,9 @@ namespace P3D.Legacy.Server.Options
 {
     public sealed class OtlpOptionsValidator : AbstractValidator<OtlpOptions>
     {
-        public OtlpOptionsValidator(IHttpClientFactory httpClientFactory)
+        public OtlpOptionsValidator(HttpClient httpClient)
         {
-            RuleFor(x => x.Host).IsUri().IsUriAvailable(httpClientFactory).When(x => x.Enabled);
+            RuleFor(x => x.Host).IsUri().IsUriAvailable(httpClient).When(x => x.Enabled);
         }
     }
 

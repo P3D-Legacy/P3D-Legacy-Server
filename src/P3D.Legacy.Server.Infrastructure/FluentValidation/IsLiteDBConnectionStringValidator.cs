@@ -5,7 +5,6 @@ using LiteDB;
 
 using System;
 using System.IO;
-using System.Linq;
 
 namespace P3D.Legacy.Server.Infrastructure.FluentValidation
 {
@@ -20,8 +19,7 @@ namespace P3D.Legacy.Server.Infrastructure.FluentValidation
             try
             {
                 var cs = new ConnectionString(value);
-                var invalidChars = Path.GetInvalidFileNameChars().ToHashSet();
-                return cs.Filename.Any(x => invalidChars.Contains(x));
+                return cs.Filename.IndexOfAny(Path.GetInvalidFileNameChars()) == -1;
             }
             catch (Exception)
             {

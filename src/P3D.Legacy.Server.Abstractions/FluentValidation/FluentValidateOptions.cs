@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace P3D.Legacy.Server.Abstractions.FluentValidation
@@ -19,13 +20,19 @@ namespace P3D.Legacy.Server.Abstractions.FluentValidation
 
         public ValidateOptionsResult Validate(string name, TOptions options)
         {
-            var failures = new List<string>();
-            foreach (var validator in _validators)
+            static IEnumerable<string> GetFailures(IEnumerable<IValidator<TOptions>> validators, string name, TOptions options)
             {
-                var result = validator.Validate(options);
-                failures.AddRange(result.Errors.Select(x => x.ErrorMessage));
+                foreach (var validator in validators)
+                {
+                    var result = validator.Validate(options);
+                    foreach (var failure in result.Errors.Select(x => x.ErrorMessage))
+                    {
+                        yield return failure;
+                    }
+                }
             }
 
+            var failures = GetFailures(_validators, name, options).ToImmutableArray();
             return failures.Any() ? ValidateOptionsResult.Fail(failures) : ValidateOptionsResult.Success;
         }
     }

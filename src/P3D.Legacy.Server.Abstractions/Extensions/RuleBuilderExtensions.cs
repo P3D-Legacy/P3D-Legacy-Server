@@ -39,14 +39,14 @@ namespace P3D.Legacy.Server.Abstractions.Extensions
             return ruleBuilder.SetValidator(new IsUriValidator<T>());
         }
 
-        public static IRuleBuilderOptions<T, string> IsUriAvailable<T>(this IRuleBuilder<T, string> ruleBuilder, IHttpClientFactory httpClientFactory)
+        public static IRuleBuilderOptions<T, string> IsUriAvailable<T>(this IRuleBuilder<T, string> ruleBuilder, HttpClient httpClient)
         {
             if (ruleBuilder == null)
             {
                 throw new ArgumentNullException(nameof(ruleBuilder));
             }
 
-            return ruleBuilder.SetValidator(new IsUriAvailableValidator<T>(httpClientFactory));
+            return ruleBuilder.SetValidator(new IsUriAvailableValidator<T>(httpClient));
         }
 
         public static IRuleBuilderOptions<T, string> IsIPAddress<T>(this IRuleBuilder<T, string> ruleBuilder)

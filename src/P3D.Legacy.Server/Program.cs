@@ -41,7 +41,7 @@ namespace P3D.Legacy.Server
             Activity.DefaultIdFormat = ActivityIdFormat.W3C;
             Activity.ForceDefaultIdFormat = true;
 
-            await CreateHostBuilder(args).Build().ValidateOptions().RunAsync();
+            await CreateHostBuilder(args).Build().RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) => Host
@@ -51,12 +51,12 @@ namespace P3D.Legacy.Server
                 services.Configure<ConsoleLifetimeOptions>(opts => opts.SuppressStatusMessages = true);
 
                 services.AddValidatedOptions<ServerOptions, ServerOptionsValidator>(ctx.Configuration.GetSection("Server"));
-                services.AddValidatedOptions<P3DSiteOptions, P3DSiteOptionsValidator>(ctx.Configuration.GetSection("OfficialSite"));
+                services.AddValidatedOptionsWithHttp<P3DSiteOptions, P3DSiteOptionsValidator>(ctx.Configuration.GetSection("OfficialSite"), builder => { });
                 services.AddValidatedOptions<P3DServerOptions, P3DServerOptionsValidator>(ctx.Configuration.GetSection("P3DServer"));
                 services.AddValidatedOptions<DiscordOptions, DiscordOptionsValidator>(ctx.Configuration.GetSection("DiscordBot"));
                 services.AddValidatedOptions<LiteDbOptions, LiteDbOptionsValidator>(ctx.Configuration.GetSection("LiteDb"));
                 services.AddValidatedOptions<JwtOptions, JwtOptionsValidator>(ctx.Configuration.GetSection("Jwt"));
-                services.AddValidatedOptions<OtlpOptions, OtlpOptionsValidator>(ctx.Configuration.GetSection("Otlp"));
+                services.AddValidatedOptionsWithHttp<OtlpOptions, OtlpOptionsValidator>(ctx.Configuration.GetSection("Otlp"), builder => { });
 
                 services.AddMediatRInternal();
                 using (var requestRegistrar = new RequestRegistrar(services))

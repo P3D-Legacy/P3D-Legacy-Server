@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-using P3D.Legacy.Server.Abstractions.FluentValidation;
+using P3D.Legacy.Server.Infrastructure.FluentValidation;
 
 using System;
 
@@ -15,7 +15,7 @@ namespace P3D.Legacy.Server.Infrastructure.Extensions
                 throw new ArgumentNullException(nameof(ruleBuilder));
             }
 
-            return ruleBuilder.SetValidator(new FluentValidation.IsLiteDBConnectionStringValidator<T>());
+            return ruleBuilder.SetValidator(new IsLiteDBConnectionStringValidator<T>());
         }
     }
 }

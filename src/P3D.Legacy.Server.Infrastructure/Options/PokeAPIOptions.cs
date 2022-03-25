@@ -8,9 +8,9 @@ namespace P3D.Legacy.Server.Infrastructure.Options
 {
     public sealed class PokeAPIOptionsValidator : AbstractValidator<PokeAPIOptions>
     {
-        public PokeAPIOptionsValidator(IHttpClientFactory httpClientFactory)
+        public PokeAPIOptionsValidator(HttpClient httpClient)
         {
-            RuleFor(x => x.GraphQLEndpoint).IsUri().IsUriAvailable(httpClientFactory).When(x => !string.IsNullOrEmpty(x.GraphQLEndpoint));
+            RuleFor(x => x.GraphQLEndpoint).IsUri().IsUriAvailable(httpClient).When(x => !string.IsNullOrEmpty(x.GraphQLEndpoint));
         }
     }
 

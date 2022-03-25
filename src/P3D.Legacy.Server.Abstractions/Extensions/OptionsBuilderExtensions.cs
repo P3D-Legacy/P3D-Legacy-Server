@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 using P3D.Legacy.Server.Abstractions.FluentValidation;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using ValidatorOptions = P3D.Legacy.Server.Abstractions.Options.ValidatorOptions;
@@ -25,9 +24,26 @@ namespace P3D.Legacy.Server.Abstractions.Extensions
                 throw new ArgumentNullException(nameof(optionsBuilder));
             }
 
-            optionsBuilder.Services.AddHttpClient("FluentClient");
-            optionsBuilder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IValidator<TOptions>, TOptionsValidator>());
-            optionsBuilder.Services.AddTransient<IValidateOptions<TOptions>>(sp => new FluentValidateOptions<TOptions>(sp.GetRequiredService<IEnumerable<IValidator<TOptions>>>()));
+            optionsBuilder.Services.AddTransient<TOptionsValidator>();
+            optionsBuilder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IValidator<TOptions>, TOptionsValidator>(sp => sp.GetRequiredService<TOptionsValidator>()));
+            optionsBuilder.Services.AddTransient<IValidateOptions<TOptions>, FluentValidateOptions<TOptions>>();
+
+            return optionsBuilder;
+        }
+
+        public static OptionsBuilder<TOptions> ValidateViaFluentWithHttp<TOptions, TOptionsValidator>(this OptionsBuilder<TOptions> optionsBuilder, Action<IHttpClientBuilder> httpClientBuilder)
+            where TOptions : class
+            where TOptionsValidator : class, IValidator<TOptions>
+        {
+            if (optionsBuilder == null)
+            {
+                throw new ArgumentNullException(nameof(optionsBuilder));
+            }
+
+            var builder = optionsBuilder.Services.AddHttpClient<TOptionsValidator>();
+            httpClientBuilder(builder);
+            optionsBuilder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IValidator<TOptions>, TOptionsValidator>(sp => sp.GetRequiredService<TOptionsValidator>()));
+            optionsBuilder.Services.AddTransient<IValidateOptions<TOptions>, FluentValidateOptions<TOptions>>();
 
             return optionsBuilder;
         }

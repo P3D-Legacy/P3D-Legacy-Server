@@ -6,8 +6,8 @@ namespace P3D.Legacy.Server.InternalAPI.Options
     {
         public JwtOptionsValidator()
         {
-            RuleFor(options => options.RsaPrivateKey).MinimumLength(16);
-            RuleFor(options => options.RsaPublicKey).MinimumLength(16);
+            RuleFor(x => x.RsaPrivateKey).MinimumLength(16);
+            RuleFor(x => x.RsaPublicKey).MinimumLength(16);
         }
     }
 

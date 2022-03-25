@@ -64,6 +64,8 @@ namespace P3D.Legacy.Server.Application.Extensions
         }
         public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddHostedService<OptionValidationService>();
+
             services.AddSingleton<TradeManager>();
 
             services.AddSingleton<P3DPacketFactory>();

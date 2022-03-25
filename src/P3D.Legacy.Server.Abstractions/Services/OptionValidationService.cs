@@ -1,25 +1,30 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Server.Abstractions.Options;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.ExceptionServices;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Abstractions.Extensions
+namespace P3D.Legacy.Server.Abstractions.Services
 {
-    public static class HostExtensions
+    public sealed class OptionValidationService : IHostedService
     {
-        public static IHost ValidateOptions(this IHost host)
-        {
-            var options = host.Services.GetRequiredService<IOptions<ValidatorOptions>>();
+        private readonly ValidatorOptions _validatorOptions;
 
+        public OptionValidationService(IOptions<ValidatorOptions> validatorOptions)
+        {
+            _validatorOptions = validatorOptions.Value ?? throw new ArgumentNullException(nameof(validatorOptions));
+        }
+
+        public Task StartAsync(CancellationToken ct)
+        {
             var exceptions = new List<Exception>();
 
-            foreach (var validate in options.Value?.Validators.Values ?? Enumerable.Empty<Action>())
+            foreach (var validate in _validatorOptions.Validators.Values)
             {
                 try
                 {
@@ -44,7 +49,9 @@ namespace P3D.Legacy.Server.Abstractions.Extensions
                 throw new AggregateException(exceptions);
             }
 
-            return host;
+            return Task.CompletedTask;
         }
+
+        public Task StopAsync(CancellationToken ct) => Task.CompletedTask;
     }
 }

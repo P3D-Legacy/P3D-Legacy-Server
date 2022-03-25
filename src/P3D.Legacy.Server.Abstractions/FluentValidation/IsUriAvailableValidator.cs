@@ -11,23 +11,22 @@ namespace P3D.Legacy.Server.Abstractions.FluentValidation
 
     public class IsUriAvailableValidator<T> : PropertyValidator<T, string>, IIsUriAvailableValidator
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
 
         public override string Name => "IsUriAvailableValidator";
 
-        public IsUriAvailableValidator(IHttpClientFactory httpClientFactory)
+        public IsUriAvailableValidator(HttpClient httpClient)
         {
-            _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
         public override bool IsValid(ValidationContext<T> context, string value)
         {
             try
             {
-                var client = _httpClientFactory.CreateClient("FluentClient");
                 var request = new HttpRequestMessage(HttpMethod.Options, value);
                 var cts = new CancellationTokenSource(2000);
-                var response = client.Send(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
+                _ = _httpClient.Send(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
                 return true;
             }
             catch (Exception e)

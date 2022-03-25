@@ -8,8 +8,8 @@ namespace P3D.Legacy.Server.DiscordBot.Options
     {
         public DiscordOptionsValidator()
         {
-            //RuleFor(options => options.BotToken).NotEmpty().NotInteger().NotBoolean();
-            RuleFor(options => options.PasstroughChannelId).NotEmpty().When(x => !string.IsNullOrEmpty(x.BotToken));
+            //RuleFor(x => x.BotToken).NotEmpty().NotInteger().NotBoolean();
+            RuleFor(x => x.PasstroughChannelId).NotEmpty().When(x => !string.IsNullOrEmpty(x.BotToken));
         }
     }
 

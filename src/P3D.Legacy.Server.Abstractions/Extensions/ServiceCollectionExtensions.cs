@@ -4,9 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Abstractions.Extensions
 {
@@ -28,6 +25,27 @@ namespace P3D.Legacy.Server.Abstractions.Extensions
             services.AddOptions<TOptions>()
                 .Bind(configuration)
                 .ValidateViaFluent<TOptions, TOptionsValidator>()
+                .ValidateViaHostManager();
+
+            return services;
+        }
+
+        public static IServiceCollection AddValidatedOptionsWithHttp<TOptions, TOptionsValidator>(this IServiceCollection services, IConfiguration configuration, Action<IHttpClientBuilder> httpClientBuilder)
+            where TOptions : class where TOptionsValidator : class, IValidator<TOptions>
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            services.AddOptions<TOptions>()
+                .Bind(configuration)
+                .ValidateViaFluentWithHttp<TOptions, TOptionsValidator>(httpClientBuilder)
                 .ValidateViaHostManager();
 
             return services;
