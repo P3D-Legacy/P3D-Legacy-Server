@@ -43,7 +43,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
         {
             ct.ThrowIfCancellationRequested();
 
-            using var span = _tracer.StartActiveSpan("P3DBanRepository UnbanAsync", SpanKind.Client);
+            using var span = _tracer.StartActiveSpan("P3DBanRepository GetAsync", SpanKind.Client);
 
             var actualEntry = await GetInternal(id, ct);
             return actualEntry is null
@@ -61,7 +61,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
         {
             ct.ThrowIfCancellationRequested();
 
-            using var span = _tracer.StartActiveSpan("P3DBanRepository UnbanAsync", SpanKind.Client);
+            using var span = _tracer.StartActiveSpan("P3DBanRepository GetAllAsync", SpanKind.Client);
 
             HttpResponseMessage response;
 
