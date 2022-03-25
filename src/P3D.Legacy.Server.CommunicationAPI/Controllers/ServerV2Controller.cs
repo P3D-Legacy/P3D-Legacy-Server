@@ -22,8 +22,17 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
     public class ServerV2Controller : ControllerBase
     {
         public record StatusRequestV2Query(int Page, int PageSize);
-        private sealed record StatusResponseV2Player(string Name, ulong GameJoltId);
-        private sealed record StatusResponseV2(IEnumerable<StatusResponseV2Player> Players);
+        public sealed record StatusResponseV2Player(string Name, ulong GameJoltId);
+        public sealed record ServerStatisticsResponse
+        {
+            public TimeSpan Uptime { get; init; }
+            public uint Online { get; init; }
+        }
+        public sealed record PlayerStatisticsResponse
+        {
+            public uint Unique { get; init; }
+            public uint SentMessages { get; init; }
+        }
 
         private readonly ILogger _logger;
 
@@ -85,30 +94,30 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
 
         [HttpGet("statistics/server")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServerStatisticsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> GetServerStatisticsAsync([FromServices] IPlayerQueries playerQueries, CancellationToken ct)
         {
             var process = Process.GetCurrentProcess();
             var (onlineCount, _) = await playerQueries.GetAllAsync(0, 0, ct);
 
-            return Ok(new
+            return Ok(new ServerStatisticsResponse
             {
                 Uptime = DateTime.UtcNow - process.StartTime.ToUniversalTime(),
-                Online = onlineCount,
+                Online = (uint) onlineCount,
             });
         }
 
         [HttpGet("statistics/player")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PlayerStatisticsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> GetPlayerStatisticsAsync([FromServices] IStatisticsManager statisticsManager, CancellationToken ct)
         {
-            return Ok(new
+            return Ok(new PlayerStatisticsResponse
             {
-                Unique = await statisticsManager.GetAllAsync("player_joined", ct).CountAsync(ct),
-                SentMessages = await statisticsManager.GetAllAsync("message_global", ct).SumAsync(x => x.Count, ct),
+                Unique = (uint) await statisticsManager.GetAllAsync("player_joined", ct).CountAsync(ct),
+                SentMessages = (uint) await statisticsManager.GetAllAsync("message_global", ct).SumAsync(x => x.Count, ct),
             });
         }
     }
