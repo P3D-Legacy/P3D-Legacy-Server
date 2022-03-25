@@ -19,15 +19,15 @@ namespace P3D.Legacy.Server.FluentValidation
             try
             {
                 var uri = new Uri(value);
-                var endpoint = uri.GetComponents(UriComponents.HostAndPort, UriFormat.Unescaped);
-
-                if (!IPEndPoint.TryParse(endpoint, out var endPoint))
+                var host = uri.GetComponents(UriComponents.Host, UriFormat.Unescaped);
+                var portStr = uri.GetComponents(UriComponents.Port, UriFormat.Unescaped);
+                if (!ushort.TryParse(portStr, out var port))
                 {
                     return false;
                 }
 
                 using var client = new TcpClient();
-                client.Connect(endPoint);
+                client.Connect(host, port);
                 return true;
             }
             catch (Exception e)
