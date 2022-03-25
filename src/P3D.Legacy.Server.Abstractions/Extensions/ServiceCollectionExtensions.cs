@@ -3,6 +3,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using P3D.Legacy.Server.Abstractions.Services;
+
 using System;
 
 namespace P3D.Legacy.Server.Abstractions.Extensions
@@ -21,6 +23,8 @@ namespace P3D.Legacy.Server.Abstractions.Extensions
             {
                 throw new ArgumentNullException(nameof(configuration));
             }
+
+            services.AddHostedService<OptionValidationService>();
 
             services.AddOptions<TOptions>()
                 .Bind(configuration)
@@ -42,6 +46,8 @@ namespace P3D.Legacy.Server.Abstractions.Extensions
             {
                 throw new ArgumentNullException(nameof(configuration));
             }
+
+            services.AddHostedService<OptionValidationService>();
 
             services.AddOptions<TOptions>()
                 .Bind(configuration)

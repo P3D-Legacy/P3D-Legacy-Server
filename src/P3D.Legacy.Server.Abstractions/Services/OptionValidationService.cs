@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Abstractions.Services
 {
-    public sealed class OptionValidationService : IHostedService
+    internal sealed class OptionValidationService : IHostedService
     {
         private readonly ValidatorOptions _validatorOptions;
 
