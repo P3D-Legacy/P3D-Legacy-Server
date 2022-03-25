@@ -1,16 +1,15 @@
 ﻿using FluentValidation;
 
 using P3D.Legacy.Server.Abstractions.Extensions;
-
-using System.Net.Http;
+using P3D.Legacy.Server.Extensions;
 
 namespace P3D.Legacy.Server.Options
 {
     public sealed class OtlpOptionsValidator : AbstractValidator<OtlpOptions>
     {
-        public OtlpOptionsValidator(HttpClient httpClient)
+        public OtlpOptionsValidator()
         {
-            RuleFor(x => x.Host).IsUri().IsUriAvailable(httpClient).When(x => x.Enabled);
+            RuleFor(x => x.Host).IsIPEndPoint().IsGrpcAvailable().When(x => x.Enabled);
         }
     }
 

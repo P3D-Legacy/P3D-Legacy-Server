@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server
 {
-    public class Program
+    public static class Program
     {
         public static async Task Main(string[] args)
         {
@@ -51,12 +51,12 @@ namespace P3D.Legacy.Server
                 services.Configure<ConsoleLifetimeOptions>(opts => opts.SuppressStatusMessages = true);
 
                 services.AddValidatedOptions<ServerOptions, ServerOptionsValidator>(ctx.Configuration.GetSection("Server"));
-                services.AddValidatedOptionsWithHttp<P3DSiteOptions, P3DSiteOptionsValidator>(ctx.Configuration.GetSection("OfficialSite"), builder => { });
+                services.AddValidatedOptionsWithHttp<P3DSiteOptions, P3DSiteOptionsValidator>(ctx.Configuration.GetSection("OfficialSite"));
                 services.AddValidatedOptions<P3DServerOptions, P3DServerOptionsValidator>(ctx.Configuration.GetSection("P3DServer"));
                 services.AddValidatedOptions<DiscordOptions, DiscordOptionsValidator>(ctx.Configuration.GetSection("DiscordBot"));
                 services.AddValidatedOptions<LiteDbOptions, LiteDbOptionsValidator>(ctx.Configuration.GetSection("LiteDb"));
                 services.AddValidatedOptions<JwtOptions, JwtOptionsValidator>(ctx.Configuration.GetSection("Jwt"));
-                services.AddValidatedOptionsWithHttp<OtlpOptions, OtlpOptionsValidator>(ctx.Configuration.GetSection("Otlp"), builder => { });
+                services.AddValidatedOptions<OtlpOptions, OtlpOptionsValidator>(ctx.Configuration.GetSection("Otlp"));
 
                 services.AddMediatRInternal();
                 using (var requestRegistrar = new RequestRegistrar(services))

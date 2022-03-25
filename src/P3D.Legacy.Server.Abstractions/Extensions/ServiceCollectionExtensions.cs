@@ -34,7 +34,7 @@ namespace P3D.Legacy.Server.Abstractions.Extensions
             return services;
         }
 
-        public static IServiceCollection AddValidatedOptionsWithHttp<TOptions, TOptionsValidator>(this IServiceCollection services, IConfiguration configuration, Action<IHttpClientBuilder> httpClientBuilder)
+        public static IServiceCollection AddValidatedOptionsWithHttp<TOptions, TOptionsValidator>(this IServiceCollection services, IConfiguration configuration, Action<IHttpClientBuilder>? httpClientBuilder = null)
             where TOptions : class where TOptionsValidator : class, IValidator<TOptions>
         {
             if (services == null)

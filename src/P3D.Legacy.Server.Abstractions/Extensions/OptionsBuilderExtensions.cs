@@ -31,7 +31,7 @@ namespace P3D.Legacy.Server.Abstractions.Extensions
             return optionsBuilder;
         }
 
-        public static OptionsBuilder<TOptions> ValidateViaFluentWithHttp<TOptions, TOptionsValidator>(this OptionsBuilder<TOptions> optionsBuilder, Action<IHttpClientBuilder> httpClientBuilder)
+        public static OptionsBuilder<TOptions> ValidateViaFluentWithHttp<TOptions, TOptionsValidator>(this OptionsBuilder<TOptions> optionsBuilder, Action<IHttpClientBuilder>? httpClientBuilder = null)
             where TOptions : class
             where TOptionsValidator : class, IValidator<TOptions>
         {
@@ -41,7 +41,7 @@ namespace P3D.Legacy.Server.Abstractions.Extensions
             }
 
             var builder = optionsBuilder.Services.AddHttpClient<TOptionsValidator>();
-            httpClientBuilder(builder);
+            if (httpClientBuilder is not null) httpClientBuilder(builder);
             optionsBuilder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IValidator<TOptions>, TOptionsValidator>(sp => sp.GetRequiredService<TOptionsValidator>()));
             optionsBuilder.Services.AddTransient<IValidateOptions<TOptions>, FluentValidateOptions<TOptions>>();
 

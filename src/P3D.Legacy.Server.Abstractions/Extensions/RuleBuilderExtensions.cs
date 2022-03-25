@@ -58,5 +58,15 @@ namespace P3D.Legacy.Server.Abstractions.Extensions
 
             return ruleBuilder.SetValidator(new IsIPAddressValidator<T>());
         }
+
+        public static IRuleBuilderOptions<T, string> IsIPEndPoint<T>(this IRuleBuilder<T, string> ruleBuilder)
+        {
+            if (ruleBuilder == null)
+            {
+                throw new ArgumentNullException(nameof(ruleBuilder));
+            }
+
+            return ruleBuilder.SetValidator(new IsIPEndPointValidator<T>());
+        }
     }
 }
