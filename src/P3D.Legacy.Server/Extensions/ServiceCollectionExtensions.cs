@@ -11,6 +11,8 @@ using Microsoft.Extensions.Options;
 using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.Behaviours;
+using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
+using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
 using P3D.Legacy.Server.Options;
 
 using System;
@@ -29,7 +31,19 @@ namespace P3D.Legacy.Server.Extensions
         {
             services.AddBetterHostedServices();
 
-            services.AddHttpClient("P3D.API")
+            services.AddHttpClient<P3DBanRepository>()
+                .ConfigureHttpClient((sp, client) =>
+                {
+                    var backendOptionsSnapshot = sp.GetRequiredService<IOptions<P3DSiteOptions>>();
+                    var backendOptions = backendOptionsSnapshot.Value;
+
+                    client.BaseAddress = new Uri(backendOptions.APIEndpointV1);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", backendOptions.APIToken);
+                    client.Timeout = Timeout.InfiniteTimeSpan;
+                })
+                .AddPolly();
+
+            services.AddHttpClient<P3DPermissionRepository>()
                 .ConfigureHttpClient((sp, client) =>
                 {
                     var backendOptionsSnapshot = sp.GetRequiredService<IOptions<P3DSiteOptions>>();

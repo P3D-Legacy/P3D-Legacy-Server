@@ -26,7 +26,7 @@ namespace P3D.Legacy.Tests
             await using var testService = TestService.CreateNew()
                 .Configure(services =>
                 {
-                    services.AddTransient<IOptions<PokeAPIOptions>>(_ => new OptionsWrapper<PokeAPIOptions>(new PokeAPIOptions()
+                    services.AddTransient<IOptions<PokeAPIOptions>>(_ => new OptionsWrapper<PokeAPIOptions>(new PokeAPIOptions
                     {
                         GraphQLEndpoint = "https://beta.pokeapi.co/graphql/v1beta"
                     }));

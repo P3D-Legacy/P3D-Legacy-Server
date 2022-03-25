@@ -1,5 +1,16 @@
-﻿namespace P3D.Legacy.Server.Infrastructure.Options
+﻿using FluentValidation;
+
+namespace P3D.Legacy.Server.Infrastructure.Options
 {
+    public sealed class PasswordOptionsValidator : AbstractValidator<PasswordOptions>
+    {
+        public PasswordOptionsValidator()
+        {
+            RuleFor(x => x.RequiredLength).NotEmpty();
+            RuleFor(x => x.RequiredUniqueChars).NotEmpty();
+        }
+    }
+
     public record PasswordOptions
     {
         public int RequiredLength { get; init; } = 6;

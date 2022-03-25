@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
+using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.Application.Extensions;
@@ -40,7 +41,7 @@ namespace P3D.Legacy.Server
             Activity.DefaultIdFormat = ActivityIdFormat.W3C;
             Activity.ForceDefaultIdFormat = true;
 
-            await CreateHostBuilder(args).Build().RunAsync();
+            await CreateHostBuilder(args).Build().ValidateOptions().RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) => Host
@@ -49,14 +50,13 @@ namespace P3D.Legacy.Server
             {
                 services.Configure<ConsoleLifetimeOptions>(opts => opts.SuppressStatusMessages = true);
 
-                services.Configure<ServerOptions>(ctx.Configuration.GetSection("Server"));
-                services.Configure<P3DSiteOptions>(ctx.Configuration.GetSection("OfficialSite"));
-                services.Configure<P3DServerOptions>(ctx.Configuration.GetSection("P3DServer"));
-                services.Configure<DiscordOptions>(ctx.Configuration.GetSection("DiscordBot"));
-                services.Configure<LiteDbOptions>(ctx.Configuration.GetSection("LiteDb"));
-                services.Configure<JwtOptions>(ctx.Configuration.GetSection("Jwt"));
-
-                var otlpSection = ctx.Configuration.GetSection("Otlp");
+                services.AddValidatedOptions<ServerOptions, ServerOptionsValidator>(ctx.Configuration.GetSection("Server"));
+                services.AddValidatedOptions<P3DSiteOptions, P3DSiteOptionsValidator>(ctx.Configuration.GetSection("OfficialSite"));
+                services.AddValidatedOptions<P3DServerOptions, P3DServerOptionsValidator>(ctx.Configuration.GetSection("P3DServer"));
+                services.AddValidatedOptions<DiscordOptions, DiscordOptionsValidator>(ctx.Configuration.GetSection("DiscordBot"));
+                services.AddValidatedOptions<LiteDbOptions, LiteDbOptionsValidator>(ctx.Configuration.GetSection("LiteDb"));
+                services.AddValidatedOptions<JwtOptions, JwtOptionsValidator>(ctx.Configuration.GetSection("Jwt"));
+                services.AddValidatedOptions<OtlpOptions, OtlpOptionsValidator>(ctx.Configuration.GetSection("Otlp"));
 
                 services.AddMediatRInternal();
                 using (var requestRegistrar = new RequestRegistrar(services))
@@ -83,9 +83,9 @@ namespace P3D.Legacy.Server
                 services.AddInternalAPI(ctx.Configuration);
                 services.AddStatistics(ctx.Configuration);
 
-                services.AddOpenTelemetryMetrics(builder =>
+                services.AddOpenTelemetryMetrics(b => b.Configure((sp, builder) =>
                 {
-                    var options = otlpSection.Get<OtlpOptions>();
+                    var options = sp.GetRequiredService<IOptions<OtlpOptions>>().Value;
                     if (options.Enabled)
                     {
                         builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
@@ -100,10 +100,10 @@ namespace P3D.Legacy.Server
                             o.Endpoint = new Uri(options.Host);
                         });
                     }
-                });
-                services.AddOpenTelemetryTracing(builder =>
+                }));
+                services.AddOpenTelemetryTracing(b => b.Configure((sp, builder) =>
                 {
-                    var options = otlpSection.Get<OtlpOptions>();
+                    var options = sp.GetRequiredService<IOptions<OtlpOptions>>().Value;
                     if (options.Enabled)
                     {
                         builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
@@ -126,7 +126,7 @@ namespace P3D.Legacy.Server
                             o.Endpoint = new Uri(options.Host);
                         });
                     }
-                });
+                }));
             })
             .AddP3DServer()
             .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())

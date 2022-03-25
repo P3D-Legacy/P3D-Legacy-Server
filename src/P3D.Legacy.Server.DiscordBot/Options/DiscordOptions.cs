@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
 
+using P3D.Legacy.Server.Abstractions.Extensions;
+
 namespace P3D.Legacy.Server.DiscordBot.Options
 {
     public sealed class DiscordOptionsValidator : AbstractValidator<DiscordOptions>
@@ -7,14 +9,13 @@ namespace P3D.Legacy.Server.DiscordBot.Options
         public DiscordOptionsValidator()
         {
             //RuleFor(options => options.BotToken).NotEmpty().NotInteger().NotBoolean();
-            RuleFor(options => options.BotToken).NotEmpty();
-            RuleFor(options => options.PasstroughChannelId).GreaterThan(0UL);
+            RuleFor(options => options.PasstroughChannelId).NotEmpty().When(x => !string.IsNullOrEmpty(x.BotToken));
         }
     }
 
     public sealed record DiscordOptions
     {
-        public ulong PasstroughChannelId { get; init; } = default!;
         public string BotToken { get; init; } = default!;
+        public ulong PasstroughChannelId { get; init; } = default!;
     }
 }

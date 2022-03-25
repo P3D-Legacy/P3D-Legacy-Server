@@ -1,5 +1,17 @@
-﻿namespace P3D.Legacy.Server.Abstractions.Options
+﻿using FluentValidation;
+
+namespace P3D.Legacy.Server.Abstractions.Options
 {
+    public sealed class ServerOptionsValidator : AbstractValidator<ServerOptions>
+    {
+        public ServerOptionsValidator()
+        {
+            RuleFor(x => x.Name).NotEmpty();
+            RuleFor(x => x.Message).NotEmpty();
+            RuleFor(x => x.MaxPlayers).NotEmpty();
+        }
+    }
+
     public sealed record ServerOptions
     {
         public string Name { get; init; } = default!;

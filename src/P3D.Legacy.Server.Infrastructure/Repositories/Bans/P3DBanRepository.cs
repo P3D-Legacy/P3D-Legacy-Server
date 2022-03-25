@@ -28,14 +28,14 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
     {
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
-        public P3DBanRepository(ILogger<P3DBanRepository> logger, TracerProvider traceProvider, IHttpClientFactory httpClientFactory, IOptionsMonitor<JsonSerializerOptions> jsonSerializerOptions)
+        public P3DBanRepository(ILogger<P3DBanRepository> logger, TracerProvider traceProvider, HttpClient httpClient, IOptionsMonitor<JsonSerializerOptions> jsonSerializerOptions)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Infrastructure");
-            _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _jsonSerializerOptions = jsonSerializerOptions.Get("P3D") ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
         }
 
@@ -67,7 +67,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
             try
             {
-                response = await _httpClientFactory.CreateClient("P3D.API").GetAsync(
+                response = await _httpClient.GetAsync(
                     $"ban/gamejoltaccount",
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);
@@ -119,7 +119,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
             try
             {
-                response = await _httpClientFactory.CreateClient("P3D.API").PostAsJsonAsync(
+                response = await _httpClient.PostAsJsonAsync(
                     $"ban/gamejoltaccount",
                     string.IsNullOrEmpty(reason)
                         ? (object) new BanRequest(GameJoltId.Parse(id.Id), reasonId, expiration, GameJoltId.Parse(bannerId.Id))
@@ -161,7 +161,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
             try
             {
-                response = await _httpClientFactory.CreateClient("P3D.API").GetAsync(
+                response = await _httpClient.GetAsync(
                     $"ban/gamejoltaccount/{id.Id}",
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);
@@ -203,7 +203,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
                 try
                 {
-                    response = await _httpClientFactory.CreateClient("P3D.API").DeleteAsync(
+                    response = await _httpClient.DeleteAsync(
                         $"ban/gamejoltaccount/{currentBan.Uid}",
                         ct);
                 }

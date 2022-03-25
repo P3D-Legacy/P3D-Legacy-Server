@@ -36,7 +36,7 @@ namespace P3D.Legacy.Server.Client.P3D
         INotificationHandler<PlayerTradeAbortedNotification>,
         INotificationHandler<PlayerTradeOfferedPokemonNotification>,
         INotificationHandler<PlayerTradeConfirmedNotification>
-        {
+    {
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
         {
             var player = notification.Player;
@@ -230,7 +230,7 @@ namespace P3D.Legacy.Server.Client.P3D
             else
             {
                 await _tradeManager.AbortTrade(target, this);
-                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(target, new TradeQuitPacket {Origin = initiator, DestinationPlayerOrigin = target.Origin}), ct);
+                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(target, new TradeQuitPacket { Origin = initiator, DestinationPlayerOrigin = target.Origin }), ct);
             }
         }
 
