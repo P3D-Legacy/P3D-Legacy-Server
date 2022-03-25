@@ -98,15 +98,14 @@ namespace P3D.Legacy.Server.Client.P3D
                 {
                     try
                     {
-                        using var span = _tracer.StartActiveSpan("P3D Client Reading Packet", SpanKind.Server);
-                        span.SetAttribute("net.peer.ip", IPEndPoint.Address.ToString());
-                        span.SetAttribute("net.peer.port", IPEndPoint.Port);
-                        span.SetAttribute("net.transport", "ip_tcp");
-
                         if (await reader.ReadAsync(_protocol, ct) is { Message: { } message, IsCompleted: var isCompleted, IsCanceled: var isCanceled })
                         {
-                            span.UpdateName($"P3D Client Reading {message.GetType().FullName}");
+                            using var span = _tracer.StartActiveSpan($"P3D Client Reading {message.GetType().FullName}", SpanKind.Server);
+                            span.SetAttribute("net.peer.ip", IPEndPoint.Address.ToString());
+                            span.SetAttribute("net.peer.port", IPEndPoint.Port);
+                            span.SetAttribute("net.transport", "ip_tcp");
                             span.SetAttribute("p3dclient.packet_type", message.GetType().FullName);
+
                             await HandlePacketAsync(message, ct);
 
                             if (isCompleted || isCanceled)
