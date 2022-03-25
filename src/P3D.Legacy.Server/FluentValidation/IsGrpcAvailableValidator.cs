@@ -1,12 +1,8 @@
 ﻿using FluentValidation;
 using FluentValidation.Validators;
 
-using Grpc.Core;
-using Grpc.Net.Client;
-
 using System;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 
 namespace P3D.Legacy.Server.FluentValidation
@@ -22,7 +18,10 @@ namespace P3D.Legacy.Server.FluentValidation
         {
             try
             {
-                if (!IPEndPoint.TryParse(value, out var endPoint))
+                var uri = new Uri(value);
+                var endpoint = uri.GetComponents(UriComponents.HostAndPort, UriFormat.Unescaped);
+
+                if (!IPEndPoint.TryParse(endpoint, out var endPoint))
                 {
                     return false;
                 }

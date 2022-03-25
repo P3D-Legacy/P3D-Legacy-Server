@@ -9,7 +9,7 @@ namespace P3D.Legacy.Server.Options
     {
         public OtlpOptionsValidator()
         {
-            RuleFor(x => x.Host).IsIPEndPoint().IsGrpcAvailable().When(x => x.Enabled);
+            RuleFor(x => x.Host).IsUri().IsGrpcAvailable().When(x => x.Enabled);
         }
     }
 
