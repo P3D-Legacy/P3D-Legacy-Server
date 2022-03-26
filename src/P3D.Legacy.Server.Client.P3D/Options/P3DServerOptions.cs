@@ -1,6 +1,6 @@
-﻿using FluentValidation;
+﻿using Aragas.Extensions.Options.FluentValidation.Extensions;
 
-using P3D.Legacy.Server.Abstractions.Extensions;
+using FluentValidation;
 
 namespace P3D.Legacy.Server.Client.P3D.Options
 {

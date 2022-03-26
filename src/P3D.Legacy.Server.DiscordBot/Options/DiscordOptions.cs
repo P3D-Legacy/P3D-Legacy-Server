@@ -1,7 +1,5 @@
 ﻿using FluentValidation;
 
-using P3D.Legacy.Server.Abstractions.Extensions;
-
 namespace P3D.Legacy.Server.DiscordBot.Options
 {
     public sealed class DiscordOptionsValidator : AbstractValidator<DiscordOptions>

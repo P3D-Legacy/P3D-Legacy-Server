@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="10.4.0" />
+    <PackageReference Include="Aragas.Extensions.Options.FluentValidation" Version="1.0.0.8" />
     <PackageReference Include="MediatR" Version="10.0.1" />
   </ItemGroup>
 

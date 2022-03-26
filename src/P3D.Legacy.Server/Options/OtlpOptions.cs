@@ -1,7 +1,6 @@
-﻿using FluentValidation;
+﻿using Aragas.Extensions.Options.FluentValidation.Extensions;
 
-using P3D.Legacy.Server.Abstractions.Extensions;
-using P3D.Legacy.Server.Extensions;
+using FluentValidation;
 
 namespace P3D.Legacy.Server.Options
 {
@@ -9,7 +8,7 @@ namespace P3D.Legacy.Server.Options
     {
         public OtlpOptionsValidator()
         {
-            RuleFor(x => x.Host).IsUri().IsGrpcAvailable().When(x => x.Enabled);
+            RuleFor(x => x.Host).IsUri().IsUrlTcpEndpointAvailable().When(x => x.Enabled);
         }
     }
 

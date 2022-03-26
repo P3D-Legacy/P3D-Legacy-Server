@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
-using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
@@ -15,10 +13,7 @@ using P3D.Legacy.Server.Infrastructure.Services.Permissions;
 using P3D.Legacy.Server.Infrastructure.Services.Statistics;
 using P3D.Legacy.Server.Infrastructure.Services.Users;
 
-using System;
-using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Threading;
 
 namespace P3D.Legacy.Server.Infrastructure.Extensions
 {

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Aragas.Extensions.Options.FluentValidation.Extensions;
+
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -8,7 +10,6 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.Application.Extensions;
