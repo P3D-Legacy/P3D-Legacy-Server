@@ -15,7 +15,7 @@
     <PackageReference Include="Nerdbank.Streams" Version="2.8.57" />
     <PackageReference Include="OpenTelemetry.Api" Version="1.2.0-rc3" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-    <PackageReference Include="Wivuu.JsonPolymorphism" Version="1.0.11" />
+    <PackageReference Include="Wivuu.JsonPolymorphism" Version="1.0.16" />
   </ItemGroup>
 
   <ItemGroup>
