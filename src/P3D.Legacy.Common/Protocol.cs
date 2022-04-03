@@ -6,7 +6,7 @@ namespace P3D.Legacy.Common
 
     public readonly struct Protocol : IEquatable<Protocol>
     {
-        private static readonly char[] SequenceV1 = { '0', '.', '5' };
+        private static readonly byte[] SequenceV1 = { (byte) '0', (byte) '.', (byte) '5' };
 
         public static implicit operator Protocol(ProtocolEnum value) => new(value);
         public static implicit operator ProtocolEnum(Protocol value) => value._value;
@@ -16,7 +16,7 @@ namespace P3D.Legacy.Common
 
         private readonly ProtocolEnum _value;
 
-        public Protocol(in ReadOnlySpan<char> protocol)
+        public Protocol(in ReadOnlySpan<byte> protocol)
         {
             _value = protocol.SequenceEqual(SequenceV1) ? ProtocolEnum.V1 : ProtocolEnum.Invalid;
         }

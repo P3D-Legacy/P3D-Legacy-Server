@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+
+using NUnit.Framework;
 
 using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Common.Packets;
@@ -57,9 +59,9 @@ namespace P3D.Legacy.Tests
             Assert.AreEqual(idInt, packet.IdInt);
             Assert.AreEqual(position, packet.GetPosition());
 
-            var packetWriter = new DefaultP3DPacketWriter();
+            var packetWriter = new P3DProtocol(NullLogger<P3DProtocol>.Instance, new P3DPacketFactory());
             var writer = new ArrayBufferWriter<byte>();
-            packetWriter.WriteData(packet, writer);
+            packetWriter.WriteMessage(packet, writer);
             Assert.AreEqual("0.5|1|0|6|0|6|7|21|22|27|Aragas115124000000000j151241|1|1\r\n", Encoding.ASCII.GetString(writer.WrittenSpan));
         }
     }

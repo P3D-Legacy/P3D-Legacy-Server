@@ -1,56 +1,66 @@
 ﻿using System;
 using System.Buffers;
+using System.Buffers.Text;
+using System.Text;
 
 namespace P3D.Legacy.Common.Packets
 {
     public abstract partial record P3DPacket
     {
-        private static ReadOnlySpan<char> ParseSection(in ReadOnlySequence<char> sequence, ref SequencePosition position)
-        {
-            var reader = new SequenceReader<char>(sequence.Slice(position));
-            reader.TryReadTo(out ReadOnlySpan<char> section, '|');
+        private static readonly byte[] Separator = { (byte) '|' };
 
-            position = reader.Position;
+        private static ReadOnlySpan<byte> ParseSection(ref ReadOnlySequence<byte> sequence)
+        {
+            var reader = new SequenceReader<byte>(sequence);
+            reader.TryReadTo(out ReadOnlySpan<byte> section, Separator);
+
+            sequence = reader.UnreadSequence;
             return section;
         }
 
-        public static bool TryParseProtocol(in ReadOnlySequence<char> sequence, ref SequencePosition position, out Protocol protocol)
+        public static bool TryParseProtocol(ref ReadOnlySequence<byte> sequence, out Protocol protocol)
         {
-            var reader = new SequenceReader<char>(sequence.Slice(position));
-            if (!reader.TryReadTo(out ReadOnlySpan<char> _, '|'))
+            var reader = new SequenceReader<byte>(sequence);
+            if (!reader.TryReadTo(out ReadOnlySpan<byte> section, Separator))
             {
                 protocol = default;
                 return false;
             }
+            sequence = reader.UnreadSequence;
 
-            protocol = new Protocol(ParseSection(in sequence, ref position));
+            protocol = new Protocol(section);
             return true;
         }
 
-        public static bool TryParseId(in ReadOnlySequence<char> sequence, ref SequencePosition position, out P3DPacketType id)
+        public static bool TryParseId(ref ReadOnlySequence<byte> sequence, out P3DPacketType id)
         {
-            var reader = new SequenceReader<char>(sequence.Slice(position));
-            if (!reader.TryReadTo(out ReadOnlySpan<char> _, '|'))
+            var reader = new SequenceReader<byte>(sequence);
+            if (!reader.TryReadTo(out ReadOnlySpan<byte> section, Separator))
+            {
+                id = P3DPacketType.None;
+                return false;
+            }
+            sequence = reader.UnreadSequence;
+
+            if (!Utf8Parser.TryParse(section, out int idInt, out _))
             {
                 id = P3DPacketType.None;
                 return false;
             }
 
-            var result = int.TryParse(ParseSection(in sequence, ref position), out var idInt);
-
             id = (P3DPacketType) idInt;
-            return result;
+            return true;
         }
 
-        public bool TryPopulateData(in ReadOnlySequence<char> sequence, ref SequencePosition position)
+        public bool TryPopulateData(ref ReadOnlySequence<byte> sequence)
         {
-            if (!int.TryParse(ParseSection(in sequence, ref position), out var origin))
+            if (!Utf8Parser.TryParse(ParseSection(ref sequence), out int origin, out _))
                 return false;
 
             Origin = Origin.FromNumber(origin);
 
 
-            if (!int.TryParse(ParseSection(in sequence, ref position), out var dataItemsCount))
+            if (!Utf8Parser.TryParse(ParseSection(ref sequence), out int dataItemsCount, out _))
                 return false;
 
             var offsets = dataItemsCount * 4 < 1024 ? stackalloc int[dataItemsCount] : new int[dataItemsCount];
@@ -58,19 +68,17 @@ namespace P3D.Legacy.Common.Packets
             //Count from 4th item to second last item. Those are the offsets.
             for (var i = 0; i < dataItemsCount; i++)
             {
-                if (!int.TryParse(ParseSection(in sequence, ref position), out var offset))
+                if (!Utf8Parser.TryParse(ParseSection(ref sequence), out int offset, out _))
                     return false;
                 else
                     offsets[i] = offset;
             }
 
-            var remainingSequence = sequence.Slice(position);
-
             //Cutting the data:
             for (var i = 0; i < offsets.Length; i++)
             {
                 var cOffset = offsets[i];
-                var length = remainingSequence.Length - cOffset;
+                var length = sequence.Length - cOffset;
 
                 if (i < offsets.Length - 1)
                     length = offsets[i + 1] - cOffset;
@@ -78,10 +86,10 @@ namespace P3D.Legacy.Common.Packets
                 if (length < 0)
                     return false;
 
-                if (cOffset + length > remainingSequence.Length)
+                if (cOffset + length > sequence.Length)
                     return false;
 
-                DataItemStorage.Set(DataItemStorage.Count, remainingSequence.Slice(cOffset, length).ToString());
+                DataItemStorage.Set(DataItemStorage.Count, Encoding.UTF8.GetString(sequence.Slice(cOffset, length)));
             }
 
             return true;

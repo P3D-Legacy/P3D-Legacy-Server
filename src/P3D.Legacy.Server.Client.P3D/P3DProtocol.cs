@@ -2,74 +2,64 @@
 
 using Microsoft.Extensions.Logging;
 
-using Nerdbank.Streams;
-
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets;
+using P3D.Legacy.Server.Client.P3D.Extensions;
 
 using System;
 using System.Buffers;
-using System.IO;
 using System.Text;
 
 namespace P3D.Legacy.Server.Client.P3D
 {
-    internal sealed class P3DProtocol : IMessageReader<P3DPacket?>, IMessageWriter<P3DPacket>, IDisposable
+    public sealed class P3DProtocol : IMessageReader<P3DPacket?>, IMessageWriter<P3DPacket?>
     {
-        private static readonly int NewLineLength = Encoding.ASCII.GetByteCount(new[] { '\r', '\n' });
+        private static readonly byte[] Separator = { (byte) '|' };
+        private static readonly byte[] DataItemSeparator = { (byte) '|', (byte) '0', (byte)  '|' };
+        private static readonly byte[] NewLine = { (byte) '\r', (byte) '\n' };
 
         private readonly ILogger _logger;
         private readonly P3DPacketFactory _packetFactory;
-        private readonly IP3DPacketWriter _packetBuilder;
-        private readonly SequenceTextReader _sequenceTextReader = new();
 
-        public P3DProtocol(ILogger<P3DProtocol> logger, P3DPacketFactory packetFactory, IP3DPacketWriter packetBuilder)
+        public P3DProtocol(ILogger<P3DProtocol> logger, P3DPacketFactory packetFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _packetFactory = packetFactory ?? throw new ArgumentNullException(nameof(packetFactory));
-            _packetBuilder = packetBuilder ?? throw new ArgumentNullException(nameof(packetBuilder));
         }
 
         public bool TryParseMessage(in ReadOnlySequence<byte> input, ref SequencePosition consumed, ref SequencePosition examined, out P3DPacket? message)
         {
-            const int maxMessageSize = 4 * 1024 * 1024;
-            if (input.Length > maxMessageSize)
-                throw new InternalBufferOverflowException($"Received more than {maxMessageSize} bytes from the client!");
-
-            _sequenceTextReader.Initialize(input, Encoding.ASCII);
-            if (_sequenceTextReader.ReadLine() is not { } line)
+            var reader = new SequenceReader<byte>(input);
+            if (!reader.TryReadTo(out ReadOnlySequence<byte> line, NewLine))
             {
                 message = null;
                 return false;
             }
+            consumed = examined = reader.Position;
 
-            consumed = examined = input.GetPosition(Encoding.ASCII.GetByteCount(line) + NewLineLength, consumed);
-
-            var sequence = new ReadOnlySequence<char>(line.AsMemory());
-            var position = default(SequencePosition);
-
-            if (!P3DPacket.TryParseProtocol(in sequence, ref position, out var protocol) || protocol != ProtocolEnum.V1)
+            var lineSpanToParse = line;
+            if (!P3DPacket.TryParseProtocol(ref lineSpanToParse, out var protocol) || protocol != ProtocolEnum.V1)
             {
-                _logger.LogCritical("Line is not a P3D packet! Invalid protocol! {Line}", line);
+                _logger.LogCritical("Line is not a P3D packet! Invalid protocol! {Line}", Encoding.UTF8.GetString(line));
                 message = null;
                 return false;
             }
 
-            if (!P3DPacket.TryParseId(in sequence, ref position, out var id))
+            if (!P3DPacket.TryParseId(ref lineSpanToParse, out var id))
             {
-                _logger.LogCritical("Line is not a P3D packet! Invalid Packet Id! {Line}", line);
+                _logger.LogCritical("Line is not a P3D packet! Invalid Packet Id! {Line}", Encoding.UTF8.GetString(line));
                 message = null;
                 return false;
             }
 
             if (_packetFactory.GetFromId(id) is not { } packet)
             {
-                _logger.LogCritical("Line is not a P3D packet! Packet Id Out of Range! {Line}", line);
+                _logger.LogCritical("Line is not a P3D packet! Packet Id Out of Range! {Line}", Encoding.UTF8.GetString(line));
                 message = null;
                 return false;
             }
 
-            if (!packet.TryPopulateData(in sequence, ref position))
+            if (!packet.TryPopulateData(ref lineSpanToParse))
             {
                 _logger.LogCritical("Failed to populate message type {Type}", packet.GetType());
                 message = null;
@@ -81,15 +71,50 @@ namespace P3D.Legacy.Server.Client.P3D
             return true;
         }
 
-        public void WriteMessage(P3DPacket message, IBufferWriter<byte> output)
+        public void WriteMessage(P3DPacket? message, IBufferWriter<byte> output)
         {
-            _logger.LogTrace("Sending a message type {Type}", message.GetType());
-            _packetBuilder.WriteData(message, output);
-        }
+            if (message is null) return;
 
-        public void Dispose()
-        {
-            _sequenceTextReader.Dispose();
+            _logger.LogTrace("Sending a message type {Type}", message.GetType());
+
+            var encoder = Encoding.ASCII.GetEncoder();
+
+            output.Write(message.Protocol.ToString(), encoder);
+            output.Write(Separator);
+            output.Write((byte) message.Id, encoder);
+            output.Write(Separator);
+            output.Write(message.Origin.ToString(), encoder);
+
+            if (message.DataItemStorage.Count == 0)
+            {
+                output.Write(DataItemSeparator);
+            }
+            else
+            {
+                output.Write(Separator);
+                output.Write(message.DataItemStorage.Count, encoder);
+                output.Write(DataItemSeparator);
+
+                // We can't switch to a better implementation where
+                // we will write DataItems without allocating
+                // the whole buffer before. This 'header' information
+                // requires us to know the whole build datastructure
+
+                for (int i = 0, pos = 0; i < message.DataItemStorage.Count - 1; i++)
+                {
+                    // We skip writing 0, it's obvious. Start with the second item
+                    pos += message.DataItemStorage.Get(i).Length;
+                    output.Write(pos, encoder);
+                    output.Write(Separator);
+                }
+
+                foreach (var dataItem in message.DataItemStorage)
+                {
+                    output.Write(dataItem, encoder);
+                }
+            }
+
+            output.Write(NewLine);
         }
     }
 }

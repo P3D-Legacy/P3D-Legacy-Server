@@ -137,7 +137,6 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             base.Dispose();
             _connectionState = P3DConnectionState.None;
-            _protocol.Dispose();
             _connectionSpan.Dispose();
 #pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
             _writer.DisposeAsync().GetAwaiter().GetResult();
@@ -149,7 +148,6 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             await base.DisposeAsync();
             _connectionState = P3DConnectionState.None;
-            _protocol.Dispose();
             _connectionSpan.Dispose();
             await _writer.DisposeAsync();
         }

@@ -17,7 +17,6 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
 
             //services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<KestrelServerOptions>, P3DServerOptionsSetup>());
 
-            services.AddSingleton<IP3DPacketWriter, DefaultP3DPacketWriter>();
             services.AddScoped<P3DConnectionContextHandler>();
             services.AddScoped<P3DProtocol>();
 
