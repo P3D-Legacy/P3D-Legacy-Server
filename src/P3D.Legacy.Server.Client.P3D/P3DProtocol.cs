@@ -77,13 +77,11 @@ namespace P3D.Legacy.Server.Client.P3D
 
             _logger.LogTrace("Sending a message type {Type}", message.GetType());
 
-            var encoder = Encoding.ASCII.GetEncoder();
-
-            output.Write(message.Protocol.ToString(), encoder);
+            output.Write(message.Protocol);
             output.Write(Separator);
-            output.Write((byte) message.Id, encoder);
+            output.WriteAsText((byte) message.Id);
             output.Write(Separator);
-            output.Write(message.Origin.ToString(), encoder);
+            output.Write(message.Origin);
 
             if (message.DataItemStorage.Count == 0)
             {
@@ -92,7 +90,7 @@ namespace P3D.Legacy.Server.Client.P3D
             else
             {
                 output.Write(Separator);
-                output.Write(message.DataItemStorage.Count, encoder);
+                output.WriteAsText(message.DataItemStorage.Count);
                 output.Write(DataItemSeparator);
 
                 // We can't switch to a better implementation where
@@ -104,10 +102,11 @@ namespace P3D.Legacy.Server.Client.P3D
                 {
                     // We skip writing 0, it's obvious. Start with the second item
                     pos += message.DataItemStorage.Get(i).Length;
-                    output.Write(pos, encoder);
+                    output.WriteAsText(pos);
                     output.Write(Separator);
                 }
 
+                var encoder = Encoding.ASCII.GetEncoder();
                 foreach (var dataItem in message.DataItemStorage)
                 {
                     output.Write(dataItem, encoder);
