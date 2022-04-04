@@ -40,7 +40,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 case BattleJoinPacket battleJoinPacket:
                     await HandleBattleJoinAsync(battleJoinPacket, ct);
                     break;
-                case BattleOfferPacket battleOfferPacket:
+                case BattleOfferFromClientPacket battleOfferPacket:
                     await HandleBattleOfferAsync(battleOfferPacket, ct);
                     break;
                 case BattleEndRoundDataPacket battleEndRoundDataPacket:
@@ -74,7 +74,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 case TradeJoinPacket tradeJoinPacket:
                     await HandleTradeJoinAsync(tradeJoinPacket, ct);
                     break;
-                case TradeOfferPacket tradeOfferPacket:
+                case TradeOfferFromClientPacket tradeOfferPacket:
                     await HandleTradeOfferAsync(tradeOfferPacket, ct);
                     break;
                 case TradeQuitPacket tradeQuitPacket:
@@ -85,6 +85,10 @@ namespace P3D.Legacy.Server.Client.P3D
                     break;
                 case TradeStartPacket tradeStartPacket:
                     await HandleTradeStartAsync(tradeStartPacket, ct);
+                    break;
+                default:
+                    if (_connectionState != P3DConnectionState.Intitialized) return;
+                    await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
                     break;
             }
         }
@@ -294,7 +298,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
             await _notificationPublisher.Publish(new PlayerTradeAbortedNotification(this, packet.DestinationPlayerOrigin), ct);
         }
-        private async Task HandleTradeOfferAsync(TradeOfferPacket packet, CancellationToken ct)
+        private async Task HandleTradeOfferAsync(TradeOfferFromClientPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
@@ -330,7 +334,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
             await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
-        private async Task HandleBattleOfferAsync(BattleOfferPacket packet, CancellationToken ct)
+        private async Task HandleBattleOfferAsync(BattleOfferFromClientPacket packet, CancellationToken ct)
         {
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;

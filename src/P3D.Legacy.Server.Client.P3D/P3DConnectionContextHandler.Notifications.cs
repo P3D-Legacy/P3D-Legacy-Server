@@ -124,21 +124,20 @@ namespace P3D.Legacy.Server.Client.P3D
             {
                 switch (p3dPacket)
                 {
-                    case TradeRequestPacket:
-                        await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
-                        await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(player, new TradeQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
-                        break;
                     case BattleRequestPacket:
                         await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
                         await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(player, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
-                        break;
-                    case TradeQuitPacket:
-                        await SendPacketAsync(p3dPacket, ct);
                         break;
                     case BattleQuitPacket:
                         await SendPacketAsync(p3dPacket, ct);
                         break;
                 }
+                return;
+            }
+
+            if (p3dPacket is BattleOfferFromClientPacket battleOfferFromClientPacket)
+            {
+                await SendPacketAsync(new BattleOfferToClientPacket { Origin = battleOfferFromClientPacket.Origin, BattleData = battleOfferFromClientPacket.BattleData}, ct);
                 return;
             }
 
@@ -266,7 +265,7 @@ namespace P3D.Legacy.Server.Client.P3D
             }
             else
             {
-                await SendPacketAsync(new TradeOfferPacket { Origin = player.Origin, DestinationPlayerOrigin = target, TradeData = data }, ct);
+                await SendPacketAsync(new TradeOfferToClientPacket { Origin = player.Origin, TradeData = data }, ct);
             }
         }
 
