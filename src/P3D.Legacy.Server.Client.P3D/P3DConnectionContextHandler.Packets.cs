@@ -403,10 +403,9 @@ namespace P3D.Legacy.Server.Client.P3D
 
                 CurrentPlayers = clientNames.Length,
                 MaxPlayers = _serverOptions.MaxPlayers,
-                PlayerNames = clientNames,
-
                 ServerName = _serverOptions.Name,
                 ServerMessage = _serverOptions.Message,
+                PlayerNames = clientNames,
             }, ct);
 
             var lifetimeNotificationFeature = Connection.Features.Get<IConnectionLifetimeNotificationFeature>();

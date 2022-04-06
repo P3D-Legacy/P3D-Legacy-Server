@@ -23,13 +23,13 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
     {
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public P3DPermissionRepository(ILogger<P3DPermissionRepository> logger, TracerProvider traceProvider, HttpClient httpClient)
+        public P3DPermissionRepository(ILogger<P3DPermissionRepository> logger, TracerProvider traceProvider, IHttpClientFactory httpClientFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Infrastructure");
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
         public async Task<PermissionEntity> GetByGameJoltIdAsync(GameJoltId id, CancellationToken ct)
@@ -42,7 +42,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 
             try
             {
-                response = await _httpClient.GetAsync(
+                response = await _httpClientFactory.CreateClient("P3D.API").GetAsync(
                     $"gamejoltaccount/{id}",
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);

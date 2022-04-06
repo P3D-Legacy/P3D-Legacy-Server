@@ -22,9 +22,9 @@ namespace P3D.Legacy.Server.Abstractions.Utils
             [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
             private void RegisterInternal(Func<IServiceProvider, IEnumerable> func)
             {
-                IEnumerable<INotificationHandler<TNotification>> Convert(IServiceProvider sp, Func<IServiceProvider, IEnumerable> func_)
+                IEnumerable<INotificationHandler<TNotification>> Convert(IServiceProvider sp, Func<IServiceProvider, IEnumerable> internalFunc)
                 {
-                    foreach (var obj in func(sp))
+                    foreach (var obj in internalFunc(sp))
                     {
                         yield return (obj as INotificationHandler<TNotification>)!;
                     }

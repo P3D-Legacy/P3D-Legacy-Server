@@ -87,13 +87,22 @@ namespace P3D.Legacy.Server.Client.P3D
 
         private async Task SendPacketAsync(P3DPacket packet, CancellationToken ct)
         {
-            using var span = _tracer.StartActiveSpan($"P3D Client Sending {packet.GetType().Name}", SpanKind.Client);
-            span.SetAttribute("net.peer.ip", IPEndPoint.Address.ToString());
-            span.SetAttribute("net.peer.port", IPEndPoint.Port);
-            span.SetAttribute("net.transport", "ip_tcp");
-            span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
+            if (_connectionState == P3DConnectionState.Finalized) return;
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct, Connection.ConnectionClosed);
 
-            await _writer.WriteAsync(_protocol, packet, ct);
+            try
+            {
+                using var span = _tracer.StartActiveSpan($"P3D Client Sending {packet.GetType().Name}", SpanKind.Client);
+                span.SetAttribute("net.peer.ip", IPEndPoint.Address.ToString());
+                span.SetAttribute("net.peer.port", IPEndPoint.Port);
+                span.SetAttribute("net.transport", "ip_tcp");
+                span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
+
+                await _writer.WriteAsync(_protocol, packet, cts.Token);
+            }
+            // Catch Writing is not allowed after writer was completed.
+            // We can't catch it in worst case scenarios
+            catch (Exception ex) when (ex is InvalidOperationException) { }
         }
 
         private async Task SendServerMessageAsync(string text, CancellationToken ct) => await SendPacketAsync(new ChatMessageGlobalPacket

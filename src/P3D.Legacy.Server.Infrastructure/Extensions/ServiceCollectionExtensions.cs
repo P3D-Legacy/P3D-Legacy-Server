@@ -29,16 +29,18 @@ namespace P3D.Legacy.Server.Infrastructure.Extensions
             services.AddOptions<PasswordOptions>();
             services.AddOptions<LockoutOptions>();
 
+            services.AddHttpClient();
+
             services.AddTransient<IUserManager, LiteDbUserManager>();
 
             services.AddTransient<IMuteManager, LiteDbMuteManager>();
 
             services.AddTransient<IPermissionManager, DefaultPermissionManager>();
-            //services.AddTransient<P3DPermissionRepository>();
+            services.AddTransient<P3DPermissionRepository>();
             services.AddTransient<LiteDbPermissionRepository>();
 
             services.AddTransient<IBanManager, DefaultBanManager>();
-            //services.AddTransient<P3DBanRepository>();
+            services.AddTransient<P3DBanRepository>();
             services.AddTransient<LiteDbBanRepository>();
 
             services.AddTransient<IMonsterRepository, MonsterRepository>();

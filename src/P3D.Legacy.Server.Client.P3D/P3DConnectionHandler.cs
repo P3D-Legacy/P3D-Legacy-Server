@@ -20,7 +20,7 @@ namespace P3D.Legacy.Server.Client.P3D
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        private readonly HashSet<P3DConnectionContextHandler> _connections = new(new ConnectionContextHandlerEqualityComparer());
+        private readonly ConcurrentDictionary<P3DConnectionContextHandler, object?> _connections = new(new ConnectionContextHandlerEqualityComparer());
         private readonly ConcurrentBag<IServiceScope> _connectionScopes = new();
 
         public P3DConnectionHandler(ILogger<P3DConnectionHandler> logger, IServiceScopeFactory serviceScopeFactory)
@@ -38,14 +38,14 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (await connectionContextHandlerFactory.CreateAsync<P3DConnectionContextHandler>(connection) is { } connectionContextHandler)
             {
-                _connections.Add(connectionContextHandler);
+                _connections.TryAdd(connectionContextHandler, null);
 
                 var lifetimeNotificationFeature = connection.Features.Get<IConnectionLifetimeNotificationFeature>();
                 var stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed, lifetimeNotificationFeature?.ConnectionClosedRequested ?? CancellationToken.None);
 
                 var _ = stoppingCts.Token.Register(() =>
                 {
-                    _connections.Remove(connectionContextHandler);
+                    _connections.Remove(connectionContextHandler, out var _);
                     stoppingCts.Dispose();
                 });
                 await connectionContextHandler.ListenAsync();
