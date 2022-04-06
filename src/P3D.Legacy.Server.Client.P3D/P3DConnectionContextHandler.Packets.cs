@@ -10,6 +10,7 @@ using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Common.Packets.Shared;
 using P3D.Legacy.Common.Packets.Trade;
+using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Application.Commands.Player;
 
@@ -396,7 +397,7 @@ namespace P3D.Legacy.Server.Client.P3D
         // ReSharper disable once UnusedParameter.Local
         private async Task HandleServerDataRequestAsync(ServerDataRequestPacket _, CancellationToken ct)
         {
-            var clientNames = await _playerContainer.GetAllAsync(ct).Select(x => x.Name).ToArrayAsync(ct);
+            var clientNames = await _playerContainer.GetAllAsync(ct).Where(x => x.Permissions > PermissionFlags.UnVerified).Select(x => x.Name).ToArrayAsync(ct);
             await SendPacketAsync(new ServerInfoDataPacket
             {
                 Origin = Origin.Server,

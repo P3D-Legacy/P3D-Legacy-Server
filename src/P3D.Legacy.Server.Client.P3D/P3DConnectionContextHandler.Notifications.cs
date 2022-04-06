@@ -11,6 +11,7 @@ using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Application.Commands.Player;
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -43,7 +44,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (Origin == player.Origin)
             {
-                await foreach (var connectedPlayer in _playerContainer.GetAllAsync(ct))
+                await foreach (var connectedPlayer in _playerContainer.GetAllAsync(ct).Where(x => x.Permissions > PermissionFlags.UnVerified).WithCancellation(ct))
                 {
                     await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerOrigin = connectedPlayer.Origin }, ct);
                     var state = connectedPlayer as IP3DPlayerState ?? IP3DPlayerState.Empty;

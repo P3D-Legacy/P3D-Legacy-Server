@@ -1,4 +1,5 @@
 ﻿using P3D.Legacy.Common;
+using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Services;
 
 using System;
@@ -20,20 +21,20 @@ namespace P3D.Legacy.Server.Application.Queries.Players
 
         public async Task<PlayerViewModel?> GetAsync(long origin, CancellationToken ct)
         {
-            return await _playerContainer.GetAsync(Origin.FromNumber(origin), ct) is { } x ? new PlayerViewModel(x.Origin, x.Name, x.GameJoltId) : null;
+            return await _playerContainer.GetAsync(Origin.FromNumber(origin), ct) is { Permissions: > PermissionFlags.UnVerified } x ? new PlayerViewModel(x.Origin, x.Name, x.GameJoltId) : null;
         }
 
         public async Task<(long Count, IReadOnlyList<PlayerViewModel> Models)> GetAllAsync(int skip, int take, CancellationToken ct)
         {
             return (
-                await _playerContainer.GetAllAsync(ct).CountAsync(ct),
-                await _playerContainer.GetAllAsync(ct).Skip(skip).Take(take).Select(x => new PlayerViewModel(x.Origin, x.Name, x.GameJoltId)).ToListAsync(ct)
+                await _playerContainer.GetAllAsync(ct).Where(x => x.Permissions > PermissionFlags.UnVerified).CountAsync(ct),
+                await _playerContainer.GetAllAsync(ct).Where(x => x.Permissions > PermissionFlags.UnVerified).Skip(skip).Take(take).Select(x => new PlayerViewModel(x.Origin, x.Name, x.GameJoltId)).ToListAsync(ct)
             );
         }
 
         public IAsyncEnumerable<PlayerViewModel> GetAllAsync(CancellationToken ct)
         {
-            return _playerContainer.GetAllAsync(ct).Select(x => new PlayerViewModel(x.Origin, x.Name, x.GameJoltId));
+            return _playerContainer.GetAllAsync(ct).Where(x => x.Permissions > PermissionFlags.UnVerified).Select(x => new PlayerViewModel(x.Origin, x.Name, x.GameJoltId));
         }
     }
 }
