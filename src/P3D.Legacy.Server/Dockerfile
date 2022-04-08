@@ -14,6 +14,7 @@ COPY ["src/P3D.Legacy.Server.Infrastructure/P3D.Legacy.Server.Infrastructure.csp
 COPY ["src/P3D.Legacy.Server.InternalAPI/P3D.Legacy.Server.InternalAPI.csproj", "src/P3D.Legacy.Server.InternalAPI/"]
 COPY ["src/P3D.Legacy.Server.Statistics/P3D.Legacy.Server.Statistics.csproj", "src/P3D.Legacy.Server.Statistics/"]
 COPY ["src/P3D.Legacy.Server.UI.Shared/P3D.Legacy.Server.UI.Shared.csproj", "src/P3D.Legacy.Server.UI.Shared/"]
+COPY ["src/P3D.Legacy.Server.GUI/P3D.Legacy.Server.GUI.csproj", "src/P3D.Legacy.Server.GUI/"]
 COPY ["src/P3D.Legacy.Server/P3D.Legacy.Server.csproj", "src/P3D.Legacy.Server/"]
 
 RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj"
@@ -29,6 +30,7 @@ COPY ["src/P3D.Legacy.Server.Infrastructure/", "src/P3D.Legacy.Server.Infrastruc
 COPY ["src/P3D.Legacy.Server.InternalAPI/", "src/P3D.Legacy.Server.InternalAPI/"]
 COPY ["src/P3D.Legacy.Server.Statistics/", "src/P3D.Legacy.Server.Statistics/"]
 COPY ["src/P3D.Legacy.Server.UI.Shared/", "src/P3D.Legacy.Server.UI.Shared/"]
+COPY ["src/P3D.Legacy.Server.GUI/", "src/P3D.Legacy.Server.GUI/"]
 COPY ["src/P3D.Legacy.Server/", "src/P3D.Legacy.Server/"]
 
 COPY [".git", ".git"]
