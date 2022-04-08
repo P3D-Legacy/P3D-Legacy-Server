@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "P3D.Legacy.Server.Benchmark": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:57780;http://localhost:57781"
+    }
+  }
+}

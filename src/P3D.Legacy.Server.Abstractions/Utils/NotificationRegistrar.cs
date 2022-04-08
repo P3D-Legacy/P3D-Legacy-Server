@@ -14,9 +14,9 @@ namespace P3D.Legacy.Server.Abstractions.Utils
     {
         private class NotificationServiceFactory<TNotification> : BaseServiceFactory where TNotification : INotification
         {
-            private readonly List<Func<IServiceProvider, IEnumerable<INotificationHandler<TNotification>>>> _notifications = new();
+            private readonly List<Func<IServiceProvider, IEnumerable<INotificationHandler<TNotification>?>>> _notifications = new();
 
-            public void Register(Func<IServiceProvider, IEnumerable<INotificationHandler<TNotification>>> func) => _notifications.Add(func);
+            public void Register(Func<IServiceProvider, IEnumerable<INotificationHandler<TNotification>?>> func) => _notifications.Add(func);
 
             [SuppressMessage("ReSharper", "UnusedMember.Local")]
             [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
@@ -33,7 +33,7 @@ namespace P3D.Legacy.Server.Abstractions.Utils
                 _notifications.Add(sp => Convert(sp, func));
             }
 
-            public override IEnumerable<INotificationHandler<TNotification>> ServiceFactory(IServiceProvider sp) => _notifications.SelectMany(func => func(sp));
+            public override IEnumerable<INotificationHandler<TNotification>> ServiceFactory(IServiceProvider sp) => _notifications.SelectMany(func => func(sp)).OfType<INotificationHandler<TNotification>>();
         }
 
         private readonly IServiceCollection _services;
@@ -41,7 +41,7 @@ namespace P3D.Legacy.Server.Abstractions.Utils
 
         public NotificationRegistrar(IServiceCollection services) => _services = services;
 
-        public void Add<TNotification>(Func<IServiceProvider, INotificationHandler<TNotification>> factory) where TNotification : INotification
+        public void Add<TNotification>(Func<IServiceProvider, INotificationHandler<TNotification>?> factory) where TNotification : INotification
         {
             var key = typeof(IEnumerable<INotificationHandler<TNotification>>);
 

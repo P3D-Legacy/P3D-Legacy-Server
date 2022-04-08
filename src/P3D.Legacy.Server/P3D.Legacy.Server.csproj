@@ -24,6 +24,9 @@
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.2.0-rc3" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc9" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
     <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" />
   </ItemGroup>
@@ -36,6 +39,7 @@
     <ProjectReference Include="..\P3D.Legacy.Server.CommunicationAPI\P3D.Legacy.Server.CommunicationAPI.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.DiscordBot\P3D.Legacy.Server.DiscordBot.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.GameCommands\P3D.Legacy.Server.GameCommands.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.GUI\P3D.Legacy.Server.GUI.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Infrastructure\P3D.Legacy.Server.Infrastructure.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.InternalAPI\P3D.Legacy.Server.InternalAPI.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Statistics\P3D.Legacy.Server.Statistics.csproj" />

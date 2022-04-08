@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\P3D.Legacy.Server.Client.P3D\P3D.Legacy.Server.Client.P3D.csproj" />
+  </ItemGroup>
+
+</Project>

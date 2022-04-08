@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using OpenTelemetry.Metrics;
@@ -20,12 +19,16 @@ using P3D.Legacy.Server.DiscordBot.Extensions;
 using P3D.Legacy.Server.DiscordBot.Options;
 using P3D.Legacy.Server.Extensions;
 using P3D.Legacy.Server.GameCommands.Extensions;
+using P3D.Legacy.Server.GUI.Extensions;
 using P3D.Legacy.Server.Infrastructure.Extensions;
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.InternalAPI.Extensions;
 using P3D.Legacy.Server.InternalAPI.Options;
 using P3D.Legacy.Server.Options;
 using P3D.Legacy.Server.Statistics.Extensions;
+
+using Serilog;
+using Serilog.Events;
 
 using System;
 using System.Diagnostics;
@@ -35,14 +38,32 @@ namespace P3D.Legacy.Server
 {
     public static class Program
     {
-        public static async Task Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
             Activity.DefaultIdFormat = ActivityIdFormat.W3C;
             Activity.ForceDefaultIdFormat = true;
 
-            await CreateHostBuilder(args).Build().RunAsync();
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .CreateBootstrapLogger();
+
+            try
+            {
+                Log.Information("Starting P3D-Legacy Server");
+                await CreateHostBuilder(args).Build().RunAsync();
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "P3D-Legacy Server terminated unexpectedly");
+                return 1;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) => Host
@@ -72,6 +93,7 @@ namespace P3D.Legacy.Server
                     services.AddInfrastructureMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                     services.AddInternalAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                     services.AddStatisticsMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                    services.AddGUIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                 }
 
                 services.AddHost(ctx.Configuration);
@@ -83,6 +105,7 @@ namespace P3D.Legacy.Server
                 services.AddInfrastructure(ctx.Configuration);
                 services.AddInternalAPI(ctx.Configuration);
                 services.AddStatistics(ctx.Configuration);
+                services.AddGUI(ctx.Configuration);
 
                 services.AddOpenTelemetryMetrics(b => b.Configure((sp, builder) =>
                 {
@@ -131,16 +154,11 @@ namespace P3D.Legacy.Server
             })
             .AddP3DServer()
             .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
-            .ConfigureLogging((ctx, builder) =>
-            {
-                builder.AddOpenTelemetry(options =>
-                {
-                    options.IncludeScopes = true;
-                    options.ParseStateValues = true;
-                    options.IncludeFormattedMessage = true;
-                    //options.AddConsoleExporter();
-                });
-            })
+            .UseSerilog((context, services, configuration) => configuration
+                .WriteTo.Console()
+                .WriteTo.UI(services)
+                .ReadFrom.Configuration(context.Configuration)
+                .ReadFrom.Services(services))
         ;
     }
 }
