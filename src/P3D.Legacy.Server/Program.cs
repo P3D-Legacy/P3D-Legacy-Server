@@ -93,7 +93,7 @@ namespace P3D.Legacy.Server
                     services.AddInfrastructureMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                     services.AddInternalAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                     services.AddStatisticsMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                    services.AddGUIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
+                    //services.AddGUIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
                 }
 
                 services.AddHost(ctx.Configuration);
@@ -105,7 +105,7 @@ namespace P3D.Legacy.Server
                 services.AddInfrastructure(ctx.Configuration);
                 services.AddInternalAPI(ctx.Configuration);
                 services.AddStatistics(ctx.Configuration);
-                services.AddGUI(ctx.Configuration);
+                //services.AddGUI(ctx.Configuration);
 
                 services.AddOpenTelemetryMetrics(b => b.Configure((sp, builder) =>
                 {
@@ -156,7 +156,7 @@ namespace P3D.Legacy.Server
             .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
             .UseSerilog((context, services, configuration) => configuration
                 .WriteTo.Console()
-                .WriteTo.UI(services)
+                //.WriteTo.UI(services)
                 .ReadFrom.Configuration(context.Configuration)
                 .ReadFrom.Services(services))
         ;

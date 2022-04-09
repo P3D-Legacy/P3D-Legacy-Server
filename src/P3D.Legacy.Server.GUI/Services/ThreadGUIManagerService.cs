@@ -86,8 +86,6 @@ namespace P3D.Legacy.Server.GUI.Services
             {
                 while (!ct.IsCancellationRequested)
                 {
-                    //Loop();
-
                     if (Console.ReadLine() == "/uimode")
                     {
                         Loop();
