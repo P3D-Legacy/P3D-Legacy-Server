@@ -21,22 +21,25 @@ namespace P3D.Legacy.Server.GUI.Services
             _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
         }
 
-        private void Loop()
+        private Task Loop(CancellationToken ct)
         {
             try
             {
-                var cts = new CancellationTokenSource();
+                using var cts = new CancellationTokenSource();
+                using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+                void OnServerUIOnOnStop(object? sender, EventArgs args) => cts.Cancel();
 
                 using var _ = _scopeFactory.CreateScope();
                 Terminal.Gui.Application.Init();
                 using var serverUI = _scopeFactory.GetRequiredService<ServerUI>();
-                serverUI.OnStop += (sender, args) => cts.Cancel();
+                serverUI.OnStop += OnServerUIOnOnStop;
                 using var runState = Terminal.Gui.Application.Begin(serverUI);
-                while (!cts.IsCancellationRequested)
+                while (!combinedCts.IsCancellationRequested)
                 {
                     Terminal.Gui.Application.RunLoop(runState, false);
                 }
                 Terminal.Gui.Application.End(runState);
+                serverUI.OnStop -= OnServerUIOnOnStop;
             }
             catch (Exception e)
             {
@@ -46,28 +49,25 @@ namespace P3D.Legacy.Server.GUI.Services
             {
                 Terminal.Gui.Application.Shutdown();
             }
+
+            return Task.CompletedTask;
         }
 
-        protected override Task ExecuteAsync(CancellationToken ct)
+        protected override async Task ExecuteAsync(CancellationToken ct)
         {
             try
             {
                 while (!ct.IsCancellationRequested)
                 {
-                    Loop();
-
-                    if (Console.ReadLine() == "/uimode")
-                    {
-                        Loop();
-                    }
+                    var result = Console.ReadLine();
+                    if (result is null) await Task.Delay(1000, ct);
+                    if (result == "/uimode") await Loop(ct);
                 }
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "UI Error!");
             }
-
-            return Task.CompletedTask;
         }
     }
 }

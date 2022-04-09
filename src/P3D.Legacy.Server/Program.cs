@@ -67,10 +67,9 @@ namespace P3D.Legacy.Server
 
         public static IHostBuilder CreateHostBuilder(string[] args) => Host
             .CreateDefaultBuilder(args)
+            .UseConsoleLifetime(opts => opts.SuppressStatusMessages = false)
             .ConfigureServices((ctx, services) =>
             {
-                services.Configure<ConsoleLifetimeOptions>(opts => opts.SuppressStatusMessages = true);
-
                 services.AddValidatedOptions<ServerOptions, ServerOptionsValidator>(ctx.Configuration.GetSection("Server"));
                 services.AddValidatedOptionsWithHttp<P3DSiteOptions, P3DSiteOptionsValidator>(ctx.Configuration.GetSection("OfficialSite"));
                 services.AddValidatedOptions<P3DServerOptions, P3DServerOptionsValidator>(ctx.Configuration.GetSection("P3DServer"));
@@ -158,7 +157,6 @@ namespace P3D.Legacy.Server
                 .WriteTo.UI(services)
                 .ReadFrom.Configuration(context.Configuration)
                 .ReadFrom.Services(services))
-            .UseConsoleLifetime()
         ;
     }
 }

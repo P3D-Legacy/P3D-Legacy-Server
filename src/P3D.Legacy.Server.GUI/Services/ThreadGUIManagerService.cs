@@ -53,22 +53,25 @@ namespace P3D.Legacy.Server.GUI.Services
             }
         }
 
-        private void Loop()
+        private void Loop(CancellationToken ct)
         {
             try
             {
-                var cts = new CancellationTokenSource();
+                using var cts = new CancellationTokenSource();
+                using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
+                void OnServerUIOnOnStop(object? sender, EventArgs args) => cts.Cancel();
 
                 using var _ = _scopeFactory.CreateScope();
                 Terminal.Gui.Application.Init();
                 using var serverUI = _scopeFactory.GetRequiredService<ServerUI>();
-                serverUI.OnStop += (sender, args) => cts.Cancel();
+                serverUI.OnStop += OnServerUIOnOnStop;
                 using var runState = Terminal.Gui.Application.Begin(serverUI);
-                while (!cts.IsCancellationRequested)
+                while (!combinedCts.IsCancellationRequested)
                 {
                     Terminal.Gui.Application.RunLoop(runState, false);
                 }
                 Terminal.Gui.Application.End(runState);
+                serverUI.OnStop -= OnServerUIOnOnStop;
             }
             catch (Exception e)
             {
@@ -86,10 +89,9 @@ namespace P3D.Legacy.Server.GUI.Services
             {
                 while (!ct.IsCancellationRequested)
                 {
-                    if (Console.ReadLine() == "/uimode")
-                    {
-                        Loop();
-                    }
+                    var result = Console.ReadLine();
+                    if (result is null) ct.WaitHandle.WaitOne(1000); // Instead of Thread.Sleep
+                    if (result == "/uimode") Loop(ct);
                 }
             }
             catch (Exception e)

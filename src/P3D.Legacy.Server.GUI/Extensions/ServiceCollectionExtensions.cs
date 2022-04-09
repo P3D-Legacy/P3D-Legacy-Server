@@ -35,10 +35,10 @@ namespace P3D.Legacy.Server.GUI.Extensions
 
             services.AddSingleton<UILogEventSink>();
 
-            services.AddSingleton<ThreadGUIManagerService>();
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, ThreadGUIManagerService>(sp => sp.GetRequiredService<ThreadGUIManagerService>()));
-            //services.AddSingleton<TaskGUIManagerService>();
-            //services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, TaskGUIManagerService>(sp => sp.GetRequiredService<TaskGUIManagerService>()));
+            //services.AddSingleton<ThreadGUIManagerService>();
+            //services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, ThreadGUIManagerService>(sp => sp.GetRequiredService<ThreadGUIManagerService>()));
+            services.AddSingleton<TaskGUIManagerService>();
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, TaskGUIManagerService>(sp => sp.GetRequiredService<TaskGUIManagerService>()));
 
             services.AddScoped<ServerUI>();
             services.AddScoped<PlayerTabView>();
