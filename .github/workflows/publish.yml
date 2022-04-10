@@ -30,7 +30,7 @@ jobs:
     #  run: |
     #    chmod +x ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server
 
-    - name: Zipping
+    - name: Copy necessary files
       run: |
         mkdir P3D-Legacy-Server-${{ matrix.runtime }}
         [[ -e ./publish-${{ matrix.runtime }}/P3D.Legacy.Server ]] &&     cp ./publish-${{ matrix.runtime }}/P3D.Legacy.Server     ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server
@@ -39,7 +39,7 @@ jobs:
 
     - name: Zipping
       run: |
-        7z a P3D-Legacy-Server-${{ matrix.runtime }}.zip ./P3D-Legacy-Server-${{ matrix.runtime }}/* P3D.Legacy.Server P3D.Legacy.Server.exe appsettings.json
+        7z a P3D-Legacy-Server-${{ matrix.runtime }}.zip ./P3D-Legacy-Server-${{ matrix.runtime }}/*
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
