@@ -16,19 +16,17 @@ namespace P3D.Legacy.Server.InternalAPI.Options
     {
         public string RsaPrivateKey { get; init; } = default!;
 
-        private RSA? _rsa;
-        public RSA Key
+
+        private RSA? _rsa; // TODO: Cache or create new?
+        public RSA GetKey()
         {
-            get
+            if (_rsa is null)
             {
-                if (_rsa is null)
-                {
-                    _rsa = RSA.Create();
-                    if (!string.IsNullOrEmpty(RsaPrivateKey))
-                        _rsa.ImportFromPem(RsaPrivateKey);
-                }
-                return _rsa;
+                _rsa = RSA.Create();
+                if (!string.IsNullOrEmpty(RsaPrivateKey))
+                    _rsa.ImportFromPem(RsaPrivateKey);
             }
+            return _rsa;
         }
     }
 }

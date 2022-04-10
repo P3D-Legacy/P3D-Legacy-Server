@@ -53,7 +53,7 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
         }
         private SecurityToken GetSecurityToken(UserEntity user)
         {
-            var signingCredentials = new SigningCredentials(new RsaSecurityKey(_jwtOptions.Key), SecurityAlgorithms.RsaSha512Signature)
+            var signingCredentials = new SigningCredentials(new RsaSecurityKey(_jwtOptions.GetKey()), SecurityAlgorithms.RsaSha512Signature)
             {
                 CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false }
             };
