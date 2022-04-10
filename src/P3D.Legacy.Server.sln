@@ -45,6 +45,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmark", "Benchmark", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P3D.Legacy.Server.GUI", "P3D.Legacy.Server.GUI\P3D.Legacy.Server.GUI.csproj", "{7A5533AD-A0F0-4141-96AB-3A5756945FFC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{0DDFBF00-5A0D-42B8-8851-A6EF0A3BE1ED}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\deploy-docker-qa.yml = ..\.github\workflows\deploy-docker-qa.yml
+		..\.github\workflows\deploy-docker.yml = ..\.github\workflows\deploy-docker.yml
+		..\.github\workflows\deploy-openapi.yml = ..\.github\workflows\deploy-openapi.yml
+		..\.github\workflows\discord.sh = ..\.github\workflows\discord.sh
+		..\.github\workflows\docker-publish-qa.yml = ..\.github\workflows\docker-publish-qa.yml
+		..\.github\workflows\docker-publish.yml = ..\.github\workflows\docker-publish.yml
+		..\.github\workflows\release-tags.yml = ..\.github\workflows\release-tags.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -136,6 +147,7 @@ Global
 		{3F4354CE-C691-4405-9354-E864E8E24D6E} = {4CE8FA6B-6920-41ED-9559-D02212AC75D1}
 		{4CE8FA6B-6920-41ED-9559-D02212AC75D1} = {B8171225-FEA8-47E8-AE9E-96DD1AFE76D2}
 		{7A5533AD-A0F0-4141-96AB-3A5756945FFC} = {679B78EF-C627-49A7-B49E-D54B4FAF1F08}
+		{0DDFBF00-5A0D-42B8-8851-A6EF0A3BE1ED} = {B8171225-FEA8-47E8-AE9E-96DD1AFE76D2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE1E891D-648F-4AD9-981D-5743A83ACDD2}

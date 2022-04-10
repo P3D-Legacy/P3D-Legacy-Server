@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bedrock.Framework" Version="0.1.62-alpha.g8a965bbcba" />
+    <PackageReference Include="Bedrock.Framework" Version="0.1.63-alpha.gf69fa1b135" />
     <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
     <PackageReference Include="Nerdbank.Streams" Version="2.8.57" />
   </ItemGroup>
