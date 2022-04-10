@@ -23,7 +23,6 @@ jobs:
 
     - name: Build
       run: dotnet build src/P3D.Legacy.Server/P3D.Legacy.Server.csproj
-
       shell: pwsh
 
     - name: Install SwashBuckle.AspNetCore.Cli
