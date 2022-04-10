@@ -6,6 +6,7 @@ using Discord.WebSocket;
 using MediatR;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -20,19 +21,23 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 {
-    internal sealed class DiscordPassthroughService : CriticalBackgroundService,
+    internal sealed class DiscordPassthroughService : IHostedService, IDisposable,
         INotificationHandler<PlayerJoinedNotification>,
         INotificationHandler<PlayerLeftNotification>,
         INotificationHandler<PlayerSentGlobalMessageNotification>,
         INotificationHandler<ServerMessageNotification>,
         INotificationHandler<PlayerTriggeredEventNotification>
     {
+        private Task? _executingTask;
+
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IMediator _mediator;
         private readonly DiscordSocketClient? _discordSocketClient;
         private readonly DiscordOptions _options;
+        private readonly CancellationTokenSource _stoppingCts = new();
+        private readonly IApplicationEnder _applicationEnder;
 
         public DiscordPassthroughService(
             ILogger<DiscordPassthroughService> logger,
@@ -41,7 +46,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             IServiceScopeFactory scopeFactory,
             IOptions<DiscordOptions> options,
             IMediator mediator,
-            IApplicationEnder applicationEnder) : base(applicationEnder)
+            IApplicationEnder applicationEnder)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.DiscordBot");
@@ -51,9 +56,63 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             _discordSocketClient = options.Value.PasstroughChannelId != 0
                 ? discordSocketClient ?? throw new ArgumentNullException(nameof(discordSocketClient))
                 : null;
+            _applicationEnder = applicationEnder;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        private void OnError(Exception exceptionFromExecuteAsync)
+        {
+            Console.Error.WriteLine($"Error happened while executing CriticalBackgroundTask {GetType().FullName}. Shutting down.");
+            Console.Error.WriteLine(exceptionFromExecuteAsync.ToString());
+            _applicationEnder.ShutDownApplication();
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            // Store the task we're executing
+            _executingTask = Task.Factory.StartNew(() => ExecuteAsync(_stoppingCts.Token), _stoppingCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
+            // If the task is completed then return it, this will bubble cancellation and failure to the caller
+            if (_executingTask.IsCompleted)
+            {
+                return _executingTask;
+            }
+
+            // Add an error handler here that shuts down the application
+            // Do not save it to _executingTask - as that means it will hang on shutting down
+            // until the grace period is over.
+            _executingTask.ContinueWith(t =>
+            {
+                if (t.Exception !=  null)
+                {
+                    OnError(t.Exception);
+                }
+            }, _stoppingCts.Token);
+
+            // Otherwise it's running
+            return Task.CompletedTask;
+        }
+        
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            // Stop called without start
+            if (_executingTask == null)
+            {
+                return;
+            }
+
+            try
+            {
+                // Signal cancellation to the executing method
+                _stoppingCts.Cancel();
+            }
+            finally
+            {
+                // Wait until the task completes or the stop token triggers
+                await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, cancellationToken));
+            }
+        }
+
+        private async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             using var span = _tracer.StartActiveSpan("Discord Bot");
 
@@ -136,10 +195,10 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             return Task.CompletedTask;
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             _discordSocketClient?.Dispose();
-            base.Dispose();
+            this._stoppingCts.Cancel();
         }
 
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken cancellationToken)

@@ -6,7 +6,7 @@ namespace P3D.Legacy.Server.GUI.Services
 {
     public sealed class UIServiceScopeFactory : IServiceScopeFactory, IServiceProvider
     {
-        private class ScopeWrapper : IServiceScope
+        private sealed class ScopeWrapper : IServiceScope
         {
             public IServiceProvider ServiceProvider => _serviceScope.ServiceProvider;
 

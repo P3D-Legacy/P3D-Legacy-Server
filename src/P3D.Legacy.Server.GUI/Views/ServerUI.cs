@@ -6,7 +6,7 @@ namespace P3D.Legacy.Server.GUI.Views
 {
     public sealed class ServerUI : Toplevel
     {
-        public event EventHandler OnStop; 
+        public event EventHandler? OnStop; 
 
         public ServerUI(PlayerTabView playerTabView, ChatTabView chatTabView, LogsTabView logsTabView, SettingsTabView settingsTabView)
         {

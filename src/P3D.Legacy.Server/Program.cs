@@ -10,7 +10,6 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Server.Abstractions.Options;
-using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.Application.Extensions;
 using P3D.Legacy.Server.Client.P3D.Extensions;
 using P3D.Legacy.Server.Client.P3D.Options;
@@ -79,16 +78,16 @@ namespace P3D.Legacy.Server
                 services.AddValidatedOptions<OtlpOptions, OtlpOptionsValidator>(ctx.Configuration.GetSection("Otlp"));
 
                 services.AddMediatRInternal();
-                services.AddHost(ctx.Configuration);
-                services.AddApplication(ctx.Configuration);
-                services.AddClientP3D(ctx.Configuration);
-                services.AddCommunicationAPI(ctx.Configuration);
-                services.AddDiscordBot(ctx.Configuration);
-                services.AddGameCommands(ctx.Configuration);
-                services.AddInfrastructure(ctx.Configuration);
-                services.AddInternalAPI(ctx.Configuration);
-                services.AddStatistics(ctx.Configuration);
-                services.AddGUI(ctx.Configuration);
+                services.AddHost();
+                services.AddApplication();
+                services.AddClientP3D();
+                services.AddCommunicationAPI();
+                services.AddDiscordBot();
+                services.AddGameCommands();
+                services.AddInfrastructure();
+                services.AddInternalAPI();
+                services.AddStatistics();
+                services.AddGUI();
 
                 services.AddOpenTelemetryMetrics(b => b.Configure((sp, builder) =>
                 {

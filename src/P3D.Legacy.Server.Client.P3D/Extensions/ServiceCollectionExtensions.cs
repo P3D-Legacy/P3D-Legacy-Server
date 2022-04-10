@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.Application.Services;
@@ -10,10 +9,8 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddClientP3D(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddClientP3D(this IServiceCollection services)
         {
-            services.AddMemoryCache();
-
             //services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<KestrelServerOptions>, P3DServerOptionsSetup>());
 
             services.AddScoped<P3DConnectionContextHandler>();

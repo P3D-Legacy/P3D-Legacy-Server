@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
@@ -13,7 +12,7 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddGameCommands(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddGameCommands(this IServiceCollection services)
         {
             services.AddTransient<CommandManagerHandler>();
             services.AddNotifications(sp => sp.GetRequiredService<CommandManagerHandler>());

@@ -20,7 +20,7 @@ namespace P3D.Legacy.Server.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddHost(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddHost(this IServiceCollection services)
         {
             services.AddBetterHostedServices();
 

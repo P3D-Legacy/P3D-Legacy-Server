@@ -11,8 +11,6 @@ using P3D.Legacy.Server.UI.Shared.Models;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -55,11 +53,7 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
         }
         private SecurityToken GetSecurityToken(UserEntity user)
         {
-            var privateKey = Encoding.UTF8.GetString(Convert.FromBase64String(_jwtOptions.RsaPrivateKey));
-            var rsa = RSA.Create();
-            rsa.ImportFromPem(privateKey);
-
-            var signingCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha512Signature)
+            var signingCredentials = new SigningCredentials(new RsaSecurityKey(_jwtOptions.Key), SecurityAlgorithms.RsaSha512Signature)
             {
                 CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false }
             };

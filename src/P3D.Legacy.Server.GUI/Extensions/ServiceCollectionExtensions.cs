@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
@@ -11,7 +10,7 @@ namespace P3D.Legacy.Server.GUI.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddGUI(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddGUI(this IServiceCollection services)
         {
             services.AddSingleton<UIServiceScopeFactory>();
 

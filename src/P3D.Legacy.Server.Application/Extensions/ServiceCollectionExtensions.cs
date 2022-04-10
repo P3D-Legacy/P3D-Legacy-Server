@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Server.Abstractions.Extensions;
@@ -20,7 +19,7 @@ namespace P3D.Legacy.Server.Application.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddRequest<ChangePlayerPermissionsCommand, CommandResult, ChangePlayerPermissionsCommandHandler>();
             services.AddRequest<PlayerAuthenticateDefaultCommand, CommandResult, PlayerAuthenticateDefaultCommandHandler>();

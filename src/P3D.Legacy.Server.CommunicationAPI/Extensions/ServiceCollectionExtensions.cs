@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.CommunicationAPI.Controllers;
@@ -9,7 +8,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddCommunicationAPI(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddCommunicationAPI(this IServiceCollection services)
         {
             services.AddTransient<CommunicationController>();
 
