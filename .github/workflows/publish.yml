@@ -22,13 +22,20 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Publish artifacts
-      run: dotnet publish src/P3D.Legacy.Server/P3D.Legacy.Server.csproj --configuration Release --framework net6.0 --runtime ${{ matrix.runtime }} --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true --output ./P3D-Legacy-Server-${{ matrix.runtime }}
+      run: dotnet publish src/P3D.Legacy.Server/P3D.Legacy.Server.csproj --configuration Release --framework net6.0 --runtime ${{ matrix.runtime }} --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true --output ./publish-${{ matrix.runtime }}
       shell: pwsh
 
     #- name: Set executable bit
     #  if: ${{ matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm' || matrix.runtime == 'linux-arm64' }}
     #  run: |
     #    chmod +x ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server
+
+    - name: Zipping
+      run: |
+        mkdir P3D-Legacy-Server-${{ matrix.runtime }}.zip
+        cp publish-${{ matrix.runtime }}/P3D.Legacy.Server P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server
+        cp publish-${{ matrix.runtime }}/P3D.Legacy.Server.exe P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server.exe
+        cp publish-${{ matrix.runtime }}/appsettings.json P3D-Legacy-Server-${{ matrix.runtime }}/appsettings.json
 
     - name: Zipping
       run: |
