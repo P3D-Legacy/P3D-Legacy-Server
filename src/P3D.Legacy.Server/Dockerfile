@@ -55,6 +55,12 @@ WORKDIR /app
 
 COPY --from=build-env /build/output .
 
+# https://github.com/opencontainers/image-spec/blob/main/annotations.md
+# org.opencontainers.image.base.digest
+# org.opencontainers.image.ref.name
+# org.opencontainers.image.revision
+# org.opencontainers.image.version
+# org.opencontainers.image.created
 LABEL org.opencontainers.image.title="P3D Legacy Server" \
       org.opencontainers.image.description="Server software for P3D Legacy" \
       org.opencontainers.image.url="https://github.com/P3D-Legacy/P3D-Legacy-Server" \
