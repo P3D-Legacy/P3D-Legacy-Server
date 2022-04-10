@@ -33,9 +33,9 @@ jobs:
     - name: Zipping
       run: |
         mkdir P3D-Legacy-Server-${{ matrix.runtime }}
-        [[ -e ./publish-${{ matrix.runtime }}/P3D.Legacy.Server ]]     cp ./publish-${{ matrix.runtime }}/P3D.Legacy.Server     ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server
-        [[ -e ./publish-${{ matrix.runtime }}/P3D.Legacy.Server.exe ]] cp ./publish-${{ matrix.runtime }}/P3D.Legacy.Server.exe ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server.exe
-                                                                       cp ./publish-${{ matrix.runtime }}/appsettings.json      ./P3D-Legacy-Server-${{ matrix.runtime }}/appsettings.json
+        [[ -e ./publish-${{ matrix.runtime }}/P3D.Legacy.Server ]] &&     cp ./publish-${{ matrix.runtime }}/P3D.Legacy.Server     ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server
+        [[ -e ./publish-${{ matrix.runtime }}/P3D.Legacy.Server.exe ]] && cp ./publish-${{ matrix.runtime }}/P3D.Legacy.Server.exe ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server.exe
+                                                                          cp ./publish-${{ matrix.runtime }}/appsettings.json      ./P3D-Legacy-Server-${{ matrix.runtime }}/appsettings.json
 
     - name: Zipping
       run: |
