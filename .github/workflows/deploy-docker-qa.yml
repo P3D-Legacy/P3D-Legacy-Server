@@ -1,14 +1,14 @@
-name: "Deploy 'P3D Legacy Server'"
+name: "Deploy 'P3D Legacy Server Next'"
 
 on:
   repository_dispatch:
     types:
-      - deploy-docker-image
+      - deploy-docker-image-qa
   workflow_dispatch:
 
 jobs:
   deploy:
-    name: "Deploy 'P3D Legacy Server'"
+    name: "Deploy 'P3D Legacy Server Next'"
     runs-on: ubuntu-latest
     environment:
       name: 'next-p3d-backend'
@@ -23,8 +23,15 @@ jobs:
         port: ${{ secrets.PORT }}
         script: |
           docker login -u=P3D-Legacy -p=${{ secrets.TOKEN_GPR }} ghcr.io
-          docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest;
-          docker stack deploy --prune --resolve-image always -c /deploy/p3d-legacy-server/docker-compose.yml p3dlegacyserver;
+          docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest-qa;
+          docker stack deploy --prune --resolve-image always -c /deploy/next-p3d-legacy-server/docker-compose.yml nextp3dlegacyserver;
 
     - name: Checkout Repository
       uses: actions/checkout@v3
+
+    - name: Notify
+      if: always()
+      env:
+        BUILD_STATUS: ${{ job.status }}
+        WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+      run: bash ./.github/workflows/discord.sh

@@ -1,4 +1,4 @@
-name: Publish Self Contained
+name: Release
 
 on:
   push:
