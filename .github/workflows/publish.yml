@@ -22,7 +22,7 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Publish artifacts
-      run: dotnet publish src/P3D.Legacy.Server/P3D.Legacy.Server.csproj --configuration Release --framework net6.0 --runtime ${{ matrix.runtime }} --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true --output ./P3D-Legacy-Server-${{ matrix.runtime }}/*
+      run: dotnet publish src/P3D.Legacy.Server/P3D.Legacy.Server.csproj --configuration Release --framework net6.0 --runtime ${{ matrix.runtime }} --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true --output ./P3D-Legacy-Server-${{ matrix.runtime }}
       shell: pwsh
 
     #- name: Set executable bit
