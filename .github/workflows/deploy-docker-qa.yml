@@ -33,5 +33,5 @@ jobs:
       if: always()
       env:
         BUILD_STATUS: ${{ job.status }}
-        WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+        WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_QA }}
       run: bash ./.github/workflows/discord.sh

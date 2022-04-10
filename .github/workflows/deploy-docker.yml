@@ -28,3 +28,10 @@ jobs:
 
     - name: Checkout Repository
       uses: actions/checkout@v3
+
+    - name: Notify
+      if: always()
+      env:
+        BUILD_STATUS: ${{ job.status }}
+        WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+      run: bash ./.github/workflows/discord.sh
