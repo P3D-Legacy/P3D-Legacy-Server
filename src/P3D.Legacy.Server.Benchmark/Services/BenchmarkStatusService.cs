@@ -16,6 +16,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using ZLogger;
+
 namespace P3D.Legacy.Server.Benchmark.Services
 {
     public class BenchmarkStatusService : IHostedService
@@ -70,7 +72,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
         {
             var batch = 1000;
             var parallel = Environment.ProcessorCount;
-            _logger.LogInformation("Start. Batch: {Batch}", batch * parallel);
+            _logger.ZLogInformation("Start. Batch: {Batch}", batch * parallel);
             var stopwatch = Stopwatch.StartNew();
             var failedCount = 0;
             await Parallel.ForEachAsync(Enumerable.Range(0, parallel), ct, async (i, ct) =>
@@ -81,10 +83,10 @@ namespace P3D.Legacy.Server.Benchmark.Services
                     if (!result) failedCount++;
                 }
                 stopwatch_p.Stop();
-                _logger.LogInformation("Parallel End {Parallel}. Time: {Time} ms.", i, stopwatch_p.ElapsedMilliseconds);
+                _logger.ZLogInformation("Parallel End {Parallel}. Time: {Time} ms.", i, stopwatch_p.ElapsedMilliseconds);
             });
             stopwatch.Stop();
-            _logger.LogInformation("End. Time {Time} ms. Failed: {FailedCount}", stopwatch.ElapsedMilliseconds, failedCount);
+            _logger.ZLogInformation("End. Time {Time} ms. Failed: {FailedCount}", stopwatch.ElapsedMilliseconds, failedCount);
         }
 
         public Task StopAsync(CancellationToken ct) => Task.CompletedTask;

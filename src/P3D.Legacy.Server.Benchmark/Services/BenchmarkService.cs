@@ -1,6 +1,5 @@
 ﻿using Bedrock.Framework.Protocols;
 
-using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,6 @@ using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Chat;
 
-using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Common.Packets.Shared;
 using P3D.Legacy.Server.Client.P3D;
@@ -22,6 +20,8 @@ using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+
+using ZLogger;
 
 namespace P3D.Legacy.Server.Benchmark.Services
 {
@@ -182,7 +182,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
         {
             var batch = 20;
             var parallel = Environment.ProcessorCount;
-            _logger.LogInformation("Start. Batch: {Batch}", batch * parallel);
+            _logger.ZLogInformation("Start. Batch: {Batch}", batch * parallel);
             var stopwatch = Stopwatch.StartNew();
             var failedCount = 0;
             await Parallel.ForEachAsync(Enumerable.Range(0, parallel), ct, async (i, ct) =>
@@ -193,15 +193,15 @@ namespace P3D.Legacy.Server.Benchmark.Services
                     if (result is not null)
                     {
                         if (result is not OperationCanceledException)
-                            _logger.LogError(result, "Parallel {Parallel}.", i);
+                            _logger.ZLogError(result, "Parallel {Parallel}.", i);
                         failedCount++;
                     }
                 }
                 stopwatch_p.Stop();
-                _logger.LogInformation("Parallel End {Parallel}. Time: {Time} ms.", i, stopwatch_p.ElapsedMilliseconds);
+                _logger.ZLogInformation("Parallel End {Parallel}. Time: {Time} ms.", i, stopwatch_p.ElapsedMilliseconds);
             });
             stopwatch.Stop();
-            _logger.LogInformation("End. Time {Time} ms. Failed: {FailedCount}", stopwatch.ElapsedMilliseconds, failedCount);
+            _logger.ZLogInformation("End. Time {Time} ms. Failed: {FailedCount}", stopwatch.ElapsedMilliseconds, failedCount);
             /*
             var batch = 4;
             var parallel = 6;

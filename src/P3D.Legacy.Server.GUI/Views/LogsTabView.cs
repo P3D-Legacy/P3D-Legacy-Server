@@ -1,4 +1,4 @@
-﻿using Serilog.Events;
+﻿using Microsoft.Extensions.Logging;
 
 using System;
 
@@ -22,9 +22,9 @@ namespace P3D.Legacy.Server.GUI.Views
             Add(messageView);
         }
 
-        public void Log(LogEvent logEvent)
+        public void Log<TState>(string category, LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            var message = logEvent.RenderMessage();
+            var message = formatter(state, exception);
             var content = message + Environment.NewLine + _logsTextView.Text;
 
             const int maxLines = 500;

@@ -8,6 +8,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+using ZLogger;
+
 namespace P3D.Legacy.Server.GUI.Services
 {
     public sealed class TaskGUIManagerService : IHostedService, IDisposable
@@ -82,7 +84,7 @@ namespace P3D.Legacy.Server.GUI.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "UI Error!");
+                _logger.ZLogError(e, "UI Error!");
             }
             finally
             {
@@ -105,7 +107,7 @@ namespace P3D.Legacy.Server.GUI.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "UI Error!");
+                _logger.ZLogError(e, "UI Error!");
             }
         }
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Connections.Features;
-using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Extensions;
@@ -17,6 +16,8 @@ using P3D.Legacy.Server.Application.Commands.Player;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using ZLogger;
 
 namespace P3D.Legacy.Server.Client.P3D
 {
@@ -98,13 +99,13 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             if (packet.DataItemStorage.Count == 0)
             {
-                _logger.LogWarning("P3D Reading Error: ParseGameData DataItems is empty");
+                _logger.ZLogWarning("P3D Reading Error: ParseGameData DataItems is empty");
                 return;
             }
 
             if (packet.DataItemStorage.Count < 14)
             {
-                _logger.LogWarning("P3D Reading Error: ParseGameData DataItems < 14. Packet DataItems {DataItems}", packet.DataItemStorage);
+                _logger.ZLogWarning("P3D Reading Error: ParseGameData DataItems < 14. Packet DataItems {DataItems}", packet.DataItemStorage);
                 return;
             }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.GUI.Services;
@@ -14,7 +15,7 @@ namespace P3D.Legacy.Server.GUI.Extensions
         {
             services.AddSingleton<UIServiceScopeFactory>();
 
-            services.AddSingleton<UILogEventSink>();
+            services.AddSingleton<ILoggerProvider, UILoggerProvider>();
 
             services.AddSingleton<TaskGUIManagerService>();
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, TaskGUIManagerService>(sp => sp.GetRequiredService<TaskGUIManagerService>()));

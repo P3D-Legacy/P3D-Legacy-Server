@@ -9,6 +9,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
+using ZLogger;
+
 namespace P3D.Legacy.Server.Application.Utils
 {
     public class PollyUtils
@@ -40,7 +42,7 @@ namespace P3D.Legacy.Server.Application.Utils
                     },
                     onRetryAsync: (result, timeSpan, retryCount, context) =>
                     {
-                        logger.LogError(result.Exception, "Exception during HTTP connection. HttpResult {@HttpResult}. Retry count {RetryCount}. Waiting {Time}...", result.Result, retryCount, timeSpan);
+                        logger.ZLogError(result.Exception, "Exception during HTTP connection. HttpResult {@HttpResult}. Retry count {RetryCount}. Waiting {Time}...", result.Result, retryCount, timeSpan);
                         return Task.CompletedTask;
                     });
         }

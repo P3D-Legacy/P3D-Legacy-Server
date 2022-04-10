@@ -27,8 +27,6 @@ using P3D.Legacy.Server.InternalAPI.Options;
 using P3D.Legacy.Server.Options;
 using P3D.Legacy.Server.Statistics.Extensions;
 
-using Serilog;
-
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -37,32 +35,14 @@ namespace P3D.Legacy.Server
 {
     public static class Program
     {
-        public static async Task<int> Main(string[] args)
+        public static async Task Main(string[] args)
         {
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
             Activity.DefaultIdFormat = ActivityIdFormat.W3C;
             Activity.ForceDefaultIdFormat = true;
 
-            Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console()
-                .CreateBootstrapLogger();
-
-            try
-            {
-                Log.Information("Starting P3D-Legacy Server");
-                await CreateHostBuilder(args).Build().RunAsync();
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "P3D-Legacy Server terminated unexpectedly");
-                return 1;
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
+            await CreateHostBuilder(args).Build().RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) => Host
@@ -145,11 +125,6 @@ namespace P3D.Legacy.Server
             })
             .AddP3DServer()
             .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
-            .UseSerilog((context, services, configuration) => configuration
-                .WriteTo.Console()
-                .WriteTo.UI(services)
-                .ReadFrom.Configuration(context.Configuration)
-                .ReadFrom.Services(services))
         ;
     }
 }

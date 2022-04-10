@@ -6,6 +6,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
+using ZLogger;
+
 namespace P3D.Legacy.Server.Behaviours
 {
     internal class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest> where TRequest : notnull
@@ -23,7 +25,7 @@ namespace P3D.Legacy.Server.Behaviours
         {
             var requestName = typeof(TRequest).Name;
 
-            _logger.LogInformation("Request: {Name} {@Request}", requestName, request);
+            _logger.ZLogInformation("Request: {Name} {@Request}", requestName, request);
 
             return Task.CompletedTask;
         }

@@ -8,6 +8,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using ZLogger;
+
 namespace P3D.Legacy.Server.Abstractions.Services
 {
     internal class NotificationMediator : Mediator
@@ -116,7 +118,7 @@ namespace P3D.Legacy.Server.Abstractions.Services
             {
                 if (task.Exception is not null)
                 {
-                    _logger.LogError(task.Exception, "Exception during publish! Strategy: {Strategy}", nameof(PublishStrategy.ParallelWhenAny));
+                    _logger.ZLogError(task.Exception, "Exception during publish! Strategy: {Strategy}", nameof(PublishStrategy.ParallelWhenAny));
                 }
             }, ct), ct)));
         }
@@ -129,7 +131,7 @@ namespace P3D.Legacy.Server.Abstractions.Services
                 {
                     if (task.Exception is not null)
                     {
-                        _logger.LogError(task.Exception, "Exception during publish! Strategy: {Strategy}", nameof(PublishStrategy.ParallelNoWait));
+                        _logger.ZLogError(task.Exception, "Exception during publish! Strategy: {Strategy}", nameof(PublishStrategy.ParallelNoWait));
                     }
                 }, ct);
             }
