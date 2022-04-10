@@ -10,15 +10,54 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GUI.Services
 {
-    public sealed class TaskGUIManagerService : BackgroundService
+    public sealed class TaskGUIManagerService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
         private readonly UIServiceScopeFactory _scopeFactory;
+
+        private Task? _executingTask;
+        private readonly CancellationTokenSource _stoppingCts = new();
 
         public TaskGUIManagerService(ILogger<TaskGUIManagerService> logger, UIServiceScopeFactory scopeFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            // Store the task we're executing
+            _executingTask = Task.Factory.StartNew(() => ExecuteAsync(_stoppingCts.Token), _stoppingCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
+            // If the task is completed then return it, this will bubble cancellation and failure to the caller
+            if (_executingTask.IsCompleted)
+            {
+                return _executingTask;
+            }
+
+            // Otherwise it's running
+            return Task.CompletedTask;
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            // Stop called without start
+            if (_executingTask == null)
+            {
+                return;
+            }
+
+            try
+            {
+                // Signal cancellation to the executing method
+                _stoppingCts.Cancel();
+            }
+            finally
+            {
+                // Wait until the task completes or the stop token triggers
+                await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, cancellationToken));
+            }
+
         }
 
         private Task Loop(CancellationToken ct)
@@ -53,7 +92,7 @@ namespace P3D.Legacy.Server.GUI.Services
             return Task.CompletedTask;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken ct)
+        private async Task ExecuteAsync(CancellationToken ct)
         {
             try
             {
@@ -68,6 +107,11 @@ namespace P3D.Legacy.Server.GUI.Services
             {
                 _logger.LogError(e, "UI Error!");
             }
+        }
+
+        public void Dispose()
+        {
+            _stoppingCts.Cancel();
         }
     }
 }
