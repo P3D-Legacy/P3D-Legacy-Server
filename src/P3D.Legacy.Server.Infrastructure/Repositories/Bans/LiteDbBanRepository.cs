@@ -26,9 +26,9 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
         private readonly LiteDbOptions _options;
 
-        public LiteDbBanRepository(IOptions<LiteDbOptions> options)
+        public LiteDbBanRepository(IOptionsMonitor<LiteDbOptions> options)
         {
-            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _options = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
         }
 
         public async Task<BanEntity?> GetAsync(PlayerId id, CancellationToken ct)

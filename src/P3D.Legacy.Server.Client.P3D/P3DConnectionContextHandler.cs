@@ -37,7 +37,7 @@ namespace P3D.Legacy.Server.Client.P3D
         private readonly IPlayerContainerReader _playerContainer;
         private readonly P3DProtocol _protocol;
         private readonly WorldService _worldService;
-        private readonly ServerOptions _serverOptions;
+        private readonly IOptionsMonitor<ServerOptions> _serverOptions;
         private readonly IMonsterRepository _monsterRepository;
         private readonly IMuteManager _muteManager;
         private readonly TradeManager _tradeManager;
@@ -52,7 +52,7 @@ namespace P3D.Legacy.Server.Client.P3D
             P3DProtocol protocol,
             IPlayerContainerReader playerContainer,
             WorldService worldService,
-            IOptions<ServerOptions> serverOptions,
+            IOptionsMonitor<ServerOptions> serverOptions,
             IMediator mediator,
             NotificationPublisher notificationPublisher,
             IMonsterRepository monsterRepository,
@@ -64,7 +64,7 @@ namespace P3D.Legacy.Server.Client.P3D
             _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
             _worldService = worldService ?? throw new ArgumentNullException(nameof(worldService));
-            _serverOptions = serverOptions.Value ?? throw new ArgumentNullException(nameof(serverOptions));
+            _serverOptions = serverOptions ?? throw new ArgumentNullException(nameof(serverOptions));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
             _monsterRepository = monsterRepository ?? throw new ArgumentNullException(nameof(monsterRepository));

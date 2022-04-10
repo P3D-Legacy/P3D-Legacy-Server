@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Infrastructure.Models.Bans;
+using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
 
 using System;
@@ -15,11 +15,11 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Bans
 {
     public sealed class DefaultBanManager : IBanManager
     {
-        private readonly ServerOptions _options;
+        private readonly P3DIntegrationOptions _options;
         private readonly LiteDbBanRepository _liteDbBanRepository;
         private readonly P3DBanRepository _p3dBanRepository;
 
-        public DefaultBanManager(IOptions<ServerOptions> options, LiteDbBanRepository liteDbBanRepository, P3DBanRepository p3dBanRepository)
+        public DefaultBanManager(IOptions<P3DIntegrationOptions> options, LiteDbBanRepository liteDbBanRepository, P3DBanRepository p3dBanRepository)
         {
             _options = options.Value ?? throw new ArgumentNullException(nameof(options));
             _liteDbBanRepository = liteDbBanRepository ?? throw new ArgumentNullException(nameof(liteDbBanRepository));

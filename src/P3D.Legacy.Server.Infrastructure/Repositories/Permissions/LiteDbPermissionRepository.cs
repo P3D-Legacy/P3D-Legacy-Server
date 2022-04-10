@@ -23,9 +23,9 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 
         private readonly LiteDbOptions _options;
 
-        public LiteDbPermissionRepository(IOptions<LiteDbOptions> options)
+        public LiteDbPermissionRepository(IOptionsMonitor<LiteDbOptions> options)
         {
-            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _options = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
         }
 
         public async Task<PermissionEntity> GetByNameIdAsync(string name, CancellationToken ct)

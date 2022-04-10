@@ -1,6 +1,8 @@
 ﻿using MediatR;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using System;
 using System.Collections.Generic;
@@ -11,8 +13,76 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Abstractions.Extensions
 {
+    public class DynamicConfigurationProviderManager
+    {
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IDynamicConfigurationProvider[] _configurationProviders = Array.Empty<IDynamicConfigurationProvider>();
+
+        public DynamicConfigurationProviderManager(IServiceProvider serviceProvider, IConfiguration configuration)
+        {
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+
+            if (configuration is IConfigurationRoot root)
+            {
+                _configurationProviders = root.Providers.OfType<IDynamicConfigurationProvider>().ToArray();
+            }
+        }
+
+        public IEnumerable<Type> GetRegisteredOptionTypes() => _configurationProviders.Select(x => x.OptionsType);
+
+        public IDynamicConfigurationProvider? GetProvider(Type optionsType) => _configurationProviders.FirstOrDefault(x => x.OptionsType == optionsType);
+        public IDynamicConfigurationProvider? GetProvider<TOptions>() => GetProvider(typeof(TOptions));
+        public object? GetOptions(Type type)
+        {
+            var openMethod = typeof(DynamicConfigurationProviderManager).GetMethod("GetOptionsInternal", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var method = openMethod?.MakeGenericMethod(type);
+            return method?.Invoke(this, Array.Empty<object>());
+        }
+        public TOptions? GetOptionsInternal<TOptions>() where TOptions : class => _serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;
+    }
+
+    public interface IDynamicConfigurationProvider
+    {
+        public Type OptionsType { get; }
+
+        public IEnumerable<PropertyInfo> AvailableProperties { get; }
+
+        public bool SetProperty(PropertyInfo property, string value);
+    }
+
+    public class MemoryConfigurationProvider<TOptions> : ConfigurationProvider, IConfigurationSource, IDynamicConfigurationProvider
+    {
+        public Type OptionsType => typeof(TOptions);
+        public IEnumerable<PropertyInfo> AvailableProperties => _keys;
+
+        private readonly string _basePath;
+        private readonly PropertyInfo[] _keys;
+        public MemoryConfigurationProvider(IConfigurationSection section)
+        {
+            _basePath = section.Path;
+            _keys = typeof(TOptions).GetProperties().Where(p => p.CanRead && p.CanWrite).ToArray();
+        }
+
+        public bool SetProperty(PropertyInfo property, string value)
+        {
+            Set($"{_basePath}:{property.Name}", value);
+            OnReload();
+            return true;
+        }
+
+        public override void Load() { }
+
+        public IConfigurationProvider Build(IConfigurationBuilder builder) => this;
+    }
+
     public static class ServiceCollectionExtensions
     {
+        public static IServiceCollection RegisterDynamicOptions<TOptions>(this IServiceCollection services, IConfigurationSection section) where TOptions : class
+        {
+
+            return services;
+        }
+
         private class NotificationHandlerWrapper<TNotificationHandler, TNotification> : INotificationHandler<TNotification>
             where TNotification : INotification
             where TNotificationHandler : INotificationHandler<TNotification>

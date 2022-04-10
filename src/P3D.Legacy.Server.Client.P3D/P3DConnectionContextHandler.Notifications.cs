@@ -251,7 +251,8 @@ namespace P3D.Legacy.Server.Client.P3D
             if (Origin != target) return;
 
             var cancel = false;
-            if (_serverOptions.ValidationEnabled)
+            var currentServerOptions = _serverOptions.CurrentValue;
+            if (currentServerOptions.ValidationEnabled)
             {
                 var monster = await _monsterRepository.GetByDataAsync(data.MonsterData);
                 cancel = !monster.IsValidP3D();

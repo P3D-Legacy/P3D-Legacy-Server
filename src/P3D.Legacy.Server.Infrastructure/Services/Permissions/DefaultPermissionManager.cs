@@ -4,6 +4,7 @@ using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Infrastructure.Models.Permissions;
+using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
 
 using System;
@@ -14,11 +15,11 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Permissions
 {
     public class DefaultPermissionManager : IPermissionManager
     {
-        private readonly ServerOptions _options;
+        private readonly P3DIntegrationOptions _options;
         private readonly LiteDbPermissionRepository _liteDbPermissionRepository;
         private readonly P3DPermissionRepository _p3dPermissionRepository;
 
-        public DefaultPermissionManager(IOptions<ServerOptions> options, LiteDbPermissionRepository liteDbPermissionRepository, P3DPermissionRepository p3dPermissionRepository)
+        public DefaultPermissionManager(IOptions<P3DIntegrationOptions> options, LiteDbPermissionRepository liteDbPermissionRepository, P3DPermissionRepository p3dPermissionRepository)
         {
             _options = options.Value ?? throw new ArgumentNullException(nameof(options));
             _liteDbPermissionRepository = liteDbPermissionRepository ?? throw new ArgumentNullException(nameof(liteDbPermissionRepository));

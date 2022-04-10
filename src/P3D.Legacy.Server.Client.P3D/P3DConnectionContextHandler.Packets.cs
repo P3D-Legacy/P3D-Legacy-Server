@@ -215,10 +215,19 @@ namespace P3D.Legacy.Server.Client.P3D
                 switch (Id.IdType)
                 {
                     case PlayerIdType.Name:
-                        await SendServerMessageAsync("Please use /login %PASSWORD% for logging in or registering.", ct);
-                        await SendServerMessageAsync("Please note that chat messages are not sent secure to the server.", ct);
-                        await SendServerMessageAsync("The game client sends a SHA-512 hash instead of the raw password.", ct);
-                        await SendServerMessageAsync("Don't use your regular passwords!", ct);
+                        var currentOptions = _serverOptions.CurrentValue;
+                        if (currentOptions.OfflineEnabled)
+                        {
+                            await SendServerMessageAsync("Please use /login %PASSWORD% for logging in or registering.", ct);
+                            await SendServerMessageAsync("Please note that chat messages are not sent secure to the server.", ct);
+                            await SendServerMessageAsync("The game client sends a SHA-512 hash instead of the raw password.", ct);
+                            await SendServerMessageAsync("Don't use your regular passwords!", ct);
+                        }
+                        else
+                        {
+                            await KickAsync("Offline saves are not supported!", ct);
+                            return;
+                        }
                         break;
                     case PlayerIdType.GameJolt:
                         if (await _mediator.Send(new PlayerAuthenticateGameJoltCommand(this, GameJoltId), ct) is { Success: true })
@@ -229,6 +238,7 @@ namespace P3D.Legacy.Server.Client.P3D
                         else
                         {
                             await KickAsync("Failed to verify your GameJolt Id!", ct);
+                            return;
                         }
                         break;
                 }
@@ -341,7 +351,8 @@ namespace P3D.Legacy.Server.Client.P3D
                 return;
 
             var cancel = false;
-            if (_serverOptions.ValidationEnabled)
+            var currentServerOptions = _serverOptions.CurrentValue;
+            if (currentServerOptions.ValidationEnabled)
             {
                 await foreach (var monster in packet.BattleData.MonsterDatas.ToAsyncEnumerable().SelectAwait(async x => await _monsterRepository.GetByDataAsync(x)).WithCancellation(ct))
                 {
@@ -397,15 +408,17 @@ namespace P3D.Legacy.Server.Client.P3D
         // ReSharper disable once UnusedParameter.Local
         private async Task HandleServerDataRequestAsync(ServerDataRequestPacket _, CancellationToken ct)
         {
+            var currentServerOptions = _serverOptions.CurrentValue;
+
             var clientNames = await _playerContainer.GetAllAsync(ct).Where(x => x.Permissions > PermissionFlags.UnVerified).Select(x => x.Name).ToArrayAsync(ct);
             await SendPacketAsync(new ServerInfoDataPacket
             {
                 Origin = Origin.Server,
 
                 CurrentPlayers = clientNames.Length,
-                MaxPlayers = _serverOptions.MaxPlayers,
-                ServerName = _serverOptions.Name,
-                ServerMessage = _serverOptions.Message,
+                MaxPlayers = currentServerOptions.MaxPlayers,
+                ServerName = currentServerOptions.Name,
+                ServerMessage = currentServerOptions.Message,
                 PlayerNames = clientNames,
             }, ct);
 

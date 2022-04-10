@@ -24,9 +24,9 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
 
         private readonly LiteDbOptions _options;
 
-        public LiteDbStatisticsRepository(IOptions<LiteDbOptions> options)
+        public LiteDbStatisticsRepository(IOptionsMonitor<LiteDbOptions> options)
         {
-            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _options = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
         }
 
         public async Task<StatisticsEntity?> GetAsync(PlayerId id, string action, CancellationToken ct)

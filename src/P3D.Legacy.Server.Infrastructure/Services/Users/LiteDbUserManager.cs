@@ -30,9 +30,9 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
         private readonly PasswordOptions _passwordOptions;
         private readonly LockoutOptions _lockoutOptions;
 
-        public LiteDbUserManager(IOptions<LiteDbOptions> options, IOptions<PasswordOptions> passwordOptions, IOptions<LockoutOptions> lockoutOptions)
+        public LiteDbUserManager(IOptionsMonitor<LiteDbOptions> options, IOptions<PasswordOptions> passwordOptions, IOptions<LockoutOptions> lockoutOptions)
         {
-            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _options = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
             _passwordOptions = passwordOptions.Value ?? throw new ArgumentNullException(nameof(passwordOptions));
             _lockoutOptions = lockoutOptions.Value ?? throw new ArgumentNullException(nameof(lockoutOptions));
         }

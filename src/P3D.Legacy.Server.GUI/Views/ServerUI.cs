@@ -15,7 +15,7 @@ namespace P3D.Legacy.Server.GUI.Views
             tabView.AddTab(new TabView.Tab("Players", playerTabView), true);
             tabView.AddTab(new TabView.Tab("Chat", chatTabView), false);
             tabView.AddTab(new TabView.Tab("Logs", logsTabView), false);
-            //tabView.AddTab(new TabView.Tab("Settings", settingsTabView), false);
+            tabView.AddTab(new TabView.Tab("Settings", settingsTabView), false);
             win.Add(tabView);
 
             var statusBar = new StatusBar(new StatusItem[]

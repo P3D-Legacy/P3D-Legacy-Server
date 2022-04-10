@@ -9,6 +9,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
+using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Application.Extensions;
 using P3D.Legacy.Server.Client.P3D.Extensions;
@@ -67,9 +68,17 @@ namespace P3D.Legacy.Server
         public static IHostBuilder CreateHostBuilder(string[] args) => Host
             .CreateDefaultBuilder(args)
             .UseConsoleLifetime(opts => opts.SuppressStatusMessages = false)
+            .ConfigureAppConfiguration((ctx, builder) =>
+            {
+                builder.Add(new MemoryConfigurationProvider<ServerOptions>(ctx.Configuration.GetSection("Server")));
+                builder.Add(new MemoryConfigurationProvider<LiteDbOptions>(ctx.Configuration.GetSection("LiteDb")));
+            })
             .ConfigureServices((ctx, services) =>
             {
+                services.AddSingleton<DynamicConfigurationProviderManager>();
+
                 services.AddValidatedOptions<ServerOptions, ServerOptionsValidator>(ctx.Configuration.GetSection("Server"));
+                services.AddValidatedOptions<P3DIntegrationOptions, P3DIntegrationOptionsValidator>(ctx.Configuration.GetSection("Server"));
                 services.AddValidatedOptionsWithHttp<P3DSiteOptions, P3DSiteOptionsValidator>(ctx.Configuration.GetSection("OfficialSite"));
                 services.AddValidatedOptions<P3DServerOptions, P3DServerOptionsValidator>(ctx.Configuration.GetSection("P3DServer"));
                 services.AddValidatedOptions<DiscordOptions, DiscordOptionsValidator>(ctx.Configuration.GetSection("DiscordBot"));

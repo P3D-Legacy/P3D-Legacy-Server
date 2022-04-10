@@ -21,9 +21,9 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Mutes
 
         private readonly LiteDbOptions _options;
 
-        public LiteDbMuteManager(IOptions<LiteDbOptions> options)
+        public LiteDbMuteManager(IOptionsMonitor<LiteDbOptions> options)
         {
-            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _options = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
         }
 
         public async IAsyncEnumerable<PlayerId> GetAllAsync(PlayerId id, [EnumeratorCancellation] CancellationToken ct)
