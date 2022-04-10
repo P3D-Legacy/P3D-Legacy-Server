@@ -79,21 +79,6 @@ namespace P3D.Legacy.Server
                 services.AddValidatedOptions<OtlpOptions, OtlpOptionsValidator>(ctx.Configuration.GetSection("Otlp"));
 
                 services.AddMediatRInternal();
-                using (var requestRegistrar = new RequestRegistrar(services))
-                using (var notificationRegistrar = new NotificationRegistrar(services))
-                {
-                    services.AddHostMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                    services.AddApplicationMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                    services.AddClientP3DMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                    services.AddCommunicationAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                    services.AddDiscordBotMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                    services.AddGameCommandsMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                    services.AddInfrastructureMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                    services.AddInternalAPIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                    services.AddStatisticsMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                    services.AddGUIMediatR(ctx.Configuration, requestRegistrar, notificationRegistrar);
-                }
-
                 services.AddHost(ctx.Configuration);
                 services.AddApplication(ctx.Configuration);
                 services.AddClientP3D(ctx.Configuration);

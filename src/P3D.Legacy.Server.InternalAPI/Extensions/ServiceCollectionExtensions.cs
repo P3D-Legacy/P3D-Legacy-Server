@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.InternalAPI.Options;
 
 using System;
@@ -13,10 +12,6 @@ namespace P3D.Legacy.Server.InternalAPI.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddInternalAPIMediatR(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
-        {
-            return services;
-        }
         public static IServiceCollection AddInternalAPI(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthentication()

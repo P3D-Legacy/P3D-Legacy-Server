@@ -1,10 +1,7 @@
-﻿using MediatR;
-
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Abstractions.Notifications;
-using P3D.Legacy.Server.Abstractions.Utils;
+using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Chat;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Permission;
@@ -16,16 +13,10 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddGameCommandsMediatR(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
-        {
-            notificationRegistrar.Add(sp => sp.GetRequiredService<CommandManagerHandler>() as INotificationHandler<PlayerSentCommandNotification>);
-
-            return services;
-        }
-
         public static IServiceCollection AddGameCommands(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddTransient<CommandManagerHandler>();
+            services.AddNotifications(sp => sp.GetRequiredService<CommandManagerHandler>());
 
             services.AddTransient<CommandManager, HelpCommandManager>();
 

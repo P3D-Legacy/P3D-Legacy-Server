@@ -8,12 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Abstractions.Services;
-using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.Behaviours;
-using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
-using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
 using P3D.Legacy.Server.Options;
 
 using System;
@@ -24,10 +20,6 @@ namespace P3D.Legacy.Server.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddHostMediatR(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
-        {
-            return services;
-        }
         public static IServiceCollection AddHost(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddBetterHostedServices();

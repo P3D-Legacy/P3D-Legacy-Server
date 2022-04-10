@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
 using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
@@ -19,10 +18,6 @@ namespace P3D.Legacy.Server.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddInfrastructureMediatR(this IServiceCollection services, IConfiguration configuration, RequestRegistrar requestRegistrar, NotificationRegistrar notificationRegistrar)
-        {
-            return services;
-        }
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOptions<JsonSerializerOptions>();
