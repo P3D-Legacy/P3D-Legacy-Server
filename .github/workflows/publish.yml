@@ -32,7 +32,7 @@ jobs:
 
     - name: Zipping
       run: |
-        7z a P3D-Legacy-Server-${{ matrix.runtime }}.zip -o ./P3D-Legacy-Server-${{ matrix.runtime }}/* P3D.Legacy.Server P3D.Legacy.Server.exe appsettings.json
+        7z a P3D-Legacy-Server-${{ matrix.runtime }}.zip ./P3D-Legacy-Server-${{ matrix.runtime }}/* P3D.Legacy.Server P3D.Legacy.Server.exe appsettings.json
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
