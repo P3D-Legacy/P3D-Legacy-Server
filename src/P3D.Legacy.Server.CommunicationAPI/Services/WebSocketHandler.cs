@@ -3,6 +3,7 @@
 using Nerdbank.Streams;
 
 using P3D.Legacy.Common;
+using P3D.Legacy.Common.Events;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Abstractions.Services;
@@ -196,7 +197,14 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
 
         public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(notification.Player.Name, notification.EventMessage), _jsonSerializerOptions), ct);
+            if (EventParser.TryParse(notification.EventMessage, out var @event))
+            {
+                await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(notification.Player.Name, @event), _jsonSerializerOptions), ct);
+            }
+            else
+            {
+                await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventRawResponsePayload(notification.Player.Name, notification.EventMessage), _jsonSerializerOptions), ct);
+            }
         }
 
         public override int GetHashCode() => _id.GetHashCode();

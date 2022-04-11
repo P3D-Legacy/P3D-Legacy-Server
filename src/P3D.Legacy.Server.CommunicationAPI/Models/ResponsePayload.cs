@@ -1,4 +1,6 @@
-﻿using System;
+﻿using P3D.Legacy.Common.Events;
+
+using System;
 using System.Text.Json.Serialization;
 
 namespace P3D.Legacy.Server.CommunicationAPI.Models
@@ -10,8 +12,9 @@ namespace P3D.Legacy.Server.CommunicationAPI.Models
         PlayerLeft = 0x02,
         PlayerSentGlobalMessage = 0x03,
         ServerMessage = 0x04,
-        PlayerTriggeredEvent = 0x05,
+        PlayerTriggeredEventRaw = 0x05,
         Kicked = 0x06,
+        PlayerTriggeredEvent = 0x07,
 
         Error = 0xFF
     }
@@ -21,7 +24,8 @@ namespace P3D.Legacy.Server.CommunicationAPI.Models
     internal sealed record PlayerLeftResponsePayload(string Player) : ResponsePayload(ResponsePayloadType.PlayerLeft, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record PlayerSentGlobalMessageResponsePayload(string Player, string Message) : ResponsePayload(ResponsePayloadType.PlayerSentGlobalMessage, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record ServerMessageResponsePayload(string Message) : ResponsePayload(ResponsePayloadType.ServerMessage, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    internal sealed record PlayerTriggeredEventResponsePayload(string Player, string Event) : ResponsePayload(ResponsePayloadType.PlayerTriggeredEvent, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    internal sealed record PlayerTriggeredEventResponsePayload(string Player, Event Event) : ResponsePayload(ResponsePayloadType.PlayerTriggeredEvent, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    internal sealed record PlayerTriggeredEventRawResponsePayload(string Player, string Event) : ResponsePayload(ResponsePayloadType.PlayerTriggeredEventRaw, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record KickedResponsePayload(string Reason) : ResponsePayload(ResponsePayloadType.Kicked, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record SuccessResponsePayload(Guid Uid) : ResponsePayload(ResponsePayloadType.Success, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record ErrorResponsePayload(int Code, string Message, Guid Uid) : ResponsePayload(ResponsePayloadType.Error, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
