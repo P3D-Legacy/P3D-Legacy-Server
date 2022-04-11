@@ -12,7 +12,6 @@
   <ItemGroup>
     <PackageReference Include="Aragas.Extensions.Options.FluentValidation" Version="1.0.0.8" />
     <PackageReference Include="MediatR" Version="10.0.1" />
-    <PackageReference Include="ZLogger" Version="1.6.1" />
   </ItemGroup>
 
   <ItemGroup>

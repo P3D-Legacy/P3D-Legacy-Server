@@ -7,8 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-using ZLogger;
-
 namespace P3D.Legacy.Server.Behaviours
 {
     internal class UnhandledExceptionBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
@@ -32,7 +30,7 @@ namespace P3D.Legacy.Server.Behaviours
             {
                 var requestName = typeof(TRequest).Name;
 
-                _logger.ZLogError(ex, "Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
+                _logger.LogError(ex, "Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
 
                 throw;
             }

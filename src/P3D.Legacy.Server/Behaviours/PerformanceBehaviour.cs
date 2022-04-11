@@ -7,8 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-using ZLogger;
-
 namespace P3D.Legacy.Server.Behaviours
 {
     internal class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
@@ -38,7 +36,7 @@ namespace P3D.Legacy.Server.Behaviours
             {
                 var requestName = typeof(TRequest).Name;
 
-                _logger.ZLogWarning("Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}", requestName, elapsedMilliseconds, request);
+                _logger.LogWarning("Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}", requestName, elapsedMilliseconds, request);
             }
 
             return response;

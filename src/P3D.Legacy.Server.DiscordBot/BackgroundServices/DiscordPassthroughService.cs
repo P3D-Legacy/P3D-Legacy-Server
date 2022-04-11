@@ -19,8 +19,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-using ZLogger;
-
 namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 {
     internal sealed class DiscordPassthroughService : IHostedService, IDisposable,
@@ -124,7 +122,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
                 _discordSocketClient.MessageReceived -= BotMessageReceivedAsync;
                 _discordSocketClient.Log -= BotLogAsync;
                 await _discordSocketClient.StopAsync();
-                _logger.ZLogWarning("Stopped Discord Bot");
+                _logger.LogWarning("Stopped Discord Bot");
             }
 
             if (_discordSocketClient is null)
@@ -138,7 +136,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             var botToken = _options.BotToken;
             if (string.IsNullOrEmpty(botToken))
             {
-                _logger.ZLogError("Error while getting Discord.BotToken! Check your configuration file");
+                _logger.LogError("Error while getting Discord.BotToken! Check your configuration file");
                 return;
             }
 
@@ -148,7 +146,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             await _discordSocketClient.LoginAsync(TokenType.Bot, botToken);
             await _discordSocketClient.StartAsync();
 
-            _logger.ZLogWarning("Started Discord Bot");
+            _logger.LogWarning("Started Discord Bot");
 
 #if NET5_0
             stoppingToken.Register(_ => OnCancellation(null, stoppingToken), null);
@@ -162,26 +160,26 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             switch (arg.Severity)
             {
                 case LogSeverity.Critical:
-                    _logger.ZLogCritical(arg.Exception, "Critical log entry: {Message}", arg.Message);
+                    _logger.LogCritical(arg.Exception, "Critical log entry: {Message}", arg.Message);
                     break;
                 case LogSeverity.Error:
-                    _logger.ZLogError(arg.Exception, "Error log entry: {Message}", arg.Message);
+                    _logger.LogError(arg.Exception, "Error log entry: {Message}", arg.Message);
                     break;
                 case LogSeverity.Warning:
-                    _logger.ZLogWarning(arg.Exception, "Warning log entry: {Message}", arg.Message);
+                    _logger.LogWarning(arg.Exception, "Warning log entry: {Message}", arg.Message);
                     break;
                 case LogSeverity.Info:
-                    _logger.ZLogInformation(arg.Exception, "Info log entry: {Message}", arg.Message);
+                    _logger.LogInformation(arg.Exception, "Info log entry: {Message}", arg.Message);
                     break;
                 case LogSeverity.Verbose:
-                    _logger.ZLogTrace(arg.Exception, "Verbose log entry: {Message}", arg.Message);
+                    _logger.LogTrace(arg.Exception, "Verbose log entry: {Message}", arg.Message);
                     break;
                 case LogSeverity.Debug:
-                    _logger.ZLogDebug(arg.Exception, "Debug log entry: {Message}", arg.Message);
+                    _logger.LogDebug(arg.Exception, "Debug log entry: {Message}", arg.Message);
                     break;
 
                 default:
-                    _logger.ZLogWarning("Incorrect LogMessage.Severity - {Severity}, {Message}", arg.Severity, arg.Message);
+                    _logger.LogWarning("Incorrect LogMessage.Severity - {Severity}, {Message}", arg.Severity, arg.Message);
                     break;
             }
 

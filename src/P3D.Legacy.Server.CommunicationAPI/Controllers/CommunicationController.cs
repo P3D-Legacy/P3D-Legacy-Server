@@ -11,8 +11,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using ZLogger;
-
 namespace P3D.Legacy.Server.CommunicationAPI.Controllers
 {
     [ApiController]
@@ -37,7 +35,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
-                _logger.ZLogTrace("WebSocket connection received at 'listener/ws'");
+                _logger.LogTrace("WebSocket connection received at 'listener/ws'");
 
                 using var connectionSpan = _tracer.StartActiveSpan("Communication WebSocket Connection", SpanKind.Server);
 
