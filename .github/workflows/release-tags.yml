@@ -42,7 +42,7 @@ jobs:
         7z a P3D-Legacy-Server-${{ matrix.runtime }}.zip ./P3D-Legacy-Server-${{ matrix.runtime }}/*
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: all-artifacts
         path: |
