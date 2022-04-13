@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -80,60 +81,53 @@ namespace P3D.Legacy.Server.Abstractions.Services
             _publishStrategies[PublishStrategy.SyncStopOnException] = new NotificationMediator(serviceFactory, SyncStopOnException);
         }
 
-        public async Task Publish(INotification notification)
+        public Task Publish<TNotification>(TNotification notification) where TNotification : INotification
         {
-            await Publish(notification, DefaultStrategy, default);
+            return Publish(notification, DefaultStrategy, default);
         }
 
-        public async Task Publish(INotification notification, PublishStrategy strategy)
+        public Task Publish<TNotification>(TNotification notification, PublishStrategy strategy) where TNotification : INotification
         {
-            await Publish(notification, strategy, default);
+            return Publish(notification, strategy, default);
         }
 
-        public async Task Publish(INotification notification, CancellationToken ct)
+        public Task Publish<TNotification>(TNotification notification, CancellationToken ct) where TNotification : INotification
         {
-            await Publish(notification, DefaultStrategy, ct);
+            return Publish(notification, DefaultStrategy, ct);
         }
 
-        public async Task Publish(INotification notification, PublishStrategy strategy, CancellationToken ct)
+        public Task Publish<TNotification>(TNotification notification, PublishStrategy strategy, CancellationToken ct) where TNotification : INotification
         {
             if (!_publishStrategies.TryGetValue(strategy, out var mediator))
             {
                 throw new ArgumentException($"Unknown strategy: {strategy}");
             }
 
-            await mediator.Publish(notification, ct);
+            return mediator.Publish(notification, ct);
         }
 
-        private async Task ParallelWhenAll(IEnumerable<Func<INotification, CancellationToken, Task>> handlers, INotification notification, CancellationToken ct)
+        private Task ParallelWhenAll(IEnumerable<Func<INotification, CancellationToken, Task>> handlers, INotification notification, CancellationToken ct)
         {
-            await Task.WhenAll(handlers.Select(handler => Task.Run(() => handler(notification, ct), ct)));
+            return Task.WhenAll(handlers.Select(handler => handler(notification, ct)).ToImmutableArray());
         }
 
-        private async Task ParallelWhenAny(IEnumerable<Func<INotification, CancellationToken, Task>> handlers, INotification notification, CancellationToken ct)
+        private Task ParallelWhenAny(IEnumerable<Func<INotification, CancellationToken, Task>> handlers, INotification notification, CancellationToken ct)
         {
-            await Task.WhenAny(handlers.Select(handler => Task.Run(() => handler(notification, ct).ContinueWith(task =>
+            return Task.WhenAny(handlers.Select(handler => handler(notification, ct).ContinueWith(task =>
             {
                 if (task.Exception is not null)
                 {
                     _logger.LogError(task.Exception, "Exception during publish! Strategy: {Strategy}", nameof(PublishStrategy.ParallelWhenAny));
                 }
-            }, ct), ct)));
+            }, ct)).ToImmutableArray());
         }
 
         private Task ParallelNoWait(IEnumerable<Func<INotification, CancellationToken, Task>> handlers, INotification notification, CancellationToken ct)
         {
             foreach (var handler in handlers)
             {
-                Task.Run(() => handler(notification, ct), ct).ContinueWith(task =>
-                {
-                    if (task.Exception is not null)
-                    {
-                        _logger.LogError(task.Exception, "Exception during publish! Strategy: {Strategy}", nameof(PublishStrategy.ParallelNoWait));
-                    }
-                }, ct);
+                _ = handler(notification, ct);
             }
-
             return Task.CompletedTask;
         }
 
@@ -195,7 +189,7 @@ namespace P3D.Legacy.Server.Abstractions.Services
                 {
                     exceptions.AddRange(ex.Flatten().InnerExceptions);
                 }
-                catch (Exception ex) when (!(ex is OutOfMemoryException or StackOverflowException))
+                catch (Exception ex) when (ex is not (OutOfMemoryException or StackOverflowException))
                 {
                     exceptions.Add(ex);
                 }
