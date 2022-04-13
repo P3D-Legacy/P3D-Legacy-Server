@@ -92,11 +92,11 @@ namespace P3D.Legacy.Server.Client.P3D
 
             try
             {
-                //using var span = _tracer.StartActiveSpan($"P3D Client Sending {packet.GetType().Name}", SpanKind.Client);
-                //span.SetAttribute("net.peer.ip", IPEndPoint.Address.ToString());
-                //span.SetAttribute("net.peer.port", IPEndPoint.Port);
-                //span.SetAttribute("net.transport", "ip_tcp");
-                //span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
+                using var span = _tracer.StartActiveSpan($"P3D Client Sending {packet.GetType().Name}", SpanKind.Client);
+                span.SetAttribute("net.peer.ip", IPEndPoint.Address.ToString());
+                span.SetAttribute("net.peer.port", IPEndPoint.Port);
+                span.SetAttribute("net.transport", "ip_tcp");
+                span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
 
                 await _writer.WriteAsync(_protocol, packet, cts.Token);
             }
