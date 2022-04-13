@@ -12,8 +12,8 @@ namespace P3D.Legacy.Server.Statistics.Extensions
             services.AddTransient<MetricsHandler>();
             services.AddNotifications(sp => sp.GetRequiredService<MetricsHandler>());
 
-            services.AddTransient<StatisticsHandler>();
-            services.AddNotifications(sp => sp.GetRequiredService<StatisticsHandler>());
+            //services.AddTransient<StatisticsHandler>();
+            //services.AddNotifications(sp => sp.GetRequiredService<StatisticsHandler>());
 
             return services;
         }

@@ -86,7 +86,8 @@ namespace P3D.Legacy.Server.Client.P3D
                 Connection.Features.Get<IConnectionCompleteFeature>()?.OnCompleted(async _ =>
                 {
                     using var finishSpan = _tracer.StartActiveSpan("P3D Client Closing", parentContext: _connectionSpan.Context);
-                    await _mediator.Send(new PlayerFinalizingCommand(this), CancellationToken.None);
+                    if (_connectionState == P3DConnectionState.Intitialized)
+                        await _mediator.Send(new PlayerFinalizingCommand(this), CancellationToken.None);
                 }, default!);
                 Connection.Features.Get<IConnectionLifetimeFeature>()?.ConnectionClosed.Register(id =>
                 {
