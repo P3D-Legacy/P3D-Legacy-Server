@@ -225,6 +225,7 @@ namespace P3D.Legacy.Server.Client.P3D
                         }
                         else
                         {
+                            Id = PlayerId.None;
                             await KickAsync("Offline saves are not supported!", ct);
                             return;
                         }
@@ -237,6 +238,7 @@ namespace P3D.Legacy.Server.Client.P3D
                         }
                         else
                         {
+                            Id = PlayerId.None;
                             await KickAsync("Failed to verify your GameJolt Id!", ct);
                             return;
                         }
