@@ -47,7 +47,7 @@ namespace P3D.Legacy.Server.Extensions
 
             services.AddTransient(typeof(IRequestPreProcessor<>), typeof(LoggingBehaviour<>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TracingBehaviour<,>));
+            //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TracingBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
