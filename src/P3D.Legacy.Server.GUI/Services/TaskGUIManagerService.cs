@@ -55,12 +55,14 @@ namespace P3D.Legacy.Server.GUI.Services
             finally
             {
                 // Wait until the task completes or the stop token triggers
+#pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
                 await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, cancellationToken));
+#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
             }
 
         }
 
-        private Task Loop(CancellationToken ct)
+        private Task LoopAsync(CancellationToken ct)
         {
             try
             {
@@ -100,7 +102,7 @@ namespace P3D.Legacy.Server.GUI.Services
                 {
                     var result = Console.ReadLine();
                     if (result is null) await Task.Delay(1000, ct);
-                    if (result == "/uimode") await Loop(ct);
+                    if (result == "/uimode") await LoopAsync(ct);
                 }
             }
             catch (Exception e)

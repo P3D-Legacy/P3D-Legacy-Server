@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Services
 {
-    public abstract class ConnectionContextHandler : IDisposable, IAsyncDisposable
+    public abstract class ConnectionContextHandler : IAsyncDisposable
     {
         public string ConnectionId => Connection.ConnectionId;
         protected ConnectionContext Connection { get; private set; } = default!;
@@ -56,15 +56,21 @@ namespace P3D.Legacy.Server.Application.Services
 
         }
 
-        public virtual void Dispose()
+        protected virtual ValueTask DisposeAsync(bool disposing)
         {
-            _stoppingCts?.Dispose();
+            if (disposing)
+            {
+                _stoppingCts?.Dispose();
+                _executingTask?.Dispose();
+            }
+
+            return ValueTask.CompletedTask;
         }
 
-        public virtual ValueTask DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
-            _stoppingCts?.Dispose();
-            return ValueTask.CompletedTask;
+            await DisposeAsync(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

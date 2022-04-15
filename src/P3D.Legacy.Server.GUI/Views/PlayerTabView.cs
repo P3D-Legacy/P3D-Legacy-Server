@@ -1,5 +1,7 @@
 ﻿using MediatR;
 
+using Microsoft.Extensions.Logging;
+
 using NStack;
 
 using P3D.Legacy.Server.Abstractions;
@@ -21,6 +23,7 @@ namespace P3D.Legacy.Server.GUI.Views
         INotificationHandler<PlayerJoinedNotification>,
         INotificationHandler<PlayerLeftNotification>
     {
+        private readonly ILogger _logger;
         private readonly IMediator _mediator;
 
         private readonly ListView _playerListView;
@@ -31,8 +34,9 @@ namespace P3D.Legacy.Server.GUI.Views
         private readonly PlayerListDataSource _currentPlayers = new(new());
         private IPlayer? _selectedPlayer;
 
-        public PlayerTabView(IMediator mediator, IPlayerContainerReader playerContainer)
+        public PlayerTabView(ILogger<PlayerTabView> logger, IMediator mediator, IPlayerContainerReader playerContainer)
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
 
 
@@ -94,13 +98,23 @@ IP: {player.IPEndPoint}";
             reasonInfoFrameView.Add(reasonTextField);
             var kick = new Button("Kick") { X = 0, Y = Pos.AnchorEnd() - 1 };
             var cancel = new Button("Cancel") { X = Pos.AnchorEnd() - "Cancel".Length - 4, Y = Pos.AnchorEnd() - 1 };
+#pragma warning disable VSTHRD101 // Avoid unsupported async delegates
             kick.Clicked += async () =>
             {
-                var reason = ustring.IsNullOrEmpty(reasonTextField.Text) ? "Kicked by a Moderator or Admin." : reasonTextField.Text.ToString() ?? string.Empty;
-                RemovePlayerInfo();
-                await _mediator.Send(new KickPlayerCommand(player, reason), CancellationToken.None);
-                Terminal.Gui.Application.RequestStop();
+                try
+                {
+                    var reason = ustring.IsNullOrEmpty(reasonTextField.Text) ? "Kicked by a Moderator or Admin." : reasonTextField.Text.ToString() ?? string.Empty;
+                    RemovePlayerInfo();
+                    await _mediator.Send(new KickPlayerCommand(player, reason), CancellationToken.None);
+                    Terminal.Gui.Application.RequestStop();
+                }
+                catch (Exception e)
+                {
+                    _logger.LogCritical(e, "Exception on Kick.Click!");
+
+                }
             };
+#pragma warning restore VSTHRD101 // Avoid unsupported async delegates
             cancel.Clicked += () => Terminal.Gui.Application.RequestStop();
             dialog.Add(reasonInfoFrameView, kick, cancel);
             return dialog;
@@ -123,13 +137,22 @@ IP: {player.IPEndPoint}";
 
             var ban = new Button("Ban") { X = 0, Y = Pos.AnchorEnd() - 1 };
             var cancel = new Button("Cancel") { X = Pos.AnchorEnd() - "Cancel".Length - 4, Y = Pos.AnchorEnd() - 1 };
+#pragma warning disable VSTHRD101 // Avoid unsupported async delegates
             ban.Clicked += async () =>
             {
-                var reason = ustring.IsNullOrEmpty(reasonTextView.Text) ? "Kicked by a Moderator or Admin." : reasonTextView.Text.ToString() ?? string.Empty;
-                RemovePlayerInfo();
-                await _mediator.Send(new KickPlayerCommand(player, reason), CancellationToken.None);
-                Terminal.Gui.Application.RequestStop();
+                try
+                {
+                    var reason = ustring.IsNullOrEmpty(reasonTextView.Text) ? "Kicked by a Moderator or Admin." : reasonTextView.Text.ToString() ?? string.Empty;
+                    RemovePlayerInfo();
+                    await _mediator.Send(new KickPlayerCommand(player, reason), CancellationToken.None);
+                    Terminal.Gui.Application.RequestStop();
+                }
+                catch (Exception e)
+                {
+                    _logger.LogCritical(e, "Exception on Ban.Click!");
+                }
             };
+#pragma warning restore VSTHRD101 // Avoid unsupported async delegates
             cancel.Clicked += () => Terminal.Gui.Application.RequestStop();
             dialog.Add(ban, cancel, reasonInfoFrameView, durationInfoFrameView);
             return dialog;

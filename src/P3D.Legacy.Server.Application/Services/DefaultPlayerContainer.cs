@@ -28,13 +28,7 @@ namespace P3D.Legacy.Server.Application.Services
             public int GetHashCode(IPlayer obj) => obj.ConnectionId.GetHashCode();
         }
 
-        private readonly ILogger _logger;
         private ImmutableHashSet<IPlayer> _connections = ImmutableHashSet.Create<IPlayer>().WithComparer(new PlayerEqualityComparer());
-
-        public DefaultPlayerContainer(ILogger<DefaultPlayerContainer> logger)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
 
         public Task<IPlayer?> GetAsync(Origin origin, CancellationToken ct) => Task.FromResult(_connections.FirstOrDefault(x => x.Origin == origin));
         public IAsyncEnumerable<IPlayer> GetAllAsync(CancellationToken ct) => _connections.ToAsyncEnumerable();

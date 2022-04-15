@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Application.Utils;
@@ -23,7 +22,6 @@ namespace P3D.Legacy.Server.Client.P3D
     {
         private static readonly IPAddress Netmask = IPAddress.Parse("255.255.0.0");
 
-        private readonly ILogger _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
         private readonly ConcurrentDictionary<P3DConnectionContextHandler, object?> _connections = new(new ConnectionContextHandlerEqualityComparer());
@@ -32,9 +30,8 @@ namespace P3D.Legacy.Server.Client.P3D
         private readonly TimeLimiter _connectionLimiter = TimeLimiter.GetFromMaxCountByInterval(1, TimeSpan.FromMilliseconds(300));
         private readonly ConcurrentDictionary<IPNetwork, TimeLimiter> _subnetLimiter = new(); // TODO: Free after a while
 
-        public P3DConnectionHandler(ILogger<P3DConnectionHandler> logger, IServiceScopeFactory serviceScopeFactory)
+        public P3DConnectionHandler(IServiceScopeFactory serviceScopeFactory)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
         }
 
@@ -63,9 +60,9 @@ namespace P3D.Legacy.Server.Client.P3D
                 var lifetimeNotificationFeature = connection.Features.Get<IConnectionLifetimeNotificationFeature>();
                 var stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed, lifetimeNotificationFeature?.ConnectionClosedRequested ?? CancellationToken.None);
 
-                var _ = stoppingCts.Token.Register(() =>
+                stoppingCts.Token.Register(() =>
                 {
-                    _connections.Remove(connectionContextHandler, out var _);
+                    _connections.Remove(connectionContextHandler, out _);
                     stoppingCts.Dispose();
                 });
                 await connectionContextHandler.ListenAsync();

@@ -115,6 +115,11 @@ namespace P3D.Legacy.Server.Client.P3D
                             {
                                 break;
                             }
+
+                            //const float StandardSpeed = 0.04F;
+                            //const float RunningSpeed = 0.06F;
+                            //const float RidingSpeed = 0.08F;
+                            //Vector3.Lerp()
                         }
                     }
                     finally
@@ -136,23 +141,16 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        public override void Dispose()
+        protected override async ValueTask DisposeAsync(bool disposing)
         {
-            base.Dispose();
-            _connectionState = P3DConnectionState.None;
-            _connectionSpan.Dispose();
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-            _writer.DisposeAsync().GetAwaiter().GetResult();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+            if (disposing)
+            {
+                _connectionState = P3DConnectionState.None;
+                _connectionSpan.Dispose();
+                await _writer.DisposeAsync();
+            }
 
-        }
-
-        public override async ValueTask DisposeAsync()
-        {
-            await base.DisposeAsync();
-            _connectionState = P3DConnectionState.None;
-            _connectionSpan.Dispose();
-            await _writer.DisposeAsync();
+            await base.DisposeAsync(disposing);
         }
     }
 }

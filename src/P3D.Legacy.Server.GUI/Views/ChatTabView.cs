@@ -1,5 +1,7 @@
 ﻿using MediatR;
 
+using Microsoft.Extensions.Logging;
+
 using NStack;
 
 using P3D.Legacy.Server.Abstractions;
@@ -22,13 +24,15 @@ namespace P3D.Legacy.Server.GUI.Views
         INotificationHandler<PlayerTriggeredEventNotification>,
         INotificationHandler<MessageToPlayerNotification>
     {
+        private readonly ILogger _logger;
         private readonly NotificationPublisher _notificationPublisher;
 
         private readonly TextView _chatTextView;
         private readonly TextField _commandTextField;
 
-        public ChatTabView(NotificationPublisher notificationPublisher)
+        public ChatTabView(ILogger<ChatTabView> logger, NotificationPublisher notificationPublisher)
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
 
 
@@ -40,21 +44,31 @@ namespace P3D.Legacy.Server.GUI.Views
             messageView.Add(_chatTextView);
 
             var sendMessageView = new FrameView("Send Message") { X = 0, Y = Pos.Bottom(messageView), Width = Dim.Fill(), Height = 3 };
-            var buttonSendCommand = new Button("S_end", true) { X = 0, Y = 0, Height = 1};
+            var buttonSendCommand = new Button("S_end", true) { X = 0, Y = 0, Height = 1 };
+#pragma warning disable VSTHRD101 // Avoid unsupported async delegates
             buttonSendCommand.Clicked += async () =>
             {
-                if (_commandTextField is null) return;
-                var message = _commandTextField.Text.ToString() ?? string.Empty;
-                _commandTextField.Text = ustring.Empty;
-                await HandleMessage(message);
+                try
+                {
+                    if (_commandTextField is null) return;
+                    var message = _commandTextField.Text.ToString() ?? string.Empty;
+                    _commandTextField.Text = ustring.Empty;
+                    await HandleMessageAsync(message);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogCritical(e, "Exception on SendMessage.Click!");
+
+                }
             };
+#pragma warning restore VSTHRD101 // Avoid unsupported async delegates
             _commandTextField = new TextField { X = Pos.Right(buttonSendCommand) + 1, Y = 0, Width = Dim.Fill(), Height = 1 };
             sendMessageView.Add(_commandTextField, buttonSendCommand);
 
             Add(messageView, sendMessageView);
         }
 
-        private async Task HandleMessage(string message)
+        private async Task HandleMessageAsync(string message)
         {
             if (message.StartsWith("/"))
             {
