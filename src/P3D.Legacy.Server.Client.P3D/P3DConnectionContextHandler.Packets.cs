@@ -14,6 +14,7 @@ using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Application.Commands.Player;
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -94,8 +95,11 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        private void ParseGameData(GameDataPacket packet)
+        private void ParseGameData(GameDataPacket packet, out bool stateUpdated, out bool positionUpdated)
         {
+            stateUpdated = false;
+            positionUpdated = false;
+
             if (packet.DataItemStorage.Count == 0)
             {
                 _logger.LogWarning("P3D Reading Error: ParseGameData DataItems is empty");
@@ -117,64 +121,124 @@ namespace P3D.Legacy.Server.Client.P3D
                 switch (idx)
                 {
                     case 0:
-                        GameMode = packet.GameMode;
+                        if (!string.Equals(GameMode, packet.GameMode, StringComparison.Ordinal))
+                        {
+                            GameMode = packet.GameMode;
+                            stateUpdated = true;
+                        }
                         break;
 
                     case 1:
-                        IsGameJoltPlayer = packet.IsGameJoltPlayer;
+                        if (!IsGameJoltPlayer.Equals(packet.IsGameJoltPlayer))
+                        {
+                            IsGameJoltPlayer = packet.IsGameJoltPlayer;
+                            stateUpdated = true;
+                        }
                         break;
 
                     case 2:
-                        GameJoltId = GameJoltId.FromNumber(packet.GameJoltId);
+                        if (!GameJoltId.Equals( packet.GameJoltId))
+                        {
+                            GameJoltId = GameJoltId.FromNumber(packet.GameJoltId);
+                            stateUpdated = true;
+                        }
                         break;
 
                     case 3:
-                        DecimalSeparator = packet.DecimalSeparator;
+                        if (!DecimalSeparator.Equals(packet.DecimalSeparator))
+                        {
+                            DecimalSeparator = packet.DecimalSeparator;
+                            stateUpdated = true;
+                        }
                         break;
 
                     case 4:
-                        Name = packet.Name;
+                        if (!string.Equals(Name, packet.Name, StringComparison.Ordinal))
+                        {
+                            Name = packet.Name;
+                            stateUpdated = true;
+                        }
                         break;
 
                     case 5:
-                        LevelFile = packet.LevelFile;
+                        if (!string.Equals(LevelFile, packet.LevelFile, StringComparison.Ordinal))
+                        {
+                            LevelFile = packet.LevelFile;
+                            positionUpdated = true;
+                        }
                         break;
 
                     case 6:
-                        Position = packet.Position;
+                        if (!Position.Equals(packet.Position))
+                        {
+                            Position = packet.Position;
+                            positionUpdated = true;
+                        }
                         break;
 
                     case 7:
-                        Facing = packet.Facing;
+                        if (!Facing.Equals(packet.Facing))
+                        {
+                            Facing = packet.Facing;
+                            positionUpdated = true;
+                        }
                         break;
 
                     case 8:
-                        Moving = packet.Moving;
+                        if (!Moving.Equals(packet.Moving))
+                        {
+                            Moving = packet.Moving;
+                            positionUpdated = true;
+                        }
                         break;
 
                     case 9:
-                        Skin = packet.Skin;
+                        if (!string.Equals(Skin, packet.Skin, StringComparison.Ordinal))
+                        {
+                            Skin = packet.Skin;
+                            stateUpdated = true;
+                        }
                         break;
 
                     case 10:
-                        BusyType = packet.BusyType;
+                        if (!string.Equals(BusyType, packet.BusyType, StringComparison.Ordinal))
+                        {
+                            BusyType = packet.BusyType;
+                            stateUpdated = true;
+                        }
                         //Basic.ServersManager.UpdatePlayerList();
                         break;
 
                     case 11:
-                        MonsterVisible = packet.MonsterVisible;
+                        if (!MonsterVisible.Equals(packet.MonsterVisible))
+                        {
+                            MonsterVisible = packet.MonsterVisible;
+                            positionUpdated = true;
+                        }
                         break;
 
                     case 12:
-                        MonsterPosition = packet.MonsterPosition;
+                        if (!MonsterPosition.Equals(packet.MonsterPosition))
+                        {
+                            MonsterPosition = packet.MonsterPosition;
+                            positionUpdated = true;
+                        }
                         break;
 
                     case 13:
-                        MonsterSkin = packet.MonsterSkin;
+                        if (!string.Equals(MonsterSkin, packet.MonsterSkin, StringComparison.Ordinal))
+                        {
+                            MonsterSkin = packet.MonsterSkin;
+                            stateUpdated = true;
+                        }
                         break;
 
                     case 14:
-                        MonsterFacing = packet.MonsterFacing;
+                        if (!MonsterFacing.Equals(packet.MonsterFacing))
+                        {
+                            MonsterFacing = packet.MonsterFacing;
+                            positionUpdated = true;
+                        }
                         break;
                 }
             }
@@ -182,7 +246,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
         private async Task HandleGameDataAsync(GameDataPacket packet, CancellationToken ct)
         {
-            ParseGameData(packet);
+            ParseGameData(packet, out var stateUpdated, out var positionUpdated);
 
             if (_connectionState == P3DConnectionState.None)
             {
@@ -248,7 +312,14 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (_connectionState == P3DConnectionState.Intitialized)
             {
-                await _notificationPublisher.Publish(new PlayerUpdatedStateNotification(this), ct);
+                if (stateUpdated)
+                {
+                    await _notificationPublisher.Publish(new PlayerUpdatedStateNotification(this), ct);
+                }
+                if (positionUpdated)
+                {
+                    await _notificationPublisher.Publish(new PlayerUpdatedPositionNotification(this), ct);
+                }
             }
 
             await SendPacketAsync(GetFromP3DPlayerState(this, this), ct);

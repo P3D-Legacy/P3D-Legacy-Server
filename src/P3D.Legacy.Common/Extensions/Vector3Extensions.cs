@@ -34,10 +34,10 @@ namespace P3D.Legacy.Common.Extensions
             var yb = float.TryParse(ys, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, numberFormat, out var y);
             var zb = float.TryParse(zs, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, numberFormat, out var z);
 
-            if (xb && yb && zb)
-                return new Vector3(x, y, z);
-            else
+            if (!xb || !yb || !zb)
                 return Vector3.Zero;
+
+            return new Vector3(x, y, z);
         }
         public static string ToP3DString(this Vector3 vector3, char gameSeparator)
         {

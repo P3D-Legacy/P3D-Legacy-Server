@@ -22,6 +22,7 @@ namespace P3D.Legacy.Server.Client.P3D
         INotificationHandler<PlayerJoinedNotification>,
         INotificationHandler<PlayerLeftNotification>,
         INotificationHandler<PlayerUpdatedStateNotification>,
+        INotificationHandler<PlayerUpdatedPositionNotification>,
         INotificationHandler<PlayerSentGlobalMessageNotification>,
         INotificationHandler<PlayerSentLocalMessageNotification>,
         INotificationHandler<PlayerSentPrivateMessageNotification>,
@@ -73,8 +74,20 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var player = notification.Player;
 
-            var state = player as IP3DPlayerState ?? IP3DPlayerState.Empty;
-            await SendPacketAsync(GetFromP3DPlayerState(player, state), ct);
+            if (player is IP3DPlayerState state)
+            {
+                await SendPacketAsync(GetFromP3DPlayerState(player, state), ct);
+            }
+        }
+
+        public async Task Handle(PlayerUpdatedPositionNotification notification, CancellationToken ct)
+        {
+            var player = notification.Player;
+
+            if (player is IP3DPlayerState state && state.LevelFile.Equals(LevelFile, StringComparison.Ordinal))
+            {
+                await SendPacketAsync(GetFromP3DPlayerState(player, state), ct);
+            }
         }
 
         public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken ct)
@@ -138,7 +151,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (p3dPacket is BattleOfferFromClientPacket battleOfferFromClientPacket)
             {
-                await SendPacketAsync(new BattleOfferToClientPacket { Origin = battleOfferFromClientPacket.Origin, BattleData = battleOfferFromClientPacket.BattleData}, ct);
+                await SendPacketAsync(new BattleOfferToClientPacket { Origin = battleOfferFromClientPacket.Origin, BattleData = battleOfferFromClientPacket.BattleData }, ct);
                 return;
             }
 
