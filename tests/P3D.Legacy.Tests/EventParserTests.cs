@@ -21,12 +21,13 @@ namespace P3D.Legacy.Tests
             testService.DoTest(serviceProvider =>
             {
                 var arg0 = "Test";
-                var msgTemplate = "achieved the emblem \"{0}\"!";
-                var msg = string.Format(msgTemplate, arg0);
+                var arg1 = "Test2";
+                var msgTemplate = "The player {0} achieved the emblem \"{1}\"!";
+                var msg = string.Format(msgTemplate, arg0, arg1);
                 Assert.True(EventParser.TryParse(msg, out var @event));
                 Assert.IsInstanceOf<AchievedEmblemEvent>(@event);
                 Assert.AreEqual(EventType.AchievedEmblem, @event.EventType);
-                Assert.AreEqual(arg0, ((AchievedEmblemEvent) @event).Emblem);
+                Assert.AreEqual(arg1, ((AchievedEmblemEvent) @event).Emblem);
             });
         }
 
@@ -39,13 +40,14 @@ namespace P3D.Legacy.Tests
             {
                 var arg0 = "Test";
                 var arg1 = "Test2";
-                var msgTemplate = "hosted a battle: \"Player {0} got defeated by Player {1}\".";
-                var msg = string.Format(msgTemplate, arg0, arg1);
+                var arg2 = "Test3";
+                var msgTemplate = "The player {0} hosted a battle: \"Player {1} got defeated by Player {2}\".";
+                var msg = string.Format(msgTemplate, arg0, arg1, arg2);
                 Assert.True(EventParser.TryParse(msg, out var @event));
                 Assert.IsInstanceOf<HostedABattleEvent>(@event);
                 Assert.AreEqual(EventType.HostedABattle, @event.EventType);
-                Assert.AreEqual(arg0, ((HostedABattleEvent) @event).DefeatedTrainer);
-                Assert.AreEqual(arg1, ((HostedABattleEvent) @event).Trainer);
+                Assert.AreEqual(arg1, ((HostedABattleEvent) @event).DefeatedTrainer);
+                Assert.AreEqual(arg2, ((HostedABattleEvent) @event).Trainer);
             });
         }
 
@@ -58,13 +60,14 @@ namespace P3D.Legacy.Tests
             {
                 var arg0 = "Test";
                 var arg1 = "Test2";
-                var msgTemplate = "evolved their {0} into a {1}!";
-                var msg = string.Format(msgTemplate, arg0, arg1);
+                var arg2 = "Test3";
+                var msgTemplate = "The player {0} evolved their {1} into a {2}!";
+                var msg = string.Format(msgTemplate, arg0, arg1, arg2);
                 Assert.True(EventParser.TryParse(msg, out var @event));
                 Assert.IsInstanceOf<EvolvedPokemonEvent>(@event);
                 Assert.AreEqual(EventType.EvolvedPokemon, @event.EventType);
-                Assert.AreEqual(arg0, ((EvolvedPokemonEvent) @event).PokemonName);
-                Assert.AreEqual(arg1, ((EvolvedPokemonEvent) @event).EvolvedPokemonName);
+                Assert.AreEqual(arg1, ((EvolvedPokemonEvent) @event).PokemonName);
+                Assert.AreEqual(arg2, ((EvolvedPokemonEvent) @event).EvolvedPokemonName);
             });
         }
 
@@ -76,12 +79,13 @@ namespace P3D.Legacy.Tests
             testService.DoTest(serviceProvider =>
             {
                 var arg0 = "Test";
-                var msgTemplate = "got defeated by a wild {0}.";
-                var msg = string.Format(msgTemplate, arg0);
+                var arg1 = "Test2";
+                var msgTemplate = "The player {0} got defeated by a wild {1}.";
+                var msg = string.Format(msgTemplate, arg0, arg1);
                 Assert.True(EventParser.TryParse(msg, out var @event));
                 Assert.IsInstanceOf<DefeatedByWildPokemonEvent>(@event);
                 Assert.AreEqual(EventType.DefeatedByWildPokemon, @event.EventType);
-                Assert.AreEqual(arg0, ((DefeatedByWildPokemonEvent) @event).PokemonName);
+                Assert.AreEqual(arg1, ((DefeatedByWildPokemonEvent) @event).PokemonName);
             });
         }
 
@@ -92,13 +96,14 @@ namespace P3D.Legacy.Tests
 
             testService.DoTest(serviceProvider =>
             {
-                var arg0 = "Test Test2";
-                var msgTemplate = "got defeated by {0}.";
-                var msg = string.Format(msgTemplate, arg0);
+                var arg0 = "Test";
+                var arg1 = "Test2 Test3";
+                var msgTemplate = "The player {0} got defeated by {1}.";
+                var msg = string.Format(msgTemplate, arg0, arg1);
                 Assert.True(EventParser.TryParse(msg, out var @event));
                 Assert.IsInstanceOf<DefeatedByTrainerEvent>(@event);
                 Assert.AreEqual(EventType.DefeatedByTrainer, @event.EventType);
-                Assert.AreEqual(arg0, ((DefeatedByTrainerEvent) @event).TrainerTypeAndName);
+                Assert.AreEqual(arg1, ((DefeatedByTrainerEvent) @event).TrainerTypeAndName);
             });
         }
     }
