@@ -43,7 +43,7 @@ namespace P3D.Legacy.Common
         }
 
         public string Get(int index) => !_dataItems.TryGetValue(index, out var value) ? string.Empty : value;
-        public char GetChar(int index) => Get(index) is { Length: >= 1 } str ? str[0] : '.';
+        public char? GetChar(int index) => Get(index) is { Length: >= 1 } str ? str[0] : null;
         public bool GetBool(int index) => GetInt32(index) == 1;
         public int GetInt32(int index) => int.TryParse(Get(index), out var val) ? val : 0;
         public ulong GetUInt64(int index) => ulong.TryParse(Get(index), out var val) ? val : 0UL;
@@ -51,7 +51,7 @@ namespace P3D.Legacy.Common
         public Origin GetOrigin(int index) => Origin.FromNumber(GetInt64(index));
 
         public void Set(int index, in ReadOnlySpan<char> value) => _dataItems[index] = value.ToString();
-        public void Set(int index, char value) => Set(index, value.ToString());
+        public void Set(int index, char? value) => Set(index, value?.ToString() ?? ".");
         public void Set(int index, bool value) => Set(index, value ? 1 : 0);
         public void Set(int index, int value) => Set(index, value.ToString());
         public void Set(int index, ulong value) => Set(index, value.ToString());

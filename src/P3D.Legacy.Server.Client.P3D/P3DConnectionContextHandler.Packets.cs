@@ -145,9 +145,9 @@ namespace P3D.Legacy.Server.Client.P3D
                         break;
 
                     case 3:
-                        if (!DecimalSeparator.Equals(packet.DecimalSeparator))
+                        if (packet.DecimalSeparator is { } decimalSeparator && !DecimalSeparator.Equals(decimalSeparator))
                         {
-                            DecimalSeparator = packet.DecimalSeparator;
+                            DecimalSeparator = decimalSeparator;
                             stateUpdated = true;
                         }
                         break;
@@ -246,6 +246,9 @@ namespace P3D.Legacy.Server.Client.P3D
 
         private async Task HandleGameDataAsync(GameDataPacket packet, CancellationToken ct)
         {
+            if (packet.DecimalSeparator is null)
+                packet = packet with { DecimalSeparator = DecimalSeparator };
+
             ParseGameData(packet, out var stateUpdated, out var positionUpdated);
 
             if (_connectionState == P3DConnectionState.None)
@@ -318,7 +321,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 }
                 if (positionUpdated)
                 {
-                    await _notificationPublisher.Publish(new PlayerUpdatedPositionNotification(this), ct);
+                    //await _notificationPublisher.Publish(new PlayerUpdatedPositionNotification(this), ct);
                 }
             }
 
