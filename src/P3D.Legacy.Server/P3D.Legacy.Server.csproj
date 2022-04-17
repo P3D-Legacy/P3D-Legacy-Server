@@ -52,4 +52,10 @@
     <ProjectReference Include="..\P3D.Legacy.Server.Statistics\P3D.Legacy.Server.Statistics.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="P3D.Legacy.Server.CommunicationAPI.Utils.BuildDateTimeAttribute">
+      <_Parameter1>$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>

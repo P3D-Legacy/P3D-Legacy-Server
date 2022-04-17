@@ -4,7 +4,7 @@ using System.Globalization;
 namespace P3D.Legacy.Server.CommunicationAPI.Utils
 {
     [AttributeUsage(AttributeTargets.Assembly)]
-    internal class BuildDateTimeAttribute : Attribute
+    public class BuildDateTimeAttribute : Attribute
     {
         public DateTime DateTime { get; }
 
