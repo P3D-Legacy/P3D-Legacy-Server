@@ -5,4 +5,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Wivuu.JsonPolymorphism" Version="1.0.16" />
+  </ItemGroup>
+
 </Project>

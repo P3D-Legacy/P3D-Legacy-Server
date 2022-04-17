@@ -5,7 +5,6 @@ namespace P3D.Legacy.Common.Events
 {
     public static class EventParser
     {
-        private static readonly char[] PlayerMarker = "The player ".ToCharArray();
         private static readonly char[] AchievedEmblemMarker = "achieved the emblem \"".ToCharArray();
         private static readonly char[] HostedABattleMarker = "hosted a battle: \"Player ".ToCharArray();
         private static readonly char[] HostedABattleMarker2 = " got defeated by Player ".ToCharArray();
@@ -17,18 +16,6 @@ namespace P3D.Legacy.Common.Events
         public static bool TryParse(in ReadOnlySpan<char> message, [NotNullWhen(true)] out Event? eventType)
         {
             var eventMessage = message;
-            if (eventMessage.StartsWith(PlayerMarker))
-            {
-                eventMessage = eventMessage switch
-                {
-                    var str when str.IndexOf(AchievedEmblemMarker) is var idx && idx != -1 => str.Slice(idx),
-                    var str when str.IndexOf(HostedABattleMarker) is var idx && idx != -1 => str.Slice(idx),
-                    var str when str.IndexOf(EvolvedPokemonMarker) is var idx && idx != -1 => str.Slice(idx),
-                    var str when str.IndexOf(DefeatedByWildPokemonMarker) is var idx && idx != -1 => str.Slice(idx),
-                    var str when str.IndexOf(DefeatedByTrainerMarker) is var idx && idx != -1 => str.Slice(idx),
-                    var str => str
-                };
-            }
 
             if (eventMessage.StartsWith(AchievedEmblemMarker))
             {

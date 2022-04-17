@@ -356,7 +356,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _notificationPublisher.Publish(new ServerMessageNotification($"The player {Name} {packet.EventMessage}"), ct);
+            await _notificationPublisher.Publish(new PlayerTriggeredEventNotification(this, packet.EventMessage), ct);
         }
 
         // 1. TradeRequestPacket
