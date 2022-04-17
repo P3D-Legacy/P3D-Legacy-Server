@@ -29,7 +29,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
             _connectionService = connectionService ?? throw new ArgumentNullException(nameof(connectionService));
         }
 
-        private async Task<bool> GetServerStatus(CancellationToken ct)
+        private async Task<bool> GetServerStatusAsync(CancellationToken ct)
         {
             string host = "karp.pokemon3d.net";
             ushort port = 15134;
@@ -54,15 +54,15 @@ namespace P3D.Legacy.Server.Benchmark.Services
             return false;
         }
 
-        private async Task<IEnumerable<bool>> GetConnectionsInParallelInWithBatches(int numberOfBatches, CancellationToken ct)
+        private async Task<IEnumerable<bool>> GetConnectionsInParallelInWithBatchesAsync(int numberOfBatches, CancellationToken ct)
         {
             var tasks = new List<Task<bool>>();
 
             for (var i = 0; i < numberOfBatches; i++)
             {
-                tasks.Add(GetServerStatus(ct));
+                tasks.Add(GetServerStatusAsync(ct));
             }
-            
+
             return await Task.WhenAll(tasks);
         }
 
@@ -76,7 +76,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
             await Parallel.ForEachAsync(Enumerable.Range(0, parallel), ct, async (i, ct) =>
             {
                 var stopwatch_p = Stopwatch.StartNew();
-                foreach (var result in await GetConnectionsInParallelInWithBatches(batch, ct))
+                foreach (var result in await GetConnectionsInParallelInWithBatchesAsync(batch, ct))
                 {
                     if (!result) failedCount++;
                 }

@@ -26,7 +26,7 @@ namespace P3D.Legacy.Tests
                 var msg = string.Format(msgTemplate, arg0, arg1);
                 Assert.True(EventParser.TryParse(msg, out var @event));
                 Assert.IsInstanceOf<AchievedEmblemEvent>(@event);
-                Assert.AreEqual(EventType.AchievedEmblem, @event.EventType);
+                Assert.AreEqual(EventType.AchievedEmblem, @event!.EventType);
                 Assert.AreEqual(arg1, ((AchievedEmblemEvent) @event).Emblem);
             });
         }
@@ -45,7 +45,7 @@ namespace P3D.Legacy.Tests
                 var msg = string.Format(msgTemplate, arg0, arg1, arg2);
                 Assert.True(EventParser.TryParse(msg, out var @event));
                 Assert.IsInstanceOf<HostedABattleEvent>(@event);
-                Assert.AreEqual(EventType.HostedABattle, @event.EventType);
+                Assert.AreEqual(EventType.HostedABattle, @event!.EventType);
                 Assert.AreEqual(arg1, ((HostedABattleEvent) @event).DefeatedTrainer);
                 Assert.AreEqual(arg2, ((HostedABattleEvent) @event).Trainer);
             });
@@ -65,7 +65,7 @@ namespace P3D.Legacy.Tests
                 var msg = string.Format(msgTemplate, arg0, arg1, arg2);
                 Assert.True(EventParser.TryParse(msg, out var @event));
                 Assert.IsInstanceOf<EvolvedPokemonEvent>(@event);
-                Assert.AreEqual(EventType.EvolvedPokemon, @event.EventType);
+                Assert.AreEqual(EventType.EvolvedPokemon, @event!.EventType);
                 Assert.AreEqual(arg1, ((EvolvedPokemonEvent) @event).PokemonName);
                 Assert.AreEqual(arg2, ((EvolvedPokemonEvent) @event).EvolvedPokemonName);
             });
@@ -84,7 +84,7 @@ namespace P3D.Legacy.Tests
                 var msg = string.Format(msgTemplate, arg0, arg1);
                 Assert.True(EventParser.TryParse(msg, out var @event));
                 Assert.IsInstanceOf<DefeatedByWildPokemonEvent>(@event);
-                Assert.AreEqual(EventType.DefeatedByWildPokemon, @event.EventType);
+                Assert.AreEqual(EventType.DefeatedByWildPokemon, @event!.EventType);
                 Assert.AreEqual(arg1, ((DefeatedByWildPokemonEvent) @event).PokemonName);
             });
         }
@@ -102,7 +102,7 @@ namespace P3D.Legacy.Tests
                 var msg = string.Format(msgTemplate, arg0, arg1);
                 Assert.True(EventParser.TryParse(msg, out var @event));
                 Assert.IsInstanceOf<DefeatedByTrainerEvent>(@event);
-                Assert.AreEqual(EventType.DefeatedByTrainer, @event.EventType);
+                Assert.AreEqual(EventType.DefeatedByTrainer, @event!.EventType);
                 Assert.AreEqual(arg1, ((DefeatedByTrainerEvent) @event).TrainerTypeAndName);
             });
         }

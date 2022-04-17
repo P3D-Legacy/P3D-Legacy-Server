@@ -30,7 +30,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
             public string Name { get; set; } = "";
             public Origin Origin { get; set; } = Origin.FromNumber(-1);
 
-            public Func<P3DPacket, ValueTask> SendMessage;
+            public Func<P3DPacket, ValueTask> SendMessage = packet => ValueTask.CompletedTask;
         }
 
         private readonly ILogger _logger;
@@ -43,7 +43,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
             _connectionService = connectionService ?? throw new ArgumentNullException(nameof(connectionService));
         }
 
-        private async Task<Exception?> Get(CancellationToken ct2)
+        private async Task<Exception?> GetAsync(CancellationToken ct2)
         {
             using var cts = new CancellationTokenSource(10000);
             using var cts2 = CancellationTokenSource.CreateLinkedTokenSource(ct2, cts.Token);
@@ -68,7 +68,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
                     SendMessage = async message =>
                     {
                         await writer.WriteAsync(protocol, message, ct);
-                        await connection.Transport.Output.FlushAsync(ct);
+                        await connection!.Transport.Output.FlushAsync(ct);
                     },
                 };
                 var gameData = new GameDataPacket
@@ -91,7 +91,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
                     MonsterFacing = 1
                 };
                 await writer.WriteAsync(protocol, gameData, ct);
-                await connection.Transport.Output.FlushAsync(ct);
+                await connection!.Transport.Output.FlushAsync(ct);
 
                 while (!ct.IsCancellationRequested)
                 {
@@ -145,7 +145,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
                     var expected2 = "The game client sends a SHA-512 hash instead of the raw password.";
                     if (chatMessageGlobalPacket.Message.Equals(expected2))
                     {
-                        await state.SendMessage(new ChatMessageGlobalPacket { Origin = state.Origin, Message = "/login 12345Ara!"});
+                        await state.SendMessage(new ChatMessageGlobalPacket { Origin = state.Origin, Message = "/login 12345Ara!" });
                     }
                     if (chatMessageGlobalPacket.Message.Equals(expected1))
                     {
@@ -164,15 +164,15 @@ namespace P3D.Legacy.Server.Benchmark.Services
             return Result.Continue;
         }
 
-        private async Task<IEnumerable<Exception?>> GetConnectionsInParallelInWithBatches(int numberOfBatches, CancellationToken ct)
+        private async Task<IEnumerable<Exception?>> GetConnectionsInParallelInWithBatchesAsync(int numberOfBatches, CancellationToken ct)
         {
             var tasks = new List<Task<Exception?>>();
 
             for (var i = 0; i < numberOfBatches; i++)
             {
-                tasks.Add(Get(ct));
+                tasks.Add(GetAsync(ct));
             }
-            
+
             return await Task.WhenAll(tasks);
         }
 
@@ -186,7 +186,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
             await Parallel.ForEachAsync(Enumerable.Range(0, parallel), ct, async (i, ct) =>
             {
                 var stopwatch_p = Stopwatch.StartNew();
-                foreach (var result in await GetConnectionsInParallelInWithBatches(batch, ct))
+                foreach (var result in await GetConnectionsInParallelInWithBatchesAsync(batch, ct))
                 {
                     if (result is not null)
                     {

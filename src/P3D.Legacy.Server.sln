@@ -12,6 +12,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{F0716B24-F9B5-4240-B10E-5B164618001A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root", "root", "{B8171225-FEA8-47E8-AE9E-96DD1AFE76D2}"
+	ProjectSection(SolutionItems) = preProject
+		..\Directory.Packages.props = ..\Directory.Packages.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{679B78EF-C627-49A7-B49E-D54B4FAF1F08}"
 EndProject

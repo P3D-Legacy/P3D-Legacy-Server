@@ -1,4 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
+
+[assembly: InternalsVisibleTo("P3D.Legacy.Server.CommunicationAPI")]
 
 namespace P3D.Legacy.Common.Events
 {

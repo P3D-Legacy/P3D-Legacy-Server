@@ -3,10 +3,16 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsTrimmable>true</IsTrimmable>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Wivuu.JsonPolymorphism" Version="1.0.16" />
+    <PackageReference Include="Wivuu.JsonPolymorphism" />
   </ItemGroup>
 
 </Project>

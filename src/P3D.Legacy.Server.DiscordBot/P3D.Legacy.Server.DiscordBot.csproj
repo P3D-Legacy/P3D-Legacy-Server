@@ -3,6 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsTrimmable>true</IsTrimmable>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BetterHostedServices" Version="2.0.3" />
-    <PackageReference Include="Discord.Net.WebSocket" Version="3.5.0" />
-    <PackageReference Include="OpenTelemetry.Api" Version="1.2.0-rc4" />
+    <PackageReference Include="BetterHostedServices" />
+    <PackageReference Include="Discord.Net.WebSocket" />
+    <PackageReference Include="OpenTelemetry.Api" />
   </ItemGroup>
 
   <ItemGroup>

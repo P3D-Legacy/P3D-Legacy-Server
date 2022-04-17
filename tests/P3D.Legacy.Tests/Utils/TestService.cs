@@ -10,8 +10,8 @@ namespace P3D.Legacy.Tests.Utils
 {
     public sealed class TestService : IDisposable, IAsyncDisposable
     {
-        private Action<IServiceCollection> _configureDescriptors;
-        private IServiceProvider _serviceProvider;
+        private Action<IServiceCollection> _configureDescriptors = _ => { };
+        private IServiceProvider _serviceProvider = default!;
         private Policy _policy = Policy.NoOp();
 
         public static TestService CreateNew() => new();

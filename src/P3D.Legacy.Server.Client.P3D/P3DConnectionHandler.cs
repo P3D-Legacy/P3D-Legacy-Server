@@ -62,7 +62,9 @@ namespace P3D.Legacy.Server.Client.P3D
 
                 stoppingCts.Token.Register(() =>
                 {
+#pragma warning disable CS8620
                     _connections.Remove(connectionContextHandler, out _);
+#pragma warning restore CS8620
                     stoppingCts.Dispose();
                 });
                 await connectionContextHandler.ListenAsync();

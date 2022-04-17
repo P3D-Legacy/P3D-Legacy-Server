@@ -3,6 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsTrimmable>true</IsTrimmable>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,11 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bedrock.Framework" Version="0.1.63-alpha.gf69fa1b135" />
-    <PackageReference Include="GitInfo" Version="2.2.0" />
-    <PackageReference Include="Nerdbank.Streams" Version="2.8.57" />
-    <PackageReference Include="OpenTelemetry.Api" Version="1.2.0-rc4" />
-    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    <PackageReference Include="Bedrock.Framework" />
+    <PackageReference Include="GitInfo" />
+    <PackageReference Include="Nerdbank.Streams" />
+    <PackageReference Include="OpenTelemetry.Api" />
+    <PackageReference Include="System.Linq.Async" />
   </ItemGroup>
 
   <ItemGroup>

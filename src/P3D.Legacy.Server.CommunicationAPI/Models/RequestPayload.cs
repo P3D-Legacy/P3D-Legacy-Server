@@ -9,7 +9,9 @@ namespace P3D.Legacy.Server.CommunicationAPI.Models
         MessageRequest = 0x02
     }
 
+#pragma warning disable SYSLIB1037
     internal abstract partial record RequestPayload([JsonDiscriminator] RequestPayloadType Type, Guid Uid);
     internal sealed record RegisterBotRequestPayload(string BotName, Guid Uid) : RequestPayload(RequestPayloadType.RegisterBot, Uid);
     internal sealed record MessageRequestPayload(string Sender, string Message, Guid Uid) : RequestPayload(RequestPayloadType.MessageRequest, Uid);
+#pragma warning restore SYSLIB1037
 }

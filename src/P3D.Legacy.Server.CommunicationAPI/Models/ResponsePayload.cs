@@ -1,7 +1,7 @@
 ﻿using P3D.Legacy.Common.Events;
 
 using System;
-using System.Text.Json.Serialization;
+
 
 namespace P3D.Legacy.Server.CommunicationAPI.Models
 {
@@ -19,7 +19,8 @@ namespace P3D.Legacy.Server.CommunicationAPI.Models
         Error = 0xFF
     }
 
-    internal abstract partial record ResponsePayload([JsonDiscriminator] ResponsePayloadType Type, long Timestamp);
+#pragma warning disable SYSLIB1037
+    internal abstract record ResponsePayload(ResponsePayloadType Type, long Timestamp);
     internal sealed record PlayerJoinedResponsePayload(string Player) : ResponsePayload(ResponsePayloadType.PlayerJoined, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record PlayerLeftResponsePayload(string Player) : ResponsePayload(ResponsePayloadType.PlayerLeft, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record PlayerSentGlobalMessageResponsePayload(string Player, string Message) : ResponsePayload(ResponsePayloadType.PlayerSentGlobalMessage, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
@@ -29,4 +30,5 @@ namespace P3D.Legacy.Server.CommunicationAPI.Models
     internal sealed record KickedResponsePayload(string Reason) : ResponsePayload(ResponsePayloadType.Kicked, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record SuccessResponsePayload(Guid Uid) : ResponsePayload(ResponsePayloadType.Success, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record ErrorResponsePayload(int Code, string Message, Guid Uid) : ResponsePayload(ResponsePayloadType.Error, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+#pragma warning restore SYSLIB1037
 }

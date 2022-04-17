@@ -15,12 +15,13 @@ using System;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.CommunicationAPI.Services
 {
-    public sealed class WebSocketHandler :
+    public sealed partial class WebSocketHandler :
         INotificationHandler<PlayerJoinedNotification>,
         INotificationHandler<PlayerLeftNotification>,
         INotificationHandler<PlayerSentGlobalMessageNotification>,
@@ -29,6 +30,18 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         IDisposable,
         IAsyncDisposable
     {
+        [JsonSerializable(typeof(RequestPayload))]
+        [JsonSerializable(typeof(PlayerJoinedResponsePayload))]
+        [JsonSerializable(typeof(PlayerLeftResponsePayload))]
+        [JsonSerializable(typeof(PlayerSentGlobalMessageResponsePayload))]
+        [JsonSerializable(typeof(ServerMessageResponsePayload))]
+        [JsonSerializable(typeof(PlayerTriggeredEventResponsePayload))]
+        [JsonSerializable(typeof(PlayerTriggeredEventRawResponsePayload))]
+        [JsonSerializable(typeof(KickedResponsePayload))]
+        [JsonSerializable(typeof(SuccessResponsePayload))]
+        [JsonSerializable(typeof(ErrorResponsePayload))]
+        internal partial class JsonContext : JsonSerializerContext { }
+
         private class WebSocketPlayer : IPlayer
         {
             private readonly Func<string, CancellationToken, Task>? _kickCallbackAsync;
@@ -79,7 +92,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         private readonly WebSocket _webSocket;
         private readonly IMediator _mediator;
         private readonly NotificationPublisher _notificationPublisher;
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
+        private readonly JsonContext _jsonContext;
         private readonly SequenceTextReader _sequenceTextReader = new();
         private readonly CancellationTokenSource _cts = new();
 
@@ -88,7 +101,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
             _webSocket = webSocket ?? throw new ArgumentNullException(nameof(webSocket));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
-            _jsonSerializerOptions = jsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
+            _jsonContext = new JsonContext(new JsonSerializerOptions(jsonSerializerOptions));
         }
 
         private ValueTask CheckWebSocketStateAsync(CancellationToken ct)
@@ -130,7 +143,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                     await CheckWebSocketStateAsync(ct);
 
                     await using var reader = new WebSocketMessageReaderStream(_webSocket, maxMessageSize);
-                    var payload = await JsonSerializer.DeserializeAsync<RequestPayload?>(reader, _jsonSerializerOptions, ct);
+                    var payload = await JsonSerializer.DeserializeAsync(reader, _jsonContext.RequestPayload, ct);
                     if (payload is not null)
                         await ProcessPayloadAsync(payload, ct);
                 }
@@ -145,7 +158,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                 case RegisterBotRequestPayload(var botName, var uid):
                     if (_bot is not null)
                     {
-                        await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ErrorResponsePayload(1, "Bot initialized twice!", uid), _jsonSerializerOptions), ct);
+                        await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ErrorResponsePayload(1, "Bot initialized twice!", uid), _jsonContext.ErrorResponsePayload), ct);
                         return;
                     }
 
@@ -153,57 +166,57 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                     await _mediator.Send(new PlayerInitializingCommand(_bot), ct);
                     await _mediator.Send(new PlayerReadyCommand(_bot), ct);
                     await _notificationPublisher.Publish(new PlayerUpdatedStateNotification(_bot), ct);
-                    await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid), _jsonSerializerOptions), ct);
+                    await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid), _jsonContext.SuccessResponsePayload), ct);
                     break;
 
                 case MessageRequestPayload(var sender, var message, var uid):
                     if (_bot is null)
                     {
-                        await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ErrorResponsePayload(2, "Bot not initialized!", uid), _jsonSerializerOptions), ct);
+                        await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ErrorResponsePayload(2, "Bot not initialized!", uid), _jsonContext.ErrorResponsePayload), ct);
                         return;
                     }
 
                     await _notificationPublisher.Publish(new PlayerSentGlobalMessageNotification(_bot, $"{sender}: {message}"), ct);
-                    await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid), _jsonSerializerOptions), ct);
+                    await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid), _jsonContext.SuccessResponsePayload), ct);
                     break;
             }
         }
 
         private async Task KickCallbackAsync(string reason, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new KickedResponsePayload(reason), _jsonSerializerOptions), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new KickedResponsePayload(reason), _jsonContext.KickedResponsePayload), ct);
             await CloseAsync(WebSocketCloseStatus.Empty, "Kicked", ct);
         }
 
         public async Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerJoinedResponsePayload(notification.Player.Name), _jsonSerializerOptions), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerJoinedResponsePayload(notification.Player.Name), _jsonContext.PlayerJoinedResponsePayload), ct);
         }
 
         public async Task Handle(PlayerLeftNotification notification, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerLeftResponsePayload(notification.Name), _jsonSerializerOptions), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerLeftResponsePayload(notification.Name), _jsonContext.PlayerLeftResponsePayload), ct);
         }
 
         public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerSentGlobalMessageResponsePayload(notification.Player.Name, notification.Message), _jsonSerializerOptions), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerSentGlobalMessageResponsePayload(notification.Player.Name, notification.Message), _jsonContext.PlayerSentGlobalMessageResponsePayload), ct);
         }
 
         public async Task Handle(ServerMessageNotification notification, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ServerMessageResponsePayload(notification.Message), _jsonSerializerOptions), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ServerMessageResponsePayload(notification.Message), _jsonContext.ServerMessageResponsePayload), ct);
         }
 
         public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
         {
             if (EventParser.TryParse(notification.EventMessage, out var @event))
             {
-                await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(notification.Player.Name, @event), _jsonSerializerOptions), ct);
+                await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(notification.Player.Name, @event), _jsonContext.PlayerTriggeredEventResponsePayload), ct);
             }
             else
             {
-                await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventRawResponsePayload(notification.Player.Name, notification.EventMessage), _jsonSerializerOptions), ct);
+                await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventRawResponsePayload(notification.Player.Name, notification.EventMessage), _jsonContext.PlayerTriggeredEventRawResponsePayload), ct);
             }
         }
 
