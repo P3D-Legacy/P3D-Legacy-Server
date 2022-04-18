@@ -37,7 +37,7 @@
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.3.0" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
     <PackageVersion Include="System.Text.Encodings.Web" Version="6.0.0" />
-    <PackageVersion Include="Terminal.Gui" Version="1.4.0" />
+    <PackageVersion Include="Terminal.Gui" Version="1.5.0" />
     <PackageVersion Include="Wivuu.JsonPolymorphism" Version="1.0.16" />
     <PackageVersion Include="coverlet.collector" Version="3.1.2" />
   </ItemGroup>
