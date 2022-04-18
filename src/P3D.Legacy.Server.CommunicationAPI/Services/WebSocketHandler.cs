@@ -92,6 +92,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         private readonly WebSocket _webSocket;
         private readonly IMediator _mediator;
         private readonly NotificationPublisher _notificationPublisher;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
         private readonly JsonContext _jsonContext;
         private readonly SequenceTextReader _sequenceTextReader = new();
         private readonly CancellationTokenSource _cts = new();
@@ -101,7 +102,8 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
             _webSocket = webSocket ?? throw new ArgumentNullException(nameof(webSocket));
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
-            _jsonContext = new JsonContext(new JsonSerializerOptions(jsonSerializerOptions));
+            _jsonSerializerOptions = jsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
+            _jsonContext = new JsonContext(new JsonSerializerOptions(_jsonSerializerOptions));
         }
 
         private ValueTask CheckWebSocketStateAsync(CancellationToken ct)
@@ -143,7 +145,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                     await CheckWebSocketStateAsync(ct);
 
                     await using var reader = new WebSocketMessageReaderStream(_webSocket, maxMessageSize);
-                    var payload = await JsonSerializer.DeserializeAsync(reader, _jsonContext.RequestPayload, ct);
+                    var payload = await JsonSerializer.DeserializeAsync<RequestPayload?>(reader, _jsonSerializerOptions, ct);
                     if (payload is not null)
                         await ProcessPayloadAsync(payload, ct);
                 }
