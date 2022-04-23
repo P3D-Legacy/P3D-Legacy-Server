@@ -39,6 +39,8 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
             services.AddTransient<CommandManager, SetTimeCommandManager>();
             services.AddTransient<CommandManager, SetWeatherCommandManager>();
 
+            services.AddTransient<CommandManager, TriggerPlayerEventCommandManager>();
+
             services.AddSingleton<CommandManagerHandler>();
 
             return services;

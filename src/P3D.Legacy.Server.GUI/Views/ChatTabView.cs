@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 using NStack;
 
+using P3D.Legacy.Common.Events;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Abstractions.Services;
@@ -124,7 +125,7 @@ namespace P3D.Legacy.Server.GUI.Views
         {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
-                var message = $"* The player {notification.Player.Name} {notification.EventMessage}{Environment.NewLine}";
+                var message = $"* The player {notification.Player.Name} {EventParser.AsText(notification.Event)}{Environment.NewLine}";
                 _chatTextView.Text = message + _chatTextView.Text;
             });
             return Task.CompletedTask;

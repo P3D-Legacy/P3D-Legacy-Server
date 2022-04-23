@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common;
+using P3D.Legacy.Common.Events;
 using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Battle;
@@ -356,7 +357,10 @@ namespace P3D.Legacy.Server.Client.P3D
             if (_connectionState != P3DConnectionState.Intitialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerTriggeredEventNotification(this, packet.EventMessage), ct);
+            if (!EventParser.TryParse(packet.EventMessage, out var @event))
+                return;
+
+            await _notificationPublisher.Publish(new PlayerTriggeredEventNotification(this, @event), ct);
         }
 
         // 1. TradeRequestPacket

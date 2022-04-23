@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Logging;
 
+using P3D.Legacy.Common.Events;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
 
@@ -63,7 +64,7 @@ namespace P3D.Legacy.Server.Statistics.NotificationHandlers
         {
             _eventCounter.Add(1,
                 new KVP("id", notification.Player.Id),
-                new KVP("event", notification.EventMessage));
+                new KVP("event", notification.Event.EventType));
 
             return Task.CompletedTask;
         }

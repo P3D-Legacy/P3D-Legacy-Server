@@ -212,14 +212,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
 
         public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
         {
-            if (EventParser.TryParse(notification.EventMessage, out var @event))
-            {
-                await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(notification.Player.Name, @event), _jsonContext.PlayerTriggeredEventResponsePayload), ct);
-            }
-            else
-            {
-                await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventRawResponsePayload(notification.Player.Name, notification.EventMessage), _jsonContext.PlayerTriggeredEventRawResponsePayload), ct);
-            }
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(notification.Player.Name, notification.Event), _jsonContext.PlayerTriggeredEventResponsePayload), ct);
         }
 
         public override int GetHashCode() => _id.GetHashCode();

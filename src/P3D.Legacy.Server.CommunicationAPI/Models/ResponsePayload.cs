@@ -12,7 +12,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Models
         PlayerLeft = 0x02,
         PlayerSentGlobalMessage = 0x03,
         ServerMessage = 0x04,
-        PlayerTriggeredEventRaw = 0x05,
+        Depreceated1 = 0x05,
         Kicked = 0x06,
         PlayerTriggeredEvent = 0x07,
 
@@ -26,7 +26,6 @@ namespace P3D.Legacy.Server.CommunicationAPI.Models
     internal sealed record PlayerSentGlobalMessageResponsePayload(string Player, string Message) : ResponsePayload(ResponsePayloadType.PlayerSentGlobalMessage, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record ServerMessageResponsePayload(string Message) : ResponsePayload(ResponsePayloadType.ServerMessage, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record PlayerTriggeredEventResponsePayload(string Player, Event Event) : ResponsePayload(ResponsePayloadType.PlayerTriggeredEvent, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    internal sealed record PlayerTriggeredEventRawResponsePayload(string Player, string Event) : ResponsePayload(ResponsePayloadType.PlayerTriggeredEventRaw, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record KickedResponsePayload(string Reason) : ResponsePayload(ResponsePayloadType.Kicked, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record SuccessResponsePayload(Guid Uid) : ResponsePayload(ResponsePayloadType.Success, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record ErrorResponsePayload(int Code, string Message, Guid Uid) : ResponsePayload(ResponsePayloadType.Error, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());

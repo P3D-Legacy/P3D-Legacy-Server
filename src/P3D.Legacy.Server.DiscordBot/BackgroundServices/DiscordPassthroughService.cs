@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 
 using OpenTelemetry.Trace;
 
+using P3D.Legacy.Common.Events;
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.DiscordBot.Options;
 
@@ -228,7 +229,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
         public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken cancellationToken)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
-                await channel.SendMessageAsync($"> `EVENT  : The player {notification.Player.Name} {notification.EventMessage}`");
+                await channel.SendMessageAsync($"> `EVENT  : The player {notification.Player.Name} {EventParser.AsText(notification.Event)}`");
         }
     }
 }

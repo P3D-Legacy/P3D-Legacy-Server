@@ -59,8 +59,19 @@ namespace P3D.Legacy.Common.Events
                 return true;
             }
 
-            eventType = null;
-            return false;
+            eventType = new UnknownEvent(eventMessage.ToString());
+            return true;
         }
+
+        public static string AsText(Event @event) => @event switch
+        {
+            AchievedEmblemEvent achievedEmblemEvent => $"achieved the emblem {achievedEmblemEvent.Emblem}!",
+            DefeatedByTrainerEvent defeatedByTrainerEvent => $"got defeated by {defeatedByTrainerEvent.TrainerTypeAndName}!",
+            DefeatedByWildPokemonEvent defeatedByWildPokemonEvent => $"got defeated by a wild {defeatedByWildPokemonEvent.PokemonName}!",
+            EvolvedPokemonEvent evolvedPokemonEvent => $"evolved their {evolvedPokemonEvent.PokemonName} into a {evolvedPokemonEvent.EvolvedPokemonName}!",
+            HostedABattleEvent hostedABattleEvent => $"hosted a battle: \"Player {hostedABattleEvent.DefeatedTrainer} got defeated by Player {hostedABattleEvent.Trainer}\"!",
+            UnknownEvent unknownEvent => unknownEvent.RawEvent,
+            _ => throw new ArgumentOutOfRangeException(nameof(@event))
+        };
     }
 }

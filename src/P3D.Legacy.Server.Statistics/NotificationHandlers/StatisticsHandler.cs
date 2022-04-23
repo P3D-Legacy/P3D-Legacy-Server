@@ -43,7 +43,7 @@ namespace P3D.Legacy.Server.Statistics.NotificationHandlers
 
         public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
         {
-            await _statisticsManager.IncrementActionAsync(notification.Player.Id, $"event_{notification.EventMessage}", ct);
+            await _statisticsManager.IncrementActionAsync(notification.Player.Id, $"event_{notification.Event.EventType}", ct);
         }
 
         public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken ct)

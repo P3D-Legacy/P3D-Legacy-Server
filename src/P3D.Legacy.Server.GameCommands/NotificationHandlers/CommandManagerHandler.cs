@@ -43,7 +43,7 @@ namespace P3D.Legacy.Server.GameCommands.NotificationHandlers
 
         private async Task HandleCommandAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
-            using var span = _tracer.StartActiveSpan($"CommandManagerHandler HandleCommand");
+            using var span = _tracer.StartActiveSpan("CommandManagerHandler HandleCommand");
 
             var command = FindByName(alias) ?? FindByAlias(alias);
             if (command is null)
@@ -85,7 +85,7 @@ namespace P3D.Legacy.Server.GameCommands.NotificationHandlers
 
         public async Task Handle(PlayerSentCommandNotification notification, CancellationToken ct)
         {
-            using var span = _tracer.StartActiveSpan($"CommandManagerHandler Handle");
+            using var span = _tracer.StartActiveSpan("CommandManagerHandler Handle");
 
             var (player, message) = notification;
 

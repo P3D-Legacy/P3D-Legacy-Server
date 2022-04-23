@@ -1,6 +1,7 @@
 ﻿using MediatR;
 
 using P3D.Legacy.Common;
+using P3D.Legacy.Common.Events;
 using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Common.Packets.Battle;
 using P3D.Legacy.Common.Packets.Chat;
@@ -167,9 +168,9 @@ namespace P3D.Legacy.Server.Client.P3D
 
         public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
         {
-            var (player, eventMessage) = notification;
+            var (player, @event) = notification;
 
-            await SendServerMessageAsync($"The player {player.Name} {eventMessage}", ct);
+            await SendServerMessageAsync($"The player {player.Name} {EventParser.AsText(@event)}", ct);
         }
 
         public async Task Handle(PlayerSentCommandNotification notification, CancellationToken ct)
