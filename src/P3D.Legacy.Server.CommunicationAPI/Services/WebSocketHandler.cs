@@ -36,7 +36,6 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         [JsonSerializable(typeof(PlayerSentGlobalMessageResponsePayload))]
         [JsonSerializable(typeof(ServerMessageResponsePayload))]
         [JsonSerializable(typeof(PlayerTriggeredEventResponsePayload))]
-        [JsonSerializable(typeof(PlayerTriggeredEventRawResponsePayload))]
         [JsonSerializable(typeof(KickedResponsePayload))]
         [JsonSerializable(typeof(SuccessResponsePayload))]
         [JsonSerializable(typeof(ErrorResponsePayload))]
