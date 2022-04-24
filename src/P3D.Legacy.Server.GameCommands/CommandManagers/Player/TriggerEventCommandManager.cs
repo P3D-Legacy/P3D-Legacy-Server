@@ -23,7 +23,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
         public override string Name => "triggerevent";
         public override string Description => "Trigger Player Event.";
         public override IEnumerable<string> Aliases => new[] { "te" };
-        public override PermissionFlags Permissions => PermissionFlags.AdministratorOrHigher;
+        public override PermissionFlags Permissions => PermissionFlags.Debug;
 
         public TriggerPlayerEventCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 

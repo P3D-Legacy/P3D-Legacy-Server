@@ -64,6 +64,9 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 
                         foreach (var permissionDto in dto.User.Roles?.SelectMany(x => x.Permissions) ?? Enumerable.Empty<PermissionDTO>())
                         {
+                            if (permissionDto.Name.Equals("gameserver.debug", StringComparison.OrdinalIgnoreCase))
+                                permissions |= PermissionFlags.Debug;
+
                             if (permissionDto.Name.Equals("gameserver.moderator", StringComparison.OrdinalIgnoreCase))
                                 permissions |= PermissionFlags.Moderator;
 

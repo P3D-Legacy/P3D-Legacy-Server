@@ -8,9 +8,10 @@ namespace P3D.Legacy.Server.Abstractions
         None = 0,
         UnVerified = 1,
         User = 2,
-        Moderator = 4,
-        Administrator = 8,
-        Server = 16,
+        Debug = 4,
+        Moderator = 8,
+        Administrator = 16,
+        Server = 32,
 
 
         UnVerifiedOrHigher = UnVerified | User | Moderator | Administrator | Server,
