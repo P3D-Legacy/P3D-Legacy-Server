@@ -303,10 +303,6 @@
             "minLength": 6,
             "type": "string",
             "format": "password"
-          },
-          "confirmPassword": {
-            "type": "string",
-            "format": "password"
           }
         },
         "additionalProperties": false
