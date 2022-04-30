@@ -1,68 +1,41 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
+﻿using NUnit.Framework;
 
-using NUnit.Framework;
-
+using P3D.Legacy.Common;
 using P3D.Legacy.Common.Extensions;
-using P3D.Legacy.Common.Packets;
-using P3D.Legacy.Server.Client.P3D;
 
-using System.Buffers;
 using System.Numerics;
-using System.Text;
 
 namespace P3D.Legacy.Tests
 {
-    public class DataItemTests
+    internal sealed class DataItemTests
     {
-        private sealed record Container() : P3DPacket(P3DPacketType.NotUsed)
-        {
-            public string Name { get => DataItemStorage.Get(0); set => DataItemStorage.Set(0, value); }
-            public bool IsCorrect { get => DataItemStorage.GetBool(1); set => DataItemStorage.Set(1, value); }
-            public ulong IdLong { get => DataItemStorage.GetUInt64(2); set => DataItemStorage.Set(2, value); }
-            public char? Char { get => DataItemStorage.GetChar(3); set => DataItemStorage.Set(3, value); }
-            public int IdInt { get => DataItemStorage.GetInt32(4); set => DataItemStorage.Set(4, value); }
-
-            private string Position { get => DataItemStorage.Get(5); set => DataItemStorage.Set(5, value); }
-            public Vector3 GetPosition() => Vector3Extensions.FromP3DString(Position, '.');
-            public void SetPosition(Vector3 position) => Position = position.ToP3DString('.');
-        }
-
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
         public void TestBasic()
         {
+            var separator = '.';
             var name = "Aragas";
             var isCorrect = true;
             var idULong = 15124000000000U;
-            var @char = 'j';
+            var @char = 'j' as char?;
             var idInt = 15124;
             var position = Vector3.One;
 
-            var packet = new Container
-            {
-                Name = name,
-                IsCorrect = isCorrect,
-                IdLong = idULong,
-                Char = @char,
-                IdInt = idInt
-            };
-            packet.SetPosition(position);
+            var dataItemStorage = new DataItemStorage();
+            dataItemStorage.Set(0, name);
+            dataItemStorage.Set(1, isCorrect);
+            dataItemStorage.Set(2, idULong);
+            dataItemStorage.Set(3, @char);
+            dataItemStorage.Set(4, idInt);
+            dataItemStorage.Set(5, position.ToP3DString(separator));
 
-            Assert.AreEqual(name, packet.Name);
-            Assert.AreEqual(isCorrect, packet.IsCorrect);
-            Assert.AreEqual(idULong, packet.IdLong);
-            Assert.AreEqual(@char, packet.Char);
-            Assert.AreEqual(idInt, packet.IdInt);
-            Assert.AreEqual(position, packet.GetPosition());
+            Assert.AreEqual(name, dataItemStorage.Get(0));
+            Assert.AreEqual(isCorrect, dataItemStorage.GetBool(1));
+            Assert.AreEqual(idULong, dataItemStorage.GetUInt64(2));
+            Assert.AreEqual(@char, dataItemStorage.GetChar(3));
+            Assert.AreEqual(idInt, dataItemStorage.GetInt64(4));
+            Assert.AreEqual(position, Vector3Extensions.FromP3DString(dataItemStorage.Get(5), separator));
 
-            var packetWriter = new P3DProtocol(NullLogger<P3DProtocol>.Instance, new P3DPacketFactory());
-            var writer = new ArrayBufferWriter<byte>();
-            packetWriter.WriteMessage(packet, writer);
-            Assert.AreEqual("0.5|1|0|6|0|6|7|21|22|27|Aragas115124000000000j151241|1|1\r\n", Encoding.ASCII.GetString(writer.WrittenSpan));
+            Assert.AreEqual("Aragas*1*15124000000000*j*15124*1|1|1", dataItemStorage.ToString());
         }
     }
 }

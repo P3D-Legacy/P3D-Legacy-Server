@@ -1,40 +1,57 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
+using P3D.Legacy.Common.Packets;
+using P3D.Legacy.Server.Benchmark.Options;
 using P3D.Legacy.Server.Benchmark.Services;
+using P3D.Legacy.Server.Client.P3D;
 
-using System;
-using System.Net;
+using System.CommandLine.Binding;
+using System.CommandLine.Builder;
+using System.CommandLine.Hosting;
+using System.CommandLine.NamingConventionBinder;
+using System.CommandLine.Parsing;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Benchmark
 {
     public static class Program
     {
-        public static async Task Main(string[] args)
+        public static Task Main(string[] args) => new CommandLineBuilder(new RunBenchmarkCommand()).UseHost(_ => new HostBuilder(), ConfigureHost).UseDefaults().Build().InvokeAsync(args);
+
+        public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            var network1 = IPNetwork.Parse(IPAddress.Parse("127.0.0.1"), IPAddress.Parse("255.255.0.0"));
-            var network2 = IPNetwork.Parse(IPAddress.Parse("212.1.1.1"), IPAddress.Parse("255.255.0.0"));
-            var network3 = IPNetwork.Parse(IPAddress.Parse("212.1.1.2"), IPAddress.Parse("255.255.0.0"));
-            var network4 = IPNetwork.Parse(IPAddress.Parse("23.1.1.1"), IPAddress.Parse("255.255.0.0"));
-            var network5 = IPNetwork.Parse(IPAddress.Parse("23.1.1.2"), IPAddress.Parse("255.255.0.0"));
-
-
-            await CreateHostBuilder(args).Build().RunAsync();
+            var builder = new HostBuilder();
+            ConfigureHost(builder);
+            return builder;
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) => Host
-            .CreateDefaultBuilder(args)
+        private static void ConfigureHost(IHostBuilder hostBuilder) => hostBuilder
             .ConfigureServices((ctx, services) =>
             {
                 services.Configure<ConsoleLifetimeOptions>(opts => opts.SuppressStatusMessages = true);
 
-                services.AddHostedService<BenchmarkService>();
-                //services.AddHostedService<BenchmarkStatusService>();
+                services.AddTransient<BenchmarkService>();
+                services.AddTransient<BenchmarkStatusService>();
+
+                services.AddSingleton<IP3DPacketFactory, P3DPacketServerFactory>();
+                services.AddSingleton<P3DProtocol>();
 
                 services.AddSingleton<P3DClientConnectionService>();
-            })
-        ;
+
+                services.AddOptions<CLIOptions>().Configure<BindingContext>((opts, bindingContext) => new ModelBinder<CLIOptions>().UpdateInstance(opts, bindingContext));
+
+            }).ConfigureLogging((ctx, builder) =>
+            {
+                builder.ClearProviders();
+                builder.AddSimpleConsole(options =>
+                {
+                    options.IncludeScopes = true;
+                    options.SingleLine = true;
+                    options.TimestampFormat = "HH:mm:ss:fff ";
+                });
+                builder.AddFilter("System.Net.Http.HttpClient", LogLevel.Warning);
+            }).UseCommandHandler<RunBenchmarkCommand, RunBenchmarkCommand.Handler>();
     }
 }

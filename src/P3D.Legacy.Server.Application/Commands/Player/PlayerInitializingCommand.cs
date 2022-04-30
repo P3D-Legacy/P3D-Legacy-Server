@@ -1,8 +1,7 @@
-﻿using MediatR;
-
-using P3D.Legacy.Server.Abstractions;
+﻿using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Abstractions.Commands;
 
 namespace P3D.Legacy.Server.Application.Commands.Player
 {
-    public record PlayerInitializingCommand(IPlayer Player) : IRequest;
+    public sealed record PlayerInitializingCommand(IPlayer Player) : ICommand;
 }

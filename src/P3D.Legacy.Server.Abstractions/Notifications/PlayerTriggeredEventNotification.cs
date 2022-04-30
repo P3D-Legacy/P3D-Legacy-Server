@@ -1,8 +1,6 @@
-﻿using MediatR;
-
-using P3D.Legacy.Common.Events;
+﻿using P3D.Legacy.Common.PlayerEvents;
 
 namespace P3D.Legacy.Server.Abstractions.Notifications
 {
-    public record PlayerTriggeredEventNotification(IPlayer Player, Event Event) : INotification;
+    public record PlayerTriggeredEventNotification(IPlayer Player, PlayerEvent Event) : INotification;
 }

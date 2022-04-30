@@ -12,6 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="CLSCompliantAttribute">
+      <_Parameter1>false</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="IPNetwork2" />
   </ItemGroup>
 

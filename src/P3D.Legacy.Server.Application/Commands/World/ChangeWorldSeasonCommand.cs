@@ -1,8 +1,7 @@
-﻿using MediatR;
-
-using P3D.Legacy.Common.Data;
+﻿using P3D.Legacy.Common.Data;
+using P3D.Legacy.Server.Abstractions.Commands;
 
 namespace P3D.Legacy.Server.Application.Commands.World
 {
-    public record ChangeWorldSeasonCommand(WorldSeason Season) : IRequest<CommandResult>;
+    public sealed record ChangeWorldSeasonCommand(WorldSeason Season) : ICommand;
 }

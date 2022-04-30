@@ -1,16 +1,16 @@
 ﻿using Bedrock.Framework.Protocols;
 
 using Microsoft.AspNetCore.Connections.Features;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Chat;
-
+using P3D.Legacy.Common.Packets.Common;
 using P3D.Legacy.Common.Packets.Server;
-using P3D.Legacy.Common.Packets.Shared;
+using P3D.Legacy.Server.Benchmark.Options;
 using P3D.Legacy.Server.Client.P3D;
 
 using System;
@@ -23,23 +23,25 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Benchmark.Services
 {
-    public class BenchmarkService : IHostedService
+    public sealed class BenchmarkService
     {
-        private class PlayerState
+        private sealed class PlayerState
         {
             public string Name { get; set; } = "";
             public Origin Origin { get; set; } = Origin.FromNumber(-1);
 
-            public Func<P3DPacket, ValueTask> SendMessage = packet => ValueTask.CompletedTask;
+            public Func<P3DPacket, ValueTask> SendMessage { get; set; } = packet => ValueTask.CompletedTask;
         }
 
         private readonly ILogger _logger;
+        private readonly CLIOptions _options;
         private readonly P3DClientConnectionService _connectionService;
         private readonly Random _random = new();
 
-        public BenchmarkService(ILogger<BenchmarkService> logger, P3DClientConnectionService connectionService)
+        public BenchmarkService(ILogger<BenchmarkService> logger, IOptions<CLIOptions> options, P3DClientConnectionService connectionService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
             _connectionService = connectionService ?? throw new ArgumentNullException(nameof(connectionService));
         }
 
@@ -51,24 +53,26 @@ namespace P3D.Legacy.Server.Benchmark.Services
 
             try
             {
-                //string host = "127.0.0.1";
-                string host = "karp.pokemon3d.net";
-                //ushort port = 15124;
-                ushort port = 15134;
-                await using var connection = await _connectionService.GetConnectionAsync(host, port, ct);
+                await using var connection = await _connectionService.GetConnectionAsync(_options.Host, _options.Port, ct);
+                if (connection is null) return new NullReferenceException();
 
                 await using var reader = connection.CreateReader();
                 await using var writer = connection.CreateWriter();
 
-                var protocol = new P3DProtocol(NullLogger<P3DProtocol>.Instance, new P3DPacketFactory());
+                var protocol = new P3DProtocol(NullLogger<P3DProtocol>.Instance, new P3DPacketServerFactory());
 
                 var state = new PlayerState
                 {
                     Name = $"Player_{_random.Next()}",
                     SendMessage = async message =>
                     {
-                        await writer.WriteAsync(protocol, message, ct);
-                        await connection!.Transport.Output.FlushAsync(ct);
+                        var capturedWriter = writer;
+                        var capturedConnection = connection;
+
+                        if (capturedWriter is null || capturedConnection is null) return;
+
+                        await capturedWriter.WriteAsync(protocol, message, ct);
+                        await capturedConnection.Transport.Output.FlushAsync(ct);
                     },
                 };
                 var gameData = new GameDataPacket
@@ -91,7 +95,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
                     MonsterFacing = 1
                 };
                 await writer.WriteAsync(protocol, gameData, ct);
-                await connection!.Transport.Output.FlushAsync(ct);
+                await connection.Transport.Output.FlushAsync(ct);
 
                 while (!ct.IsCancellationRequested)
                 {
@@ -143,11 +147,11 @@ namespace P3D.Legacy.Server.Benchmark.Services
                 case ChatMessageGlobalPacket chatMessageGlobalPacket:
                     var expected1 = $"Player {state.Name} joined the server!";
                     var expected2 = "The game client sends a SHA-512 hash instead of the raw password.";
-                    if (chatMessageGlobalPacket.Message.Equals(expected2))
+                    if (string.Equals(chatMessageGlobalPacket.Message, expected2, StringComparison.Ordinal))
                     {
                         await state.SendMessage(new ChatMessageGlobalPacket { Origin = state.Origin, Message = "/login 12345Ara!" });
                     }
-                    if (chatMessageGlobalPacket.Message.Equals(expected1))
+                    if (string.Equals(chatMessageGlobalPacket.Message, expected1, StringComparison.Ordinal))
                     {
                         return Result.Success;
                     }
@@ -157,7 +161,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
                 case IdPacket idPacket:
                     state.Origin = idPacket.PlayerOrigin;
                     break;
-                case WorldDataPacket worldDataPacket:
+                case WorldDataPacket:
                     break;
             }
 
@@ -176,7 +180,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
             return await Task.WhenAll(tasks);
         }
 
-        public async Task StartAsync(CancellationToken ct)
+        public async Task ExecuteAsync(CancellationToken ct)
         {
             var batch = 20;
             var parallel = Environment.ProcessorCount;
@@ -227,7 +231,5 @@ namespace P3D.Legacy.Server.Benchmark.Services
             _logger.LogInformation("End. Time {Time} ms. Failed: {FailedCount}", stopwatch.ElapsedMilliseconds, failedCount);
             */
         }
-
-        public Task StopAsync(CancellationToken ct) => Task.CompletedTask;
     }
 }

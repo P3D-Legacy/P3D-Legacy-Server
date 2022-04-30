@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Logging;
 
+using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -9,8 +10,12 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Behaviours
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
+        private static readonly Action<ILogger, string, long, TRequest, Exception?> Request = LoggerMessage.Define<string, long, TRequest>(
+            LogLevel.Warning, default, "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}");
+
         private readonly Stopwatch _timer;
         private readonly ILogger<TRequest> _logger;
 
@@ -36,7 +41,7 @@ namespace P3D.Legacy.Server.Behaviours
             {
                 var requestName = typeof(TRequest).Name;
 
-                _logger.LogWarning("Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}", requestName, elapsedMilliseconds, request);
+                Request(_logger, requestName, elapsedMilliseconds, request, null);
             }
 
             return response;

@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Globalization;
 
 namespace P3D.Legacy.Common
 {
     public readonly struct Origin : IEquatable<Origin>, IComparable<Origin>
     {
-        public static Origin Parse(string id) => new(long.Parse(id));
+        public static Origin Parse(string id) => new(long.Parse(id, CultureInfo.InvariantCulture));
 
         public static Origin None { get; } = new(0);
         public static Origin Server { get; } = new(-1);
@@ -19,7 +20,7 @@ namespace P3D.Legacy.Common
         private readonly long _value;
         private Origin(long origin) => _value = origin;
 
-        public override string ToString() => _value.ToString();
+        public override string ToString() => _value.ToString(CultureInfo.InvariantCulture);
 
         public override int GetHashCode() => HashCode.Combine(_value);
 

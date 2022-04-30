@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
-using P3D.Legacy.Common.Data.P3DData;
+using P3D.Legacy.Common.Data.P3DDatas;
 using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
@@ -11,11 +11,12 @@ using P3D.Legacy.Tests.Utils;
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Tests
 {
-    public class MonsterTests
+    internal sealed class MonsterTests
     {
         private static string[] TestCaseSources() => File.ReadAllLines("./Data/Monsters.txt");
 
@@ -36,7 +37,7 @@ namespace P3D.Legacy.Tests
             await testService.DoTestAsync(async serviceProvider =>
             {
                 var repository = serviceProvider.GetRequiredService<PokeAPIMonsterRepository>();
-                var monster = await repository.GetByDataAsync(line);
+                var monster = await repository.GetByDataAsync(line, CancellationToken.None);
                 if (monster.IsValidP3D())
                 {
                     var convertedBack = MonsterExtensions.DictionaryToString(monster.ToDictionary());
@@ -49,44 +50,30 @@ namespace P3D.Legacy.Tests
         [TestCaseSource(nameof(TestCaseSources))]
         public void TestMonsterDictionaryTransformation(string line)
         {
-            using var testService = TestService.CreateNew();
+            var dict = line.AsSpan().MonsterDataToDictionary();
+            var convertedBack = dict.DictionaryToMonsterData();
 
-            testService.DoTest(serviceProvider =>
-            {
-                var dict = line.AsSpan().MonsterDataToDictionary();
-                var convertedBack = dict.DictionaryToMonsterData();
-                Assert.AreEqual(line, convertedBack);
-            });
+            Assert.AreEqual(line, convertedBack);
         }
 
         [Test]
         public void TestBattleOfferData()
         {
-            using var testService = TestService.CreateNew();
+            var monsters = string.Join('|', TestCaseSources());
+            var data = new BattleOfferData(monsters);
+            var convertedBack = data.ToP3DString();
 
-            testService.DoTest(serviceProvider =>
-            {
-                var monsters = string.Join('|', TestCaseSources());
-                var data = new BattleOfferData(monsters);
-                var convertedBack = data.ToP3DString();
-
-                Assert.AreEqual(monsters, convertedBack);
-            });
+            Assert.AreEqual(monsters, convertedBack);
         }
 
         [Test]
         [TestCaseSource(nameof(TestCaseSources))]
         public void TestTradeData(string line)
         {
-            using var testService = TestService.CreateNew();
+            var data = new TradeData(line);
+            var convertedBack = data.ToP3DString();
 
-            testService.DoTest(serviceProvider =>
-            {
-                var data = new TradeData(line);
-                var convertedBack = data.ToP3DString();
-
-                Assert.AreEqual(line, convertedBack);
-            });
+            Assert.AreEqual(line, convertedBack);
         }
     }
 }

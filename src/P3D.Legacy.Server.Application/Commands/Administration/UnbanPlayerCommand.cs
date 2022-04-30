@@ -1,8 +1,7 @@
-﻿using MediatR;
-
-using P3D.Legacy.Common;
+﻿using P3D.Legacy.Common;
+using P3D.Legacy.Server.Abstractions.Commands;
 
 namespace P3D.Legacy.Server.Application.Commands.Administration
 {
-    public record UnbanPlayerCommand(PlayerId Id) : IRequest<CommandResult>;
+    public sealed record UnbanPlayerCommand(PlayerId Id) : ICommand;
 }

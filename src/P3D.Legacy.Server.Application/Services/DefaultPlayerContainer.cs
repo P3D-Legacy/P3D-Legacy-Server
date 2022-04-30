@@ -1,17 +1,17 @@
-﻿using Microsoft.Extensions.Logging;
-
-using P3D.Legacy.Common;
+﻿using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
 
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Services
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class DefaultPlayerContainer : IPlayerContainerWriter, IPlayerContainerReader
     {
         private class PlayerEqualityComparer : IEqualityComparer<IPlayer>
@@ -25,7 +25,7 @@ namespace P3D.Legacy.Server.Application.Services
                 return x.ConnectionId == y.ConnectionId;
             }
 
-            public int GetHashCode(IPlayer obj) => obj.ConnectionId.GetHashCode();
+            public int GetHashCode(IPlayer obj) => obj.ConnectionId.GetHashCode(StringComparison.Ordinal);
         }
 
         private ImmutableHashSet<IPlayer> _connections = ImmutableHashSet.Create<IPlayer>().WithComparer(new PlayerEqualityComparer());

@@ -3,17 +3,19 @@ using P3D.Legacy.Server.Application.Commands.Player;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class UnmuteCommandManager : CommandManager
     {
         public override string Name => "unmute";
         public override string Description => "Command is disabled";
         public override IEnumerable<string> Aliases => new[] { "um" };
-        public override PermissionFlags Permissions => PermissionFlags.UserOrHigher;
+        public override PermissionTypes Permissions => PermissionTypes.UserOrHigher;
 
         public UnmuteCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
@@ -34,12 +36,14 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                     return;
                 }
 
-                var result = await Mediator.Send(new PlayerUnmutedPlayerCommand(player.Id, targetPlayer.Id), ct);
-                if (!result.Success)
+                var result = await CommandDispatcher.DispatchAsync(new PlayerUnmutedPlayerCommand(player.Id, targetPlayer.Id), ct);
+                if (!result.IsSuccess)
                     await SendMessageAsync(player, $"Failed to unmute player {targetName}!", ct);
             }
             else
+            {
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
+            }
         }
 
         public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)

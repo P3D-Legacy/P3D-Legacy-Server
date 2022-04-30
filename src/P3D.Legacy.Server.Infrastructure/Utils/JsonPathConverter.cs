@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -9,6 +10,7 @@ using System.Runtime.Serialization;
 namespace P3D.Legacy.Server.Infrastructure.Utils
 {
     // TODO: System.Text.Json https://github.com/dotnet/runtime/issues/38324
+    [SuppressMessage("Performance", "CA1812")]
     internal class JsonPathConverter : JsonConverter
     {
         // CanConvert is not called when [JsonConverter] attribute is used

@@ -24,7 +24,7 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] RegisterModel model, CancellationToken ct)
+        public async Task<IActionResult> PostAsync([FromBody] RegisterModel model, CancellationToken ct)
         {
             var newUser = new UserEntity(PlayerId.FromName(model.Username), model.Username);
 

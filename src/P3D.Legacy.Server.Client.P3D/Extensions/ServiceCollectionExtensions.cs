@@ -12,8 +12,6 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
     {
         public static IServiceCollection AddClientP3D(this IServiceCollection services)
         {
-            //services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<KestrelServerOptions>, P3DServerOptionsSetup>());
-
             services.AddHostedService<P3DPlayerMovementCompensationService>();
 
             services.AddScoped<P3DConnectionContextHandler>();

@@ -4,7 +4,7 @@ using System;
 
 namespace P3D.Legacy.Server.GUI.Services
 {
-    public sealed class UIServiceScopeFactory : IServiceScopeFactory, IServiceProvider
+    public sealed class UIServiceScopeFactory : IServiceScopeFactory, IServiceProvider, IDisposable
     {
         private sealed class ScopeWrapper : IServiceScope
         {
@@ -37,5 +37,10 @@ namespace P3D.Legacy.Server.GUI.Services
         public IServiceScope CreateScope() => _currentScope = new ScopeWrapper(this, _serviceScopeFactory.CreateScope());
 
         public object? GetService(Type serviceType) => _currentScope?.ServiceProvider.GetService(serviceType);
+
+        public void Dispose()
+        {
+            _currentScope?.Dispose();
+        }
     }
 }

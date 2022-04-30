@@ -2,8 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Application.Queries.Players;
-using P3D.Legacy.Server.CommunicationAPI.Utils;
+using P3D.Legacy.Server.Abstractions.Queries;
+using P3D.Legacy.Server.Abstractions.Utils;
+using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Infrastructure.Services.Statistics;
 using P3D.Legacy.Server.UI.Shared.Models;
 
@@ -45,12 +46,12 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         [Produces("application/json")]
         [ProducesResponseType(typeof(PagingResponse<StatusResponseV2Player>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetAllAsync([FromQuery] StatusRequestV2Query query, [FromServices] IPlayerQueries playerQueries, CancellationToken ct)
+        public async Task<ActionResult> GetAllAsync([FromQuery] StatusRequestV2Query query, [FromServices] IQueryDispatcher queryDispatcher, CancellationToken ct)
         {
             var page = query.Page;
             var pageSize = Math.Max(Math.Min(query.PageSize, 100), 5);
 
-            var (count, models) = await playerQueries.GetAllAsync((page - 1) * pageSize, pageSize, ct);
+            var (count, models) = await queryDispatcher.DispatchAsync(new GetPlayerViewModelsPaginatedQuery((page - 1) * pageSize, pageSize), ct);
 
             var metadata = new PagingMetadata
             {
@@ -96,10 +97,10 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         [Produces("application/json")]
         [ProducesResponseType(typeof(ServerStatisticsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetServerStatisticsAsync([FromServices] IPlayerQueries playerQueries, CancellationToken ct)
+        public async Task<ActionResult> GetServerStatisticsAsync([FromServices] IQueryDispatcher queryDispatcher, CancellationToken ct)
         {
             var process = Process.GetCurrentProcess();
-            var (onlineCount, _) = await playerQueries.GetAllAsync(0, 0, ct);
+            var (onlineCount, _) = await queryDispatcher.DispatchAsync(new GetPlayerViewModelsPaginatedQuery(0, 0), ct);
 
             return Ok(new ServerStatisticsResponse
             {

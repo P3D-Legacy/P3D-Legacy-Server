@@ -15,15 +15,11 @@ namespace P3D.Legacy.Server.Application.Services
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public async Task<TConnectionContextHandler?> CreateAsync<TConnectionContextHandler>(ConnectionContext connectionContext) where TConnectionContextHandler : ConnectionContextHandler
+        public async Task<TConnectionContextHandler> CreateAsync<TConnectionContextHandler>(ConnectionContext connectionContext) where TConnectionContextHandler : ConnectionContextHandler
         {
-            if (_serviceProvider.GetRequiredService<TConnectionContextHandler>() is { } connectionContextHandler)
-            {
-                await connectionContextHandler.SetConnectionContextAsync(connectionContext);
-                return connectionContextHandler;
-            }
-
-            return null;
+            var connectionContextHandler = _serviceProvider.GetRequiredService<TConnectionContextHandler>();
+            await connectionContextHandler.SetConnectionContextAsync(connectionContext);
+            return connectionContextHandler;
         }
     }
 }

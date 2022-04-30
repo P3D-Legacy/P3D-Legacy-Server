@@ -14,7 +14,7 @@ namespace P3D.Legacy.Common.Monsters
             StatType.SpecialAttack => SpecialAttack,
             StatType.SpecialDefense => SpecialDefense,
             StatType.Speed => Speed,
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(nameof(statType))
         };
 
         public override string ToString() =>

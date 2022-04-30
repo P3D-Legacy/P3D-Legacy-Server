@@ -31,11 +31,12 @@ namespace P3D.Legacy.Server.GUI.Views
 
                 if (dynamicConfigurationProvider.GetOptions(optionsType) is not { } currentOptions) continue;
 
-                var view = new FrameView(optionsType.Name.Replace("Options", ""))
+                var view = new FrameView(optionsType.Name.Replace("Options", "", StringComparison.Ordinal))
                 {
                     X = 0,
                     Y = views.Count == 0 ? 0 : Pos.Bottom(views.Last()),
-                    Width = Dim.Fill(), Height = 3 + propertyCount
+                    Width = Dim.Fill(),
+                    Height = 3 + propertyCount
                 };
                 var maxLength = manager.AvailableProperties.Max(x => x.Name.Length);
                 var i = 0;

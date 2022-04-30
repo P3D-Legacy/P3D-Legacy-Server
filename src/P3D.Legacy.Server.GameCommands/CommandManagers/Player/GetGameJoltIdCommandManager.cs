@@ -2,17 +2,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class GetGameJoltIdCommandManager : CommandManager
     {
         public override string Name => "getgamejolt";
         public override string Description => "Returns the player's GameJolt Id";
         public override IEnumerable<string> Aliases => new[] { "ggj" };
-        public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
+        public override PermissionTypes Permissions => PermissionTypes.ModeratorOrHigher;
 
         public GetGameJoltIdCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 

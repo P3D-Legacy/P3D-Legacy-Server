@@ -13,8 +13,9 @@ namespace P3D.Legacy.Server.Client.P3D
         public Origin Origin { get; private set; } = Origin.None;
         public string Name { get; private set; } = string.Empty;
         public GameJoltId GameJoltId { get; private set; } = GameJoltId.None;
-        public PermissionFlags Permissions { get; private set; } = PermissionFlags.UnVerified;
-        public IPEndPoint IPEndPoint { get; private set; } = new IPEndPoint(IPAddress.None, 0);
+        public PermissionTypes Permissions { get; private set; } = PermissionTypes.UnVerified;
+        public IPEndPoint IPEndPoint { get; private set; } = new(IPAddress.None, 0);
+        public PlayerState State { get; private set; } = PlayerState.None;
 
 
         public string GameMode { get; private set; } = default!;

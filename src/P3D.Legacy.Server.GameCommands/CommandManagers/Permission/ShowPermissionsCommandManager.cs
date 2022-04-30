@@ -1,26 +1,25 @@
-﻿using MediatR;
-
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Services;
+﻿using P3D.Legacy.Server.Abstractions;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class ShowPermissionsCommandManager : CommandManager
     {
         public override string Name => "showperm";
         public override string Description => "Show available Client permissions.";
-        public override PermissionFlags Permissions => PermissionFlags.AdministratorOrHigher;
+        public override PermissionTypes Permissions => PermissionTypes.AdministratorOrHigher;
 
         public ShowPermissionsCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
             if (arguments.Length == 1)
-                await SendMessageAsync(player, string.Join(",", Enum.GetNames(typeof(PermissionFlags))), ct);
+                await SendMessageAsync(player, string.Join(",", Enum.GetNames(typeof(PermissionTypes))), ct);
             else if (arguments.Length == 2)
             {
                 var targetName = arguments[0];

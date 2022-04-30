@@ -1,18 +1,18 @@
-﻿using MediatR;
+﻿using Microsoft.Extensions.Logging;
 
-using Microsoft.Extensions.Logging;
-
-using P3D.Legacy.Server.Application.Commands;
+using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Infrastructure.Services.Mutes;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 {
-    internal class PlayerMutedPlayerCommandHandler : IRequestHandler<PlayerMutedPlayerCommand, CommandResult>
+    [SuppressMessage("Performance", "CA1812")]
+    internal sealed class PlayerMutedPlayerCommandHandler : ICommandHandler<PlayerMutedPlayerCommand>
     {
         private readonly ILogger _logger;
         private readonly IMuteManager _muteRepository;

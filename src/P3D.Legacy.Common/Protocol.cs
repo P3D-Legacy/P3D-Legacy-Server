@@ -2,32 +2,36 @@
 
 namespace P3D.Legacy.Common
 {
-    public enum ProtocolEnum : byte { Invalid, V1 }
+    public enum ProtocolVersion
+    {
+        Invalid,
+        V1
+    }
 
     public readonly struct Protocol : IEquatable<Protocol>
     {
         private static readonly byte[] SequenceV1 = { (byte) '0', (byte) '.', (byte) '5' };
 
-        public static implicit operator Protocol(ProtocolEnum value) => new(value);
-        public static implicit operator ProtocolEnum(Protocol value) => value._value;
+        public static implicit operator Protocol(ProtocolVersion value) => new(value);
+        public static implicit operator ProtocolVersion(Protocol value) => value._value;
 
         public static bool operator ==(Protocol left, Protocol right) => left.Equals(right);
         public static bool operator !=(Protocol left, Protocol right) => !(left == right);
 
-        private readonly ProtocolEnum _value;
+        private readonly ProtocolVersion _value;
 
         public Protocol(in ReadOnlySpan<byte> protocol)
         {
-            _value = protocol.SequenceEqual(SequenceV1) ? ProtocolEnum.V1 : ProtocolEnum.Invalid;
+            _value = protocol.SequenceEqual(SequenceV1) ? ProtocolVersion.V1 : ProtocolVersion.Invalid;
         }
-        public Protocol(ProtocolEnum value)
+        public Protocol(ProtocolVersion value)
         {
             _value = value;
         }
 
         public override string ToString() => _value switch
         {
-            ProtocolEnum.V1 => "0.5",
+            ProtocolVersion.V1 => "0.5",
             _ => "0.0",
         };
 

@@ -42,7 +42,9 @@ namespace P3D.Legacy.Server
 
             var appName = typeof(Startup).Assembly.GetName().Name ?? "ERROR";
 
-            services.AddControllers().AddControllersAsServices().AddJsonOptions(options => Configure(options.JsonSerializerOptions));
+            services.AddControllers()
+                .AddControllersAsServices()
+                .AddJsonOptions(options => Configure(options.JsonSerializerOptions));
 
             services.AddRouting(options =>
             {

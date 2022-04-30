@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Globalization;
 
 namespace P3D.Legacy.Common
 {
     public readonly struct GameJoltId : IEquatable<GameJoltId>, IEquatable<ulong>
     {
-        public static GameJoltId Parse(string id) => new(ulong.Parse(id));
+        public static GameJoltId Parse(string id) => new(ulong.Parse(id, CultureInfo.InvariantCulture));
 
         public static GameJoltId None { get; } = new(0);
         public static GameJoltId FromNumber(ulong gameJoltId) => new(gameJoltId);
@@ -21,7 +22,7 @@ namespace P3D.Legacy.Common
         private readonly ulong _value;
         private GameJoltId(ulong origin) => _value = origin;
 
-        public override string ToString() => _value.ToString();
+        public override string ToString() => _value.ToString(CultureInfo.InvariantCulture);
 
         public bool Equals(GameJoltId other) => _value == other._value;
         public bool Equals(ulong other) => _value == other;

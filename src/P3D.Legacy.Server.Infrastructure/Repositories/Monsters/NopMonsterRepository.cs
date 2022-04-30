@@ -1,6 +1,7 @@
 ﻿using P3D.Legacy.Common.Monsters;
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Infrastructure.Repositories.Monsters
@@ -23,6 +24,6 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Monsters
             public IDictionary<string, string> Metadata => default!;
         }
 
-        public Task<IMonsterInstance> GetByDataAsync(string monsterData) => Task.FromResult<IMonsterInstance>(new NopMonsterInstance());
+        public Task<IMonsterInstance> GetByDataAsync(string monsterData, CancellationToken ct) => Task.FromResult<IMonsterInstance>(new NopMonsterInstance());
     }
 }

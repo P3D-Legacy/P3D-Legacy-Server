@@ -12,12 +12,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="CLSCompliantAttribute">
+      <_Parameter1>false</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Aragas.Extensions.Options.FluentValidation" />
     <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,7 +2,6 @@
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Infrastructure.Models.Permissions;
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
@@ -32,10 +31,10 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Permissions
             PlayerIdType.GameJolt => _options.IsOfficial
                 ? await _p3dPermissionRepository.GetByGameJoltIdAsync(GameJoltId.Parse(id.Id), ct)
                 : await _liteDbPermissionRepository.GetByGameJoltIdAsync(GameJoltId.Parse(id.Id), ct),
-            _ => new PermissionEntity(PermissionFlags.UnVerified)
+            _ => new PermissionEntity(PermissionTypes.UnVerified)
         };
 
-        public async Task<bool> SetPermissionsAsync(PlayerId id, PermissionFlags permissions, CancellationToken ct) => id.IdType switch
+        public async Task<bool> SetPermissionsAsync(PlayerId id, PermissionTypes permissions, CancellationToken ct) => id.IdType switch
         {
             PlayerIdType.Name => await _liteDbPermissionRepository.UpdateAsync(id, permissions, ct),
             PlayerIdType.GameJolt => !_options.IsOfficial && await _liteDbPermissionRepository.UpdateAsync(id, permissions, ct),

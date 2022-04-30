@@ -16,7 +16,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 {
     public class LiteDbPermissionRepository
     {
-        private record Permission(string Id, PermissionFlags Permissions)
+        private record Permission(string Id, PermissionTypes Permissions)
         {
             public Permission() : this(default!, default) { }
         }
@@ -42,7 +42,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
             ct.ThrowIfCancellationRequested();
             var entry = await collection.FindByIdAsync(idStr);
 
-            return new PermissionEntity(entry?.Permissions ?? PermissionFlags.User);
+            return new PermissionEntity(entry?.Permissions ?? PermissionTypes.User);
         }
 
         public async Task<PermissionEntity> GetByGameJoltIdAsync(GameJoltId gameJoltId, CancellationToken ct)
@@ -59,10 +59,10 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
             ct.ThrowIfCancellationRequested();
             var entry = await collection.FindByIdAsync(idStr);
 
-            return new PermissionEntity(entry?.Permissions ?? PermissionFlags.User);
+            return new PermissionEntity(entry?.Permissions ?? PermissionTypes.User);
         }
 
-        public async Task<bool> UpdateAsync(PlayerId id, PermissionFlags permissions, CancellationToken ct)
+        public async Task<bool> UpdateAsync(PlayerId id, PermissionTypes permissions, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 

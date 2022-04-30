@@ -10,6 +10,6 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Permissions
     public interface IPermissionManager
     {
         Task<PermissionEntity> GetByIdAsync(PlayerId id, CancellationToken ct);
-        Task<bool> SetPermissionsAsync(PlayerId id,PermissionFlags permissions, CancellationToken ct);
+        Task<bool> SetPermissionsAsync(PlayerId id, PermissionTypes permissions, CancellationToken ct);
     }
 }

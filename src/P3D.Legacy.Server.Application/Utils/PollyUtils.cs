@@ -11,8 +11,11 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Utils
 {
-    public class PollyUtils
+    public sealed class PollyUtils
     {
+        private static readonly Action<ILogger, HttpResponseMessage, int, TimeSpan, Exception?> Exception = LoggerMessage.Define<HttpResponseMessage, int, TimeSpan>(
+            LogLevel.Error, default, "Exception during HTTP connection. HttpResult {@HttpResult}. Retry count {RetryCount}. Waiting {Time}...");
+
         private static TimeSpan GetServerWaitDuration(DelegateResult<HttpResponseMessage> response)
         {
             if (response.Result?.Headers.RetryAfter is not { } retryAfter)
@@ -40,7 +43,7 @@ namespace P3D.Legacy.Server.Application.Utils
                     },
                     onRetryAsync: (result, timeSpan, retryCount, context) =>
                     {
-                        logger.LogError(result.Exception, "Exception during HTTP connection. HttpResult {@HttpResult}. Retry count {RetryCount}. Waiting {Time}...", result.Result, retryCount, timeSpan);
+                        Exception(logger, result.Result, retryCount, timeSpan, result.Exception);
                         return Task.CompletedTask;
                     });
         }

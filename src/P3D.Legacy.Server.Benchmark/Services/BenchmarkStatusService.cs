@@ -1,16 +1,14 @@
 ﻿using Bedrock.Framework.Protocols;
 
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
-using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Common.Packets.Server;
+using P3D.Legacy.Server.Benchmark.Options;
 using P3D.Legacy.Server.Client.P3D;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -18,75 +16,61 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Benchmark.Services
 {
-    public class BenchmarkStatusService : IHostedService
+    public sealed class BenchmarkStatusService
     {
         private readonly ILogger _logger;
+        private readonly CLIOptions _options;
+        private readonly P3DProtocol _protocol;
         private readonly P3DClientConnectionService _connectionService;
 
-        public BenchmarkStatusService(ILogger<BenchmarkStatusService> logger, P3DClientConnectionService connectionService)
+        public BenchmarkStatusService(ILogger<BenchmarkStatusService> logger, IOptions<CLIOptions> options, P3DProtocol protocol, P3DClientConnectionService connectionService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));
             _connectionService = connectionService ?? throw new ArgumentNullException(nameof(connectionService));
         }
 
-        private async Task<bool> GetServerStatusAsync(CancellationToken ct)
+        private async Task<bool> GetServerStatusAsync(int idx, CancellationToken ct)
         {
-            string host = "karp.pokemon3d.net";
-            ushort port = 15134;
-            await using var connection = await _connectionService.GetConnectionAsync(host, port, ct);
+            _logger.LogInformation("Iteration: {I}", idx);
+            await using var connection = await _connectionService.GetConnectionAsync(_options.Host, _options.Port, ct);
 
             await using var reader = connection.CreateReader();
             await using var writer = connection.CreateWriter();
 
-            var protocol = new P3DProtocol(NullLogger<P3DProtocol>.Instance, new P3DPacketFactory());
+            await writer.WriteAsync(_protocol, new ServerDataRequestPacket(), ct);
 
-            await writer.WriteAsync(protocol, new ServerDataRequestPacket(), ct);
-
-            if (await reader.ReadAsync(protocol, ct) is { Message: { } message, IsCompleted: var isCompleted, IsCanceled: var isCanceled })
+            if (await reader.ReadAsync(_protocol, ct) is { Message: ServerInfoDataPacket })
             {
-                if (message is ServerInfoDataPacket)
-                {
-                    return true;
-                }
+                _logger.LogInformation("Iteration: {I} Complete", idx);
+                return true;
             }
             reader.Advance();
 
+            _logger.LogInformation("Iteration: {I} Complete", idx);
             return false;
         }
 
-        private async Task<IEnumerable<bool>> GetConnectionsInParallelInWithBatchesAsync(int numberOfBatches, CancellationToken ct)
+        public async Task ExecuteAsync(CancellationToken ct)
         {
-            var tasks = new List<Task<bool>>();
+            var batch = _options.Batch;
+            _logger.LogInformation("Start. Batch: {Batch}", batch);
 
-            for (var i = 0; i < numberOfBatches; i++)
-            {
-                tasks.Add(GetServerStatusAsync(ct));
-            }
+            //var desiredThreads = batch * parallel;
+            //ThreadPool.GetMaxThreads(out _, out var maxIoThreads);
+            //ThreadPool.SetMaxThreads(desiredThreads, maxIoThreads);
+            //ThreadPool.GetMinThreads(out _, out var minIoThreads);
+            //ThreadPool.SetMinThreads(desiredThreads, minIoThreads);
 
-            return await Task.WhenAll(tasks);
-        }
-
-        public async Task StartAsync(CancellationToken ct)
-        {
-            var batch = 1000;
-            var parallel = Environment.ProcessorCount;
-            _logger.LogInformation("Start. Batch: {Batch}", batch * parallel);
-            var stopwatch = Stopwatch.StartNew();
+            var stopwatchGlobal = Stopwatch.StartNew();
             var failedCount = 0;
-            await Parallel.ForEachAsync(Enumerable.Range(0, parallel), ct, async (i, ct) =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, batch), new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount, CancellationToken = ct }, async (i, ct2) =>
             {
-                var stopwatch_p = Stopwatch.StartNew();
-                foreach (var result in await GetConnectionsInParallelInWithBatchesAsync(batch, ct))
-                {
-                    if (!result) failedCount++;
-                }
-                stopwatch_p.Stop();
-                _logger.LogInformation("Parallel End {Parallel}. Time: {Time} ms.", i, stopwatch_p.ElapsedMilliseconds);
+                if (!await GetServerStatusAsync(i, ct2)) failedCount++;
             });
-            stopwatch.Stop();
-            _logger.LogInformation("End. Time {Time} ms. Failed: {FailedCount}", stopwatch.ElapsedMilliseconds, failedCount);
+            stopwatchGlobal.Stop();
+            _logger.LogInformation("End. Time {Time} ms. Failed: {FailedCount}", stopwatchGlobal.ElapsedMilliseconds, failedCount);
         }
-
-        public Task StopAsync(CancellationToken ct) => Task.CompletedTask;
     }
 }

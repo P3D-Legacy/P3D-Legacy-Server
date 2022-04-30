@@ -1,22 +1,21 @@
-﻿using MediatR;
-
-using P3D.Legacy.Server.Abstractions;
+﻿using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.World;
-using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class SetTimeCommandManager : CommandManager
     {
         public override string Name => "settime";
         public override string Description => "Set World Time.";
         public override IEnumerable<string> Aliases => new[] { "st" };
-        public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
+        public override PermissionTypes Permissions => PermissionTypes.ModeratorOrHigher;
 
 
         public SetTimeCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
@@ -27,14 +26,18 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
             {
                 if (TimeSpan.TryParseExact(arguments[0], "g", null, out var time))
                 {
-                    await Mediator.Send(new ChangeWorldTimeCommand(time), ct);
+                    await CommandDispatcher.DispatchAsync(new ChangeWorldTimeCommand(time), ct);
                     await SendMessageAsync(player, $"Set time to {time}!", ct);
                 }
                 else
+                {
                     await SendMessageAsync(player, "Invalid time!", ct);
+                }
             }
             else
+            {
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
+            }
         }
 
         public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)

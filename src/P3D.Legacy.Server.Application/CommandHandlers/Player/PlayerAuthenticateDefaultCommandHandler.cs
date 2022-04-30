@@ -1,38 +1,38 @@
-﻿using MediatR;
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Abstractions.Notifications;
-using P3D.Legacy.Server.Abstractions.Services;
-using P3D.Legacy.Server.Application.Commands;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Infrastructure.Models.Users;
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Services.Users;
 
 using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 {
-    internal class PlayerAuthenticateDefaultCommandHandler : IRequestHandler<PlayerAuthenticateDefaultCommand, CommandResult>
+    [SuppressMessage("Performance", "CA1812")]
+    internal sealed class PlayerAuthenticateDefaultCommandHandler : ICommandHandler<PlayerAuthenticateDefaultCommand>
     {
         private readonly ILogger _logger;
-        private readonly NotificationPublisher _notificationPublisher;
+        private readonly INotificationDispatcher _notificationDispatcher;
         private readonly IUserManager _userManager;
         private readonly LockoutOptions _lockoutOptions;
 
         public PlayerAuthenticateDefaultCommandHandler(
             ILogger<PlayerAuthenticateDefaultCommandHandler> logger,
-            NotificationPublisher notificationPublisher,
+            INotificationDispatcher notificationDispatcher,
             IUserManager userManager,
             IOptions<LockoutOptions> lockoutOptions)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
+            _notificationDispatcher = notificationDispatcher ?? throw new ArgumentNullException(nameof(notificationDispatcher));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _lockoutOptions = lockoutOptions.Value ?? throw new ArgumentNullException(nameof(lockoutOptions));
         }
@@ -40,6 +40,8 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
         public async Task<CommandResult> Handle(PlayerAuthenticateDefaultCommand request, CancellationToken ct)
         {
             var (player, password) = request;
+
+            Debug.Assert(player.State == PlayerState.Authentication);
 
             if (await _userManager.FindByIdAsync(player.Id, ct) is not { } user)
             {
@@ -49,7 +51,7 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
                 {
                     foreach (var error in createResult.Errors)
                     {
-                        await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, error.Description), ct);
+                        await _notificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, player, error.Description), ct);
                     }
 
                     return new CommandResult(false);
@@ -64,15 +66,15 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
                     var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user, ct) ?? DateTimeOffset.Now;
                     var duration = lockoutEnd - DateTimeOffset.Now;
 
-                    await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, $"You are locked out for {duration.Seconds} seconds!"), ct);
+                    await _notificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, player, $"You are locked out for {duration.Seconds} seconds!"), ct);
                     return new CommandResult(false);
                 }
 
                 var failedCount = await _userManager.GetAccessFailedCountAsync(user, ct);
                 var attemptsLeft = _lockoutOptions.MaxFailedAccessAttempts - failedCount;
 
-                await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "Invalid Password!"), ct);
-                await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, $"You have {attemptsLeft} attempts left before lockout!"), ct);
+                await _notificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, player, "Invalid Password!"), ct);
+                await _notificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, player, $"You have {attemptsLeft} attempts left before lockout!"), ct);
                 return new CommandResult(false);
             }
 

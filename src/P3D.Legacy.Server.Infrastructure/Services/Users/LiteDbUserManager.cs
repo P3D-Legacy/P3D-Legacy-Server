@@ -13,6 +13,7 @@ using P3D.Legacy.Server.Infrastructure.Options;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -72,7 +73,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             if (!isSha512)
             {
                 using var sha512 = SHA512.Create();
-                password = BitConverter.ToString(sha512.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower() + "A!";
+                password = BitConverter.ToString(sha512.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "", StringComparison.Ordinal).ToLower(CultureInfo.InvariantCulture) + "A!";
             }
             var pwHash = GetPasswordHash(password);
             var user = new User(playerId.ToString(), name, pwHash);
@@ -158,7 +159,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             if (!isSha512)
             {
                 using var sha512 = SHA512.Create();
-                password = BitConverter.ToString(sha512.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "").ToLower() + "A!";
+                password = BitConverter.ToString(sha512.ComputeHash(Encoding.UTF8.GetBytes(password))).Replace("-", "", StringComparison.Ordinal).ToLower(CultureInfo.InvariantCulture) + "A!";
             }
             var result = VerifyPassword(entry.PasswordHash, password);
 

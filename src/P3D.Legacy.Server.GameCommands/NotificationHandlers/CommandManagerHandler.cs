@@ -1,16 +1,14 @@
-﻿using MediatR;
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
-using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -18,27 +16,29 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.NotificationHandlers
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal sealed class CommandManagerHandler :
         INotificationHandler<PlayerSentCommandNotification>
     {
+        private static readonly Action<ILogger, string, string, string, Exception?> Command = LoggerMessage.Define<string, string, string>(
+            LogLevel.Information, default, "{PlayerName}: /{CommandAlias} {CommandArgs}");
+
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
-        private readonly IMediator _mediator;
-        private readonly NotificationPublisher _notificationPublisher;
+        private readonly INotificationDispatcher _notificationDispatcher;
         private readonly IReadOnlyList<CommandManager> _commandManagers;
 
-        public CommandManagerHandler(ILogger<CommandManagerHandler> logger, TracerProvider traceProvider, IMediator mediator, NotificationPublisher notificationPublisher, IEnumerable<CommandManager> commandManagers)
+        public CommandManagerHandler(ILogger<CommandManagerHandler> logger, TracerProvider traceProvider, INotificationDispatcher notificationDispatcher, IEnumerable<CommandManager> commandManagers)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
+            _notificationDispatcher = notificationDispatcher ?? throw new ArgumentNullException(nameof(notificationDispatcher));
             _commandManagers = commandManagers.ToList();
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.GameCommands");
         }
 
         private async Task SendMessageAsync(IPlayer player, string message, CancellationToken ct)
         {
-            await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, message), ct);
+            await _notificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, player, message), ct);
         }
 
         private async Task HandleCommandAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
@@ -52,17 +52,19 @@ namespace P3D.Legacy.Server.GameCommands.NotificationHandlers
                 return;
             }
 
-            if (command.LogCommand && (player.Permissions & PermissionFlags.UnVerified) == 0)
-                _logger.LogInformation("{PlayerName}: /{CommandAlias} {CommandArgs}", player.Name, alias, string.Join(" ", arguments));
+            if (command.LogCommand && (player.Permissions & PermissionTypes.UnVerified) == 0)
+            {
+                Command(_logger, player.Name, alias, string.Join(" ", arguments), null);
+            }
 
-            if (command.Permissions == PermissionFlags.None)
+            if (command.Permissions == PermissionTypes.None)
             {
                 await SendMessageAsync(player, "Command is not found!", ct);
                 //await SendMessageAsync(player, @"Command is disabled!", ct);
                 return;
             }
 
-            if ((player.Permissions & command.Permissions) == PermissionFlags.None)
+            if ((player.Permissions & command.Permissions) == PermissionTypes.None)
             {
                 await SendMessageAsync(player, "Command is not found!", ct);
                 //await SendMessageAsync(player, @"You have not the permission to use this command!", ct);
@@ -74,14 +76,13 @@ namespace P3D.Legacy.Server.GameCommands.NotificationHandlers
         }
 
         public CommandManager? FindByName(string name) => _commandManagers
-            .Where(x => x.Permissions != PermissionFlags.None)
+            .Where(x => x.Permissions != PermissionTypes.None)
             .FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         public CommandManager? FindByAlias(string alias) => _commandManagers
-            .Where(x => x.Permissions != PermissionFlags.None)
+            .Where(x => x.Permissions != PermissionTypes.None)
             .FirstOrDefault(x => x.Aliases.Contains(alias, StringComparer.OrdinalIgnoreCase));
 
         public IReadOnlyList<CommandManager> GetCommands() => _commandManagers;
-
 
         public async Task Handle(PlayerSentCommandNotification notification, CancellationToken ct)
         {

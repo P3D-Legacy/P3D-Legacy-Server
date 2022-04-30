@@ -14,14 +14,27 @@ namespace P3D.Legacy.Server.Client.P3D
 {
     public sealed class P3DProtocol : IMessageReader<P3DPacket?>, IMessageWriter<P3DPacket?>
     {
+        private static readonly Action<ILogger, string, Exception?> InvalidProtocol = LoggerMessage.Define<string>(
+            LogLevel.Critical, default, "Line is not a P3D packet! Invalid protocol! {Line}");
+        private static readonly Action<ILogger, string, Exception?> InvalidPacketId = LoggerMessage.Define<string>(
+            LogLevel.Critical, default, "Line is not a P3D packet! Invalid Packet Id! {Line}");
+        private static readonly Action<ILogger, string, Exception?> InvalidPacketIdOutOfRange = LoggerMessage.Define<string>(
+            LogLevel.Critical, default, "Line is not a P3D packet! Packet Id Out of Range! {Line}");
+        private static readonly Action<ILogger, Type, Exception?> FailedToPopulate = LoggerMessage.Define<Type>(
+            LogLevel.Critical, default, "Failed to populate message type {Type}");
+        private static readonly Action<ILogger, Type, Exception?> ReceivedAMessage = LoggerMessage.Define<Type>(
+            LogLevel.Trace, default, "Received a message type {Type}");
+        private static readonly Action<ILogger, Type, Exception?> SendingAMessage = LoggerMessage.Define<Type>(
+            LogLevel.Trace, default, "Sending a message type {Type}");
+
         private static readonly byte[] Separator = { (byte) '|' };
-        private static readonly byte[] DataItemSeparator = { (byte) '|', (byte) '0', (byte)  '|' };
+        private static readonly byte[] DataItemSeparator = { (byte) '|', (byte) '0', (byte) '|' };
         private static readonly byte[] NewLine = { (byte) '\r', (byte) '\n' };
 
         private readonly ILogger _logger;
-        private readonly P3DPacketFactory _packetFactory;
+        private readonly IP3DPacketFactory _packetFactory;
 
-        public P3DProtocol(ILogger<P3DProtocol> logger, P3DPacketFactory packetFactory)
+        public P3DProtocol(ILogger<P3DProtocol> logger, IP3DPacketFactory packetFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _packetFactory = packetFactory ?? throw new ArgumentNullException(nameof(packetFactory));
@@ -38,35 +51,35 @@ namespace P3D.Legacy.Server.Client.P3D
             consumed = examined = reader.Position;
 
             var lineSpanToParse = line;
-            if (!P3DPacket.TryParseProtocol(ref lineSpanToParse, out var protocol) || protocol != ProtocolEnum.V1)
+            if (!P3DPacket.TryParseProtocol(ref lineSpanToParse, out var protocol) || protocol != ProtocolVersion.V1)
             {
-                _logger.LogCritical("Line is not a P3D packet! Invalid protocol! {Line}", Encoding.UTF8.GetString(line));
+                InvalidProtocol(_logger, Encoding.UTF8.GetString(line), null);
                 message = null;
                 return false;
             }
 
             if (!P3DPacket.TryParseId(ref lineSpanToParse, out var id))
             {
-                _logger.LogCritical("Line is not a P3D packet! Invalid Packet Id! {Line}", Encoding.UTF8.GetString(line));
+                InvalidPacketId(_logger, Encoding.UTF8.GetString(line), null);
                 message = null;
                 return false;
             }
 
             if (_packetFactory.GetFromId(id) is not { } packet)
             {
-                _logger.LogCritical("Line is not a P3D packet! Packet Id Out of Range! {Line}", Encoding.UTF8.GetString(line));
+                InvalidPacketIdOutOfRange(_logger, Encoding.UTF8.GetString(line), null);
                 message = null;
                 return false;
             }
 
             if (!packet.TryPopulateData(ref lineSpanToParse))
             {
-                _logger.LogCritical("Failed to populate message type {Type}", packet.GetType());
+                FailedToPopulate(_logger, packet.GetType(), null);
                 message = null;
                 return false;
             }
 
-            _logger.LogTrace("Received a message type {Type}", packet.GetType());
+            ReceivedAMessage(_logger, packet.GetType(), null);
             message = packet;
             return true;
         }
@@ -75,7 +88,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             if (message is null) return;
 
-            _logger.LogTrace("Sending a message type {Type}", message.GetType());
+            SendingAMessage(_logger, message.GetType(), null);
 
             output.Write(message.Protocol);
             output.Write(Separator);

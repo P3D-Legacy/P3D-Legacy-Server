@@ -3,6 +3,7 @@ using P3D.Legacy.Common.Monsters;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace P3D.Legacy.Server.Infrastructure.Models.Monsters
 {
@@ -32,7 +33,7 @@ namespace P3D.Legacy.Server.Infrastructure.Models.Monsters
 
             var dict = monsterData.MonsterDataToDictionary();
 
-            Gender = int.Parse(dict["Gender"]) switch
+            Gender = int.Parse(dict["Gender"], CultureInfo.InvariantCulture) switch
             {
                 0 => MonsterGender.Male,
                 1 => MonsterGender.Female,
@@ -40,9 +41,9 @@ namespace P3D.Legacy.Server.Infrastructure.Models.Monsters
                 _ => MonsterGender.Genderless,
             };
 
-            IsShiny = int.Parse(dict["isShiny"]) != 0;
+            IsShiny = int.Parse(dict["isShiny"], CultureInfo.InvariantCulture) != 0;
 
-            var abilityId = short.Parse(dict["Ability"]);
+            var abilityId = short.Parse(dict["Ability"], CultureInfo.InvariantCulture);
             if (monsterStaticData.Abilities.First.StaticData.Id == abilityId)
             {
                 Ability = monsterStaticData.Abilities.First;
@@ -56,15 +57,15 @@ namespace P3D.Legacy.Server.Infrastructure.Models.Monsters
                 Ability = null!;
             }
 
-            Nature = byte.Parse(dict["Nature"]);
+            Nature = byte.Parse(dict["Nature"], CultureInfo.InvariantCulture);
 
-            Experience = int.Parse(dict["Experience"]);
-            Friendship = byte.Parse(dict["Friendship"]);
-            EggSteps = int.Parse(dict["EggSteps"]);
+            Experience = int.Parse(dict["Experience"], CultureInfo.InvariantCulture);
+            Friendship = byte.Parse(dict["Friendship"], CultureInfo.InvariantCulture);
+            EggSteps = int.Parse(dict["EggSteps"], CultureInfo.InvariantCulture);
             CatchInfo = new CatchInfo
             {
                 Nickname = string.IsNullOrEmpty(dict["NickName"]) ? null : dict["NickName"],
-                ContainerId = byte.Parse(dict["CatchBall"]),
+                ContainerId = byte.Parse(dict["CatchBall"], CultureInfo.InvariantCulture),
                 Method = dict["CatchMethod"],
                 Location = dict["CatchLocation"],
                 TrainerName = dict["CatchTrainer"],
@@ -77,24 +78,24 @@ namespace P3D.Legacy.Server.Infrastructure.Models.Monsters
 
             Attacks = attacks;
 
-            CurrentHP = short.Parse(dict["HP"]);
+            CurrentHP = short.Parse(dict["HP"], CultureInfo.InvariantCulture);
 
             var iv = dict["IVs"].Split(',');
-            var iv0 = short.Parse(iv[0]);
-            var iv1 = short.Parse(iv[1]);
-            var iv2 = short.Parse(iv[2]);
-            var iv3 = short.Parse(iv[3]);
-            var iv4 = short.Parse(iv[4]);
-            var iv5 = short.Parse(iv[5]);
+            var iv0 = short.Parse(iv[0], CultureInfo.InvariantCulture);
+            var iv1 = short.Parse(iv[1], CultureInfo.InvariantCulture);
+            var iv2 = short.Parse(iv[2], CultureInfo.InvariantCulture);
+            var iv3 = short.Parse(iv[3], CultureInfo.InvariantCulture);
+            var iv4 = short.Parse(iv[4], CultureInfo.InvariantCulture);
+            var iv5 = short.Parse(iv[5], CultureInfo.InvariantCulture);
             IV = new Stats(iv0, iv1, iv2, iv3, iv4, iv5);
 
             var ev = dict["EVs"].Split(',');
-            var ev0 = short.Parse(ev[0]);
-            var ev1 = short.Parse(ev[1]);
-            var ev2 = short.Parse(ev[2]);
-            var ev3 = short.Parse(ev[3]);
-            var ev4 = short.Parse(ev[4]);
-            var ev5 = short.Parse(ev[5]);
+            var ev0 = short.Parse(ev[0], CultureInfo.InvariantCulture);
+            var ev1 = short.Parse(ev[1], CultureInfo.InvariantCulture);
+            var ev2 = short.Parse(ev[2], CultureInfo.InvariantCulture);
+            var ev3 = short.Parse(ev[3], CultureInfo.InvariantCulture);
+            var ev4 = short.Parse(ev[4], CultureInfo.InvariantCulture);
+            var ev5 = short.Parse(ev[5], CultureInfo.InvariantCulture);
             EV = new Stats(ev0, ev1, ev2, ev3, ev4, ev5);
 
             Metadata.Add("OriginalNumber", dict["OriginalNumber"]);

@@ -1,13 +1,10 @@
-﻿using MediatR;
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 using NStack;
 
-using P3D.Legacy.Common.Events;
+using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
-using P3D.Legacy.Server.Abstractions.Services;
 
 using System;
 using System.Threading;
@@ -26,15 +23,15 @@ namespace P3D.Legacy.Server.GUI.Views
         INotificationHandler<MessageToPlayerNotification>
     {
         private readonly ILogger _logger;
-        private readonly NotificationPublisher _notificationPublisher;
+        private readonly INotificationDispatcher _notificationDispatcher;
 
         private readonly TextView _chatTextView;
         private readonly TextField _commandTextField;
 
-        public ChatTabView(ILogger<ChatTabView> logger, NotificationPublisher notificationPublisher)
+        public ChatTabView(ILogger<ChatTabView> logger, INotificationDispatcher notificationDispatcher)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
+            _notificationDispatcher = notificationDispatcher ?? throw new ArgumentNullException(nameof(notificationDispatcher));
 
 
             Width = Dim.Fill();
@@ -59,7 +56,6 @@ namespace P3D.Legacy.Server.GUI.Views
                 catch (Exception e)
                 {
                     _logger.LogCritical(e, "Exception on SendMessage.Click!");
-
                 }
             };
 #pragma warning restore VSTHRD101 // Avoid unsupported async delegates
@@ -71,13 +67,13 @@ namespace P3D.Legacy.Server.GUI.Views
 
         private async Task HandleMessageAsync(string message)
         {
-            if (message.StartsWith("/"))
+            if (message.StartsWith("/", StringComparison.Ordinal))
             {
-                await _notificationPublisher.Publish(new PlayerSentCommandNotification(IPlayer.Server, message), CancellationToken.None);
+                await _notificationDispatcher.DispatchAsync(new PlayerSentCommandNotification(IPlayer.Server, message), CancellationToken.None);
             }
             //else if (!string.IsNullOrEmpty(message))
             //{
-            //    await _notificationPublisher.Publish(new PlayerSentGlobalMessageNotification(IPlayer.Server, message), CancellationToken.None);
+            //    await _notificationDispatcher.Dispatch(new PlayerSentGlobalMessageNotification(IPlayer.Server, message), CancellationToken.None);
             //}
         }
 
@@ -125,7 +121,7 @@ namespace P3D.Legacy.Server.GUI.Views
         {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
-                var message = $"* The player {notification.Player.Name} {EventParser.AsText(notification.Event)}{Environment.NewLine}";
+                var message = $"* The player {notification.Player.Name} {PlayerEventParser.AsText(notification.Event)}{Environment.NewLine}";
                 _chatTextView.Text = message + _chatTextView.Text;
             });
             return Task.CompletedTask;

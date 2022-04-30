@@ -1,4 +1,4 @@
-﻿using P3D.Legacy.Common.Events;
+﻿using P3D.Legacy.Common.PlayerEvents;
 
 using System;
 
@@ -19,13 +19,13 @@ namespace P3D.Legacy.Server.CommunicationAPI.Models
         Error = 0xFF
     }
 
-#pragma warning disable SYSLIB1037
     internal abstract record ResponsePayload(ResponsePayloadType Type, long Timestamp);
+#pragma warning disable SYSLIB1037
     internal sealed record PlayerJoinedResponsePayload(string Player) : ResponsePayload(ResponsePayloadType.PlayerJoined, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record PlayerLeftResponsePayload(string Player) : ResponsePayload(ResponsePayloadType.PlayerLeft, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record PlayerSentGlobalMessageResponsePayload(string Player, string Message) : ResponsePayload(ResponsePayloadType.PlayerSentGlobalMessage, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record ServerMessageResponsePayload(string Message) : ResponsePayload(ResponsePayloadType.ServerMessage, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    internal sealed record PlayerTriggeredEventResponsePayload(string Player, Event Event) : ResponsePayload(ResponsePayloadType.PlayerTriggeredEvent, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    internal sealed record PlayerTriggeredEventResponsePayload(string Player, PlayerEvent Event) : ResponsePayload(ResponsePayloadType.PlayerTriggeredEvent, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record KickedResponsePayload(string Reason) : ResponsePayload(ResponsePayloadType.Kicked, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record SuccessResponsePayload(Guid Uid) : ResponsePayload(ResponsePayloadType.Success, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     internal sealed record ErrorResponsePayload(int Code, string Message, Guid Uid) : ResponsePayload(ResponsePayloadType.Error, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());

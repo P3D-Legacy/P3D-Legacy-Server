@@ -13,15 +13,17 @@ using P3D.Legacy.Server.Infrastructure.Options;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Infrastructure.Repositories.Monsters
 {
     public class PokeAPIMonsterRepository : IMonsterRepository
     {
-        private static readonly string _getQuery = @"
+        private static readonly string GetQuery = @"
 query MonsterStaticData($id: Int, $itemId: Int) {
   pokemon_v2_pokemon(where: {id: {_eq: $id}}) {
     id
@@ -85,19 +87,19 @@ query MonsterStaticData($id: Int, $itemId: Int) {
             _options = options.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public async Task<IMonsterInstance> GetByDataAsync(string monsterDataStr)
+        public async Task<IMonsterInstance> GetByDataAsync(string monsterDataStr, CancellationToken ct)
         {
             var dict = monsterDataStr.AsSpan().MonsterDataToDictionary();
             var itemId = short.TryParse(dict["Item"], out var itemIdVar) ? itemIdVar : -1;
 
-            var graphQLClient = new GraphQLHttpClient(_options.GraphQLEndpoint, new SystemTextJsonSerializer());
+            using var graphQLClient = new GraphQLHttpClient(_options.GraphQLEndpoint, new SystemTextJsonSerializer());
             var monsterStaticDataRequest = new GraphQLRequest
             {
-                Query = _getQuery,
+                Query = GetQuery,
                 OperationName = "MonsterStaticData",
                 Variables = new { ID = dict["Pokemon"], ItemId = itemId }
             };
-            var data = await graphQLClient.SendQueryAsync<Response>(monsterStaticDataRequest);
+            var data = await graphQLClient.SendQueryAsync<Response>(monsterStaticDataRequest, ct);
 
 
             var monsterData = data.Data.Monster[0];
@@ -183,28 +185,34 @@ query MonsterStaticData($id: Int, $itemId: Int) {
             return monster;
         }
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2Type(
             [property: JsonPropertyName("id")] int Id,
             [property: JsonPropertyName("name")] string Name
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2Types(
             [property: JsonPropertyName("pokemon_v2_type")] V2Type Type
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2Stat(
             [property: JsonPropertyName("name")] string Name
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2Stats(
             [property: JsonPropertyName("base_stat")] int BaseStat,
             [property: JsonPropertyName("pokemon_v2_stat")] V2Stat Stat
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2Ability(
             [property: JsonPropertyName("name")] string Name
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2Abilities(
             [property: JsonPropertyName("pokemon_v2_ability")] V2Ability Ability,
             [property: JsonPropertyName("ability_id")] int AbilityId,
@@ -212,22 +220,26 @@ query MonsterStaticData($id: Int, $itemId: Int) {
             [property: JsonPropertyName("slot")] int Slot
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2Move(
             [property: JsonPropertyName("name")] string Name,
             [property: JsonPropertyName("pp")] int PP
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2Moves(
             [property: JsonPropertyName("move_id")] int MoveId,
             [property: JsonPropertyName("level")] int Level,
             [property: JsonPropertyName("pokemon_v2_move")] V2Move Move
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2GrowthRate(
             [property: JsonPropertyName("formula")] string Formula,
             [property: JsonPropertyName("name")] string Name
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2Species(
             [property: JsonPropertyName("gender_rate")] int GenderRate,
             [property: JsonPropertyName("hatch_counter")] int HatchCounter,
@@ -235,6 +247,7 @@ query MonsterStaticData($id: Int, $itemId: Int) {
             [property: JsonPropertyName("pokemon_v2_growthrate")] V2GrowthRate GrowthRate
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2Monster(
             [property: JsonPropertyName("id")] int Id,
             [property: JsonPropertyName("name")] string Name,
@@ -245,11 +258,13 @@ query MonsterStaticData($id: Int, $itemId: Int) {
             [property: JsonPropertyName("pokemon_v2_pokemonspecy")] V2Species Species
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record V2Item(
             [property: JsonPropertyName("id")] int Id,
             [property: JsonPropertyName("name")] string Name
         );
 
+        [SuppressMessage("Performance", "CA1812")]
         private sealed record Response(
             [property: JsonPropertyName("pokemon_v2_pokemon")] V2Monster[] Monster,
             [property: JsonPropertyName("pokemon_v2_item")] V2Item[] Item

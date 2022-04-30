@@ -48,7 +48,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Utils
         /// <returns>A completed task.</returns>
         public override Task FlushAsync(CancellationToken ct) => Task.CompletedTask;
 
-        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken ct)
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
         {
             Verify.NotDisposed(this);
 
@@ -57,7 +57,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Utils
                 return 0;
             }
 
-            var result = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count), ct).ConfigureAwait(false);
+            var result = await _webSocket.ReceiveAsync(buffer, cancellationToken);
             _endOfMessageReceived = result.EndOfMessage;
             _messageSize += result.Count;
             return result.Count;
@@ -67,7 +67,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Utils
 
         public override void SetLength(long value) => throw ThrowDisposedOr(new NotSupportedException());
 
-        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken ct) => throw ThrowDisposedOr(new NotSupportedException());
+        public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken ct = default) => throw ThrowDisposedOr(new NotSupportedException());
 
 #pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
 

@@ -3,18 +3,20 @@ using P3D.Legacy.Server.Application.Commands.Administration;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class BanCommandManager : CommandManager
     {
         public override string Name => "ban";
         public override string Description => "Ban a Player.";
         public override IEnumerable<string> Aliases => new[] { "b" };
-        public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
+        public override PermissionTypes Permissions => PermissionTypes.ModeratorOrHigher;
 
         public BanCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
@@ -46,9 +48,9 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                 if (ulong.TryParse(reason, out var reasonId))
                     reason = string.Empty;
 
-                var result = await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
-                if (result.Success)
-                    await Mediator.Send(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
+                var result = await CommandDispatcher.DispatchAsync(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
+                if (result.IsSuccess)
+                    await CommandDispatcher.DispatchAsync(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
                 else
                     await SendMessageAsync(player, $"Failed to ban player {targetName}!", ct);
             }
@@ -78,14 +80,16 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                 if (ulong.TryParse(reason, out var reasonId))
                     reason = string.Empty;
 
-                var result = await Mediator.Send(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
-                if (result.Success)
-                    await Mediator.Send(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
+                var result = await CommandDispatcher.DispatchAsync(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
+                if (result.IsSuccess)
+                    await CommandDispatcher.DispatchAsync(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
                 else
                     await SendMessageAsync(player, $"Failed to ban player {targetName}!", ct);
             }
             else
+            {
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
+            }
         }
 
         public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)

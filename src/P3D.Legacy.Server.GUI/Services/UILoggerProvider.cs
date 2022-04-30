@@ -4,7 +4,7 @@ using System;
 
 namespace P3D.Legacy.Server.GUI.Services
 {
-    public class UILoggerProvider : ILoggerProvider
+    public sealed class UILoggerProvider : ILoggerProvider
     {
         private readonly UIServiceScopeFactory _uiServiceScopeFactory;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace P3D.Legacy.Common
@@ -29,7 +30,10 @@ namespace P3D.Legacy.Common
         public int Count => BootlegCount(_dataItems);
 
         public DataItemStorage() : this(Array.Empty<string>()) { }
-        public DataItemStorage(params string[] raw) => _dataItems = raw.Select((x, i) => new KeyValuePair<int, string>(i, x)).ToDictionary(x => x.Key, x => x.Value);
+        public DataItemStorage(params string[] raw)
+        {
+            _dataItems = raw.Select((x, i) => new KeyValuePair<int, string>(i, x)).ToDictionary(x => x.Key, x => x.Value);
+        }
 
         public IEnumerator<string> GetEnumerator() => Iterate(_dataItems).GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => Iterate(_dataItems).GetEnumerator();
@@ -51,13 +55,13 @@ namespace P3D.Legacy.Common
         public Origin GetOrigin(int index) => Origin.FromNumber(GetInt64(index));
 
         public void Set(int index, in ReadOnlySpan<char> value) => _dataItems[index] = value.ToString();
-        public void Set(int index, char? value) => Set(index, value?.ToString() ?? ".");
+        public void Set(int index, char? value) => Set(index, value?.ToString(CultureInfo.InvariantCulture) ?? ".");
         public void Set(int index, bool value) => Set(index, value ? 1 : 0);
-        public void Set(int index, int value) => Set(index, value.ToString());
-        public void Set(int index, ulong value) => Set(index, value.ToString());
-        public void Set(int index, long value) => Set(index, value.ToString());
+        public void Set(int index, int value) => Set(index, value.ToString(CultureInfo.InvariantCulture));
+        public void Set(int index, ulong value) => Set(index, value.ToString(CultureInfo.InvariantCulture));
+        public void Set(int index, long value) => Set(index, value.ToString(CultureInfo.InvariantCulture));
         public void Set(int index, Origin value) => Set(index, (long) value);
 
-        public override string ToString() => string.Join("*", _dataItems);
+        public override string ToString() => string.Join("*", _dataItems.Values);
     }
 }

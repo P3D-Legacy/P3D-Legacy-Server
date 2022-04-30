@@ -2,7 +2,7 @@
 {
     public abstract partial record P3DPacket(P3DPacketType Id)
     {
-        private RawPacketData _rawPacketData = new(ProtocolEnum.V1, Id, default, new());
+        private RawPacketData _rawPacketData = new(ProtocolVersion.V1, Id, default, new());
 
         public Protocol Protocol { get => _rawPacketData.Protocol; private set => _rawPacketData = _rawPacketData with { Protocol = value }; }
         public P3DPacketType Id => _rawPacketData.Id;

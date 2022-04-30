@@ -2,20 +2,27 @@
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Common.Events;
+using P3D.Legacy.Common.Data;
 using P3D.Legacy.Common.Extensions;
+using P3D.Legacy.Common.Monsters;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Battle;
 using P3D.Legacy.Common.Packets.Chat;
 using P3D.Legacy.Common.Packets.Client;
+using P3D.Legacy.Common.Packets.Common;
 using P3D.Legacy.Common.Packets.Server;
-using P3D.Legacy.Common.Packets.Shared;
 using P3D.Legacy.Common.Packets.Trade;
+using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Application.Commands.Player;
+using P3D.Legacy.Server.Application.Queries.Options;
+using P3D.Legacy.Server.Application.Queries.Player;
+using P3D.Legacy.Server.Application.Queries.World;
 
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,8 +30,15 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.Client.P3D
 {
     // ReSharper disable once ArrangeTypeModifiers
-    partial class P3DConnectionContextHandler
+    internal partial class P3DConnectionContextHandler
     {
+        private static readonly Action<ILogger, Exception?> DataItemsIsEmpty = LoggerMessage.Define(
+            LogLevel.Warning, default, "P3D Reading Error: ParseGameData DataItems is empty");
+
+        private static readonly Action<ILogger, string, Exception?> DataItemsCountLessThan14 = LoggerMessage.Define<string>(
+            LogLevel.Warning, default, "P3D Reading Error: ParseGameData DataItems < 14. Packet DataItems {DataItems}");
+
+
         private async Task HandlePacketAsync(P3DPacket? packet, CancellationToken ct)
         {
             if (packet is null) return;
@@ -90,8 +104,8 @@ namespace P3D.Legacy.Server.Client.P3D
                     await HandleTradeStartAsync(tradeStartPacket, ct);
                     break;
                 default:
-                    if (_connectionState != P3DConnectionState.Intitialized) return;
-                    await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+                    if (State != PlayerState.Initialized) return;
+                    await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
                     break;
             }
         }
@@ -103,13 +117,13 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (packet.DataItemStorage.Count == 0)
             {
-                _logger.LogWarning("P3D Reading Error: ParseGameData DataItems is empty");
+                DataItemsIsEmpty(_logger, null);
                 return;
             }
 
             if (packet.DataItemStorage.Count < 14)
             {
-                _logger.LogWarning("P3D Reading Error: ParseGameData DataItems < 14. Packet DataItems {DataItems}", packet.DataItemStorage);
+                DataItemsCountLessThan14(_logger, packet.DataItemStorage.ToString(), null);
                 return;
             }
 
@@ -138,7 +152,7 @@ namespace P3D.Legacy.Server.Client.P3D
                         break;
 
                     case 2:
-                        if (!GameJoltId.Equals( packet.GameJoltId))
+                        if (!GameJoltId.Equals(packet.GameJoltId))
                         {
                             GameJoltId = GameJoltId.FromNumber(packet.GameJoltId);
                             stateUpdated = true;
@@ -252,39 +266,55 @@ namespace P3D.Legacy.Server.Client.P3D
 
             ParseGameData(packet, out var stateUpdated, out var positionUpdated);
 
-            if (_connectionState == P3DConnectionState.None)
+            if (State == PlayerState.None)
             {
                 _connectionSpan.UpdateName($"P3D Session {Name}");
                 _connectionSpan.SetAttribute("enduser.id", Name);
 
-                _connectionState = P3DConnectionState.Initializing;
-                await _mediator.Send(new PlayerInitializingCommand(this), ct);
+                State = PlayerState.Initializing;
+                await _commandDispatcher.DispatchAsync(new PlayerInitializingCommand(this), ct);
             }
 
-            if (_connectionState == P3DConnectionState.Initializing)
+            if (State == PlayerState.Initializing)
             {
+                var serverOptions = await _queryDispatcher.DispatchAsync(new GetServerOptionsQuery(), ct);
+                var players = await _queryDispatcher.DispatchAsync(new GetPlayersInitializedQuery(), ct);
+
+                if (players.Length >= serverOptions.MaxPlayers)
+                {
+                    await KickAsync("Server is full!", ct);
+                    return;
+                }
+
+                if (players.Any(x => x.Id == Id))
+                {
+                    await KickAsync("You are already on the server!", ct);
+                    return;
+                }
+
+
                 await SendPacketAsync(new IdPacket
                 {
                     Origin = Origin.Server,
                     PlayerOrigin = Origin
 
                 }, ct);
+                var worldState = await _queryDispatcher.DispatchAsync(new GetWorldStateQuery(), ct);
                 await SendPacketAsync(new WorldDataPacket
                 {
                     Origin = Origin.Server,
 
-                    Season = _worldService.Season,
-                    Weather = _worldService.Weather,
-                    CurrentTime = $"{_worldService.CurrentTime.Hours:00},{_worldService.CurrentTime.Minutes:00},{_worldService.CurrentTime.Seconds:00}"
+                    Season = worldState.Season,
+                    Weather = worldState.Weather,
+                    CurrentTime = $"{worldState.Time.Hours:00},{worldState.Time.Minutes:00},{worldState.Time.Seconds:00}"
                 }, ct);
 
-                _connectionState = P3DConnectionState.Authentication;
+                State = PlayerState.Authentication;
 
                 switch (Id.IdType)
                 {
                     case PlayerIdType.Name:
-                        var currentOptions = _serverOptions.CurrentValue;
-                        if (currentOptions.OfflineEnabled)
+                        if (serverOptions.OfflineEnabled)
                         {
                             await SendServerMessageAsync("Please use /login %PASSWORD% for logging in or registering.", ct);
                             await SendServerMessageAsync("Please note that chat messages are not sent secure to the server.", ct);
@@ -299,10 +329,10 @@ namespace P3D.Legacy.Server.Client.P3D
                         }
                         break;
                     case PlayerIdType.GameJolt:
-                        if (await _mediator.Send(new PlayerAuthenticateGameJoltCommand(this, GameJoltId), ct) is { Success: true })
+                        if (await _commandDispatcher.DispatchAsync(new PlayerAuthenticateGameJoltCommand(this, GameJoltId), ct) is { IsSuccess: true })
                         {
-                            await _mediator.Send(new PlayerReadyCommand(this), ct);
-                            _connectionState = P3DConnectionState.Intitialized;
+                            await _commandDispatcher.DispatchAsync(new PlayerReadyCommand(this), ct);
+                            State = PlayerState.Initialized;
                         }
                         else
                         {
@@ -314,15 +344,15 @@ namespace P3D.Legacy.Server.Client.P3D
                 }
             }
 
-            if (_connectionState == P3DConnectionState.Intitialized)
+            if (State == PlayerState.Initialized)
             {
                 if (stateUpdated)
                 {
-                    await _notificationPublisher.Publish(new PlayerUpdatedStateNotification(this), ct);
+                    await _notificationDispatcher.DispatchAsync(new PlayerUpdatedStateNotification(this), ct);
                 }
                 if (positionUpdated)
                 {
-                    //await _notificationPublisher.Publish(new PlayerUpdatedPositionNotification(this), ct);
+                    //await _notificationDispatcher.Dispatch(new PlayerUpdatedPositionNotification(this), ct);
                 }
             }
 
@@ -333,34 +363,34 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var message = packet.Message;
 
-            if (message.StartsWith("/"))
+            if (message.StartsWith("/", StringComparison.Ordinal))
             {
-                await _notificationPublisher.Publish(new PlayerSentCommandNotification(this, packet.Message), ct);
+                await _notificationDispatcher.DispatchAsync(new PlayerSentCommandNotification(this, packet.Message), ct);
             }
-            else if (_connectionState == P3DConnectionState.Intitialized)
+            else if (State == PlayerState.Initialized)
             {
-                //await _notificationPublisher.Publish(new PlayerSentLocalMessageNotification(this, LevelFile, packet.Message), ct);
-                await _notificationPublisher.Publish(new PlayerSentGlobalMessageNotification(this, packet.Message), ct);
+                //await _notificationDispatcher.Dispatch(new PlayerSentLocalMessageNotification(this, LevelFile, packet.Message), ct);
+                await _notificationDispatcher.DispatchAsync(new PlayerSentGlobalMessageNotification(this, packet.Message), ct);
             }
         }
         private async Task HandlePrivateMessageAsync(ChatMessagePrivatePacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentPrivateMessageNotification(this, packet.DestinationPlayerName, packet.Message), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerSentPrivateMessageNotification(this, packet.DestinationPlayerName, packet.Message), ct);
         }
 
 
         private async Task HandleGameStateMessageAsync(GameStateMessagePacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            if (!EventParser.TryParse(packet.EventMessage, out var @event))
+            if (!PlayerEventParser.TryParse(packet.EventMessage, out var @event))
                 return;
 
-            await _notificationPublisher.Publish(new PlayerTriggeredEventNotification(this, @event), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerTriggeredEventNotification(this, @event), ct);
         }
 
         // 1. TradeRequestPacket
@@ -370,71 +400,75 @@ namespace P3D.Legacy.Server.Client.P3D
 
         private async Task HandleTradeRequestAsync(TradeRequestPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerTradeInitiatedNotification(this, packet.DestinationPlayerOrigin), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerTradeInitiatedNotification(this, packet.DestinationPlayerOrigin), ct);
         }
         private async Task HandleTradeJoinAsync(TradeJoinPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerTradeAcceptedNotification(this, packet.DestinationPlayerOrigin), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerTradeAcceptedNotification(this, packet.DestinationPlayerOrigin), ct);
         }
         private async Task HandleTradeQuitAsync(TradeQuitPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerTradeAbortedNotification(this, packet.DestinationPlayerOrigin), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerTradeAbortedNotification(this, packet.DestinationPlayerOrigin), ct);
         }
         private async Task HandleTradeOfferAsync(TradeOfferFromClientPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerTradeOfferedPokemonNotification(this, packet.DestinationPlayerOrigin, packet.TradeData), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerTradeOfferedPokemonNotification(this, packet.DestinationPlayerOrigin, packet.TradeData), ct);
         }
         private async Task HandleTradeStartAsync(TradeStartPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerTradeConfirmedNotification(this, packet.DestinationPlayerOrigin), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerTradeConfirmedNotification(this, packet.DestinationPlayerOrigin), ct);
         }
 
         private async Task HandleBattleClientDataAsync(BattleClientDataPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleHostDataAsync(BattleHostDataPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleJoinAsync(BattleJoinPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleOfferAsync(BattleOfferFromClientPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
             var cancel = false;
-            var currentServerOptions = _serverOptions.CurrentValue;
-            if (currentServerOptions.ValidationEnabled)
+            var serverOptions = await _queryDispatcher.DispatchAsync(new GetServerOptionsQuery(), ct);
+            if (serverOptions.ValidationEnabled)
             {
-                await foreach (var monster in packet.BattleData.MonsterDatas.ToAsyncEnumerable().SelectAwait(async x => await _monsterRepository.GetByDataAsync(x)).WithCancellation(ct))
+                var query = packet.BattleData.MonsterDatas
+                    .ToAsyncEnumerable()
+                    .SelectAwait(async x => await _queryDispatcher.DispatchAsync(new GetMonsterByDataQuery(x), ct))
+                    .WithCancellation(ct);
+                await foreach (var monster in query)
                 {
                     if (!monster.IsValidP3D())
                     {
@@ -448,57 +482,59 @@ namespace P3D.Legacy.Server.Client.P3D
             {
                 await SendServerMessageAsync("One of your Pokemon is not valid!", ct);
                 await SendPacketAsync(new BattleQuitPacket { Origin = packet.DestinationPlayerOrigin, DestinationPlayerOrigin = Origin }, ct);
-                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = packet.DestinationPlayerOrigin }), ct);
+                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = packet.DestinationPlayerOrigin }), ct);
             }
             else
             {
-                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
             }
         }
         private async Task HandleBattlePokemonDataAsync(BattleEndRoundDataPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleQuitAsync(BattleQuitPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleRequestAsync(BattleRequestPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
         private async Task HandleBattleStartAsync(BattleStartPacket packet, CancellationToken ct)
         {
-            if (_connectionState != P3DConnectionState.Intitialized)
+            if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
         }
 
 
         // ReSharper disable once UnusedParameter.Local
         private async Task HandleServerDataRequestAsync(ServerDataRequestPacket _, CancellationToken ct)
         {
-            var currentServerOptions = _serverOptions.CurrentValue;
+            var serverOptions = await _queryDispatcher.DispatchAsync(new GetServerOptionsQuery(), ct);
 
-            var clientNames = await _playerContainer.GetAllAsync(ct).Where(x => x.Permissions > PermissionFlags.UnVerified).Select(x => x.Name).ToArrayAsync(ct);
+            var players = await _queryDispatcher.DispatchAsync(new GetPlayersInitializedQuery(), ct);
+            var clientNames = players.Select(x => x.Name).ToImmutableArray();
+
             await SendPacketAsync(new ServerInfoDataPacket
             {
                 Origin = Origin.Server,
 
                 CurrentPlayers = clientNames.Length,
-                MaxPlayers = currentServerOptions.MaxPlayers,
-                ServerName = currentServerOptions.Name,
-                ServerMessage = currentServerOptions.Message,
+                MaxPlayers = serverOptions.MaxPlayers,
+                ServerName = serverOptions.Name,
+                ServerMessage = serverOptions.Message,
                 PlayerNames = clientNames,
             }, ct);
 

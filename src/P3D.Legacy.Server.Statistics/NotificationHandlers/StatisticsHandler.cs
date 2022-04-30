@@ -1,17 +1,17 @@
-﻿using MediatR;
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Infrastructure.Services.Statistics;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Statistics.NotificationHandlers
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal sealed class StatisticsHandler :
         INotificationHandler<PlayerUpdatedStateNotification>,
         INotificationHandler<PlayerTriggeredEventNotification>,
@@ -35,7 +35,7 @@ namespace P3D.Legacy.Server.Statistics.NotificationHandlers
         public async Task Handle(PlayerUpdatedStateNotification notification, CancellationToken ct)
         {
             var player = notification.Player;
-            if (player is IP3DPlayerState state)
+            if (player is IP3DPlayerState)
             {
                 await _statisticsManager.IncrementActionAsync(player.Id, "player_update_state", ct);
             }

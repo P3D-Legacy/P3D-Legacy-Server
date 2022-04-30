@@ -3,8 +3,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 using System;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace P3D.Legacy.Server.InternalAPI.Options
 {

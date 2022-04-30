@@ -6,7 +6,7 @@ namespace P3D.Legacy.Server.GUI.Views
 {
     public sealed class ServerUI : Toplevel
     {
-        public event EventHandler? OnStop; 
+        public event EventHandler? OnStop;
 
         public ServerUI(PlayerTabView playerTabView, ChatTabView chatTabView, LogsTabView logsTabView, SettingsTabView settingsTabView)
         {
@@ -21,10 +21,7 @@ namespace P3D.Legacy.Server.GUI.Views
             var statusBar = new StatusBar(new StatusItem[]
             {
                 new(Key.F1, "~F1~ Help", () => MessageBox.Query(50, 7, "Help", "Helping", "Ok")),
-                new(Key.CtrlMask | Key.Q, "~^Q~ Quit", () =>
-                {
-                    OnStop?.Invoke(this, EventArgs.Empty);
-                }),
+                new(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => OnStop?.Invoke(this, EventArgs.Empty)),
                 new(Key.Null, Terminal.Gui.Application.Driver.GetType().Name, null)
             });
 

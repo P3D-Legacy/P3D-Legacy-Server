@@ -1,4 +1,4 @@
-﻿using P3D.Legacy.Common.Data.P3DData;
+﻿using P3D.Legacy.Common.Data.P3DDatas;
 
 namespace P3D.Legacy.Common.Packets.Battle
 {

@@ -64,9 +64,10 @@ namespace P3D.Legacy.Server.GUI.Services
                     if (result == "/uimode") await LoopAsync(ct);
                 }
             }
+            catch (Exception e) when (e is TaskCanceledException or OperationCanceledException) { }
             catch (Exception e)
             {
-                _logger.LogError(e, "UI Error!");
+                _logger.LogError(e, "Exception!");
             }
         }
     }

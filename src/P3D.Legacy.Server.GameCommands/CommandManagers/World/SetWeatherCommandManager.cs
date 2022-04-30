@@ -1,23 +1,22 @@
-﻿using MediatR;
-
-using P3D.Legacy.Common.Data;
+﻿using P3D.Legacy.Common.Data;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.World;
-using P3D.Legacy.Server.Application.Services;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class SetWeatherCommandManager : CommandManager
     {
         public override string Name => "setweather";
         public override string Description => "Set World Weather.";
         public override IEnumerable<string> Aliases => new[] { "sw" };
-        public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
+        public override PermissionTypes Permissions => PermissionTypes.ModeratorOrHigher;
 
         public SetWeatherCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
@@ -27,14 +26,18 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
             {
                 if (Enum.TryParse(arguments[0], true, out WorldWeather weather))
                 {
-                    await Mediator.Send(new ChangeWorldWeatherCommand(weather), ct);
+                    await CommandDispatcher.DispatchAsync(new ChangeWorldWeatherCommand(weather), ct);
                     await SendMessageAsync(player, $"Set Weather to {weather}!", ct);
                 }
                 else
+                {
                     await SendMessageAsync(player, $"Weather '{arguments[0]}' not found!", ct);
+                }
             }
             else
+            {
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
+            }
         }
 
         public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)

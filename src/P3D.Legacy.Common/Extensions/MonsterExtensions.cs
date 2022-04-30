@@ -2,15 +2,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace P3D.Legacy.Common.Extensions
 {
     public static class MonsterExtensions
     {
-        [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
-        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
         public static bool IsValidP3D(this IMonsterInstance monster) =>
             (monster.Gender == MonsterGender.Male && monster.StaticData.MaleRatio == 0 ||
              monster.Gender == MonsterGender.Female && monster.StaticData.MaleRatio == 1 ||
@@ -25,13 +22,11 @@ namespace P3D.Legacy.Common.Extensions
 
         public static Dictionary<string, string> ToDictionary(this IMonsterInstance monster)
         {
-#pragma warning disable IDE0028 // Simplify collection initialization
-            // ReSharper disable once UseObjectOrCollectionInitializer
             var dict = new Dictionary<string, string>();
             dict.Add("Pokemon", $"[{monster.StaticData.Id}]");
             dict.Add("OriginalNumber", $"[{monster.Metadata["OriginalNumber"]}]");
             dict.Add("Experience", $"[{monster.Experience}]");
-            dict.Add("Gender", $"[{monster.Gender switch { MonsterGender.Male => 0, MonsterGender.Female => 1, MonsterGender.Genderless => 2, _ => throw new ArgumentOutOfRangeException() }}]");
+            dict.Add("Gender", $"[{monster.Gender switch { MonsterGender.Male => 0, MonsterGender.Female => 1, MonsterGender.Genderless => 2, _ => throw new ArgumentOutOfRangeException(nameof(monster), nameof(monster.Gender)) }}]");
             dict.Add("EggSteps", $"[{monster.EggSteps}]");
             dict.Add("Item", $"[{monster.HeldItem?.StaticData.Id ?? 0}]");
             dict.Add("ItemData", $"[{monster.Metadata["ItemData"]}]");
@@ -56,7 +51,9 @@ namespace P3D.Legacy.Common.Extensions
                 dict.Add("Attack1", $"[{attack.StaticData.Id},{ppMax},{attack.PPCurrent}]");
             }
             else
+            {
                 dict.Add("Attack1", "[]");
+            }
             if (monster.Attacks.Count > 1)
             {
                 var attack = monster.Attacks[1];
@@ -65,7 +62,9 @@ namespace P3D.Legacy.Common.Extensions
                 dict.Add("Attack2", $"[{attack.StaticData.Id},{ppMax},{attack.PPCurrent}]");
             }
             else
+            {
                 dict.Add("Attack2", "[]");
+            }
             if (monster.Attacks.Count > 2)
             {
                 var attack = monster.Attacks[2];
@@ -74,7 +73,9 @@ namespace P3D.Legacy.Common.Extensions
                 dict.Add("Attack3", $"[{attack.StaticData.Id},{ppMax},{attack.PPCurrent}]");
             }
             else
+            {
                 dict.Add("Attack3", "[]");
+            }
             if (monster.Attacks.Count > 3)
             {
                 var attack = monster.Attacks[3];
@@ -83,14 +84,15 @@ namespace P3D.Legacy.Common.Extensions
                 dict.Add("Attack4", $"[{attack.StaticData.Id},{ppMax},{attack.PPCurrent}]");
             }
             else
+            {
                 dict.Add("Attack4", "[]");
+            }
 
             dict.Add("HP", $"[{monster.CurrentHP}]");
             dict.Add("EVs", $"[{monster.EV.HP},{monster.EV.Attack},{monster.EV.Defense},{monster.EV.SpecialAttack},{monster.EV.SpecialDefense},{monster.EV.Speed}]");
             dict.Add("IVs", $"[{monster.IV.HP},{monster.IV.Attack},{monster.IV.Defense},{monster.IV.SpecialAttack},{monster.IV.SpecialDefense},{monster.IV.Speed}]");
             dict.Add("AdditionalData", $"[{monster.Metadata["AdditionalData"]}]");
             dict.Add("IDValue", $"[{monster.Metadata["IDValue"]}]");
-#pragma warning restore IDE0028 // Simplify collection initialization
 
             return dict;
         }

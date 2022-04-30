@@ -4,6 +4,7 @@ using P3D.Legacy.Common.Monsters;
 using P3D.Legacy.Server.Abstractions.Options;
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Infrastructure.Repositories.Monsters
@@ -22,6 +23,6 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Monsters
                 : nopMonsterRepository;
         }
 
-        public async Task<IMonsterInstance> GetByDataAsync(string monsterData) => await _implementation.GetByDataAsync(monsterData);
+        public async Task<IMonsterInstance> GetByDataAsync(string monsterData, CancellationToken ct) => await _implementation.GetByDataAsync(monsterData, ct);
     }
 }

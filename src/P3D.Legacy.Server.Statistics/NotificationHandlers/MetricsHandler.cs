@@ -1,12 +1,10 @@
-﻿using MediatR;
+﻿using Microsoft.Extensions.Logging;
 
-using Microsoft.Extensions.Logging;
-
-using P3D.Legacy.Common.Events;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Metrics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +13,7 @@ using KVP = System.Collections.Generic.KeyValuePair<string, object?>;
 
 namespace P3D.Legacy.Server.Statistics.NotificationHandlers
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal sealed class MetricsHandler :
         INotificationHandler<PlayerUpdatedStateNotification>,
         INotificationHandler<PlayerTriggeredEventNotification>,

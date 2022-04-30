@@ -1,8 +1,7 @@
-﻿using MediatR;
-
-using P3D.Legacy.Server.Abstractions;
+﻿using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Abstractions.Commands;
 
 namespace P3D.Legacy.Server.Application.Commands.Player
 {
-    public record ChangePlayerPermissionsCommand(IPlayer Player, PermissionFlags Permissions) : IRequest<CommandResult>;
+    public sealed record ChangePlayerPermissionsCommand(IPlayer Player, PermissionTypes Permissions) : ICommand;
 }

@@ -9,6 +9,7 @@ using P3D.Legacy.Server.InternalAPI.Options;
 using P3D.Legacy.Server.UI.Shared.Models;
 
 using System;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading;
@@ -30,7 +31,7 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginModel login, CancellationToken ct)
+        public async Task<IActionResult> LoginAsync([FromBody] LoginModel login, CancellationToken ct)
         {
             var user = await _userManager.FindByIdAsync(PlayerId.FromName(login.Username), ct);
 
@@ -67,7 +68,7 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
                 issuer: "P3D Legacy Server",
                 claims: new Claim[]
                 {
-                    new(JwtRegisteredClaimNames.Iat, unixTimeSeconds.ToString(), ClaimValueTypes.Integer64),
+                    new(JwtRegisteredClaimNames.Iat, unixTimeSeconds.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64),
                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new(nameof(user.Id), user.Id.ToString()),
                     new(nameof(user.Name), user.Name),

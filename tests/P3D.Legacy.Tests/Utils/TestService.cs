@@ -1,14 +1,17 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.Threading;
 
 using Polly;
 
 using System;
 using System.Threading.Tasks;
 
+using IAsyncDisposable = System.IAsyncDisposable;
+
 namespace P3D.Legacy.Tests.Utils
 {
-    public sealed class TestService : IDisposable, IAsyncDisposable
+    internal sealed class TestService : IDisposable, IAsyncDisposable
     {
         private Action<IServiceCollection> _configureDescriptors = _ => { };
         private IServiceProvider _serviceProvider = default!;
@@ -44,7 +47,7 @@ namespace P3D.Legacy.Tests.Utils
         private IServiceProvider CreateAndBuildServiceProvider()
         {
             var serviceDescriptors = new ServiceCollection();
-            _configureDescriptors?.Invoke(serviceDescriptors);
+            _configureDescriptors.Invoke(serviceDescriptors);
 
             InternalConfigure(serviceDescriptors);
 
@@ -73,9 +76,19 @@ namespace P3D.Legacy.Tests.Utils
             });
         }
 
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-        public void Dispose() => DisposeAsync().AsTask().GetAwaiter().GetResult();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+        public void Dispose()
+        {
+            using var jctx = new JoinableTaskContext();
+            switch (_serviceProvider)
+            {
+                case IAsyncDisposable asyncDisposable:
+                    new JoinableTaskFactory(jctx).Run(() => asyncDisposable.DisposeAsync().AsTask());
+                    break;
+                case IDisposable disposable:
+                    disposable.Dispose();
+                    break;
+            }
+        }
 
         public async ValueTask DisposeAsync()
         {

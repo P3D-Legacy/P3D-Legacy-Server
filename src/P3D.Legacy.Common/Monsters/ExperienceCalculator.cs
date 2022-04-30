@@ -1,22 +1,35 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace P3D.Legacy.Common.Monsters
 {
+    [Serializable]
+    public class ExperienceCalculatorException : Exception
+    {
+        protected ExperienceCalculatorException() { }
+        protected ExperienceCalculatorException(string message) : base(message) { }
+        protected ExperienceCalculatorException(string message, Exception innerException) : base(message, innerException) { }
+        protected ExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+    }
+    [Serializable]
+    public class IncorrectExperienceTypeExperienceCalculatorException : ExperienceCalculatorException
+    {
+        public IncorrectExperienceTypeExperienceCalculatorException() { }
+        public IncorrectExperienceTypeExperienceCalculatorException(string message) : base(message) { }
+        public IncorrectExperienceTypeExperienceCalculatorException(string message, Exception innerException) : base(message, innerException) { }
+        protected IncorrectExperienceTypeExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+    }
+    [Serializable]
+    public class LevelTooHighExperienceCalculatorException : ExperienceCalculatorException
+    {
+        public LevelTooHighExperienceCalculatorException() { }
+        public LevelTooHighExperienceCalculatorException(string message) : base(message) { }
+        public LevelTooHighExperienceCalculatorException(string message, Exception innerException) : base(message, innerException) { }
+        protected LevelTooHighExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+    }
+
     public static class ExperienceCalculator
     {
-        private class ExperienceCalculatorException : Exception
-        {
-            protected ExperienceCalculatorException(string message) : base(message) { }
-        }
-        private class IncorrectExperienceTypeExperienceCalculatorException : ExperienceCalculatorException
-        {
-            public IncorrectExperienceTypeExperienceCalculatorException(string message) : base(message) { }
-        }
-        private class LevelTooHighExperienceCalculatorException : ExperienceCalculatorException
-        {
-            public LevelTooHighExperienceCalculatorException(string message) : base(message) { }
-        }
-
         public static byte LevelForExperienceValue(ExperienceType experienceType, long experience)
         {
             // returns level 1 if no experience (or negative value):

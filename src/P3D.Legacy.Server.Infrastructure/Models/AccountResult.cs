@@ -23,6 +23,6 @@ namespace P3D.Legacy.Server.Infrastructure.Models
 
         public override string ToString() => Succeeded
             ? "Succeeded"
-            : string.Format("{0} : {1}", "Failed", string.Join(",", Errors.Select(x => x.Code).ToList()));
+            : $"Failed : {string.Join(",", Errors.Select(x => x.Code).ToList())}";
     }
 }

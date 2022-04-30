@@ -51,9 +51,18 @@ namespace P3D.Legacy.Server.Application.Services
 
         protected abstract Task ExecuteAsync(CancellationToken ct);
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _stoppingCts.Dispose();
+            }
+        }
+
         public void Dispose()
         {
-            _stoppingCts.Cancel();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

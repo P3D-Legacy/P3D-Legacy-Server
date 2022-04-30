@@ -1,17 +1,17 @@
-﻿using MediatR;
+﻿using Microsoft.Extensions.Options;
 
 using Nerdbank.Streams;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Common.Events;
 using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Abstractions.Notifications;
-using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.CommunicationAPI.Models;
 using P3D.Legacy.Server.CommunicationAPI.Utils;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text.Json;
@@ -30,6 +30,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         IDisposable,
         IAsyncDisposable
     {
+        [SuppressMessage("Performance", "CA1812")]
         [JsonSerializable(typeof(RequestPayload))]
         [JsonSerializable(typeof(PlayerJoinedResponsePayload))]
         [JsonSerializable(typeof(PlayerLeftResponsePayload))]
@@ -50,8 +51,9 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
             public Origin Origin { get; private set; }
             public string Name { get; }
             public GameJoltId GameJoltId => GameJoltId.None;
-            public PermissionFlags Permissions { get; private set; } = PermissionFlags.User;
+            public PermissionTypes Permissions { get; private set; } = PermissionTypes.User;
             public IPEndPoint IPEndPoint => new(IPAddress.Loopback, 0);
+            public PlayerState State => PlayerState.Initialized;
 
             public WebSocketPlayer(string botName, Func<string, CancellationToken, Task>? kickCallbackAsync)
             {
@@ -72,7 +74,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                 return Task.CompletedTask;
             }
 
-            public Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct)
+            public Task AssignPermissionsAsync(PermissionTypes permissions, CancellationToken ct)
             {
                 Permissions = permissions;
                 return Task.CompletedTask;
@@ -89,19 +91,19 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         private IPlayer? _bot;
 
         private readonly WebSocket _webSocket;
-        private readonly IMediator _mediator;
-        private readonly NotificationPublisher _notificationPublisher;
+        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly INotificationDispatcher _notificationDispatcher;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
         private readonly JsonContext _jsonContext;
         private readonly SequenceTextReader _sequenceTextReader = new();
         private readonly CancellationTokenSource _cts = new();
 
-        public WebSocketHandler(WebSocket webSocket, IMediator mediator, NotificationPublisher notificationPublisher, JsonSerializerOptions jsonSerializerOptions)
+        public WebSocketHandler(WebSocket webSocket, ICommandDispatcher commandDispatcher, INotificationDispatcher notificationDispatcher, IOptions<JsonSerializerOptions> jsonSerializerOptions)
         {
             _webSocket = webSocket ?? throw new ArgumentNullException(nameof(webSocket));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
-            _jsonSerializerOptions = jsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
+            _commandDispatcher = commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
+            _notificationDispatcher = notificationDispatcher ?? throw new ArgumentNullException(nameof(notificationDispatcher));
+            _jsonSerializerOptions = jsonSerializerOptions.Value ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
             _jsonContext = new JsonContext(new JsonSerializerOptions(_jsonSerializerOptions));
         }
 
@@ -144,7 +146,10 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                     await CheckWebSocketStateAsync(ct);
 
                     await using var reader = new WebSocketMessageReaderStream(_webSocket, maxMessageSize);
+                    // TODO: Json Source generator with discriminators
+#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
                     var payload = await JsonSerializer.DeserializeAsync<RequestPayload?>(reader, _jsonSerializerOptions, ct);
+#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
                     if (payload is not null)
                         await ProcessPayloadAsync(payload, ct);
                 }
@@ -164,9 +169,9 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                     }
 
                     _bot = new WebSocketPlayer(botName, KickCallbackAsync);
-                    await _mediator.Send(new PlayerInitializingCommand(_bot), ct);
-                    await _mediator.Send(new PlayerReadyCommand(_bot), ct);
-                    await _notificationPublisher.Publish(new PlayerUpdatedStateNotification(_bot), ct);
+                    await _commandDispatcher.DispatchAsync(new PlayerInitializingCommand(_bot), ct);
+                    await _commandDispatcher.DispatchAsync(new PlayerReadyCommand(_bot), ct);
+                    await _notificationDispatcher.DispatchAsync(new PlayerUpdatedStateNotification(_bot), ct);
                     await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid), _jsonContext.SuccessResponsePayload), ct);
                     break;
 
@@ -177,7 +182,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                         return;
                     }
 
-                    await _notificationPublisher.Publish(new PlayerSentGlobalMessageNotification(_bot, $"{sender}: {message}"), ct);
+                    await _notificationDispatcher.DispatchAsync(new PlayerSentGlobalMessageNotification(_bot, $"{sender}: {message}"), ct);
                     await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid), _jsonContext.SuccessResponsePayload), ct);
                     break;
             }
@@ -224,18 +229,19 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
 
             if (_bot is not null)
 #pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-                _mediator.Send(new PlayerFinalizingCommand(_bot), CancellationToken.None).GetAwaiter().GetResult();
+                _commandDispatcher.DispatchAsync(new PlayerFinalizingCommand(_bot), CancellationToken.None).GetAwaiter().GetResult();
 #pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
         }
 
         public async ValueTask DisposeAsync()
         {
             _cts.Cancel();
+            _cts.Dispose();
             _webSocket.Dispose();
             _sequenceTextReader.Dispose();
 
             if (_bot is not null)
-                await _mediator.Send(new PlayerFinalizingCommand(_bot), CancellationToken.None);
+                await _commandDispatcher.DispatchAsync(new PlayerFinalizingCommand(_bot), CancellationToken.None);
         }
     }
 }

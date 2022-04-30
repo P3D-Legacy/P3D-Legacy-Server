@@ -5,19 +5,27 @@ using OpenTelemetry.Trace;
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Chat;
+using P3D.Legacy.Common.Packets.Common;
 using P3D.Legacy.Common.Packets.Server;
-using P3D.Legacy.Common.Packets.Shared;
 using P3D.Legacy.Server.Abstractions;
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Client.P3D
 {
     // ReSharper disable once ArrangeTypeModifiers
-    partial class P3DConnectionContextHandler
+    internal partial class P3DConnectionContextHandler
     {
+        private static bool IsOfficialGameMode(string gamemode) =>
+            string.Equals(gamemode, "Kolben", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(gamemode, "Pokemon3D", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(gamemode, "Pokémon3D", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(gamemode, "Pokemon 3D", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(gamemode, "Pokémon 3D", StringComparison.OrdinalIgnoreCase);
+
         private static GameDataPacket GetFromP3DPlayerState(IPlayer player, IP3DPlayerState state) => new()
         {
             Origin = player.Origin,
@@ -38,17 +46,10 @@ namespace P3D.Legacy.Server.Client.P3D
             MonsterFacing = state.MonsterFacing
         };
 
-
-
-        private static bool IsOfficialGameMode(string gamemode) =>
-            string.Equals(gamemode, "Kolben", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(gamemode, "Pokemon3D", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(gamemode, "Pokémon3D", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(gamemode, "Pokemon 3D", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(gamemode, "Pokémon 3D", StringComparison.OrdinalIgnoreCase);
-
         public Task AssignIdAsync(PlayerId id, CancellationToken ct)
         {
+            Debug.Assert(State == PlayerState.Initializing);
+
             if (!Id.IsEmpty)
                 throw new InvalidOperationException("Id was already assigned!");
 
@@ -59,6 +60,8 @@ namespace P3D.Legacy.Server.Client.P3D
 
         public Task AssignOriginAsync(Origin origin, CancellationToken ct)
         {
+            Debug.Assert(State == PlayerState.Initializing);
+
             if (Origin.IsPlayer)
                 throw new InvalidOperationException("Origin was already assigned!");
 
@@ -67,10 +70,9 @@ namespace P3D.Legacy.Server.Client.P3D
             return Task.CompletedTask;
         }
 
-        public Task AssignPermissionsAsync(PermissionFlags permissions, CancellationToken ct)
+        public Task AssignPermissionsAsync(PermissionTypes permissions, CancellationToken ct)
         {
-            //if (_connectionState != P3DConnectionState.Authentication)
-            //    throw new InvalidOperationException("Permissions can't be assigned at this stage!");
+            Debug.Assert(State == PlayerState.Authentication);
 
             Permissions = permissions;
 
@@ -79,6 +81,8 @@ namespace P3D.Legacy.Server.Client.P3D
 
         public async Task KickAsync(string reason, CancellationToken ct)
         {
+            Debug.Assert(State is PlayerState.Initializing or PlayerState.Authentication or PlayerState.Initialized);
+
             await SendPacketAsync(new KickedPacket { Reason = reason }, ct);
 
             var lifetimeNotificationFeature = Connection.Features.Get<IConnectionLifetimeNotificationFeature>();
@@ -87,7 +91,9 @@ namespace P3D.Legacy.Server.Client.P3D
 
         private async Task SendPacketAsync(P3DPacket packet, CancellationToken ct)
         {
-            if (_connectionState == P3DConnectionState.Finalized) return;
+            Debug.Assert(State is not PlayerState.Finalizing and not PlayerState.Finalized);
+
+            if (State == PlayerState.Finalized) return;
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct, Connection.ConnectionClosed);
 
             try

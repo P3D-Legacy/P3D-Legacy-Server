@@ -11,6 +11,7 @@ using P3D.Legacy.Server.Infrastructure.Models.Permissions;
 using P3D.Legacy.Server.Infrastructure.Utils;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -19,6 +20,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 {
+    [RequiresUnreferencedCode("Newtonsoft.Json")]
     public class P3DPermissionRepository
     {
         private readonly ILogger _logger;
@@ -36,14 +38,14 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
         {
             using var span = _tracer.StartActiveSpan("P3DPermissionRepository GetByGameJoltAsync", SpanKind.Client);
 
-            var permissions = PermissionFlags.UnVerified;
+            var permissions = PermissionTypes.UnVerified;
 
             HttpResponseMessage response;
 
             try
             {
                 response = await _httpClientFactory.CreateClient("P3D.API").GetAsync(
-                    $"gamejoltaccount/{id}",
+                    new Uri($"gamejoltaccount/{id}", UriKind.Relative),
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);
             }
@@ -59,22 +61,22 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
                     var content = await response.Content.ReadAsStringAsync(ct);
                     if (JsonConvert.DeserializeObject<GameJoltResponseDTO?>(content) is { User: { }, UserGameJolt: { } } dto)
                     {
-                        permissions &= ~PermissionFlags.UnVerified;
-                        permissions |= PermissionFlags.User;
+                        permissions &= ~PermissionTypes.UnVerified;
+                        permissions |= PermissionTypes.User;
 
                         foreach (var permissionDto in dto.User.Roles?.SelectMany(x => x.Permissions) ?? Enumerable.Empty<PermissionDTO>())
                         {
                             if (permissionDto.Name.Equals("gameserver.debug", StringComparison.OrdinalIgnoreCase))
-                                permissions |= PermissionFlags.Debug;
+                                permissions |= PermissionTypes.Debug;
 
                             if (permissionDto.Name.Equals("gameserver.moderator", StringComparison.OrdinalIgnoreCase))
-                                permissions |= PermissionFlags.Moderator;
+                                permissions |= PermissionTypes.Moderator;
 
                             if (permissionDto.Name.Equals("gameserver.admin", StringComparison.OrdinalIgnoreCase))
-                                permissions |= PermissionFlags.Administrator;
+                                permissions |= PermissionTypes.Administrator;
 
                             if (permissionDto.Name.Equals("gameserver.server", StringComparison.OrdinalIgnoreCase))
-                                permissions |= PermissionFlags.Server;
+                                permissions |= PermissionTypes.Server;
                         }
                         return new PermissionEntity(permissions);
                     }
@@ -82,8 +84,8 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    permissions &= ~PermissionFlags.UnVerified;
-                    permissions |= PermissionFlags.User;
+                    permissions &= ~PermissionTypes.UnVerified;
+                    permissions |= PermissionTypes.User;
                 }
 
                 return new PermissionEntity(permissions);
@@ -95,17 +97,20 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
         }
 
         [JsonConverter(typeof(JsonPathConverter))]
+        [SuppressMessage("Performance", "CA1812")]
         private record UserResponseDTO(
             [property: JsonProperty("data")] UserDTO User,
             [property: JsonProperty("data.gamejolt")] GameJoltDTO UserGameJolt,
             [property: JsonProperty("data.forum")] ForumDTO UserForum);
 
         [JsonConverter(typeof(JsonPathConverter))]
+        [SuppressMessage("Performance", "CA1812")]
         private record GameJoltResponseDTO(
             [property: JsonProperty("data.user")] UserDTO User,
             [property: JsonProperty("data")] GameJoltDTO UserGameJolt);
 
         [JsonConverter(typeof(JsonPathConverter))]
+        [SuppressMessage("Performance", "CA1812")]
         private record ForumResponseDTO(
             [property: JsonProperty("data.user")] UserDTO User,
             [property: JsonProperty("data")] ForumDTO UserForum);

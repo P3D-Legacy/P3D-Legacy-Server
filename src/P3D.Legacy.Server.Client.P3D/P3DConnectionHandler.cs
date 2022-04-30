@@ -1,34 +1,18 @@
-﻿using ComposableAsync;
-
-using Microsoft.AspNetCore.Connections;
-using Microsoft.AspNetCore.Connections.Features;
+﻿using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.DependencyInjection;
 
 using P3D.Legacy.Server.Application.Services;
-using P3D.Legacy.Server.Application.Utils;
-
-using RateLimiter;
 
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Client.P3D
 {
-    internal sealed class P3DConnectionHandler : ConnectionHandler, IDisposable
+    [SuppressMessage("Performance", "CA1812")]
+    internal sealed class P3DConnectionHandler : ConnectionHandler
     {
-        private static readonly IPAddress Netmask = IPAddress.Parse("255.255.0.0");
-
         private readonly IServiceScopeFactory _serviceScopeFactory;
-
-        private readonly ConcurrentDictionary<P3DConnectionContextHandler, object?> _connections = new(new ConnectionContextHandlerEqualityComparer());
-        private readonly ConcurrentBag<IServiceScope> _connectionScopes = new();
-
-        private readonly TimeLimiter _connectionLimiter = TimeLimiter.GetFromMaxCountByInterval(1, TimeSpan.FromMilliseconds(300));
-        private readonly ConcurrentDictionary<IPNetwork, TimeLimiter> _subnetLimiter = new(); // TODO: Free after a while
 
         public P3DConnectionHandler(IServiceScopeFactory serviceScopeFactory)
         {
@@ -37,46 +21,16 @@ namespace P3D.Legacy.Server.Client.P3D
 
         public override async Task OnConnectedAsync(ConnectionContext connection)
         {
-            var connectionScope = _serviceScopeFactory.CreateScope();
-            _connectionScopes.Add(connectionScope);
+            await using var connectionScope = _serviceScopeFactory.CreateAsyncScope();
 
             var connectionContextHandlerFactory = connectionScope.ServiceProvider.GetRequiredService<ConnectionContextHandlerFactory>();
+            var connectionContextHandler = await connectionContextHandlerFactory.CreateAsync<P3DConnectionContextHandler>(connection);
 
-            if (await connectionContextHandlerFactory.CreateAsync<P3DConnectionContextHandler>(connection) is { } connectionContextHandler)
+            try
             {
-                // Rate limiting subnet
-                if (connection.RemoteEndPoint is IPEndPoint ipEndPoint)
-                {
-                    var subnet = IPNetwork.Parse(ipEndPoint.Address, Netmask);
-                    await _subnetLimiter.AddOrUpdate(subnet, _ => TimeLimiter.GetFromMaxCountByInterval(1, TimeSpan.FromMilliseconds(2000)), (_, x) => x);
-                }
-
-                // Rate limiting general
-                await _connectionLimiter;
-
-
-                _connections.TryAdd(connectionContextHandler, null);
-
-                var lifetimeNotificationFeature = connection.Features.Get<IConnectionLifetimeNotificationFeature>();
-                var stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed, lifetimeNotificationFeature?.ConnectionClosedRequested ?? CancellationToken.None);
-
-                stoppingCts.Token.Register(() =>
-                {
-#pragma warning disable CS8620
-                    _connections.Remove(connectionContextHandler, out _);
-#pragma warning restore CS8620
-                    stoppingCts.Dispose();
-                });
                 await connectionContextHandler.ListenAsync();
             }
-        }
-
-        public void Dispose()
-        {
-            foreach (var scope in _connectionScopes)
-            {
-                scope.Dispose();
-            }
+            catch (Exception e) when (e is TaskCanceledException or OperationCanceledException) { }
         }
     }
 }

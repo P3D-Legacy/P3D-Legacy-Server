@@ -41,37 +41,37 @@
         public static GenericError InvalidUserName(string userName) => new()
         {
             Code = nameof(InvalidUserName),
-            Description = string.Format("Username '{0}' is invalid, can only contain letters or digits.", userName)
+            Description = $"Username '{userName}' is invalid, can only contain letters or digits."
         };
 
         public static GenericError InvalidEmail(string email) => new()
         {
             Code = nameof(InvalidEmail),
-            Description = string.Format("Email '{0}' is invalid.", email)
+            Description = $"Email '{email}' is invalid."
         };
 
         public static GenericError DuplicateUserName(string userName) => new()
         {
             Code = nameof(DuplicateUserName),
-            Description = string.Format("Username '{0}' is already taken.", userName)
+            Description = $"Username '{userName}' is already taken."
         };
 
         public static GenericError DuplicateEmail(string email) => new()
         {
             Code = nameof(DuplicateEmail),
-            Description = string.Format("Email '{0}' is already taken.", email)
+            Description = $"Email '{email}' is already taken."
         };
 
         public static GenericError InvalidRoleName(string role) => new()
         {
             Code = nameof(InvalidRoleName),
-            Description = string.Format("Role name '{0}' is invalid.", role)
+            Description = $"Role name '{role}' is invalid."
         };
 
         public static GenericError DuplicateRoleName(string role) => new()
         {
             Code = nameof(DuplicateRoleName),
-            Description = string.Format("Role name '{0}' is already taken.", role)
+            Description = $"Role name '{role}' is already taken."
         };
 
         public static GenericError UserAlreadyHasPassword() => new()
@@ -89,25 +89,25 @@
         public static GenericError UserAlreadyInRole(string role) => new()
         {
             Code = nameof(UserAlreadyInRole),
-            Description = string.Format("User already in role '{0}'.", role)
+            Description = $"User already in role '{role}'."
         };
 
         public static GenericError UserNotInRole(string role) => new()
         {
             Code = nameof(UserNotInRole),
-            Description = string.Format("User is not in role '{0}'.", role)
+            Description = $"User is not in role '{role}'."
         };
 
         public static GenericError PasswordTooShort(int length) => new()
         {
             Code = nameof(PasswordTooShort),
-            Description = string.Format("Passwords must be at least {0} characters.", length)
+            Description = $"Passwords must be at least {length} characters."
         };
 
         public static GenericError PasswordRequiresUniqueChars(int uniqueChars) => new()
         {
             Code = nameof(PasswordRequiresUniqueChars),
-            Description = string.Format("Passwords must use at least {0} different characters.", uniqueChars)
+            Description = $"Passwords must use at least {uniqueChars} different characters."
         };
 
         public static GenericError PasswordRequiresNonAlphanumeric() => new()

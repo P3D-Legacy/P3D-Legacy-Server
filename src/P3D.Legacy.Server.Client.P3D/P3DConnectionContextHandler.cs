@@ -1,22 +1,19 @@
 ﻿using Bedrock.Framework.Protocols;
 
-using MediatR;
-
 using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.VisualStudio.Threading;
 
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Options;
-using P3D.Legacy.Server.Abstractions.Services;
+using P3D.Legacy.Server.Abstractions.Commands;
+using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Queries;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Services;
-using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
-using P3D.Legacy.Server.Infrastructure.Services.Mutes;
 
 using System;
 using System.Diagnostics;
@@ -28,48 +25,31 @@ namespace P3D.Legacy.Server.Client.P3D
 {
     internal sealed partial class P3DConnectionContextHandler : ConnectionContextHandler, IPlayer
     {
-        private enum P3DConnectionState { None, Initializing, Authentication, Intitialized, Finalized }
-
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
-        private readonly IMediator _mediator;
-        private readonly NotificationPublisher _notificationPublisher;
-        private readonly IPlayerContainerReader _playerContainer;
         private readonly P3DProtocol _protocol;
-        private readonly WorldService _worldService;
-        private readonly IOptionsMonitor<ServerOptions> _serverOptions;
-        private readonly IMonsterRepository _monsterRepository;
-        private readonly IMuteManager _muteManager;
-        private readonly TradeManager _tradeManager;
+
+        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IQueryDispatcher _queryDispatcher;
+        private readonly INotificationDispatcher _notificationDispatcher;
 
         private TelemetrySpan _connectionSpan = default!;
         private ProtocolWriter _writer = default!;
-        private P3DConnectionState _connectionState = P3DConnectionState.None;
 
         public P3DConnectionContextHandler(
             ILogger<P3DConnectionContextHandler> logger,
             TracerProvider traceProvider,
             P3DProtocol protocol,
-            IPlayerContainerReader playerContainer,
-            WorldService worldService,
-            IOptionsMonitor<ServerOptions> serverOptions,
-            IMediator mediator,
-            NotificationPublisher notificationPublisher,
-            IMonsterRepository monsterRepository,
-            IMuteManager muteManager,
-            TradeManager tradeManager)
+            ICommandDispatcher commandDispatcher,
+            IQueryDispatcher queryDispatcher,
+            INotificationDispatcher notificationDispatcher)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Client.P3D");
             _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));
-            _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
-            _worldService = worldService ?? throw new ArgumentNullException(nameof(worldService));
-            _serverOptions = serverOptions ?? throw new ArgumentNullException(nameof(serverOptions));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
-            _monsterRepository = monsterRepository ?? throw new ArgumentNullException(nameof(monsterRepository));
-            _muteManager = muteManager ?? throw new ArgumentNullException(nameof(muteManager));
-            _tradeManager = tradeManager ?? throw new ArgumentNullException(nameof(tradeManager));
+            _commandDispatcher = commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
+            _queryDispatcher = queryDispatcher ?? throw new ArgumentNullException(nameof(queryDispatcher));
+            _notificationDispatcher = notificationDispatcher ?? throw new ArgumentNullException(nameof(notificationDispatcher));
         }
 
         protected override async Task OnCreatedAsync(CancellationToken ct)
@@ -83,17 +63,21 @@ namespace P3D.Legacy.Server.Client.P3D
                     IPEndPoint = ipEndPoint;
                 }
 
-                Connection.Features.Get<IConnectionCompleteFeature>()?.OnCompleted(async _ =>
+                Connection.Features.Get<IConnectionLifetimeNotificationFeature>()?.ConnectionClosedRequested.Register(() =>
                 {
                     using var finishSpan = _tracer.StartActiveSpan("P3D Client Closing", parentContext: _connectionSpan.Context);
-                    await _mediator.Send(new PlayerFinalizingCommand(this), CancellationToken.None);
-                }, default!);
-                Connection.Features.Get<IConnectionLifetimeFeature>()?.ConnectionClosed.Register(id =>
-                {
-                    _connectionState = P3DConnectionState.Finalized;
-                }, ConnectionId);
+                    var oldState = State;
+                    State = PlayerState.Finalizing;
+                    if (oldState == PlayerState.Initialized)
+                    {
+                        using var jctx = new JoinableTaskContext(); // Should I create it here or in the main method?
+                        new JoinableTaskFactory(jctx).Run(() => _commandDispatcher.DispatchAsync(new PlayerFinalizingCommand(this), CancellationToken.None));
+                    }
+                    State = PlayerState.Finalized;
+                });
 
                 _writer = Connection.CreateWriter();
+                await using var _ = _writer;
 
                 await using var reader = Connection.CreateReader();
                 var watch = Stopwatch.StartNew();
@@ -115,11 +99,6 @@ namespace P3D.Legacy.Server.Client.P3D
                             {
                                 break;
                             }
-
-                            //const float StandardSpeed = 0.04F;
-                            //const float RunningSpeed = 0.06F;
-                            //const float RidingSpeed = 0.08F;
-                            //Vector3.Lerp()
                         }
                     }
                     finally
@@ -127,7 +106,7 @@ namespace P3D.Legacy.Server.Client.P3D
                         reader.Advance();
                     }
 
-                    if (_connectionState == P3DConnectionState.Intitialized && watch.ElapsedMilliseconds >= 5000)
+                    if (State == PlayerState.Initialized && watch.ElapsedMilliseconds >= 5000)
                     {
                         await SendPacketAsync(new PingPacket { Origin = Origin.Server }, ct);
                         watch.Restart();
@@ -141,16 +120,15 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        protected override async ValueTask DisposeAsync(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                _connectionState = P3DConnectionState.None;
+                State = PlayerState.None;
                 _connectionSpan.Dispose();
-                await _writer.DisposeAsync();
             }
 
-            await base.DisposeAsync(disposing);
+            base.Dispose(disposing);
         }
     }
 }

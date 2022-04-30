@@ -1,27 +1,26 @@
-﻿using MediatR;
-
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.GameCommands.NotificationHandlers;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class HelpCommandManager : CommandManager
     {
         public override string Name => "help";
         public override string Description => "Command help menu.";
         public override IEnumerable<string> Aliases => new[] { "h" };
-        public override PermissionFlags Permissions => PermissionFlags.UnVerifiedOrHigher;
+        public override PermissionTypes Permissions => PermissionTypes.UnVerifiedOrHigher;
 
         private readonly IServiceProvider _serviceProvider;
         private readonly Tracer _tracer;
@@ -73,7 +72,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
             var commandManagerService = _serviceProvider.GetRequiredService<CommandManagerHandler>();
 
             const int perPage = 5;
-            var commands = commandManagerService.GetCommands().Where(command => (client.Permissions & command.Permissions) != PermissionFlags.None).ToList();
+            var commands = commandManagerService.GetCommands().Where(command => (client.Permissions & command.Permissions) != PermissionTypes.None).ToList();
             var numPages = (int) Math.Floor((double) commands.Count / perPage);
             if ((commands.Count % perPage) > 0)
                 numPages++;

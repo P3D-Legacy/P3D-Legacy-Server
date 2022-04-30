@@ -1,28 +1,19 @@
-﻿using MediatR;
-
-using Microsoft.Extensions.Options;
-
-using P3D.Legacy.Server.Abstractions.Services;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 using System;
 using System.Net.WebSockets;
-using System.Text.Json;
 
 namespace P3D.Legacy.Server.CommunicationAPI.Services
 {
     public sealed class WebSocketHandlerFactory
     {
-        private readonly IMediator _mediator;
-        private readonly NotificationPublisher _notificationPublisher;
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
+        private readonly IServiceProvider _serviceProvider;
 
-        public WebSocketHandlerFactory(IMediator mediator, NotificationPublisher notificationPublisher, IOptions<JsonSerializerOptions> jsonSerializerOptions)
+        public WebSocketHandlerFactory(IServiceProvider serviceProvider)
         {
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            _notificationPublisher = notificationPublisher ?? throw new ArgumentNullException(nameof(notificationPublisher));
-            _jsonSerializerOptions = jsonSerializerOptions.Value ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public WebSocketHandler Create(WebSocket webSocket) => new(webSocket, _mediator, _notificationPublisher, _jsonSerializerOptions);
+        public WebSocketHandler Create(WebSocket webSocket) => ActivatorUtilities.CreateInstance<WebSocketHandler>(_serviceProvider, webSocket);
     }
 }

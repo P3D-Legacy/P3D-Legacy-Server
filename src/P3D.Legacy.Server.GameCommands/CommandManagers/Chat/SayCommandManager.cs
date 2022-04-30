@@ -1,19 +1,18 @@
-﻿using MediatR;
-
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Services;
+﻿using P3D.Legacy.Server.Abstractions;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Chat
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class SayCommandManager : CommandManager
     {
         public override string Name => "say";
         public override string Description => "Speak as the Server.";
-        public override PermissionFlags Permissions => PermissionFlags.AdministratorOrHigher;
+        public override PermissionTypes Permissions => PermissionTypes.AdministratorOrHigher;
 
         public SayCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 

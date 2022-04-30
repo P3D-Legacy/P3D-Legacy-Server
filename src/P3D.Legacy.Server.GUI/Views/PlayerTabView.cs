@@ -1,10 +1,9 @@
-﻿using MediatR;
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 using NStack;
 
 using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Application.Commands.Administration;
 using P3D.Legacy.Server.Application.Services;
@@ -24,7 +23,7 @@ namespace P3D.Legacy.Server.GUI.Views
         INotificationHandler<PlayerLeftNotification>
     {
         private readonly ILogger _logger;
-        private readonly IMediator _mediator;
+        private readonly ICommandDispatcher _commandDispatcher;
 
         private readonly ListView _playerListView;
         private readonly TextView _playerInfoTextView;
@@ -34,17 +33,17 @@ namespace P3D.Legacy.Server.GUI.Views
         private readonly PlayerListDataSource _currentPlayers = new(new());
         private IPlayer? _selectedPlayer;
 
-        public PlayerTabView(ILogger<PlayerTabView> logger, IMediator mediator, IPlayerContainerReader playerContainer)
+        public PlayerTabView(ILogger<PlayerTabView> logger, ICommandDispatcher commandDispatcher, IPlayerContainerReader playerContainer)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _commandDispatcher = commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
 
 
             Width = Dim.Fill();
             Height = Dim.Fill();
 
             var onlineView = new FrameView("Online") { X = 0, Y = 0, Width = 20, Height = Dim.Fill() };
-            _currentPlayers.Players.AddRange(playerContainer.GetAll().Where(x => x.Permissions > PermissionFlags.UnVerified));
+            _currentPlayers.Players.AddRange(playerContainer.GetAll().Where(x => x.Permissions > PermissionTypes.UnVerified));
             _playerListView = new ListView(_currentPlayers) { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
             onlineView.Add(_playerListView);
 
@@ -105,13 +104,12 @@ IP: {player.IPEndPoint}";
                 {
                     var reason = ustring.IsNullOrEmpty(reasonTextField.Text) ? "Kicked by a Moderator or Admin." : reasonTextField.Text.ToString() ?? string.Empty;
                     RemovePlayerInfo();
-                    await _mediator.Send(new KickPlayerCommand(player, reason), CancellationToken.None);
+                    await _commandDispatcher.DispatchAsync(new KickPlayerCommand(player, reason), CancellationToken.None);
                     Terminal.Gui.Application.RequestStop();
                 }
                 catch (Exception e)
                 {
                     _logger.LogCritical(e, "Exception on Kick.Click!");
-
                 }
             };
 #pragma warning restore VSTHRD101 // Avoid unsupported async delegates
@@ -144,7 +142,7 @@ IP: {player.IPEndPoint}";
                 {
                     var reason = ustring.IsNullOrEmpty(reasonTextView.Text) ? "Kicked by a Moderator or Admin." : reasonTextView.Text.ToString() ?? string.Empty;
                     RemovePlayerInfo();
-                    await _mediator.Send(new KickPlayerCommand(player, reason), CancellationToken.None);
+                    await _commandDispatcher.DispatchAsync(new KickPlayerCommand(player, reason), CancellationToken.None);
                     Terminal.Gui.Application.RequestStop();
                 }
                 catch (Exception e)

@@ -3,17 +3,19 @@ using P3D.Legacy.Server.Application.Commands.Administration;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class UnbanCommandManager : CommandManager
     {
         public override string Name => "unban";
         public override string Description => "Unban a Player.";
         public override IEnumerable<string> Aliases => new[] { "ub" };
-        public override PermissionFlags Permissions => PermissionFlags.ModeratorOrHigher;
+        public override PermissionTypes Permissions => PermissionTypes.ModeratorOrHigher;
 
         public UnbanCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
@@ -34,12 +36,14 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                     return;
                 }
 
-                var result = await Mediator.Send(new UnbanPlayerCommand(targetPlayer.Id), ct);
-                if (!result.Success)
+                var result = await CommandDispatcher.DispatchAsync(new UnbanPlayerCommand(targetPlayer.Id), ct);
+                if (!result.IsSuccess)
                     await SendMessageAsync(player, $"Failed to unban player {targetName}!", ct);
             }
             else
+            {
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
+            }
         }
 
         public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)

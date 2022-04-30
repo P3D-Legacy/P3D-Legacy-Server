@@ -9,8 +9,12 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Behaviours
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class UnhandledExceptionBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
+        private static readonly Action<ILogger, string, TRequest, Exception?> Request = LoggerMessage.Define<string, TRequest>(
+            LogLevel.Error, default, "Request: Unhandled Exception for Request {Name} {@Request}");
+
         private readonly ILogger<TRequest> _logger;
 
         [SuppressMessage("CodeQuality", "IDE0079")]
@@ -30,7 +34,7 @@ namespace P3D.Legacy.Server.Behaviours
             {
                 var requestName = typeof(TRequest).Name;
 
-                _logger.LogError(ex, "Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
+                Request(_logger, requestName, request, ex);
 
                 throw;
             }

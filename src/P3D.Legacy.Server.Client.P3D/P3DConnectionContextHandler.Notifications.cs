@@ -1,25 +1,27 @@
-﻿using MediatR;
-
-using P3D.Legacy.Common;
-using P3D.Legacy.Common.Events;
+﻿using P3D.Legacy.Common;
 using P3D.Legacy.Common.Extensions;
 using P3D.Legacy.Common.Packets.Battle;
 using P3D.Legacy.Common.Packets.Chat;
 using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Common.Packets.Trade;
+using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Application.Commands.Player;
+using P3D.Legacy.Server.Application.Commands.Trade;
+using P3D.Legacy.Server.Application.Queries.Options;
+using P3D.Legacy.Server.Application.Queries.Player;
 
 using System;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Client.P3D
 {
     // ReSharper disable once ArrangeTypeModifiers
-    partial class P3DConnectionContextHandler :
+    [SuppressMessage("Performance", "CA1812")]
+    internal partial class P3DConnectionContextHandler :
         INotificationHandler<PlayerJoinedNotification>,
         INotificationHandler<PlayerLeftNotification>,
         INotificationHandler<PlayerUpdatedStateNotification>,
@@ -46,7 +48,8 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (Origin == player.Origin)
             {
-                await foreach (var connectedPlayer in _playerContainer.GetAllAsync(ct).Where(x => x.Permissions > PermissionFlags.UnVerified).WithCancellation(ct))
+                var players = await _queryDispatcher.DispatchAsync(new GetPlayersInitializedQuery(), ct);
+                foreach (var connectedPlayer in players)
                 {
                     await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerOrigin = connectedPlayer.Origin }, ct);
                     var state = connectedPlayer as IP3DPlayerState ?? IP3DPlayerState.Empty;
@@ -95,7 +98,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var (player, message) = notification;
 
-            if (Id != player.Id && await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
+            if (Id != player.Id && await _queryDispatcher.DispatchAsync(new GetPlayerMuteStateQuery(Id, player.Id), ct)) return;
 
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
@@ -105,7 +108,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var (player, location, message) = notification;
 
             if (!LevelFile.Equals(location, StringComparison.OrdinalIgnoreCase)) return;
-            if (Id != player.Id && await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
+            if (Id != player.Id && await _queryDispatcher.DispatchAsync(new GetPlayerMuteStateQuery(Id, player.Id), ct)) return;
 
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
@@ -115,7 +118,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var (player, receiverName, message) = notification;
 
             if (!Name.Equals(receiverName, StringComparison.OrdinalIgnoreCase)) return;
-            if (Id != player.Id && await _muteManager.IsMutedAsync(Id, player.Id, ct)) return;
+            if (Id != player.Id && await _queryDispatcher.DispatchAsync(new GetPlayerMuteStateQuery(Id, player.Id), ct)) return;
 
             await SendPacketAsync(new ChatMessagePrivatePacket { Origin = player.Origin, DestinationPlayerName = receiverName, Message = message }, ct);
         }
@@ -125,7 +128,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var (from, to, message) = notification;
 
             if (Origin != to.Origin) return;
-            if (Id != from.Id && await _muteManager.IsMutedAsync(Id, from.Id, ct)) return;
+            if (Id != from.Id && await _queryDispatcher.DispatchAsync(new GetPlayerMuteStateQuery(Id, from.Id), ct)) return;
 
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = from.Origin, Message = message }, ct);
         }
@@ -140,8 +143,8 @@ namespace P3D.Legacy.Server.Client.P3D
                 switch (p3dPacket)
                 {
                     case BattleRequestPacket:
-                        await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
-                        await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(player, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
+                        await _notificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
+                        await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(player, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
                         break;
                     case BattleQuitPacket:
                         await SendPacketAsync(p3dPacket, ct);
@@ -170,7 +173,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var (player, @event) = notification;
 
-            await SendServerMessageAsync($"The player {player.Name} {EventParser.AsText(@event)}", ct);
+            await SendServerMessageAsync($"The player {player.Name} {PlayerEventParser.AsText(@event)}", ct);
         }
 
         public async Task Handle(PlayerSentCommandNotification notification, CancellationToken ct)
@@ -201,12 +204,12 @@ namespace P3D.Legacy.Server.Client.P3D
             var (player, password) = notification;
 
             if (Origin != player.Origin) return;
-            if (_connectionState != P3DConnectionState.Authentication) return;
+            if (State != PlayerState.Authentication) return;
 
-            if (await _mediator.Send(new PlayerAuthenticateDefaultCommand(this, password), ct) is { Success: true })
+            if (await _commandDispatcher.DispatchAsync(new PlayerAuthenticateDefaultCommand(this, password), ct) is { IsSuccess: true })
             {
-                await _mediator.Send(new PlayerReadyCommand(this), ct);
-                _connectionState = P3DConnectionState.Intitialized;
+                await _commandDispatcher.DispatchAsync(new PlayerReadyCommand(this), ct);
+                State = PlayerState.Initialized;
             }
         }
 
@@ -218,17 +221,19 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (GameJoltId.IsNone != initiator.GameJoltId.IsNone)
             {
-                await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, initiator, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
-                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
+                await _notificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, initiator, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
+                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
             }
             else
             {
-                if (await _tradeManager.OfferTrade(initiator, this))
+                if (await _commandDispatcher.DispatchAsync(new TradeOfferCommand(initiator, this), ct) is { IsSuccess: true })
+                {
                     await SendPacketAsync(new TradeRequestPacket { Origin = initiator.Origin, DestinationPlayerOrigin = target }, ct);
+                }
                 else
                 {
-                    await _tradeManager.AbortTrade(initiator, this);
-                    await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
+                    await _commandDispatcher.DispatchAsync(new TradeAbortCommand(initiator, this), ct);
+                    await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
                 }
             }
         }
@@ -239,12 +244,14 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (Origin != initiator) return;
 
-            if (await _tradeManager.AcceptTrade(target, this))
+            if (await _commandDispatcher.DispatchAsync(new TradeAcceptCommand(target, this), ct) is { IsSuccess: true })
+            {
                 await SendPacketAsync(new TradeJoinPacket { Origin = target.Origin, DestinationPlayerOrigin = initiator }, ct);
+            }
             else
             {
-                await _tradeManager.AbortTrade(target, this);
-                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(target, new TradeQuitPacket { Origin = initiator, DestinationPlayerOrigin = target.Origin }), ct);
+                await _commandDispatcher.DispatchAsync(new TradeAbortCommand(target, this), ct);
+                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(target, new TradeQuitPacket { Origin = initiator, DestinationPlayerOrigin = target.Origin }), ct);
             }
         }
 
@@ -254,7 +261,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (Origin != partner) return;
 
-            await _tradeManager.AbortTrade(player, this);
+            await _commandDispatcher.DispatchAsync(new TradeAbortCommand(player, this), ct);
             await SendPacketAsync(new TradeQuitPacket { Origin = player.Origin, DestinationPlayerOrigin = partner }, ct);
         }
 
@@ -265,19 +272,19 @@ namespace P3D.Legacy.Server.Client.P3D
             if (Origin != target) return;
 
             var cancel = false;
-            var currentServerOptions = _serverOptions.CurrentValue;
-            if (currentServerOptions.ValidationEnabled)
+            var serverOptions = await _queryDispatcher.DispatchAsync(new GetServerOptionsQuery(), ct);
+            if (serverOptions.ValidationEnabled)
             {
-                var monster = await _monsterRepository.GetByDataAsync(data.MonsterData);
+                var monster = await _queryDispatcher.DispatchAsync(new GetMonsterByDataQuery(data.MonsterData), ct);
                 cancel = !monster.IsValidP3D();
             }
 
             if (cancel)
             {
-                await _tradeManager.AbortTrade(player, this);
-                await _notificationPublisher.Publish(new MessageToPlayerNotification(IPlayer.Server, player, "The Pokemon is not valid!"), ct);
+                await _commandDispatcher.DispatchAsync(new TradeAbortCommand(player, this), ct);
+                await _notificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, player, "The Pokemon is not valid!"), ct);
                 await SendPacketAsync(new TradeQuitPacket { Origin = player.Origin, DestinationPlayerOrigin = target }, ct);
-                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(this, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = player.Origin }), ct);
+                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = player.Origin }), ct);
             }
             else
             {
@@ -291,10 +298,10 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (Origin != target) return;
 
-            if (await _tradeManager.ConfirmTrade(player, this))
-                await SendPacketAsync(new TradeStartPacket() { Origin = player.Origin, DestinationPlayerOrigin = target }, ct);
+            if (await _commandDispatcher.DispatchAsync(new TradeConfirmCommand(player, this), ct) is { IsSuccess: true })
+                await SendPacketAsync(new TradeStartPacket { Origin = player.Origin, DestinationPlayerOrigin = target }, ct);
             else
-                await _notificationPublisher.Publish(new PlayerSentRawP3DPacketNotification(player, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = player.Origin }), ct);
+                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(player, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = player.Origin }), ct);
         }
     }
 }

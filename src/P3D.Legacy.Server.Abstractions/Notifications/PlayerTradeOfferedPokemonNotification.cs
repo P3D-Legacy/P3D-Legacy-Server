@@ -1,7 +1,5 @@
-﻿using MediatR;
-
-using P3D.Legacy.Common;
-using P3D.Legacy.Common.Data.P3DData;
+﻿using P3D.Legacy.Common;
+using P3D.Legacy.Common.Data.P3DDatas;
 
 namespace P3D.Legacy.Server.Abstractions.Notifications
 {

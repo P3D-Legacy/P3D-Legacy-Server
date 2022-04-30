@@ -28,7 +28,7 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
 
         public static void Write(this IBufferWriter<byte> output, in Protocol protocol)
         {
-            output.Write(protocol == ProtocolEnum.V1 ? ProtocolSequenceV1 : ProtocolSequenceInvalid);
+            output.Write(protocol == ProtocolVersion.V1 ? ProtocolSequenceV1 : ProtocolSequenceInvalid);
         }
 
         public static void Write(this IBufferWriter<byte> output, in Origin origin)

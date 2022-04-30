@@ -22,9 +22,15 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <IsTrimmable>true</IsTrimmable>
+    <IsTrimmable>false</IsTrimmable>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="CLSCompliantAttribute">
+      <_Parameter1>false</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" />
@@ -53,7 +59,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="P3D.Legacy.Server.CommunicationAPI.Utils.BuildDateTimeAttribute">
+    <AssemblyAttribute Include="P3D.Legacy.Server.Abstractions.Utils.BuildDateTimeAttribute">
       <_Parameter1>$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>

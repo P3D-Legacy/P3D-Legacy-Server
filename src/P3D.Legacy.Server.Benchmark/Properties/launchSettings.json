@@ -1,12 +1,32 @@
 {
   "profiles": {
-    "P3D.Legacy.Server.Benchmark": {
+    "Benchmark Status Localhost": {
+      "commandLineArgs": "--benchmark-type status",
       "commandName": "Project",
-      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "https://localhost:57780;http://localhost:57781"
+      }
+    },
+    "Benchmark Client Localhost": {
+      "commandLineArgs": "--benchmark-type client",
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Benchmark Status": {
+      "commandLineArgs": "--benchmark-type status --host karp.pokemon3d.net --port 15134",
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Benchmark Client": {
+      "commandLineArgs": "--benchmark-type client --host karp.pokemon3d.net --port 15134",
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }

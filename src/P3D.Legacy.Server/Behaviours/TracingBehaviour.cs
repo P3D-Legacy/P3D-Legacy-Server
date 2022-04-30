@@ -2,11 +2,13 @@
 
 using OpenTelemetry.Trace;
 
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Behaviours
 {
+    [SuppressMessage("Performance", "CA1812")]
     internal class TracingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
         private readonly Tracer _tracer;
