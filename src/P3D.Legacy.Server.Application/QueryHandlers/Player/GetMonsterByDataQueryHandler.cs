@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common.Monsters;
-using P3D.Legacy.Server.Abstractions.Queries;
 using P3D.Legacy.Server.Application.Queries.Player;
+using P3D.Legacy.Server.CQERS.Queries;
 using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
 
 using System;
@@ -24,9 +24,11 @@ namespace P3D.Legacy.Server.Application.QueryHandlers.Player
             _monsterRepository = monsterRepository ?? throw new ArgumentNullException(nameof(monsterRepository));
         }
 
-        public async Task<IMonsterInstance> Handle(GetMonsterByDataQuery request, CancellationToken ct)
+        public async Task<IMonsterInstance> HandleAsync(GetMonsterByDataQuery query, CancellationToken ct)
         {
-            return await _monsterRepository.GetByDataAsync(request.MonsterData, ct);
+            var monsterData = query.MonsterData;
+
+            return await _monsterRepository.GetByDataAsync(monsterData, ct);
         }
     }
 }

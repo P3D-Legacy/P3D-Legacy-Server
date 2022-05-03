@@ -3,7 +3,7 @@
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.GameCommands.NotificationHandlers;
+using P3D.Legacy.Server.GameCommands.EventHandlers;
 
 using System;
 using System.Collections.Generic;

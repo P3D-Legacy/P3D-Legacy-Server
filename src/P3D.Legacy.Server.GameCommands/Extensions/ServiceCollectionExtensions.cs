@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Abstractions.Extensions;
+using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Chat;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Permission;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Player;
 using P3D.Legacy.Server.GameCommands.CommandManagers.World;
-using P3D.Legacy.Server.GameCommands.NotificationHandlers;
+using P3D.Legacy.Server.GameCommands.EventHandlers;
 
 namespace P3D.Legacy.Server.GameCommands.Extensions
 {
@@ -15,7 +15,7 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
         public static IServiceCollection AddGameCommands(this IServiceCollection services)
         {
             services.AddTransient<CommandManagerHandler>();
-            services.AddNotifications(sp => sp.GetRequiredService<CommandManagerHandler>());
+            services.AddEvent(sp => sp.GetRequiredService<CommandManagerHandler>());
 
             services.AddTransient<CommandManager, HelpCommandManager>();
 

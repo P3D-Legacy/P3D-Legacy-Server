@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.CommunicationAPI.Controllers;
 using P3D.Legacy.Server.CommunicationAPI.Services;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 namespace P3D.Legacy.Server.CommunicationAPI.Extensions
 {
@@ -13,7 +13,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Extensions
             services.AddTransient<CommunicationController>();
 
             services.AddScoped<WebSocketHandlerFactory>();
-            services.AddNotificationsEnumerable(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().Values);
+            services.AddEvents(sp => sp.GetRequiredService<WebSocketSubscribtionManager>().Values);
 
             services.AddSingleton<WebSocketSubscribtionManager>();
 

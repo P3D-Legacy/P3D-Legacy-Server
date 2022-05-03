@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common.Data;
-using P3D.Legacy.Server.Abstractions.Queries;
 using P3D.Legacy.Server.Application.Queries.World;
 using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.CQERS.Queries;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -24,7 +24,7 @@ namespace P3D.Legacy.Server.Application.QueryHandlers.World
             _world = world ?? throw new ArgumentNullException(nameof(world));
         }
 
-        public Task<WorldState> Handle(GetWorldStateQuery request, CancellationToken ct)
+        public Task<WorldState> HandleAsync(GetWorldStateQuery query, CancellationToken ct)
         {
             return Task.FromResult(_world.State);
         }

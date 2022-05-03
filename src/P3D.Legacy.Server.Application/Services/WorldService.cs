@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common.Data;
-using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Events;
+using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using RateLimiter;
 
@@ -20,13 +22,13 @@ namespace P3D.Legacy.Server.Application.Services
         public TimeSpan CurrentTime { get => State.Time; set => State = State with { Time = value }; }
 
         private readonly ILogger _logger;
-        private readonly INotificationDispatcher _notificationDispatcher;
+        private readonly IEventDispatcher _eventDispatcher;
         private readonly TimeLimiter _checkTimeLimiter;
 
-        public WorldService(ILogger<WorldService> logger, INotificationDispatcher notificationDispatcher)
+        public WorldService(ILogger<WorldService> logger, IEventDispatcher eventDispatcher)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _notificationDispatcher = notificationDispatcher ?? throw new ArgumentNullException(nameof(notificationDispatcher));
+            _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
 
             var now = DateTime.UtcNow;
             var currentHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, now.Kind);
@@ -85,7 +87,7 @@ namespace P3D.Legacy.Server.Application.Services
 
                         var oldState = State;
                         State = State with { Season = season, Weather = weather, Time = now.TimeOfDay };
-                        await _notificationDispatcher.DispatchAsync(new WorldUpdatedNotification(State, oldState), ct);
+                        await _eventDispatcher.DispatchAsync(new WorldUpdatedEvent(State, oldState), ct);
                     }, ct);
                 }
             }

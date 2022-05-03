@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Application.Commands.Player;
+using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.Infrastructure.Services.Permissions;
 
 using System;
@@ -23,12 +23,14 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
             _permissionManager = permissionManager ?? throw new ArgumentNullException(nameof(permissionManager));
         }
 
-        public async Task<CommandResult> Handle(ChangePlayerPermissionsCommand request, CancellationToken ct)
+        public async Task<CommandResult> HandleAsync(ChangePlayerPermissionsCommand command, CancellationToken ct)
         {
-            var result = await _permissionManager.SetPermissionsAsync(request.Player.Id, request.Permissions, ct);
+            var (player, permissions) = command;
+
+            var result = await _permissionManager.SetPermissionsAsync(player.Id, permissions, ct);
             if (result)
             {
-                await request.Player.AssignPermissionsAsync(request.Permissions, ct);
+                await player.AssignPermissionsAsync(permissions, ct);
             }
 
             return new CommandResult(result);

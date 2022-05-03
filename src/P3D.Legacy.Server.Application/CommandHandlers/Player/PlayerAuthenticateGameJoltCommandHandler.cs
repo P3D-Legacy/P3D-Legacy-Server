@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Application.Commands.Player;
+using P3D.Legacy.Server.CQERS.Commands;
 
 using System;
 using System.Diagnostics;
@@ -21,9 +21,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<CommandResult> Handle(PlayerAuthenticateGameJoltCommand request, CancellationToken ct)
+        public Task<CommandResult> HandleAsync(PlayerAuthenticateGameJoltCommand command, CancellationToken ct)
         {
-            var (player, _) = request;
+            var (player, _) = command;
 
             Debug.Assert(player.State == PlayerState.Authentication);
 

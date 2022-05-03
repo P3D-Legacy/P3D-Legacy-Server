@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Application.Commands.Administration;
+using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.Infrastructure.Models.Bans;
 using P3D.Legacy.Server.Infrastructure.Services.Bans;
 
@@ -24,9 +24,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
             _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
         }
 
-        public async Task<CommandResult> Handle(BanPlayerCommand request, CancellationToken ct)
+        public async Task<CommandResult> HandleAsync(BanPlayerCommand command, CancellationToken ct)
         {
-            var (bannerId, id, ip, reasonId, reason, expiration) = request;
+            var (bannerId, id, ip, reasonId, reason, expiration) = command;
 
             var result = await _banRepository.BanAsync(new BanEntity(bannerId, id, ip, reasonId, reason, expiration), ct);
             return new CommandResult(result);

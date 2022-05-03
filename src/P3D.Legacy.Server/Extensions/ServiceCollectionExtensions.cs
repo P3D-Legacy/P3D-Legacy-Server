@@ -1,17 +1,11 @@
 ﻿using BetterHostedServices;
 
-using MediatR;
-using MediatR.Pipeline;
-using MediatR.Registration;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-using P3D.Legacy.Server.Abstractions.Commands;
-using P3D.Legacy.Server.Abstractions.Notifications;
-using P3D.Legacy.Server.Abstractions.Queries;
-using P3D.Legacy.Server.Abstractions.Services;
 using P3D.Legacy.Server.Behaviours;
+using P3D.Legacy.Server.CQERS.Behaviours.Command;
+using P3D.Legacy.Server.CQERS.Behaviours.Query;
 using P3D.Legacy.Server.Options;
 
 using System;
@@ -24,6 +18,12 @@ namespace P3D.Legacy.Server.Extensions
     {
         public static IServiceCollection AddHost(this IServiceCollection services)
         {
+            services.AddTransient(typeof(ICommandBehavior<>), typeof(CommandValidationBehaviour<>));
+            services.AddTransient(typeof(ICommandBehavior<>), typeof(CommandTracingBehaviour<>));
+
+            services.AddTransient(typeof(IQueryBehavior<,>), typeof(QueryValidationBehaviour<,>));
+            services.AddTransient(typeof(IQueryBehavior<,>), typeof(QueryTracingBehaviour<,>));
+
             services.AddBetterHostedServices();
 
             services.AddHttpClient("P3D.API")
@@ -37,23 +37,6 @@ namespace P3D.Legacy.Server.Extensions
                     client.Timeout = Timeout.InfiniteTimeSpan;
                 })
                 .AddPolly();
-
-            return services;
-        }
-
-        public static IServiceCollection AddMediatRInternal(this IServiceCollection services)
-        {
-            ServiceRegistrar.AddRequiredServices(services, new MediatRServiceConfiguration().AsTransient());
-
-            services.AddTransient<ICommandDispatcher, CommandDispatcher>();
-            services.AddTransient<IQueryDispatcher, QueryDispatcher>();
-            services.AddTransient<INotificationDispatcher, NotificationDispatcher>();
-
-            services.AddTransient(typeof(IRequestPreProcessor<>), typeof(LoggingBehaviour<>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TracingBehaviour<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
             return services;
         }

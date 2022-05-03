@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Application.Commands.Administration;
+using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.Infrastructure.Services.Bans;
 
 using System;
@@ -23,9 +23,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
             _banManager = banManager ?? throw new ArgumentNullException(nameof(banManager));
         }
 
-        public async Task<CommandResult> Handle(UnbanPlayerCommand request, CancellationToken ct)
+        public async Task<CommandResult> HandleAsync(UnbanPlayerCommand command, CancellationToken ct)
         {
-            var result = await _banManager.UnbanAsync(request.Id, ct);
+            var result = await _banManager.UnbanAsync(command.Id, ct);
 
             return new CommandResult(result);
         }

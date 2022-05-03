@@ -2,8 +2,10 @@
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using RateLimiter;
 
@@ -24,14 +26,14 @@ namespace P3D.Legacy.Server.Client.P3D.Services
     {
         private readonly ILogger _logger;
         private readonly IPlayerContainerReader _playerContainer;
-        private readonly INotificationDispatcher _notificationDispatcher;
+        private readonly IEventDispatcher _eventDispatcher;
         private readonly TimeLimiter _timeLimiter;
 
-        public P3DPlayerMovementCompensationService(ILogger<P3DPlayerMovementCompensationService> logger, IPlayerContainerReader playerContainer, INotificationDispatcher notificationDispatcher)
+        public P3DPlayerMovementCompensationService(ILogger<P3DPlayerMovementCompensationService> logger, IPlayerContainerReader playerContainer, IEventDispatcher eventDispatcher)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
-            _notificationDispatcher = notificationDispatcher ?? throw new ArgumentNullException(nameof(notificationDispatcher));
+            _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
             _timeLimiter = TimeLimiter.GetFromMaxCountByInterval(1, TimeSpan.FromMilliseconds(1000D / 60D));
         }
 
@@ -45,7 +47,7 @@ namespace P3D.Legacy.Server.Client.P3D.Services
                     {
                         var players = await group.Where(x => x.Moving).OfType<IPlayer>().ToArrayAsync(ct);
                         foreach (var player in players)
-                            await _notificationDispatcher.DispatchAsync(new PlayerUpdatedPositionNotification(player), ct);
+                            await _eventDispatcher.DispatchAsync(new PlayerUpdatedPositionEvent(player), ct);
                     }
                 }, ct);
             }

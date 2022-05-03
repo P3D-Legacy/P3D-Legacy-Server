@@ -9,12 +9,13 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-using P3D.Legacy.Server.Abstractions.Extensions;
+using P3D.Legacy.Server.Abstractions.Configuration;
 using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Application.Extensions;
 using P3D.Legacy.Server.Client.P3D.Extensions;
 using P3D.Legacy.Server.Client.P3D.Options;
 using P3D.Legacy.Server.CommunicationAPI.Extensions;
+using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.DiscordBot.Extensions;
 using P3D.Legacy.Server.DiscordBot.Options;
 using P3D.Legacy.Server.Extensions;
@@ -66,7 +67,7 @@ namespace P3D.Legacy.Server
                 services.AddValidatedOptions<JwtOptions, JwtOptionsValidator>(ctx.Configuration.GetSection("Jwt"));
                 services.AddValidatedOptions<OtlpOptions, OtlpOptionsValidator>(ctx.Configuration.GetSection("Otlp"));
 
-                services.AddMediatRInternal();
+                services.AddMediator();
                 services.AddHost();
                 services.AddApplication();
                 services.AddClientP3D();

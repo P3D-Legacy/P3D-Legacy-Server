@@ -11,7 +11,8 @@ using Microsoft.Extensions.Options;
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common.PlayerEvents;
-using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Events;
+using P3D.Legacy.Server.CQERS.Events;
 using P3D.Legacy.Server.DiscordBot.Options;
 
 using System;
@@ -23,11 +24,11 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 {
     [SuppressMessage("Performance", "CA1812")]
     internal sealed class DiscordPassthroughService : IHostedService, IDisposable,
-        INotificationHandler<PlayerJoinedNotification>,
-        INotificationHandler<PlayerLeftNotification>,
-        INotificationHandler<PlayerSentGlobalMessageNotification>,
-        INotificationHandler<ServerMessageNotification>,
-        INotificationHandler<PlayerTriggeredEventNotification>
+        IEventHandler<PlayerJoinedEvent>,
+        IEventHandler<PlayerLeftEvent>,
+        IEventHandler<PlayerSentGlobalMessageEvent>,
+        IEventHandler<ServerMessageEvent>,
+        IEventHandler<PlayerTriggeredEventEvent>
     {
         private Task? _executingTask;
 
@@ -225,31 +226,31 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             _stoppingCts.Dispose();
         }
 
-        public async Task Handle(PlayerJoinedNotification notification, CancellationToken cancellationToken)
+        public async Task HandleAsync(PlayerJoinedEvent notification, CancellationToken cancellationToken)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
                 await channel.SendMessageAsync($"> `EVENT  : Player {notification.Player.Name} joined the server!`");
         }
 
-        public async Task Handle(PlayerLeftNotification notification, CancellationToken cancellationToken)
+        public async Task HandleAsync(PlayerLeftEvent notification, CancellationToken cancellationToken)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
                 await channel.SendMessageAsync($"> `EVENT  : Player {notification.Name} left the server!`");
         }
 
-        public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken cancellationToken)
+        public async Task HandleAsync(PlayerSentGlobalMessageEvent notification, CancellationToken cancellationToken)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
                 await channel.SendMessageAsync($"> `MESSAGE: <{notification.Player.Name}> {notification.Message}`");
         }
 
-        public async Task Handle(ServerMessageNotification notification, CancellationToken cancellationToken)
+        public async Task HandleAsync(ServerMessageEvent notification, CancellationToken cancellationToken)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
                 await channel.SendMessageAsync($"> `SERVER : {notification.Message}`");
         }
 
-        public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken cancellationToken)
+        public async Task HandleAsync(PlayerTriggeredEventEvent notification, CancellationToken cancellationToken)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
                 await channel.SendMessageAsync($"> `EVENT  : The player {notification.Player.Name} {PlayerEventParser.AsText(notification.Event)}`");

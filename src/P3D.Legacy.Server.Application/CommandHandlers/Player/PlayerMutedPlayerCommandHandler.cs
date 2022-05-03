@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Application.Commands.Player;
+using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.Infrastructure.Services.Mutes;
 
 using System;
@@ -23,9 +23,11 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
             _muteRepository = muteRepository ?? throw new ArgumentNullException(nameof(muteRepository));
         }
 
-        public async Task<CommandResult> Handle(PlayerMutedPlayerCommand request, CancellationToken ct)
+        public async Task<CommandResult> HandleAsync(PlayerMutedPlayerCommand command, CancellationToken ct)
         {
-            await _muteRepository.MuteAsync(request.Id, request.IdToMute, ct);
+            var (id, idToMute) = command;
+
+            await _muteRepository.MuteAsync(id, idToMute, ct);
             return new CommandResult(true);
         }
     }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Abstractions.Extensions;
-using P3D.Legacy.Server.Statistics.NotificationHandlers;
+using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.Statistics.EventHandlers;
 
 namespace P3D.Legacy.Server.Statistics.Extensions
 {
@@ -10,10 +10,10 @@ namespace P3D.Legacy.Server.Statistics.Extensions
         public static IServiceCollection AddStatistics(this IServiceCollection services)
         {
             services.AddTransient<MetricsHandler>();
-            services.AddNotifications(sp => sp.GetRequiredService<MetricsHandler>());
+            services.AddEvent(sp => sp.GetRequiredService<MetricsHandler>());
 
             //services.AddTransient<StatisticsHandler>();
-            //services.AddNotifications(sp => sp.GetRequiredService<StatisticsHandler>());
+            //services.AddEvents(sp => sp.GetRequiredService<StatisticsHandler>());
 
             return services;
         }

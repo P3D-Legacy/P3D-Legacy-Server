@@ -1,7 +1,7 @@
 ﻿using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Application.Commands.Trade;
+using P3D.Legacy.Server.CQERS.Commands;
 
 using System.Collections.Generic;
 using System.Threading;
@@ -24,9 +24,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Trade
 
         private readonly Dictionary<Key, TradeState> _currentTrades = new();
 
-        public Task<CommandResult> Handle(TradeOfferCommand request, CancellationToken ct)
+        public Task<CommandResult> HandleAsync(TradeOfferCommand command, CancellationToken ct)
         {
-            var (initiator, target) = request;
+            var (initiator, target) = command;
 
             var key = Key.Create(initiator.Origin, target.Origin);
             if (_currentTrades.TryGetValue(key, out var trade))
@@ -36,9 +36,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Trade
             return Task.FromResult(CommandResult.Success);
         }
 
-        public Task<CommandResult> Handle(TradeAcceptCommand request, CancellationToken ct)
+        public Task<CommandResult> HandleAsync(TradeAcceptCommand command, CancellationToken ct)
         {
-            var (initiator, target) = request;
+            var (initiator, target) = command;
 
             var key = Key.Create(initiator.Origin, target.Origin);
             if (!_currentTrades.TryGetValue(key, out var trade))
@@ -56,18 +56,18 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Trade
             return Task.FromResult(CommandResult.Success);
         }
 
-        public Task<CommandResult> Handle(TradeAbortCommand request, CancellationToken ct)
+        public Task<CommandResult> HandleAsync(TradeAbortCommand command, CancellationToken ct)
         {
-            var (player, partner) = request;
+            var (player, partner) = command;
 
             var key = Key.Create(player.Origin, partner.Origin);
             _currentTrades.Remove(key);
             return Task.FromResult(CommandResult.Success);
         }
 
-        public Task<CommandResult> Handle(TradeConfirmCommand request, CancellationToken ct)
+        public Task<CommandResult> HandleAsync(TradeConfirmCommand command, CancellationToken ct)
         {
-            var (player, partner) = request;
+            var (player, partner) = command;
 
             var key = Key.Create(player.Origin, partner.Origin);
             if (!_currentTrades.TryGetValue(key, out var trade))

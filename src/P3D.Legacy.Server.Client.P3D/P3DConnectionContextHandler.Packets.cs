@@ -2,9 +2,7 @@
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Common.Data;
 using P3D.Legacy.Common.Extensions;
-using P3D.Legacy.Common.Monsters;
 using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Battle;
 using P3D.Legacy.Common.Packets.Chat;
@@ -14,12 +12,12 @@ using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Common.Packets.Trade;
 using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Notifications;
-using P3D.Legacy.Server.Abstractions.Options;
+using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Application.Queries.World;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Collections.Immutable;
@@ -105,7 +103,7 @@ namespace P3D.Legacy.Server.Client.P3D
                     break;
                 default:
                     if (State != PlayerState.Initialized) return;
-                    await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+                    await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
                     break;
             }
         }
@@ -348,11 +346,11 @@ namespace P3D.Legacy.Server.Client.P3D
             {
                 if (stateUpdated)
                 {
-                    await _notificationDispatcher.DispatchAsync(new PlayerUpdatedStateNotification(this), ct);
+                    await _eventDispatcher.DispatchAsync(new PlayerUpdatedStateEvent(this), ct);
                 }
                 if (positionUpdated)
                 {
-                    //await _notificationDispatcher.Dispatch(new PlayerUpdatedPositionNotification(this), ct);
+                    //await _eventDispatcher.Dispatch(new PlayerUpdatedPositionEvent(this), ct);
                 }
             }
 
@@ -365,12 +363,12 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (message.StartsWith("/", StringComparison.Ordinal))
             {
-                await _notificationDispatcher.DispatchAsync(new PlayerSentCommandNotification(this, packet.Message), ct);
+                await _eventDispatcher.DispatchAsync(new PlayerSentCommandEvent(this, packet.Message), ct);
             }
             else if (State == PlayerState.Initialized)
             {
-                //await _notificationDispatcher.Dispatch(new PlayerSentLocalMessageNotification(this, LevelFile, packet.Message), ct);
-                await _notificationDispatcher.DispatchAsync(new PlayerSentGlobalMessageNotification(this, packet.Message), ct);
+                //await _eventDispatcher.Dispatch(new PlayerSentLocalMessageEvent(this, LevelFile, packet.Message), ct);
+                await _eventDispatcher.DispatchAsync(new PlayerSentGlobalMessageEvent(this, packet.Message), ct);
             }
         }
         private async Task HandlePrivateMessageAsync(ChatMessagePrivatePacket packet, CancellationToken ct)
@@ -378,7 +376,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerSentPrivateMessageNotification(this, packet.DestinationPlayerName, packet.Message), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentPrivateMessageEvent(this, packet.DestinationPlayerName, packet.Message), ct);
         }
 
 
@@ -390,7 +388,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (!PlayerEventParser.TryParse(packet.EventMessage, out var @event))
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerTriggeredEventNotification(this, @event), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerTriggeredEventEvent(this, @event), ct);
         }
 
         // 1. TradeRequestPacket
@@ -403,35 +401,35 @@ namespace P3D.Legacy.Server.Client.P3D
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerTradeInitiatedNotification(this, packet.DestinationPlayerOrigin), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerTradeInitiatedEvent(this, packet.DestinationPlayerOrigin), ct);
         }
         private async Task HandleTradeJoinAsync(TradeJoinPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerTradeAcceptedNotification(this, packet.DestinationPlayerOrigin), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerTradeAcceptedEvent(this, packet.DestinationPlayerOrigin), ct);
         }
         private async Task HandleTradeQuitAsync(TradeQuitPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerTradeAbortedNotification(this, packet.DestinationPlayerOrigin), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerTradeAbortedEvent(this, packet.DestinationPlayerOrigin), ct);
         }
         private async Task HandleTradeOfferAsync(TradeOfferFromClientPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerTradeOfferedPokemonNotification(this, packet.DestinationPlayerOrigin, packet.TradeData), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerTradeOfferedPokemonEvent(this, packet.DestinationPlayerOrigin, packet.TradeData), ct);
         }
         private async Task HandleTradeStartAsync(TradeStartPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerTradeConfirmedNotification(this, packet.DestinationPlayerOrigin), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerTradeConfirmedEvent(this, packet.DestinationPlayerOrigin), ct);
         }
 
         private async Task HandleBattleClientDataAsync(BattleClientDataPacket packet, CancellationToken ct)
@@ -439,21 +437,21 @@ namespace P3D.Legacy.Server.Client.P3D
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
         }
         private async Task HandleBattleHostDataAsync(BattleHostDataPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
         }
         private async Task HandleBattleJoinAsync(BattleJoinPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
         }
         private async Task HandleBattleOfferAsync(BattleOfferFromClientPacket packet, CancellationToken ct)
         {
@@ -482,11 +480,11 @@ namespace P3D.Legacy.Server.Client.P3D
             {
                 await SendServerMessageAsync("One of your Pokemon is not valid!", ct);
                 await SendPacketAsync(new BattleQuitPacket { Origin = packet.DestinationPlayerOrigin, DestinationPlayerOrigin = Origin }, ct);
-                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = packet.DestinationPlayerOrigin }), ct);
+                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = packet.DestinationPlayerOrigin }), ct);
             }
             else
             {
-                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
             }
         }
         private async Task HandleBattlePokemonDataAsync(BattleEndRoundDataPacket packet, CancellationToken ct)
@@ -494,28 +492,28 @@ namespace P3D.Legacy.Server.Client.P3D
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
         }
         private async Task HandleBattleQuitAsync(BattleQuitPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
         }
         private async Task HandleBattleRequestAsync(BattleRequestPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
         }
         private async Task HandleBattleStartAsync(BattleStartPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
 
-            await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, packet), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
         }
 
 

@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions.Queries;
 using P3D.Legacy.Server.Application.Queries.Player;
+using P3D.Legacy.Server.CQERS.Queries;
 
 using System;
 using System.Collections.Generic;
@@ -32,6 +32,6 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         [ProducesResponseType(typeof(StatusResponseV1), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> GetStatusAsync([FromServices] IQueryDispatcher queryDispatcher, CancellationToken ct) =>
-            Ok(new StatusResponseV1((await queryDispatcher.DispatchAsync(new GetPlayerViewModelsQuery(),  ct)).Select(x => new StatusResponseV1Player(x.Name, x.GameJoltId.ToString()))));
+            Ok(new StatusResponseV1((await queryDispatcher.DispatchAsync(new GetPlayerViewModelsQuery(), ct)).Select(x => new StatusResponseV1Player(x.Name, x.GameJoltId.ToString()))));
     }
 }

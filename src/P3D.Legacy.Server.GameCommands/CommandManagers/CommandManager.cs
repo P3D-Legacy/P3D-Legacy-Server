@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Commands;
-using P3D.Legacy.Server.Abstractions.Notifications;
-using P3D.Legacy.Server.Abstractions.Queries;
+using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.Application.Queries.Player;
+using P3D.Legacy.Server.CQERS.Commands;
+using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.CQERS.Queries;
 
 using System;
 using System.Collections.Generic;
@@ -24,7 +26,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
 
         protected ICommandDispatcher CommandDispatcher { get; }
         protected IQueryDispatcher QueryDispatcher { get; }
-        protected INotificationDispatcher NotificationDispatcher { get; }
+        protected IEventDispatcher EventDispatcher { get; }
 
         protected CommandManager(IServiceProvider serviceProvider)
         {
@@ -33,7 +35,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
 
             CommandDispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
             QueryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
-            NotificationDispatcher = serviceProvider.GetRequiredService<INotificationDispatcher>();
+            EventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
         }
 
         protected async Task<IPlayer?> GetPlayerAsync(string name, CancellationToken ct)
@@ -44,12 +46,12 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
 
         protected async Task SendMessageAsync(IPlayer player, string message, CancellationToken ct)
         {
-            await NotificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, player, message), ct);
+            await EventDispatcher.DispatchAsync(new MessageToPlayerEvent(IPlayer.Server, player, message), ct);
         }
 
         protected async Task SendServerMessageAsync(string message, CancellationToken ct)
         {
-            await NotificationDispatcher.DispatchAsync(new ServerMessageNotification(message), ct);
+            await EventDispatcher.DispatchAsync(new ServerMessageEvent(message), ct);
         }
 
         public virtual async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)

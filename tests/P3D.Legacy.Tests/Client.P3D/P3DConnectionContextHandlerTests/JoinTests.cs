@@ -10,15 +10,17 @@ using P3D.Legacy.Common.Data;
 using P3D.Legacy.Common.Packets.Common;
 using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Commands;
-using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.Abstractions.Options;
-using P3D.Legacy.Server.Abstractions.Queries;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Application.Queries.World;
 using P3D.Legacy.Server.Client.P3D;
+using P3D.Legacy.Server.CQERS.Commands;
+using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.CQERS.Queries;
 
 using System;
 using System.Collections.Immutable;
@@ -27,19 +29,17 @@ using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 
-using INotification = P3D.Legacy.Server.Abstractions.Notifications.INotification;
-
 namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 {
     internal sealed class JoinTests : BaseTests
     {
         private class CommandDispatcherMock : ICommandDispatcher
         {
-            private readonly INotificationDispatcher _notificationDispatcher;
+            private readonly IEventDispatcher _eventDispatcher;
 
-            public CommandDispatcherMock(INotificationDispatcher notificationDispatcher)
+            public CommandDispatcherMock(IEventDispatcher eventDispatcher)
             {
-                _notificationDispatcher = notificationDispatcher;
+                _eventDispatcher = eventDispatcher;
             }
 
             public async Task<CommandResult> DispatchAsync<TCommand>(TCommand rawCommand, CancellationToken ct) where TCommand : ICommand
@@ -54,7 +54,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                         return CommandResult.Success;
 
                     case PlayerReadyCommand command:
-                        await _notificationDispatcher.DispatchAsync(new PlayerJoinedNotification(command.Player), ct);
+                        await _eventDispatcher.DispatchAsync(new PlayerJoinedEvent(command.Player), ct);
                         return CommandResult.Success;
 
                     case PlayerFinalizingCommand:
@@ -87,25 +87,25 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                 }
             }
         }
-        private class NotificationDispatcherMock : INotificationDispatcher
+        private class EventDispatcherMock : IEventDispatcher
         {
             public DispatchStrategy DefaultStrategy { get; set; }
 
-            public Task DispatchAsync<TNotification>(TNotification rawNotification, CancellationToken ct) where TNotification : INotification => DispatchAsync(rawNotification, DefaultStrategy, ct);
-            public async Task DispatchAsync<TNotification>(TNotification rawNotification, DispatchStrategy dispatchStrategy, CancellationToken ct) where TNotification : INotification
+            public Task DispatchAsync<TEvent>(TEvent rawEvent, CancellationToken ct) where TEvent : IEvent => DispatchAsync(rawEvent, DefaultStrategy, ct);
+            public async Task DispatchAsync<TEvent>(TEvent rawEvent, DispatchStrategy dispatchStrategy, CancellationToken ct) where TEvent : IEvent
             {
-                switch (rawNotification)
+                switch (rawEvent)
                 {
-                    case PlayerUpdatedStateNotification:
+                    case PlayerUpdatedStateEvent:
                         return;
 
-                    case PlayerJoinedNotification notification:
+                    case PlayerJoinedEvent notification:
                         await notification.Player.KickAsync("", ct);
                         return;
 
                     default:
-                        Assert.Fail($"Missing handling of Notification {typeof(TNotification)}");
-                        throw new AssertionException($"Missing handling of Notification {typeof(TNotification)}");
+                        Assert.Fail($"Missing handling of Event {typeof(TEvent)}");
+                        throw new AssertionException($"Missing handling of Event {typeof(TEvent)}");
                 }
             }
         }
@@ -117,7 +117,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
             {
                 services.AddSingleton<ICommandDispatcher, CommandDispatcherMock>();
                 services.AddSingleton<IQueryDispatcher, QueryDispatcherMock>();
-                services.AddSingleton<INotificationDispatcher, NotificationDispatcherMock>();
+                services.AddSingleton<IEventDispatcher, EventDispatcherMock>();
             });
 
             await testService.DoTestAsync(async serviceProvider =>

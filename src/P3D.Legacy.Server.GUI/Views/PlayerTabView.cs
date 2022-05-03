@@ -3,10 +3,11 @@
 using NStack;
 
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Commands;
-using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.Application.Commands.Administration;
 using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.CQERS.Commands;
+using P3D.Legacy.Server.CQERS.Events;
 using P3D.Legacy.Server.GUI.Utils;
 
 using System;
@@ -19,8 +20,8 @@ using Terminal.Gui;
 namespace P3D.Legacy.Server.GUI.Views
 {
     public sealed class PlayerTabView : View,
-        INotificationHandler<PlayerJoinedNotification>,
-        INotificationHandler<PlayerLeftNotification>
+        IEventHandler<PlayerJoinedEvent>,
+        IEventHandler<PlayerLeftEvent>
     {
         private readonly ILogger _logger;
         private readonly ICommandDispatcher _commandDispatcher;
@@ -166,7 +167,7 @@ IP: {player.IPEndPoint}";
             _playerInfoTextView.Text = ustring.Empty;
         }
 
-        public Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
+        public Task HandleAsync(PlayerJoinedEvent notification, CancellationToken ct)
         {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
@@ -176,7 +177,7 @@ IP: {player.IPEndPoint}";
             return Task.CompletedTask;
         }
 
-        public Task Handle(PlayerLeftNotification notification, CancellationToken ct)
+        public Task HandleAsync(PlayerLeftEvent notification, CancellationToken ct)
         {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {

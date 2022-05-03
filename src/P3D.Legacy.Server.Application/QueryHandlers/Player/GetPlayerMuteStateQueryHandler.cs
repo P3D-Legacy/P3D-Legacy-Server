@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions.Queries;
 using P3D.Legacy.Server.Application.Queries.Player;
+using P3D.Legacy.Server.CQERS.Queries;
 using P3D.Legacy.Server.Infrastructure.Services.Mutes;
 
 using System;
@@ -23,9 +23,9 @@ namespace P3D.Legacy.Server.Application.QueryHandlers.Player
             _muteManager = muteManager ?? throw new ArgumentNullException(nameof(muteManager));
         }
 
-        public async Task<bool> Handle(GetPlayerMuteStateQuery request, CancellationToken ct)
+        public async Task<bool> HandleAsync(GetPlayerMuteStateQuery query, CancellationToken ct)
         {
-            var (playerId, targetPlayerId) = request;
+            var (playerId, targetPlayerId) = query;
 
             return await _muteManager.IsMutedAsync(playerId, targetPlayerId, ct);
         }

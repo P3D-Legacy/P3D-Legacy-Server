@@ -4,7 +4,9 @@ using NStack;
 
 using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Events;
+using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Threading;
@@ -15,23 +17,23 @@ using Terminal.Gui;
 namespace P3D.Legacy.Server.GUI.Views
 {
     public sealed class ChatTabView : View,
-        INotificationHandler<PlayerJoinedNotification>,
-        INotificationHandler<PlayerLeftNotification>,
-        INotificationHandler<PlayerSentGlobalMessageNotification>,
-        INotificationHandler<ServerMessageNotification>,
-        INotificationHandler<PlayerTriggeredEventNotification>,
-        INotificationHandler<MessageToPlayerNotification>
+        IEventHandler<PlayerJoinedEvent>,
+        IEventHandler<PlayerLeftEvent>,
+        IEventHandler<PlayerSentGlobalMessageEvent>,
+        IEventHandler<ServerMessageEvent>,
+        IEventHandler<PlayerTriggeredEventEvent>,
+        IEventHandler<MessageToPlayerEvent>
     {
         private readonly ILogger _logger;
-        private readonly INotificationDispatcher _notificationDispatcher;
+        private readonly IEventDispatcher _eventDispatcher;
 
         private readonly TextView _chatTextView;
         private readonly TextField _commandTextField;
 
-        public ChatTabView(ILogger<ChatTabView> logger, INotificationDispatcher notificationDispatcher)
+        public ChatTabView(ILogger<ChatTabView> logger, IEventDispatcher eventDispatcher)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _notificationDispatcher = notificationDispatcher ?? throw new ArgumentNullException(nameof(notificationDispatcher));
+            _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
 
 
             Width = Dim.Fill();
@@ -69,15 +71,15 @@ namespace P3D.Legacy.Server.GUI.Views
         {
             if (message.StartsWith("/", StringComparison.Ordinal))
             {
-                await _notificationDispatcher.DispatchAsync(new PlayerSentCommandNotification(IPlayer.Server, message), CancellationToken.None);
+                await _eventDispatcher.DispatchAsync(new PlayerSentCommandEvent(IPlayer.Server, message), CancellationToken.None);
             }
             //else if (!string.IsNullOrEmpty(message))
             //{
-            //    await _notificationDispatcher.Dispatch(new PlayerSentGlobalMessageNotification(IPlayer.Server, message), CancellationToken.None);
+            //    await _eventDispatcher.Dispatch(new PlayerSentGlobalMessageEvent(IPlayer.Server, message), CancellationToken.None);
             //}
         }
 
-        public Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
+        public Task HandleAsync(PlayerJoinedEvent notification, CancellationToken ct)
         {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
@@ -87,7 +89,7 @@ namespace P3D.Legacy.Server.GUI.Views
             return Task.CompletedTask;
         }
 
-        public Task Handle(PlayerLeftNotification notification, CancellationToken ct)
+        public Task HandleAsync(PlayerLeftEvent notification, CancellationToken ct)
         {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
@@ -97,7 +99,7 @@ namespace P3D.Legacy.Server.GUI.Views
             return Task.CompletedTask;
         }
 
-        public Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken ct)
+        public Task HandleAsync(PlayerSentGlobalMessageEvent notification, CancellationToken ct)
         {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
@@ -107,7 +109,7 @@ namespace P3D.Legacy.Server.GUI.Views
             return Task.CompletedTask;
         }
 
-        public Task Handle(ServerMessageNotification notification, CancellationToken ct)
+        public Task HandleAsync(ServerMessageEvent notification, CancellationToken ct)
         {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
@@ -117,7 +119,7 @@ namespace P3D.Legacy.Server.GUI.Views
             return Task.CompletedTask;
         }
 
-        public Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
+        public Task HandleAsync(PlayerTriggeredEventEvent notification, CancellationToken ct)
         {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
@@ -127,7 +129,7 @@ namespace P3D.Legacy.Server.GUI.Views
             return Task.CompletedTask;
         }
 
-        public Task Handle(MessageToPlayerNotification notification, CancellationToken ct)
+        public Task HandleAsync(MessageToPlayerEvent notification, CancellationToken ct)
         {
             if (notification.To != IPlayer.Server) return Task.CompletedTask;
             Terminal.Gui.Application.MainLoop.Invoke(() =>

@@ -1,4 +1,4 @@
-﻿using P3D.Legacy.Server.Abstractions.Commands;
+﻿using P3D.Legacy.Server.CQERS.Commands;
 
 using System;
 

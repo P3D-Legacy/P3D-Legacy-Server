@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions.Commands;
-using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.CQERS.Commands;
+using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.Infrastructure.Services.Permissions;
 
 using System;
@@ -17,26 +19,28 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     internal sealed class PlayerReadyCommandHandler : ICommandHandler<PlayerReadyCommand>
     {
         private readonly ILogger _logger;
-        private readonly INotificationDispatcher _notificationDispatcher;
+        private readonly IEventDispatcher _eventDispatcher;
         private readonly IPermissionManager _permissionManager;
         private readonly IPlayerContainerWriter _playerContainer;
 
-        public PlayerReadyCommandHandler(ILogger<PlayerReadyCommandHandler> logger, INotificationDispatcher notificationDispatcher, IPermissionManager permissionManager, IPlayerContainerWriter playerContainer)
+        public PlayerReadyCommandHandler(ILogger<PlayerReadyCommandHandler> logger, IEventDispatcher eventDispatcher, IPermissionManager permissionManager, IPlayerContainerWriter playerContainer)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _notificationDispatcher = notificationDispatcher ?? throw new ArgumentNullException(nameof(notificationDispatcher));
+            _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
             _permissionManager = permissionManager ?? throw new ArgumentNullException(nameof(permissionManager));
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
         }
 
-        public async Task<CommandResult> Handle(PlayerReadyCommand request, CancellationToken ct)
+        public async Task<CommandResult> HandleAsync(PlayerReadyCommand command, CancellationToken ct)
         {
-            var permissions = await _permissionManager.GetByIdAsync(request.Player.Id, ct);
-            await request.Player.AssignPermissionsAsync(permissions.Permissions, ct);
+            var player = command.Player;
+
+            var permissions = await _permissionManager.GetByIdAsync(player.Id, ct);
+            await player.AssignPermissionsAsync(permissions.Permissions, ct);
 
             //await _playerContainer.AddAsync(request.Player, ct);
 
-            await _notificationDispatcher.DispatchAsync(new PlayerJoinedNotification(request.Player), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerJoinedEvent(player), ct);
             return CommandResult.Success;
         }
     }

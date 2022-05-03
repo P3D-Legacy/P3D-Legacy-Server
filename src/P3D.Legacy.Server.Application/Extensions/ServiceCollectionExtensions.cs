@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
 using P3D.Legacy.Common.Packets;
-using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.Application.CommandHandlers.Administration;
 using P3D.Legacy.Server.Application.CommandHandlers.Player;
 using P3D.Legacy.Server.Application.CommandHandlers.Trade;
@@ -12,6 +11,7 @@ using P3D.Legacy.Server.Application.QueryHandlers.Permission;
 using P3D.Legacy.Server.Application.QueryHandlers.Player;
 using P3D.Legacy.Server.Application.QueryHandlers.World;
 using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 namespace P3D.Legacy.Server.Application.Extensions
 {

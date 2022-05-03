@@ -10,13 +10,13 @@ using NUnit.Framework;
 using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Commands;
-using P3D.Legacy.Server.Abstractions.Notifications;
 using P3D.Legacy.Server.Abstractions.Options;
-using P3D.Legacy.Server.Abstractions.Queries;
 using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Client.P3D;
+using P3D.Legacy.Server.CQERS.Commands;
+using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Queries;
 
 using System;
 using System.Collections.Immutable;
@@ -55,7 +55,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
             {
                 services.AddSingleton<ICommandDispatcher>(_ => new Mock<ICommandDispatcher>(MockBehavior.Strict).Object);
                 services.AddSingleton<IQueryDispatcher, QueryDispatcherMock>();
-                services.AddSingleton<INotificationDispatcher>(_ => new Mock<INotificationDispatcher>(MockBehavior.Strict).Object);
+                services.AddSingleton<IEventDispatcher>(_ => new Mock<IEventDispatcher>(MockBehavior.Strict).Object);
             });
 
             await testService.DoTestAsync(async serviceProvider =>

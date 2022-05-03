@@ -1,8 +1,8 @@
 ﻿using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.Infrastructure.Services.Bans;
 
 using System;
@@ -30,9 +30,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
             _banManager = banManager ?? throw new ArgumentNullException(nameof(banManager));
         }
 
-        public async Task<CommandResult> Handle(PlayerInitializingCommand request, CancellationToken ct)
+        public async Task<CommandResult> HandleAsync(PlayerInitializingCommand command, CancellationToken ct)
         {
-            var player = request.Player;
+            var player = command.Player;
 
             Debug.Assert(player.State == PlayerState.Initializing);
 

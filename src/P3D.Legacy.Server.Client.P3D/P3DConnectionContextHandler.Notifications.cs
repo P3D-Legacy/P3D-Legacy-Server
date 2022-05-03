@@ -6,11 +6,13 @@ using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Common.Packets.Trade;
 using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Commands.Trade;
 using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
+using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -22,27 +24,27 @@ namespace P3D.Legacy.Server.Client.P3D
     // ReSharper disable once ArrangeTypeModifiers
     [SuppressMessage("Performance", "CA1812")]
     internal partial class P3DConnectionContextHandler :
-        INotificationHandler<PlayerJoinedNotification>,
-        INotificationHandler<PlayerLeftNotification>,
-        INotificationHandler<PlayerUpdatedStateNotification>,
-        INotificationHandler<PlayerUpdatedPositionNotification>,
-        INotificationHandler<PlayerSentGlobalMessageNotification>,
-        INotificationHandler<PlayerSentLocalMessageNotification>,
-        INotificationHandler<PlayerSentPrivateMessageNotification>,
-        INotificationHandler<MessageToPlayerNotification>,
-        INotificationHandler<PlayerSentRawP3DPacketNotification>,
-        INotificationHandler<ServerMessageNotification>,
-        INotificationHandler<PlayerTriggeredEventNotification>,
-        INotificationHandler<PlayerSentCommandNotification>,
-        INotificationHandler<WorldUpdatedNotification>,
-        INotificationHandler<PlayerSentLoginNotification>,
-        INotificationHandler<PlayerTradeInitiatedNotification>,
-        INotificationHandler<PlayerTradeAcceptedNotification>,
-        INotificationHandler<PlayerTradeAbortedNotification>,
-        INotificationHandler<PlayerTradeOfferedPokemonNotification>,
-        INotificationHandler<PlayerTradeConfirmedNotification>
+        IEventHandler<PlayerJoinedEvent>,
+        IEventHandler<PlayerLeftEvent>,
+        IEventHandler<PlayerUpdatedStateEvent>,
+        IEventHandler<PlayerUpdatedPositionEvent>,
+        IEventHandler<PlayerSentGlobalMessageEvent>,
+        IEventHandler<PlayerSentLocalMessageEvent>,
+        IEventHandler<PlayerSentPrivateMessageEvent>,
+        IEventHandler<MessageToPlayerEvent>,
+        IEventHandler<PlayerSentRawP3DPacketEvent>,
+        IEventHandler<ServerMessageEvent>,
+        IEventHandler<PlayerTriggeredEventEvent>,
+        IEventHandler<PlayerSentCommandEvent>,
+        IEventHandler<WorldUpdatedEvent>,
+        IEventHandler<PlayerSentLoginEvent>,
+        IEventHandler<PlayerTradeInitiatedEvent>,
+        IEventHandler<PlayerTradeAcceptedEvent>,
+        IEventHandler<PlayerTradeAbortedEvent>,
+        IEventHandler<PlayerTradeOfferedPokemonEvent>,
+        IEventHandler<PlayerTradeConfirmedEvent>
     {
-        public async Task Handle(PlayerJoinedNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerJoinedEvent notification, CancellationToken ct)
         {
             var player = notification.Player;
 
@@ -64,7 +66,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendServerMessageAsync($"Player {player.Name} joined the server!", ct);
         }
 
-        public async Task Handle(PlayerLeftNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerLeftEvent notification, CancellationToken ct)
         {
             var (_, origin, name) = notification;
 
@@ -74,7 +76,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendServerMessageAsync($"Player {name} left the server!", ct);
         }
 
-        public async Task Handle(PlayerUpdatedStateNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerUpdatedStateEvent notification, CancellationToken ct)
         {
             var player = notification.Player;
 
@@ -84,7 +86,7 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        public async Task Handle(PlayerUpdatedPositionNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerUpdatedPositionEvent notification, CancellationToken ct)
         {
             var player = notification.Player;
 
@@ -94,7 +96,7 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        public async Task Handle(PlayerSentGlobalMessageNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerSentGlobalMessageEvent notification, CancellationToken ct)
         {
             var (player, message) = notification;
 
@@ -103,7 +105,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
 
-        public async Task Handle(PlayerSentLocalMessageNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerSentLocalMessageEvent notification, CancellationToken ct)
         {
             var (player, location, message) = notification;
 
@@ -113,7 +115,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
 
-        public async Task Handle(PlayerSentPrivateMessageNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerSentPrivateMessageEvent notification, CancellationToken ct)
         {
             var (player, receiverName, message) = notification;
 
@@ -123,7 +125,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new ChatMessagePrivatePacket { Origin = player.Origin, DestinationPlayerName = receiverName, Message = message }, ct);
         }
 
-        public async Task Handle(MessageToPlayerNotification notification, CancellationToken ct)
+        public async Task HandleAsync(MessageToPlayerEvent notification, CancellationToken ct)
         {
             var (from, to, message) = notification;
 
@@ -133,7 +135,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = from.Origin, Message = message }, ct);
         }
 
-        public async Task Handle(PlayerSentRawP3DPacketNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerSentRawP3DPacketEvent notification, CancellationToken ct)
         {
             var (player, p3dPacket) = notification;
 
@@ -143,8 +145,8 @@ namespace P3D.Legacy.Server.Client.P3D
                 switch (p3dPacket)
                 {
                     case BattleRequestPacket:
-                        await _notificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
-                        await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(player, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
+                        await _eventDispatcher.DispatchAsync(new MessageToPlayerEvent(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
+                        await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(player, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
                         break;
                     case BattleQuitPacket:
                         await SendPacketAsync(p3dPacket, ct);
@@ -162,21 +164,21 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(p3dPacket, ct);
         }
 
-        public async Task Handle(ServerMessageNotification notification, CancellationToken ct)
+        public async Task HandleAsync(ServerMessageEvent notification, CancellationToken ct)
         {
             var message = notification.Message;
 
             await SendServerMessageAsync(message, ct);
         }
 
-        public async Task Handle(PlayerTriggeredEventNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerTriggeredEventEvent notification, CancellationToken ct)
         {
             var (player, @event) = notification;
 
             await SendServerMessageAsync($"The player {player.Name} {PlayerEventParser.AsText(@event)}", ct);
         }
 
-        public async Task Handle(PlayerSentCommandNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerSentCommandEvent notification, CancellationToken ct)
         {
             var (player, message) = notification;
 
@@ -186,7 +188,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
 
-        public async Task Handle(WorldUpdatedNotification notification, CancellationToken ct)
+        public async Task HandleAsync(WorldUpdatedEvent notification, CancellationToken ct)
         {
             var (time, season, weather) = notification.State;
             await SendPacketAsync(new WorldDataPacket
@@ -199,7 +201,7 @@ namespace P3D.Legacy.Server.Client.P3D
             }, ct);
         }
 
-        public async Task Handle(PlayerSentLoginNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerSentLoginEvent notification, CancellationToken ct)
         {
             var (player, password) = notification;
 
@@ -213,7 +215,7 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        public async Task Handle(PlayerTradeInitiatedNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerTradeInitiatedEvent notification, CancellationToken ct)
         {
             var (initiator, target) = notification;
 
@@ -221,8 +223,8 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (GameJoltId.IsNone != initiator.GameJoltId.IsNone)
             {
-                await _notificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, initiator, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
-                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
+                await _eventDispatcher.DispatchAsync(new MessageToPlayerEvent(IPlayer.Server, initiator, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
+                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
             }
             else
             {
@@ -233,12 +235,12 @@ namespace P3D.Legacy.Server.Client.P3D
                 else
                 {
                     await _commandDispatcher.DispatchAsync(new TradeAbortCommand(initiator, this), ct);
-                    await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
+                    await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
                 }
             }
         }
 
-        public async Task Handle(PlayerTradeAcceptedNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerTradeAcceptedEvent notification, CancellationToken ct)
         {
             var (target, initiator) = notification;
 
@@ -251,11 +253,11 @@ namespace P3D.Legacy.Server.Client.P3D
             else
             {
                 await _commandDispatcher.DispatchAsync(new TradeAbortCommand(target, this), ct);
-                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(target, new TradeQuitPacket { Origin = initiator, DestinationPlayerOrigin = target.Origin }), ct);
+                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(target, new TradeQuitPacket { Origin = initiator, DestinationPlayerOrigin = target.Origin }), ct);
             }
         }
 
-        public async Task Handle(PlayerTradeAbortedNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerTradeAbortedEvent notification, CancellationToken ct)
         {
             var (player, partner) = notification;
 
@@ -265,7 +267,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new TradeQuitPacket { Origin = player.Origin, DestinationPlayerOrigin = partner }, ct);
         }
 
-        public async Task Handle(PlayerTradeOfferedPokemonNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerTradeOfferedPokemonEvent notification, CancellationToken ct)
         {
             var (player, target, data) = notification;
 
@@ -282,9 +284,9 @@ namespace P3D.Legacy.Server.Client.P3D
             if (cancel)
             {
                 await _commandDispatcher.DispatchAsync(new TradeAbortCommand(player, this), ct);
-                await _notificationDispatcher.DispatchAsync(new MessageToPlayerNotification(IPlayer.Server, player, "The Pokemon is not valid!"), ct);
+                await _eventDispatcher.DispatchAsync(new MessageToPlayerEvent(IPlayer.Server, player, "The Pokemon is not valid!"), ct);
                 await SendPacketAsync(new TradeQuitPacket { Origin = player.Origin, DestinationPlayerOrigin = target }, ct);
-                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(this, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = player.Origin }), ct);
+                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = player.Origin }), ct);
             }
             else
             {
@@ -292,7 +294,7 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        public async Task Handle(PlayerTradeConfirmedNotification notification, CancellationToken ct)
+        public async Task HandleAsync(PlayerTradeConfirmedEvent notification, CancellationToken ct)
         {
             var (player, target) = notification;
 
@@ -301,7 +303,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (await _commandDispatcher.DispatchAsync(new TradeConfirmCommand(player, this), ct) is { IsSuccess: true })
                 await SendPacketAsync(new TradeStartPacket { Origin = player.Origin, DestinationPlayerOrigin = target }, ct);
             else
-                await _notificationDispatcher.DispatchAsync(new PlayerSentRawP3DPacketNotification(player, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = player.Origin }), ct);
+                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(player, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = player.Origin }), ct);
         }
     }
 }

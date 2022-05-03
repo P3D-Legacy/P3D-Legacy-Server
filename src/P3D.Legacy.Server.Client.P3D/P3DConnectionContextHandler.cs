@@ -9,11 +9,11 @@ using OpenTelemetry.Trace;
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Packets.Client;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Commands;
-using P3D.Legacy.Server.Abstractions.Notifications;
-using P3D.Legacy.Server.Abstractions.Queries;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.CQERS.Commands;
+using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Queries;
 
 using System;
 using System.Diagnostics;
@@ -31,7 +31,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
         private readonly ICommandDispatcher _commandDispatcher;
         private readonly IQueryDispatcher _queryDispatcher;
-        private readonly INotificationDispatcher _notificationDispatcher;
+        private readonly IEventDispatcher _eventDispatcher;
 
         private TelemetrySpan _connectionSpan = default!;
         private ProtocolWriter _writer = default!;
@@ -42,14 +42,14 @@ namespace P3D.Legacy.Server.Client.P3D
             P3DProtocol protocol,
             ICommandDispatcher commandDispatcher,
             IQueryDispatcher queryDispatcher,
-            INotificationDispatcher notificationDispatcher)
+            IEventDispatcher eventDispatcher)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Client.P3D");
             _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));
             _commandDispatcher = commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
             _queryDispatcher = queryDispatcher ?? throw new ArgumentNullException(nameof(queryDispatcher));
-            _notificationDispatcher = notificationDispatcher ?? throw new ArgumentNullException(nameof(notificationDispatcher));
+            _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
         }
 
         protected override async Task OnCreatedAsync(CancellationToken ct)

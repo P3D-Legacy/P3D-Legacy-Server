@@ -1,5 +1,6 @@
 ﻿using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
             if (arguments.Length == 1)
-                await NotificationDispatcher.DispatchAsync(new PlayerSentLoginNotification(player, arguments[0]), ct);
+                await EventDispatcher.DispatchAsync(new PlayerSentLoginEvent(player, arguments[0]), ct);
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
         }

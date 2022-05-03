@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions.Extensions;
+using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.GUI.Services;
 using P3D.Legacy.Server.GUI.Views;
 
@@ -23,10 +23,10 @@ namespace P3D.Legacy.Server.GUI.Extensions
             services.AddScoped<ServerUI>();
 
             services.AddScoped<PlayerTabView>();
-            services.AddNotifications(sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<PlayerTabView>());
+            services.AddEvent(sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<PlayerTabView>());
 
             services.AddScoped<ChatTabView>();
-            services.AddNotifications(sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<ChatTabView>());
+            services.AddEvent(sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<ChatTabView>());
 
             services.AddScoped<LogsTabView>();
 

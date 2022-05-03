@@ -1,4 +1,4 @@
-﻿using P3D.Legacy.Server.Abstractions.Queries;
+﻿using P3D.Legacy.Server.CQERS.Queries;
 
 using System.Collections.Immutable;
 

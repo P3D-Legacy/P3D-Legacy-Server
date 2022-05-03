@@ -1,6 +1,6 @@
-﻿using P3D.Legacy.Server.Abstractions.Queries;
-using P3D.Legacy.Server.Application.Extensions;
+﻿using P3D.Legacy.Server.Application.Extensions;
 using P3D.Legacy.Server.Application.Queries.Ban;
+using P3D.Legacy.Server.CQERS.Queries;
 using P3D.Legacy.Server.Infrastructure.Services.Bans;
 
 using System;
@@ -24,12 +24,14 @@ namespace P3D.Legacy.Server.Application.QueryHandlers.Ban
             _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
         }
 
-        public async Task<BanViewModel?> Handle(GetPlayerBanQuery request, CancellationToken ct)
+        public async Task<BanViewModel?> HandleAsync(GetPlayerBanQuery query, CancellationToken ct)
         {
-            return await _banRepository.GetAsync(request.Id, ct) is { } ban ? new BanViewModel(ban.BannerId, ban.Id, ban.Ip, ban.Reason, ban.Expiration) : null;
+            var id = query.Id;
+
+            return await _banRepository.GetAsync(id, ct) is { } ban ? new BanViewModel(ban.BannerId, ban.Id, ban.Ip, ban.Reason, ban.Expiration) : null;
         }
 
-        public async Task<ImmutableArray<BanViewModel>> Handle(GetPlayerBansQuery request, CancellationToken ct)
+        public async Task<ImmutableArray<BanViewModel>> HandleAsync(GetPlayerBansQuery query, CancellationToken ct)
         {
             return await _banRepository.GetAllAsync(ct).Select(ban => new BanViewModel(ban.BannerId, ban.Id, ban.Ip, ban.Reason, ban.Expiration)).ToImmutableArrayAsync(ct);
         }

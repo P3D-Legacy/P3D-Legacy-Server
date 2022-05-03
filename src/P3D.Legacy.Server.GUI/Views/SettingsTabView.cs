@@ -1,4 +1,4 @@
-﻿using P3D.Legacy.Server.Abstractions.Extensions;
+﻿using P3D.Legacy.Server.Abstractions.Configuration;
 
 using System;
 using System.Collections.Generic;

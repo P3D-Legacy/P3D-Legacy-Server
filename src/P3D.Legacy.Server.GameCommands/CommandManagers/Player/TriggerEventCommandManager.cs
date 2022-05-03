@@ -1,6 +1,7 @@
 ﻿using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Collections.Generic;
@@ -45,7 +46,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                 if (@event is null)
                     await SendMessageAsync(player, "Invalid arguments given.", ct);
                 else
-                    await NotificationDispatcher.DispatchAsync(new PlayerTriggeredEventNotification(player, @event), ct);
+                    await EventDispatcher.DispatchAsync(new PlayerTriggeredEventEvent(player, @event), ct);
             }
             else
             {

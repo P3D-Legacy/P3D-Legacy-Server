@@ -1,0 +1,28 @@
+﻿using P3D.Legacy.Server.CQERS.Commands;
+
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace P3D.Legacy.Server.CQERS.Behaviours.Command
+{
+    public class CommandPreProcessorBehavior<TCommand> : ICommandBehavior<TCommand>
+        where TCommand : ICommand
+    {
+        private readonly IEnumerable<ICommandPreProcessor<TCommand>> _preProcessors;
+
+        public CommandPreProcessorBehavior(IEnumerable<ICommandPreProcessor<TCommand>> preProcessors)
+        {
+            _preProcessors = preProcessors;
+        }
+
+        public async Task<CommandResult> Handle(TCommand command, CancellationToken ct, CommandHandlerDelegate next)
+        {
+            foreach (var processor in _preProcessors)
+            {
+                await processor.Process(command, ct);
+            }
+            return await next();
+        }
+    }
+}

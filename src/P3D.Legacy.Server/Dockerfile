@@ -4,6 +4,7 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS build-env
 WORKDIR /build
 
 COPY ["src/P3D.Legacy.Common/P3D.Legacy.Common.csproj", "src/P3D.Legacy.Common/"]
+COPY ["src/P3D.Legacy.Server.CQERS/P3D.Legacy.Server.CQERS.csproj", "src/P3D.Legacy.Server.CQERS/"]
 COPY ["src/P3D.Legacy.Server.Abstractions/P3D.Legacy.Server.Abstractions.csproj", "src/P3D.Legacy.Server.Abstractions/"]
 COPY ["src/P3D.Legacy.Server.Application/P3D.Legacy.Server.Application.csproj", "src/P3D.Legacy.Server.Application/"]
 COPY ["src/P3D.Legacy.Server.Client.P3D/P3D.Legacy.Server.Client.P3D.csproj", "src/P3D.Legacy.Server.Client.P3D/"]
@@ -21,6 +22,7 @@ COPY ["Directory.Packages.props", "./"]
 RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj"
 
 COPY ["src/P3D.Legacy.Common/", "src/P3D.Legacy.Common/"]
+COPY ["src/P3D.Legacy.Server.CQERS/", "src/P3D.Legacy.Server.CQERS/"]
 COPY ["src/P3D.Legacy.Server.Abstractions/", "src/P3D.Legacy.Server.Abstractions/"]
 COPY ["src/P3D.Legacy.Server.Application/", "src/P3D.Legacy.Server.Application/"]
 COPY ["src/P3D.Legacy.Server.Client.P3D/", "src/P3D.Legacy.Server.Client.P3D/"]

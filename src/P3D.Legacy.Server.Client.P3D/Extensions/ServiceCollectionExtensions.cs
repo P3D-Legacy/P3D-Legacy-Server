@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Client.P3D.Services;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System.Linq;
 
@@ -15,7 +15,7 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
             services.AddHostedService<P3DPlayerMovementCompensationService>();
 
             services.AddScoped<P3DConnectionContextHandler>();
-            services.AddNotificationsEnumerable(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<P3DConnectionContextHandler>());
+            services.AddEvents(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<P3DConnectionContextHandler>());
 
             services.AddScoped<P3DProtocol>();
 

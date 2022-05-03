@@ -1,8 +1,10 @@
 ﻿using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Commands;
-using P3D.Legacy.Server.Abstractions.Notifications;
+using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.CQERS.Commands;
+using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Diagnostics;
@@ -15,23 +17,23 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     [SuppressMessage("Performance", "CA1812")]
     internal sealed class PlayerFinalizingCommandHandler : ICommandHandler<PlayerFinalizingCommand>
     {
-        private readonly INotificationDispatcher _notificationDispatcher;
+        private readonly IEventDispatcher _eventDispatcher;
         private readonly IPlayerContainerWriter _playerContainer;
 
-        public PlayerFinalizingCommandHandler(INotificationDispatcher notificationDispatcher, IPlayerContainerWriter playerContainer)
+        public PlayerFinalizingCommandHandler(IEventDispatcher eventDispatcher, IPlayerContainerWriter playerContainer)
         {
-            _notificationDispatcher = notificationDispatcher ?? throw new ArgumentNullException(nameof(notificationDispatcher));
+            _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
         }
 
-        public async Task<CommandResult> Handle(PlayerFinalizingCommand request, CancellationToken ct)
+        public async Task<CommandResult> HandleAsync(PlayerFinalizingCommand command, CancellationToken ct)
         {
-            var player = request.Player;
+            var player = command.Player;
 
             Debug.Assert(player.State == PlayerState.Finalizing);
 
             await _playerContainer.RemoveAsync(player, ct);
-            await _notificationDispatcher.DispatchAsync(new PlayerLeftNotification(player.Id, player.Origin, player.Name), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerLeftEvent(player.Id, player.Origin, player.Name), ct);
 
             return new CommandResult(true);
         }

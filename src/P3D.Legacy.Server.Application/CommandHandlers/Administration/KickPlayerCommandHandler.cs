@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions.Commands;
 using P3D.Legacy.Server.Application.Commands.Administration;
+using P3D.Legacy.Server.CQERS.Commands;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -20,9 +20,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<CommandResult> Handle(KickPlayerCommand request, CancellationToken ct)
+        public async Task<CommandResult> HandleAsync(KickPlayerCommand command, CancellationToken ct)
         {
-            var (player, reason) = request;
+            var (player, reason) = command;
 
             await player.KickAsync(reason, ct);
 

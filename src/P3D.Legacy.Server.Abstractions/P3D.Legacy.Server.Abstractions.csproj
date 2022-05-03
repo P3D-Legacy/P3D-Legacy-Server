@@ -23,13 +23,13 @@
 
   <ItemGroup>
     <PackageReference Include="Aragas.Extensions.Options.FluentValidation" />
-    <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\P3D.Legacy.Common\P3D.Legacy.Common.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.CQERS\P3D.Legacy.Server.CQERS.csproj" />
   </ItemGroup>
 
 </Project>
