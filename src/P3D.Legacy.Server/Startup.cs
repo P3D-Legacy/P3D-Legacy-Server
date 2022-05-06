@@ -51,7 +51,7 @@ namespace P3D.Legacy.Server
 
             services.AddSwaggerGen(static opt =>
             {
-                var appName = Assembly.GetEntryAssembly()?.GetName().Name;
+                var appName = typeof(Startup).Assembly.GetName().Name;
 
                 opt.SwaggerDoc("v1", new OpenApiInfo { Title = appName, Version = "v1" });
                 opt.SupportNonNullableReferenceTypes();
@@ -82,7 +82,7 @@ namespace P3D.Legacy.Server
             app.UseSwagger();
             app.UseSwaggerUI(static options =>
             {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", Assembly.GetEntryAssembly()?.GetName().Name);
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", typeof(Startup).Assembly.GetName().Name);
             });
 
             app.UseWebSockets();
