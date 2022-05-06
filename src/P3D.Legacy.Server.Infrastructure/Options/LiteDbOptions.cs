@@ -8,7 +8,7 @@ namespace P3D.Legacy.Server.Infrastructure.Options
     {
         public LiteDbOptionsValidator()
         {
-            RuleFor(x => x.ConnectionString).IsLiteDBConnectionString();
+            RuleFor(static x => x.ConnectionString).IsLiteDBConnectionString();
         }
     }
 

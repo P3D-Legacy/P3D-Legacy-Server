@@ -12,7 +12,6 @@ using P3D.Legacy.Server.Infrastructure.Options;
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -108,7 +107,7 @@ query MonsterStaticData($id: Int, $itemId: Int) {
                 monsterData.Name,
                 Stats.None,
                 0,
-                new AbilityContainer(monsterData.Abilities.Select(x => new AbilityEntity(new AbilityStaticDataEntity((short) x.AbilityId, x.Ability.Name), x.IsHidden)).Cast<IAbilityInstance>().ToArray()),
+                new AbilityContainer(monsterData.Abilities.Select(static x => new AbilityEntity(new AbilityStaticDataEntity((short) x.AbilityId, x.Ability.Name), x.IsHidden)).Cast<IAbilityInstance>().ToArray()),
                 monsterData.Species.GenderRate != -1 ? monsterData.Species.GenderRate * 1f / 8f : -1,
                 monsterData.Species.HatchCounter,
                 monsterData.Species.IsBaby,
@@ -122,7 +121,7 @@ query MonsterStaticData($id: Int, $itemId: Int) {
                     "fast-then-very-slow" => ExperienceType.Fluctuating,
                     _ => throw new NotImplementedException()
                 },
-                monsterData.Moves.Select(x => new AttackStaticDataEntity((ushort) x.MoveId, x.Move.Name, (byte) x.Move.PP)).ToImmutableArray()
+                monsterData.Moves.Select(static x => new AttackStaticDataEntity((ushort) x.MoveId, x.Move.Name, (byte) x.Move.PP)).ToList()
             );
 
             var heldItemData = data.Data.Item.FirstOrDefault();

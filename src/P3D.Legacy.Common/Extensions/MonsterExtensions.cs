@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace P3D.Legacy.Common.Extensions
@@ -10,8 +11,8 @@ namespace P3D.Legacy.Common.Extensions
     {
         public static bool IsValidP3D(this IMonsterInstance monster) =>
             (monster.Gender == MonsterGender.Male && monster.StaticData.MaleRatio == 0 ||
-             monster.Gender == MonsterGender.Female && monster.StaticData.MaleRatio == 1 ||
-             monster.Gender == MonsterGender.Genderless && monster.StaticData.MaleRatio == -1 ||
+             monster.Gender == MonsterGender.Female && Math.Abs(monster.StaticData.MaleRatio - 1) < float.Epsilon ||
+             monster.Gender == MonsterGender.Genderless && Math.Abs(monster.StaticData.MaleRatio - (-1)) < float.Epsilon ||
              monster.Gender is MonsterGender.Male or MonsterGender.Female)
             && monster.Ability is not null
             //&& Attacks.All(a => StaticData.LearnableAttacks.Any(la => la.Id == a.StaticData.Id))
@@ -32,7 +33,7 @@ namespace P3D.Legacy.Common.Extensions
             dict.Add("ItemData", $"[{monster.Metadata["ItemData"]}]");
             dict.Add("NickName", $"[{monster.CatchInfo.Nickname ?? string.Empty}]");
             dict.Add("Level", $"[{monster.Level}]");
-            dict.Add("OT", $"[{(monster.CatchInfo.TrainerId.HasValue ? monster.CatchInfo.TrainerId : string.Empty)}]");
+            dict.Add("OT", $"[{(monster.CatchInfo.TrainerId.HasValue ? monster.CatchInfo.TrainerId.Value.ToString(CultureInfo.InvariantCulture) : string.Empty)}]");
             dict.Add("Ability", $"[{monster.Ability.StaticData.Id}]");
             dict.Add("Status", $"[{monster.Metadata["Status"]}]");
             dict.Add("Nature", $"[{monster.Nature}]");

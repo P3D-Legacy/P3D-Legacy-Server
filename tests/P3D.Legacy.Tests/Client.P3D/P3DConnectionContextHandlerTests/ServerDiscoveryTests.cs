@@ -49,44 +49,39 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
         }
 
         [Test]
-        public async Task TestAsync()
+        public async Task TestAsync() => await Common().Configure(static services =>
         {
-            await using var testService = Commnon().Configure(services =>
-            {
-                services.AddSingleton<ICommandDispatcher>(_ => new Mock<ICommandDispatcher>(MockBehavior.Strict).Object);
-                services.AddSingleton<IQueryDispatcher, QueryDispatcherMock>();
-                services.AddSingleton<IEventDispatcher>(_ => new Mock<IEventDispatcher>(MockBehavior.Strict).Object);
-            });
+            services.AddSingleton<ICommandDispatcher>(static _ => new Mock<ICommandDispatcher>(MockBehavior.Strict).Object);
+            services.AddSingleton<IQueryDispatcher, QueryDispatcherMock>();
+            services.AddSingleton<IEventDispatcher>(static _ => new Mock<IEventDispatcher>(MockBehavior.Strict).Object);
+        }).DoTestAsync(static async sp =>
+        {
+            var connectionFactory = sp.GetRequiredService<IConnectionFactory>();
 
-            await testService.DoTestAsync(async serviceProvider =>
-            {
-                var connectionFactory = serviceProvider.GetRequiredService<IConnectionFactory>();
+            var connection = (DefaultConnectionContext) await connectionFactory.ConnectAsync(IPEndPoint.Parse("127.0.0.1:80"));
+            var handler = sp.GetRequiredService<P3DConnectionHandler>();
+            var connectionTask = handler.OnConnectedAsync(connection);
 
-                var connection = (DefaultConnectionContext) await connectionFactory.ConnectAsync(IPEndPoint.Parse("127.0.0.1:80"));
-                var handler = serviceProvider.GetRequiredService<P3DConnectionHandler>();
-                var connectionTask = handler.OnConnectedAsync(connection);
+            var protocol = sp.GetRequiredService<P3DProtocol>();
+            var reader = new ProtocolReader(connection.Application!.Input);
+            var writer = new ProtocolWriter(connection.Application!.Output);
 
-                var protocol = serviceProvider.GetRequiredService<P3DProtocol>();
-                var reader = new ProtocolReader(connection.Application!.Input);
-                var writer = new ProtocolWriter(connection.Application!.Output);
+            await writer.WriteAsync(protocol, new ServerDataRequestPacket());
+            var response = await reader.ReadAsync(protocol);
+            reader.Advance();
 
-                await writer.WriteAsync(protocol, new ServerDataRequestPacket());
-                var response = await reader.ReadAsync(protocol);
-                reader.Advance();
+            Assert.NotNull(response);
+            Assert.IsFalse(response.IsCanceled);
+            Assert.IsFalse(response.IsCompleted);
+            Assert.NotNull(response.Message);
+            Assert.IsInstanceOf<ServerInfoDataPacket>(response.Message);
 
-                Assert.NotNull(response);
-                Assert.IsFalse(response.IsCanceled);
-                Assert.IsFalse(response.IsCompleted);
-                Assert.NotNull(response.Message);
-                Assert.IsInstanceOf<ServerInfoDataPacket>(response.Message);
+            var serverInfoDataPacket = (ServerInfoDataPacket) response.Message!;
+            Assert.NotNull(serverInfoDataPacket.PlayerNames.Single(static x => x == IPlayer.Server.Name));
+            Assert.AreEqual(1, serverInfoDataPacket.CurrentPlayers);
+            Assert.AreEqual(0, serverInfoDataPacket.MaxPlayers);
 
-                var serverInfoDataPacket = (ServerInfoDataPacket) response.Message!;
-                Assert.NotNull(serverInfoDataPacket.PlayerNames.Single(x => x == IPlayer.Server.Name));
-                Assert.AreEqual(1, serverInfoDataPacket.CurrentPlayers);
-                Assert.AreEqual(0, serverInfoDataPacket.MaxPlayers);
-
-                await connectionTask.WaitAsync(TimeSpan.FromMilliseconds(1000));
-            });
-        }
+            await connectionTask.WaitAsync(TimeSpan.FromMilliseconds(1000));
+        });
     }
 }

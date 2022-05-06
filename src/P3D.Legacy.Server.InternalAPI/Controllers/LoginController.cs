@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Server.Infrastructure.Models.Users;
-using P3D.Legacy.Server.Infrastructure.Services.Users;
+using P3D.Legacy.Server.Infrastructure.Repositories.Users;
 using P3D.Legacy.Server.InternalAPI.Options;
 using P3D.Legacy.Server.UI.Shared.Models;
 
@@ -22,22 +22,22 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
     public class LoginController : ControllerBase
     {
         private readonly JwtOptions _jwtOptions;
-        private readonly IUserManager _userManager;
+        private readonly IUserRepository _userRepository;
 
-        public LoginController(IOptions<JwtOptions> jwtOptions, IUserManager userManager)
+        public LoginController(IOptions<JwtOptions> jwtOptions, IUserRepository userRepository)
         {
             _jwtOptions = jwtOptions.Value ?? throw new ArgumentNullException(nameof(jwtOptions));
-            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         [HttpPost]
         public async Task<IActionResult> LoginAsync([FromBody] LoginModel login, CancellationToken ct)
         {
-            var user = await _userManager.FindByIdAsync(PlayerId.FromName(login.Username), ct);
+            var user = await _userRepository.FindByIdAsync(PlayerId.FromName(login.Username), ct);
 
             if (user is null) return BadRequest(new LoginResult { Successful = false, Error = "User does not exists." });
 
-            var result = await _userManager.CheckPasswordSignInAsync(user, login.Password, false, true, ct);
+            var result = await _userRepository.CheckPasswordSignInAsync(user, login.Password, false, true, ct);
             if (!result.Succeeded)
             {
                 return BadRequest(new LoginResult { Successful = false, Error = "Username and password are invalid." });

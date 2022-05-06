@@ -22,7 +22,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query
             _logger = logger;
         }
 
-        public Task Process(TQuery query, CancellationToken ct)
+        public Task ProcessAsync(TQuery query, CancellationToken ct)
         {
             var queryName = typeof(TQuery).Name;
 

@@ -24,14 +24,14 @@ namespace P3D.Legacy.Server.Behaviours
             _validators = validators;
         }
 
-        public async Task<CommandResult> Handle(TCommand command, CancellationToken ct, CommandHandlerDelegate next)
+        public async Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct)
         {
             if (_validators.Any())
             {
                 var context = new ValidationContext<TCommand>(command);
 
                 var validationResults = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, ct)));
-                var failures = validationResults.SelectMany(r => r.Errors).Where(f => f is not null).ToImmutableArray();
+                var failures = validationResults.SelectMany(static r => r.Errors).Where(static f => f is not null).ToImmutableArray();
 
                 if (failures.Any())
                     throw new ValidationException(failures);
@@ -50,14 +50,14 @@ namespace P3D.Legacy.Server.Behaviours
             _validators = validators;
         }
 
-        public async Task<TQueryResult> Handle(TQuery query, CancellationToken ct, QueryHandlerDelegate<TQueryResult> next)
+        public async Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct)
         {
             if (_validators.Any())
             {
                 var context = new ValidationContext<TQuery>(query);
 
                 var validationResults = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, ct)));
-                var failures = validationResults.SelectMany(r => r.Errors).Where(f => f is not null).ToImmutableArray();
+                var failures = validationResults.SelectMany(static r => r.Errors).Where(static f => f is not null).ToImmutableArray();
 
                 if (failures.Any())
                     throw new ValidationException(failures);

@@ -23,15 +23,18 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
         {
             private class DuplexPipe : IDuplexPipe
             {
-                public DuplexPipe(PipeReader reader, PipeWriter writer)
+                // This class exists to work around issues with value tuple on .NET Framework
+                public readonly struct DuplexPipePair
                 {
-                    Input = reader;
-                    Output = writer;
+                    public IDuplexPipe Transport { get; }
+                    public IDuplexPipe Application { get; }
+
+                    public DuplexPipePair(IDuplexPipe transport, IDuplexPipe application)
+                    {
+                        Transport = transport;
+                        Application = application;
+                    }
                 }
-
-                public PipeReader Input { get; }
-
-                public PipeWriter Output { get; }
 
                 public static DuplexPipePair CreateConnectionPair(PipeOptions inputOptions, PipeOptions outputOptions)
                 {
@@ -44,17 +47,13 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                     return new DuplexPipePair(applicationToTransport, transportToApplication);
                 }
 
-                // This class exists to work around issues with value tuple on .NET Framework
-                public readonly struct DuplexPipePair
-                {
-                    public IDuplexPipe Transport { get; }
-                    public IDuplexPipe Application { get; }
+                public PipeReader Input { get; }
+                public PipeWriter Output { get; }
 
-                    public DuplexPipePair(IDuplexPipe transport, IDuplexPipe application)
-                    {
-                        Transport = transport;
-                        Application = application;
-                    }
+                private DuplexPipe(PipeReader reader, PipeWriter writer)
+                {
+                    Input = reader;
+                    Output = writer;
                 }
             }
             private class TestConnectionLifetimeNotificationFeature : IConnectionLifetimeNotificationFeature
@@ -71,7 +70,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                 public void RequestClose() => _connectionContext.Abort();
             }
 
-            public ValueTask<ConnectionContext> ConnectAsync(EndPoint endpoint, CancellationToken cancellationToken = default)
+            public ValueTask<ConnectionContext> ConnectAsync(EndPoint endpoint, CancellationToken ct = default)
             {
                 var options = new PipeOptions(useSynchronizationContext: false);
                 var pair = DuplexPipe.CreateConnectionPair(options, options);
@@ -81,9 +80,9 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
             }
         }
 
-        protected static TestService Commnon() => TestService.CreateNew().Configure(services =>
+        protected static TestService Common() => TestService.CreateNew().Configure(static services =>
         {
-            services.AddSingleton<TracerProvider>(_ => TracerProvider.Default);
+            services.AddSingleton<TracerProvider>(static _ => TracerProvider.Default);
 
             services.AddSingleton<IConnectionFactory, TestConnectionFactory>();
 

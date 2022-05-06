@@ -226,7 +226,6 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         public void Dispose()
         {
             _cts.Cancel();
-            _webSocket.Dispose();
             _sequenceTextReader.Dispose();
 
             if (_bot is not null)
@@ -239,7 +238,6 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         {
             _cts.Cancel();
             _cts.Dispose();
-            _webSocket.Dispose();
             _sequenceTextReader.Dispose();
 
             if (_bot is not null)

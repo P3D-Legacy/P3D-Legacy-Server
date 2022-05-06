@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -18,6 +19,7 @@ namespace P3D.Legacy.Server.GUI.Views
             _ => string.Empty
         };
 
+        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
         public SettingsTabView(DynamicConfigurationProviderManager dynamicConfigurationProvider)
         {
             Width = Dim.Fill();
@@ -38,7 +40,7 @@ namespace P3D.Legacy.Server.GUI.Views
                     Width = Dim.Fill(),
                     Height = 3 + propertyCount
                 };
-                var maxLength = manager.AvailableProperties.Max(x => x.Name.Length);
+                var maxLength = manager.AvailableProperties.Max(static x => x.Name.Length);
                 var i = 0;
                 var propertyViews = new Dictionary<PropertyInfo, TextField>();
                 foreach (var property in manager.AvailableProperties)
@@ -77,7 +79,7 @@ namespace P3D.Legacy.Server.GUI.Views
                     }
                     MessageBox.Query(faultyProps.Count == 0 ? "Success!" : "Warning!", faultyProps.Count == 0
                         ? "Saved successfully!"
-                        : $"Some properties were not saved and were reverted to their default values - {string.Join(", ", faultyProps.Select(x => x.Name))}", "Ok");
+                        : $"Some properties were not saved and were reverted to their default values - {string.Join(", ", faultyProps.Select(static x => x.Name))}", "Ok");
                 };
                 view.Add(button);
                 views.Add(view);

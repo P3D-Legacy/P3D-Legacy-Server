@@ -27,7 +27,7 @@ namespace P3D.Legacy.Server.Extensions
             services.AddBetterHostedServices();
 
             services.AddHttpClient("P3D.API")
-                .ConfigureHttpClient((sp, client) =>
+                .ConfigureHttpClient(static (sp, client) =>
                 {
                     var backendOptionsSnapshot = sp.GetRequiredService<IOptions<P3DSiteOptions>>();
                     var backendOptions = backendOptionsSnapshot.Value;

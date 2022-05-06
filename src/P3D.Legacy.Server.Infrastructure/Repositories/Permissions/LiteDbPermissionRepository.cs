@@ -36,7 +36,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
             var collection = db.GetCollection<Permission>("permissions");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var idStr = PlayerId.FromName(name).ToString();
             ct.ThrowIfCancellationRequested();
@@ -53,7 +53,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
             var collection = db.GetCollection<Permission>("permissions");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var idStr = PlayerId.FromGameJolt(gameJoltId).ToString();
             ct.ThrowIfCancellationRequested();
@@ -70,7 +70,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
             var collection = db.GetCollection<Permission>("permissions");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();

@@ -20,7 +20,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Monsters
             public byte Friendship => default!;
             public bool IsShiny => default!;
             public int EggSteps => default!;
-            public IItemInstance? HeldItem => default!;
+            public IItemInstance? HeldItem => default;
             public IDictionary<string, string> Metadata => default!;
         }
 

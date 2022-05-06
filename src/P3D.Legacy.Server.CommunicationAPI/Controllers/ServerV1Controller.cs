@@ -32,6 +32,6 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         [ProducesResponseType(typeof(StatusResponseV1), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> GetStatusAsync([FromServices] IQueryDispatcher queryDispatcher, CancellationToken ct) =>
-            Ok(new StatusResponseV1((await queryDispatcher.DispatchAsync(new GetPlayerViewModelsQuery(), ct)).Select(x => new StatusResponseV1Player(x.Name, x.GameJoltId.ToString()))));
+            Ok(new StatusResponseV1((await queryDispatcher.DispatchAsync(new GetPlayerViewModelsQuery(), ct)).Select(static x => new StatusResponseV1Player(x.Name, x.GameJoltId.ToString()))));
     }
 }

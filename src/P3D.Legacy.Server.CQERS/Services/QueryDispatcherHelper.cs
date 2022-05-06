@@ -37,7 +37,7 @@ namespace P3D.Legacy.Server.CQERS.Services
             Task<TQueryResult> GetHandler() => _handler.HandleAsync(query, ct);
             return _behaviors
                 .Reverse()
-                .Aggregate((QueryHandlerDelegate<TQueryResult>) GetHandler, (next, pipeline) => () => pipeline.Handle(query, ct, next))();
+                .Aggregate((QueryHandlerDelegate<TQueryResult>) GetHandler, (next, pipeline) => () => pipeline.HandleAsync(query, next, ct))();
         }
     }
 }

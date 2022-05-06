@@ -16,10 +16,10 @@ namespace P3D.Legacy.Server.Application.Extensions
             return builder.ConfigureServices((ctx, services) =>
             {
                 services.AddHostedService<ServerHostedService>();
-                services.AddOptions<ServerHostedServiceOptions>().Configure<IServiceProvider>((options, sp) =>
+                services.AddOptions<ServerHostedServiceOptions>().Configure<IServiceProvider>((opt, sp) =>
                 {
-                    options.ServerBuilder = new ServerBuilder(sp);
-                    configure(new ServerBuilderContext(ctx.HostingEnvironment, ctx.Configuration), options.ServerBuilder);
+                    opt.ServerBuilder = new ServerBuilder(sp);
+                    configure(new ServerBuilderContext(ctx.HostingEnvironment, ctx.Configuration), opt.ServerBuilder);
                 });
             });
         }

@@ -7,9 +7,9 @@ using System;
 
 namespace P3D.Legacy.Server.GUI.Services
 {
-    public class UILogger : ILogger
+    public sealed class UILogger : ILogger
     {
-        private class NopDisposable : IDisposable
+        private sealed class NopDisposable : IDisposable
         {
             public void Dispose() { }
         }

@@ -24,7 +24,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query
             _logger = logger;
         }
 
-        public async Task<TQueryResult> Handle(TQuery query, CancellationToken ct, QueryHandlerDelegate<TQueryResult> next)
+        public async Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct)
         {
             try
             {

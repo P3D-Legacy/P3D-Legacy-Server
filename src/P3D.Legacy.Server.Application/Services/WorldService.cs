@@ -32,7 +32,7 @@ namespace P3D.Legacy.Server.Application.Services
 
             var now = DateTime.UtcNow;
             var currentHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, now.Kind);
-            _checkTimeLimiter = TimeLimiter.GetPersistentTimeLimiter(1, TimeSpan.FromHours(1), _ => { }, new[] { currentHour });
+            _checkTimeLimiter = TimeLimiter.GetPersistentTimeLimiter(1, TimeSpan.FromHours(1), static _ => { }, new[] { currentHour });
         }
 
         protected override async Task ExecuteAsync(CancellationToken ct)

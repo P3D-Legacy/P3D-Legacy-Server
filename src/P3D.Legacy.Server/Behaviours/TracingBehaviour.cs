@@ -21,13 +21,12 @@ namespace P3D.Legacy.Server.Behaviours
             _tracer = tracerProvider.GetTracer("P3D.Legacy.Server.Host");
         }
 
-        public async Task<CommandResult> Handle(TCommand command, CancellationToken ct, CommandHandlerDelegate next)
+        public async Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct)
         {
             var span = _tracer.StartActiveSpan($"{typeof(TCommand).Name} Handle");
             try
             {
                 return await next();
-
             }
             catch
             {
@@ -51,13 +50,12 @@ namespace P3D.Legacy.Server.Behaviours
             _tracer = tracerProvider.GetTracer("P3D.Legacy.Server.Host");
         }
 
-        public async Task<TQueryResult> Handle(TQuery query, CancellationToken ct, QueryHandlerDelegate<TQueryResult> next)
+        public async Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct)
         {
             var span = _tracer.StartActiveSpan($"{typeof(TQuery).Name} Handle");
             try
             {
                 return await next();
-
             }
             catch
             {

@@ -22,7 +22,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command
             _logger = logger;
         }
 
-        public Task Process(TCommand command, CancellationToken ct)
+        public Task ProcessAsync(TCommand command, CancellationToken ct)
         {
             var commandName = typeof(TCommand).Name;
 

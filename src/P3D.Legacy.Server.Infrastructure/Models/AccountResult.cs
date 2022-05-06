@@ -9,10 +9,7 @@ namespace P3D.Legacy.Server.Infrastructure.Models
         public static AccountResult Failed(params GenericError[] errors)
         {
             var result = new AccountResult { Succeeded = false };
-            if (errors is not null)
-            {
-                result._errors.AddRange(errors);
-            }
+            result._errors.AddRange(errors);
             return result;
         }
 
@@ -23,6 +20,6 @@ namespace P3D.Legacy.Server.Infrastructure.Models
 
         public override string ToString() => Succeeded
             ? "Succeeded"
-            : $"Failed : {string.Join(",", Errors.Select(x => x.Code).ToList())}";
+            : $"Failed : {string.Join(",", Errors.Select(static x => x.Code).ToList())}";
     }
 }

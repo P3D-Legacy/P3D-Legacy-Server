@@ -24,7 +24,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command
             _logger = logger;
         }
 
-        public async Task<CommandResult> Handle(TCommand request, CancellationToken ct, CommandHandlerDelegate next)
+        public async Task<CommandResult> HandleAsync(TCommand request, CommandHandlerDelegate next, CancellationToken ct)
         {
             try
             {

@@ -7,6 +7,6 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query
 {
     public interface IQueryBehavior<in TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
     {
-        Task<TQueryResult> Handle(TQuery query, CancellationToken ct, QueryHandlerDelegate<TQueryResult> next);
+        Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct);
     }
 }

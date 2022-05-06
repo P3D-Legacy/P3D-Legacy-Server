@@ -6,8 +6,8 @@ namespace P3D.Legacy.Server.Infrastructure.Options
     {
         public PasswordOptionsValidator()
         {
-            RuleFor(x => x.RequiredLength).NotEmpty();
-            RuleFor(x => x.RequiredUniqueChars).NotEmpty();
+            RuleFor(static x => x.RequiredLength).NotEmpty();
+            RuleFor(static x => x.RequiredUniqueChars).NotEmpty();
         }
     }
 

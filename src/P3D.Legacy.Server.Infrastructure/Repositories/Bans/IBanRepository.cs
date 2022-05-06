@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Infrastructure.Services.Bans
+namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 {
-    public interface IBanManager
+    public interface IBanRepository
     {
         Task<BanEntity?> GetAsync(PlayerId id, CancellationToken ct);
         IAsyncEnumerable<BanEntity> GetAllAsync(CancellationToken ct);

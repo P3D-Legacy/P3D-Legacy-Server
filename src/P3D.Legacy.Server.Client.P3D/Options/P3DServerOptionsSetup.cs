@@ -18,7 +18,7 @@ namespace P3D.Legacy.Server.Client.P3D.Options
 
         public void PostConfigure(string name, KestrelServerOptions options)
         {
-            options.Listen(new IPEndPoint(IPAddress.Parse(_options.IP), _options.Port), builder =>
+            options.Listen(new IPEndPoint(IPAddress.Parse(_options.IP), _options.Port), static builder =>
             {
                 builder.UseConnectionLogging().UseConnectionHandler<P3DConnectionHandler>();
             });

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 using Terminal.Gui;
 
@@ -10,6 +11,7 @@ namespace P3D.Legacy.Server.GUI.Views
     {
         private readonly TextView _logsTextView;
 
+        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
         public LogsTabView()
         {
             Width = Dim.Fill();

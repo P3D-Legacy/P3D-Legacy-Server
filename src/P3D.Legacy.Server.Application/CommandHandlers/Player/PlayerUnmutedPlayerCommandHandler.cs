@@ -2,7 +2,7 @@
 
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.CQERS.Commands;
-using P3D.Legacy.Server.Infrastructure.Services.Mutes;
+using P3D.Legacy.Server.Infrastructure.Repositories.Mutes;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -15,9 +15,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     internal sealed class PlayerUnmutedPlayerCommandHandler : ICommandHandler<PlayerUnmutedPlayerCommand>
     {
         private readonly ILogger _logger;
-        private readonly IMuteManager _muteRepository;
+        private readonly IMuteRepository _muteRepository;
 
-        public PlayerUnmutedPlayerCommandHandler(ILogger<PlayerUnmutedPlayerCommandHandler> logger, IMuteManager muteRepository)
+        public PlayerUnmutedPlayerCommandHandler(ILogger<PlayerUnmutedPlayerCommandHandler> logger, IMuteRepository muteRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _muteRepository = muteRepository ?? throw new ArgumentNullException(nameof(muteRepository));

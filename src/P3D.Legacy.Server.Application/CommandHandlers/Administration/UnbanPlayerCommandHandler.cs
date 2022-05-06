@@ -2,7 +2,7 @@
 
 using P3D.Legacy.Server.Application.Commands.Administration;
 using P3D.Legacy.Server.CQERS.Commands;
-using P3D.Legacy.Server.Infrastructure.Services.Bans;
+using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -15,17 +15,17 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
     internal sealed class UnbanPlayerCommandHandler : ICommandHandler<UnbanPlayerCommand>
     {
         private readonly ILogger _logger;
-        private readonly IBanManager _banManager;
+        private readonly IBanRepository _banRepository;
 
-        public UnbanPlayerCommandHandler(ILogger<UnbanPlayerCommandHandler> logger, IBanManager banManager)
+        public UnbanPlayerCommandHandler(ILogger<UnbanPlayerCommandHandler> logger, IBanRepository banRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _banManager = banManager ?? throw new ArgumentNullException(nameof(banManager));
+            _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
         }
 
         public async Task<CommandResult> HandleAsync(UnbanPlayerCommand command, CancellationToken ct)
         {
-            var result = await _banManager.UnbanAsync(command.Id, ct);
+            var result = await _banRepository.UnbanAsync(command.Id, ct);
 
             return new CommandResult(result);
         }

@@ -6,10 +6,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Infrastructure.Services.Users
+namespace P3D.Legacy.Server.Infrastructure.Repositories.Users
 {
-
-    public interface IUserManager
+    public interface IUserRepository
     {
         Task<UserEntity?> FindByIdAsync(PlayerId playerId, CancellationToken ct);
         Task<AccountResult> CreateAsync(UserEntity user, string password, bool isSha512 = true, CancellationToken ct = default);

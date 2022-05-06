@@ -25,7 +25,7 @@ namespace P3D.Legacy.Server.CQERS.Services
             Task<CommandResult> GetHandler() => _handler.HandleAsync(command, ct);
             return _behaviors
                 .Reverse()
-                .Aggregate((CommandHandlerDelegate) GetHandler, (next, pipeline) => () => pipeline.Handle(command, ct, next))();
+                .Aggregate((CommandHandlerDelegate) GetHandler, (next, pipeline) => () => pipeline.HandleAsync(command, next, ct))();
         }
     }
 }

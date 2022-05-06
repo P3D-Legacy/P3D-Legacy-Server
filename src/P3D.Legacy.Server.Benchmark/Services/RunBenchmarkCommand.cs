@@ -14,10 +14,10 @@ namespace P3D.Legacy.Server.Benchmark.Services
     {
         public RunBenchmarkCommand() : base("Generates ThirdPartyNotices")
         {
-            AddOption(new Option<string>("--benchmark-type", () => "status", "Benchmark Type (status, client)"));
-            AddOption(new Option<string>("--host", () => "localhost", "Server Host"));
-            AddOption(new Option<ushort>("--port", () => 15124, "Server Port"));
-            AddOption(new Option<int>("--batch", () => 100, "Batch count"));
+            AddOption(new Option<string>("--benchmark-type", static () => "status", "Benchmark Type (status, client)"));
+            AddOption(new Option<string>("--host", static () => "localhost", "Server Host"));
+            AddOption(new Option<ushort>("--port", static () => 15124, "Server Port"));
+            AddOption(new Option<int>("--batch", static () => 100, "Batch count"));
         }
 
         internal new sealed class Handler : ICommandHandler

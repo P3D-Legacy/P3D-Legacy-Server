@@ -8,8 +8,8 @@ namespace P3D.Legacy.Server.Client.P3D.Options
     {
         public P3DServerOptionsValidator()
         {
-            RuleFor(x => x.IP).NotEmpty().IsIPAddress();
-            RuleFor(x => x.Port).NotEmpty();
+            RuleFor(static x => x.IP).NotEmpty().IsIPAddress();
+            RuleFor(static x => x.Port).NotEmpty();
         }
     }
 

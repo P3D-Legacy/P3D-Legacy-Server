@@ -1,5 +1,6 @@
 ﻿using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
+using P3D.Legacy.Server.Abstractions.Extensions;
 using P3D.Legacy.Server.Application.Extensions;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Application.Services;
@@ -37,17 +38,16 @@ namespace P3D.Legacy.Server.Application.QueryHandlers.Player
         {
             var (skip, take) = query;
 
-            var baseQuery = _playerContainer.GetAllAsync(ct).AreInitializedAsync();
             return (
-                await baseQuery.CountAsync(ct),
-                await baseQuery.Skip(skip).Take(take).Select(x => new PlayerViewModel(x.Origin, x.Name, x.GameJoltId)).ToImmutableArrayAsync(ct)
+                await _playerContainer.GetAllAsync(ct).AreInitializedAsync().CountAsync(ct),
+                await _playerContainer.GetAllAsync(ct).AreInitializedAsync().Skip(skip).Take(take).Select(static x => new PlayerViewModel(x.Origin, x.Name, x.GameJoltId)).ToImmutableArrayAsync(ct)
             );
         }
 
 
         public async Task<ImmutableArray<PlayerViewModel>> HandleAsync(GetPlayerViewModelsQuery query, CancellationToken ct)
         {
-            return await _playerContainer.GetAllAsync(ct).AreInitializedAsync().Select(x => new PlayerViewModel(x.Origin, x.Name, x.GameJoltId)).ToImmutableArrayAsync(ct);
+            return await _playerContainer.GetAllAsync(ct).AreInitializedAsync().Select(static x => new PlayerViewModel(x.Origin, x.Name, x.GameJoltId)).ToImmutableArrayAsync(ct);
         }
 
         public async Task<PlayerViewModel?> HandleAsync(GetPlayerViewModelQuery query, CancellationToken ct)

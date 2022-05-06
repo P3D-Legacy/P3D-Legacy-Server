@@ -24,7 +24,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await using var connectionScope = _serviceScopeFactory.CreateAsyncScope();
 
             var connectionContextHandlerFactory = connectionScope.ServiceProvider.GetRequiredService<ConnectionContextHandlerFactory>();
-            var connectionContextHandler = await connectionContextHandlerFactory.CreateAsync<P3DConnectionContextHandler>(connection);
+            using var connectionContextHandler = await connectionContextHandlerFactory.CreateAsync<P3DConnectionContextHandler>(connection);
 
             try
             {

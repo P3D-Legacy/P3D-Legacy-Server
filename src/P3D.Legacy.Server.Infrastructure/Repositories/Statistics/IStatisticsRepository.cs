@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Infrastructure.Services.Statistics
+namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
 {
-    public interface IStatisticsManager
+    public interface IStatisticsRepository
     {
         Task<StatisticsEntity?> GetAsync(string action, CancellationToken ct);
         Task<StatisticsEntity?> GetAsync(PlayerId id, string action, CancellationToken ct);

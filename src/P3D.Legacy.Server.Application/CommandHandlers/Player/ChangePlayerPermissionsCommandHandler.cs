@@ -2,7 +2,7 @@
 
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.CQERS.Commands;
-using P3D.Legacy.Server.Infrastructure.Services.Permissions;
+using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -15,9 +15,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     internal sealed class ChangePlayerPermissionsCommandHandler : ICommandHandler<ChangePlayerPermissionsCommand>
     {
         private readonly ILogger _logger;
-        private readonly IPermissionManager _permissionManager;
+        private readonly IPermissionRepository _permissionManager;
 
-        public ChangePlayerPermissionsCommandHandler(ILogger<ChangePlayerPermissionsCommandHandler> logger, IPermissionManager permissionManager)
+        public ChangePlayerPermissionsCommandHandler(ILogger<ChangePlayerPermissionsCommandHandler> logger, IPermissionRepository permissionManager)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _permissionManager = permissionManager ?? throw new ArgumentNullException(nameof(permissionManager));

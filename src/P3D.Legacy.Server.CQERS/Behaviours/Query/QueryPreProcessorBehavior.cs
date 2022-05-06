@@ -16,11 +16,11 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query
             _preProcessors = preProcessors;
         }
 
-        public async Task<TQueryResult> Handle(TQuery request, CancellationToken ct, QueryHandlerDelegate<TQueryResult> next)
+        public async Task<TQueryResult> HandleAsync(TQuery request, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct)
         {
             foreach (var processor in _preProcessors)
             {
-                await processor.Process(request, ct);
+                await processor.ProcessAsync(request, ct);
             }
 
             return await next();

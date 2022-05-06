@@ -18,7 +18,7 @@ namespace P3D.Legacy.Server.Benchmark
 {
     public static class Program
     {
-        public static Task Main(string[] args) => new CommandLineBuilder(new RunBenchmarkCommand()).UseHost(_ => new HostBuilder(), ConfigureHost).UseDefaults().Build().InvokeAsync(args);
+        public static Task Main(string[] args) => new CommandLineBuilder(new RunBenchmarkCommand()).UseHost(static _ => new HostBuilder(), ConfigureHost).UseDefaults().Build().InvokeAsync(args);
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
@@ -28,9 +28,9 @@ namespace P3D.Legacy.Server.Benchmark
         }
 
         private static void ConfigureHost(IHostBuilder hostBuilder) => hostBuilder
-            .ConfigureServices((ctx, services) =>
+            .ConfigureServices(static (ctx, services) =>
             {
-                services.Configure<ConsoleLifetimeOptions>(opts => opts.SuppressStatusMessages = true);
+                services.Configure<ConsoleLifetimeOptions>(static opt => opt.SuppressStatusMessages = true);
 
                 services.AddTransient<BenchmarkService>();
                 services.AddTransient<BenchmarkStatusService>();
@@ -40,16 +40,16 @@ namespace P3D.Legacy.Server.Benchmark
 
                 services.AddSingleton<P3DClientConnectionService>();
 
-                services.AddOptions<CLIOptions>().Configure<BindingContext>((opts, bindingContext) => new ModelBinder<CLIOptions>().UpdateInstance(opts, bindingContext));
+                services.AddOptions<CLIOptions>().Configure<BindingContext>(static (opt, bindingContext) => new ModelBinder<CLIOptions>().UpdateInstance(opt, bindingContext));
 
-            }).ConfigureLogging((ctx, builder) =>
+            }).ConfigureLogging(static (ctx, builder) =>
             {
                 builder.ClearProviders();
-                builder.AddSimpleConsole(options =>
+                builder.AddSimpleConsole(static opt =>
                 {
-                    options.IncludeScopes = true;
-                    options.SingleLine = true;
-                    options.TimestampFormat = "HH:mm:ss:fff ";
+                    opt.IncludeScopes = true;
+                    opt.SingleLine = true;
+                    opt.TimestampFormat = "HH:mm:ss:fff ";
                 });
                 builder.AddFilter("System.Net.Http.HttpClient", LogLevel.Warning);
             }).UseCommandHandler<RunBenchmarkCommand, RunBenchmarkCommand.Handler>();

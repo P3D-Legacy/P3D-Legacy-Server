@@ -22,10 +22,10 @@ namespace P3D.Legacy.Server.Application.Extensions
             services.AddSingleton<TradeManager>();
 
 
-            services.AddCommandHandler<TradeManager>(sp => sp.GetRequiredService<TradeManager>());
-            services.AddCommandHandler<TradeManager>(sp => sp.GetRequiredService<TradeManager>());
-            services.AddCommandHandler<TradeManager>(sp => sp.GetRequiredService<TradeManager>());
-            services.AddCommandHandler<TradeManager>(sp => sp.GetRequiredService<TradeManager>());
+            services.AddCommandHandler<TradeManager>(static sp => sp.GetRequiredService<TradeManager>());
+            services.AddCommandHandler<TradeManager>(static sp => sp.GetRequiredService<TradeManager>());
+            services.AddCommandHandler<TradeManager>(static sp => sp.GetRequiredService<TradeManager>());
+            services.AddCommandHandler<TradeManager>(static sp => sp.GetRequiredService<TradeManager>());
 
             services.AddCommandHandler<ChangePlayerPermissionsCommandHandler>();
             services.AddCommandHandler<PlayerAuthenticateDefaultCommandHandler>();
@@ -58,11 +58,11 @@ namespace P3D.Legacy.Server.Application.Extensions
             services.AddSingleton<IPlayerOriginGenerator, DefaultPlayerOriginGenerator>();
 
             services.AddSingleton<DefaultPlayerContainer>();
-            services.AddTransient<IPlayerContainerWriter>(sp => sp.GetRequiredService<DefaultPlayerContainer>());
-            services.AddTransient<IPlayerContainerReader>(sp => sp.GetRequiredService<DefaultPlayerContainer>());
+            services.AddTransient<IPlayerContainerWriter>(static sp => sp.GetRequiredService<DefaultPlayerContainer>());
+            services.AddTransient<IPlayerContainerReader>(static sp => sp.GetRequiredService<DefaultPlayerContainer>());
 
             services.AddSingleton<WorldService>();
-            services.AddHostedService<WorldService>(sp => sp.GetRequiredService<WorldService>());
+            services.AddHostedService<WorldService>(static sp => sp.GetRequiredService<WorldService>());
 
             return services;
         }

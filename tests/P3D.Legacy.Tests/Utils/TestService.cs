@@ -1,20 +1,16 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.Threading;
 
 using Polly;
 
 using System;
 using System.Threading.Tasks;
 
-using IAsyncDisposable = System.IAsyncDisposable;
-
 namespace P3D.Legacy.Tests.Utils
 {
-    internal sealed class TestService : IDisposable, IAsyncDisposable
+    internal sealed class TestService
     {
-        private Action<IServiceCollection> _configureDescriptors = _ => { };
-        private IServiceProvider _serviceProvider = default!;
+        private Action<IServiceCollection> _configureDescriptors = static _ => { };
         private Policy _policy = Policy.NoOp();
 
         public static TestService CreateNew() => new();
@@ -23,7 +19,7 @@ namespace P3D.Legacy.Tests.Utils
 
         private void InternalConfigure(IServiceCollection serviceDescriptors)
         {
-            serviceDescriptors.AddLogging(builder => builder.AddNUnit());
+            serviceDescriptors.AddLogging(static builder => builder.AddNUnit());
         }
 
         public TestService Configure(Action<IServiceCollection> services)
@@ -44,7 +40,7 @@ namespace P3D.Legacy.Tests.Utils
             return this;
         }
 
-        private IServiceProvider CreateAndBuildServiceProvider()
+        private ServiceProvider CreateAndBuildServiceProvider()
         {
             var serviceDescriptors = new ServiceCollection();
             _configureDescriptors.Invoke(serviceDescriptors);
@@ -54,53 +50,18 @@ namespace P3D.Legacy.Tests.Utils
             return serviceDescriptors.BuildServiceProvider();
         }
 
-        public void DoTest(Action<IServiceProvider> test)
+        public void DoTest(Action<IServiceProvider> test) => _policy.Execute(() =>
         {
-            _serviceProvider = CreateAndBuildServiceProvider();
+            using var serviceProvider = CreateAndBuildServiceProvider();
+            using var scope = serviceProvider.CreateScope();
+            test.Invoke(scope.ServiceProvider);
+        });
 
-            _policy.Execute(() =>
-            {
-                using var scope = _serviceProvider.CreateScope();
-                test.Invoke(scope.ServiceProvider);
-            });
-        }
-
-        public async Task DoTestAsync(Func<IServiceProvider, Task> test)
+        public Task DoTestAsync(Func<IServiceProvider, Task> test) => _policy.Execute(async () =>
         {
-            _serviceProvider = CreateAndBuildServiceProvider();
-
-            await _policy.Execute(async () =>
-            {
-                using var scope = _serviceProvider.CreateScope();
-                await test.Invoke(scope.ServiceProvider);
-            });
-        }
-
-        public void Dispose()
-        {
-            using var jctx = new JoinableTaskContext();
-            switch (_serviceProvider)
-            {
-                case IAsyncDisposable asyncDisposable:
-                    new JoinableTaskFactory(jctx).Run(() => asyncDisposable.DisposeAsync().AsTask());
-                    break;
-                case IDisposable disposable:
-                    disposable.Dispose();
-                    break;
-            }
-        }
-
-        public async ValueTask DisposeAsync()
-        {
-            switch (_serviceProvider)
-            {
-                case IAsyncDisposable asyncDisposable:
-                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
-                    break;
-                case IDisposable disposable:
-                    disposable.Dispose();
-                    break;
-            }
-        }
+            await using var serviceProvider = CreateAndBuildServiceProvider();
+            using var scope = serviceProvider.CreateScope();
+            await test.Invoke(scope.ServiceProvider);
+        });
     }
 }

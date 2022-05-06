@@ -49,7 +49,7 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
 
             // Rate limiting subnet
             var subnet = IPNetwork.Parse(ipEndPoint.Address, Netmask);
-            await _subnetLimiter.AddOrUpdate(subnet, _ => TimeLimiter.GetFromMaxCountByInterval(1, TimeSpan.FromMilliseconds(2000)), (_, x) => x);
+            await _subnetLimiter.AddOrUpdate(subnet, static _ => TimeLimiter.GetFromMaxCountByInterval(1, TimeSpan.FromMilliseconds(2000)), static (_, x) => x);
 
             // Rate limiting general
             await _connectionLimiter;
@@ -67,12 +67,12 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
             return builder;
         }
 
-        public static IHostBuilder AddP3DServer(this IHostBuilder hostBuilder) => hostBuilder.ConfigureServer((ctx, server) =>
+        public static IHostBuilder AddP3DServer(this IHostBuilder hostBuilder) => hostBuilder.ConfigureServer(static (ctx, server) =>
         {
             var p3dServerOptions = server.ApplicationServices.GetRequiredService<IOptions<P3DServerOptions>>().Value;
             server.UseSockets(sockets =>
             {
-                sockets.Listen(new IPEndPoint(IPAddress.Parse(p3dServerOptions.IP), p3dServerOptions.Port), builder =>
+                sockets.Listen(new IPEndPoint(IPAddress.Parse(p3dServerOptions.IP), p3dServerOptions.Port), static builder =>
                 {
                     builder
                         .UseConnectionThrottle()

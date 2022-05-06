@@ -3,7 +3,7 @@
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.Infrastructure.Services.Statistics;
+using P3D.Legacy.Server.Infrastructure.Repositories.Statistics;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -25,12 +25,12 @@ namespace P3D.Legacy.Server.Statistics.EventHandlers
         IEventHandler<WorldUpdatedEvent>
     {
         private readonly ILogger _logger;
-        private readonly IStatisticsManager _statisticsManager;
+        private readonly IStatisticsRepository _statisticsRepository;
 
-        public StatisticsHandler(ILogger<StatisticsHandler> logger, IStatisticsManager statisticsManager)
+        public StatisticsHandler(ILogger<StatisticsHandler> logger, IStatisticsRepository statisticsRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _statisticsManager = statisticsManager ?? throw new ArgumentNullException(nameof(statisticsManager));
+            _statisticsRepository = statisticsRepository ?? throw new ArgumentNullException(nameof(statisticsRepository));
         }
 
         public async Task HandleAsync(PlayerUpdatedStateEvent notification, CancellationToken ct)
@@ -38,58 +38,58 @@ namespace P3D.Legacy.Server.Statistics.EventHandlers
             var player = notification.Player;
             if (player is IP3DPlayerState)
             {
-                await _statisticsManager.IncrementActionAsync(player.Id, "player_update_state", ct);
+                await _statisticsRepository.IncrementActionAsync(player.Id, "player_update_state", ct);
             }
         }
 
         public async Task HandleAsync(PlayerTriggeredEventEvent notification, CancellationToken ct)
         {
-            await _statisticsManager.IncrementActionAsync(notification.Player.Id, $"event_{notification.Event.EventType}", ct);
+            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, $"event_{notification.Event.EventType}", ct);
         }
 
         public async Task HandleAsync(PlayerSentGlobalMessageEvent notification, CancellationToken ct)
         {
-            await _statisticsManager.IncrementActionAsync(notification.Player.Id, "message_global", ct);
+            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, "message_global", ct);
         }
 
         public async Task HandleAsync(PlayerSentLocalMessageEvent notification, CancellationToken ct)
         {
-            await _statisticsManager.IncrementActionAsync(notification.Player.Id, "message_local", ct);
+            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, "message_local", ct);
         }
 
         public async Task HandleAsync(PlayerSentPrivateMessageEvent notification, CancellationToken ct)
         {
-            await _statisticsManager.IncrementActionAsync(notification.Player.Id, "message_private", ct);
+            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, "message_private", ct);
         }
 
         public async Task HandleAsync(PlayerSentCommandEvent notification, CancellationToken ct)
         {
-            await _statisticsManager.IncrementActionAsync(notification.Player.Id, "message_command", ct);
+            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, "message_command", ct);
         }
 
         public async Task HandleAsync(PlayerJoinedEvent notification, CancellationToken ct)
         {
-            await _statisticsManager.IncrementActionAsync(notification.Player.Id, "player_joined", ct);
+            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, "player_joined", ct);
         }
 
         public async Task HandleAsync(PlayerLeftEvent notification, CancellationToken ct)
         {
-            await _statisticsManager.IncrementActionAsync(notification.Id, "player_left", ct);
+            await _statisticsRepository.IncrementActionAsync(notification.Id, "player_left", ct);
         }
 
         public async Task HandleAsync(WorldUpdatedEvent notification, CancellationToken ct)
         {
             if (notification.State.Season != notification.OldState.Season)
             {
-                await _statisticsManager.IncrementActionAsync("world_update_season", ct);
+                await _statisticsRepository.IncrementActionAsync("world_update_season", ct);
             }
             if (notification.State.Weather != notification.OldState.Weather)
             {
-                await _statisticsManager.IncrementActionAsync("world_update_weather", ct);
+                await _statisticsRepository.IncrementActionAsync("world_update_weather", ct);
             }
             if (notification.State.Time != notification.OldState.Time)
             {
-                await _statisticsManager.IncrementActionAsync("world_update_time", ct);
+                await _statisticsRepository.IncrementActionAsync("world_update_time", ct);
             }
         }
     }

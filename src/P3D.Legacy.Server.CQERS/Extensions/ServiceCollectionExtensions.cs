@@ -46,7 +46,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             where TEventHandler : IEventHandler
         {
             var @typeof = typeof(TEventHandler);
-            var @typeofEventInterfaces = @typeof.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEventHandler<>));
+            var @typeofEventInterfaces = @typeof.GetInterfaces().Where(static x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEventHandler<>));
             foreach (var eventHandlerInterface in @typeofEventInterfaces)
             {
                 var eventType = eventHandlerInterface.GenericTypeArguments[0];
@@ -61,11 +61,11 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             where TEventHandler : IEventHandler
         {
             var @typeof = typeof(TEventHandler);
-            var @typeofEventInterfaces = @typeof.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEventHandler<>));
+            var @typeofEventInterfaces = @typeof.GetInterfaces().Where(static x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEventHandler<>));
             foreach (var eventHandlerInterface in @typeofEventInterfaces)
             {
                 var genericType = eventHandlerInterface.GenericTypeArguments[0];
-                var openMethod = typeof(ServiceCollectionExtensions).GetMethod("AddEvent", BindingFlags.Static | BindingFlags.NonPublic);
+                var openMethod = typeof(ServiceCollectionExtensions).GetMethod(nameof(AddEvent), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
                 var method = openMethod?.MakeGenericMethod(@typeof, genericType);
                 method?.Invoke(null, new object?[] { services, factory });
             }
@@ -76,11 +76,11 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             where TEventHandler : IEventHandler
         {
             var @typeof = typeof(TEventHandler);
-            var @typeofEventInterfaces = @typeof.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEventHandler<>));
+            var @typeofEventInterfaces = @typeof.GetInterfaces().Where(static x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEventHandler<>));
             foreach (var eventHandlerInterface in @typeofEventInterfaces)
             {
                 var genericType = eventHandlerInterface.GenericTypeArguments[0];
-                var openMethod = typeof(ServiceCollectionExtensions).GetMethod("AddEvents", BindingFlags.Static | BindingFlags.NonPublic);
+                var openMethod = typeof(ServiceCollectionExtensions).GetMethod(nameof(AddEvents), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
                 var method = openMethod?.MakeGenericMethod(@typeof, genericType);
                 method?.Invoke(null, new object?[] { services, factory });
             }
@@ -108,7 +108,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             where TCommandHandler : class, ICommandHandler
         {
             var @typeof = typeof(TCommandHandler);
-            var @typeofCommandHandlerInterface = @typeof.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ICommandHandler<>));
+            var @typeofCommandHandlerInterface = @typeof.GetInterfaces().Where(static x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ICommandHandler<>));
             foreach (var commandHandlerInterface in @typeofCommandHandlerInterface)
             {
                 var commandType = commandHandlerInterface.GenericTypeArguments[0];
@@ -123,7 +123,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             where TCommandHandler : class, ICommandHandler
         {
             var @typeof = typeof(TCommandHandler);
-            var @typeofCommandHandlerInterface = @typeof.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ICommandHandler<>));
+            var @typeofCommandHandlerInterface = @typeof.GetInterfaces().Where(static x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ICommandHandler<>));
             foreach (var commandHandlerInterface in @typeofCommandHandlerInterface)
             {
                 var commandType = commandHandlerInterface.GenericTypeArguments[0];
@@ -139,7 +139,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             where TQueryHandler : class, IQueryHandler
         {
             var @typeof = typeof(TQueryHandler);
-            var @typeofQueryHandlerInterface = @typeof.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IQueryHandler<,>));
+            var @typeofQueryHandlerInterface = @typeof.GetInterfaces().Where(static x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IQueryHandler<,>));
             foreach (var queryHandlerInterface in @typeofQueryHandlerInterface)
             {
                 var queryType = queryHandlerInterface.GenericTypeArguments[0];
@@ -155,7 +155,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             where TQueryHandler : class, IQueryHandler
         {
             var @typeof = typeof(TQueryHandler);
-            var @typeofQueryHandlerInterface = @typeof.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IQueryHandler<,>));
+            var @typeofQueryHandlerInterface = @typeof.GetInterfaces().Where(static x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IQueryHandler<,>));
             foreach (var queryHandlerInterface in @typeofQueryHandlerInterface)
             {
                 var queryType = queryHandlerInterface.GenericTypeArguments[0];

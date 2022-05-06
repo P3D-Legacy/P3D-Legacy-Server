@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using P3D.Legacy.Server.Abstractions.Utils;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.CQERS.Queries;
-using P3D.Legacy.Server.Infrastructure.Services.Statistics;
+using P3D.Legacy.Server.Infrastructure.Repositories.Statistics;
 using P3D.Legacy.Server.UI.Shared.Models;
 
 using System;
@@ -63,7 +63,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
 
             return StatusCode(StatusCodes.Status200OK, new PagingResponse<StatusResponseV2Player>
             {
-                Items = models.Select(x => new StatusResponseV2Player(x.Name, x.GameJoltId)),
+                Items = models.Select(static x => new StatusResponseV2Player(x.Name, x.GameJoltId)),
                 Metadata = metadata
             });
         }
@@ -113,12 +113,12 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         [Produces("application/json")]
         [ProducesResponseType(typeof(PlayerStatisticsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetPlayerStatisticsAsync([FromServices] IStatisticsManager statisticsManager, CancellationToken ct)
+        public async Task<ActionResult> GetPlayerStatisticsAsync([FromServices] IStatisticsRepository statisticsRepository, CancellationToken ct)
         {
             return Ok(new PlayerStatisticsResponse
             {
-                Unique = (uint) await statisticsManager.GetAllAsync("player_joined", ct).CountAsync(ct),
-                SentMessages = (uint) await statisticsManager.GetAllAsync("message_global", ct).SumAsync(x => x.Count, ct),
+                Unique = (uint) await statisticsRepository.GetAllAsync("player_joined", ct).CountAsync(ct),
+                SentMessages = (uint) await statisticsRepository.GetAllAsync("message_global", ct).SumAsync(static x => x.Count, ct),
             });
         }
     }

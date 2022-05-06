@@ -60,7 +60,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 
         private void OnError(Exception exceptionFromExecuteAsync)
         {
-            Console.Error.WriteLine($"Error happened while executing CriticalBackgroundTask {GetType().FullName}. Shutting down.");
+            Console.Error.WriteLine($"Error happened while executing CriticalBackgroundTask {typeof(DiscordPassthroughService).FullName}. Shutting down.");
             Console.Error.WriteLine(exceptionFromExecuteAsync.ToString());
             _applicationEnder.ShutDownApplication();
         }
@@ -157,11 +157,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 
             _logger.LogWarning("Started Discord Bot");
 
-#if NET5_0
-            stoppingToken.Register(_ => OnCancellation(null, stoppingToken), null);
-#else
             stoppingToken.Register(OnCancellation, null);
-#endif
         }
 
         private static readonly Action<ILogger, string, Exception?> LogCritical = LoggerMessage.Define<string>(
@@ -221,7 +217,6 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 
         public void Dispose()
         {
-            _discordSocketClient?.Dispose();
             _stoppingCts.Cancel();
             _stoppingCts.Dispose();
         }

@@ -15,7 +15,7 @@ namespace P3D.Legacy.Server.GameCommands.Extensions
         public static IServiceCollection AddGameCommands(this IServiceCollection services)
         {
             services.AddTransient<CommandManagerHandler>();
-            services.AddEvent(sp => sp.GetRequiredService<CommandManagerHandler>());
+            services.AddEvent(static sp => sp.GetRequiredService<CommandManagerHandler>());
 
             services.AddTransient<CommandManager, HelpCommandManager>();
 

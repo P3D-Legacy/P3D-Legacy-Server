@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Connections.Features;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace P3D.Legacy.Server.Application.Services
         private CancellationTokenSource? _stoppingCts;
         private Task? _executingTask;
 
+        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP003:Dispose previous before re-assigning")]
         public Task<ConnectionContextHandler> SetConnectionContextAsync(ConnectionContext connectionContext)
         {
             Connection = connectionContext;
@@ -53,7 +55,6 @@ namespace P3D.Legacy.Server.Application.Services
                 await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, ct));
 #pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
             }
-
         }
 
         protected virtual void Dispose(bool disposing)

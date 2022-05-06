@@ -12,7 +12,7 @@ namespace P3D.Legacy.Common.Monsters
 
         public AbilityContainer(params IAbilityInstance[] abilities)
         {
-            abilities = abilities.OrderBy(ability => ability.StaticData.Id).ThenBy(ability => !ability.IsHidden).ToArray();
+            abilities = abilities.OrderBy(static x => x.StaticData.Id).ThenBy(static x => !x.IsHidden).ToArray();
 
             if (abilities.Length > 0)
                 First = abilities[0];
@@ -44,6 +44,6 @@ namespace P3D.Legacy.Common.Monsters
 
 
         public bool Contains(IAbilityInstance ability) => First == ability || Second == ability || Hidden == ability;
-        public bool Contains(short abilityId) => First?.StaticData.Id == abilityId || Second?.StaticData.Id == abilityId || Hidden?.StaticData.Id == abilityId;
+        public bool Contains(short abilityId) => First.StaticData.Id == abilityId || Second?.StaticData.Id == abilityId || Hidden?.StaticData.Id == abilityId;
     }
 }

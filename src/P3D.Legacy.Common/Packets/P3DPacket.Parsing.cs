@@ -70,8 +70,8 @@ namespace P3D.Legacy.Common.Packets
             {
                 if (!Utf8Parser.TryParse(ParseSection(ref sequence), out int offset, out _))
                     return false;
-                else
-                    offsets[i] = offset;
+
+                offsets[i] = offset;
             }
 
             //Cutting the data:

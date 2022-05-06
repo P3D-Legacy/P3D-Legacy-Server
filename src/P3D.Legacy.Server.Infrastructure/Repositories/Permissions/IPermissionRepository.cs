@@ -5,9 +5,9 @@ using P3D.Legacy.Server.Infrastructure.Models.Permissions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Infrastructure.Services.Permissions
+namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 {
-    public interface IPermissionManager
+    public interface IPermissionRepository
     {
         Task<PermissionEntity> GetByIdAsync(PlayerId id, CancellationToken ct);
         Task<bool> SetPermissionsAsync(PlayerId id, PermissionTypes permissions, CancellationToken ct);

@@ -37,33 +37,33 @@ namespace P3D.Legacy.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<JsonSerializerOptions>(options => Configure(options));
-            services.Configure<JsonSerializerOptions>("P3D", options => ConfigureSite(options));
-
-            var appName = typeof(Startup).Assembly.GetName().Name ?? "ERROR";
+            services.Configure<JsonSerializerOptions>(static opt => Configure(opt));
+            services.Configure<JsonSerializerOptions>("P3D", static opt => ConfigureSite(opt));
 
             services.AddControllers()
                 .AddControllersAsServices()
-                .AddJsonOptions(options => Configure(options.JsonSerializerOptions));
+                .AddJsonOptions(static opt => Configure(opt.JsonSerializerOptions));
 
-            services.AddRouting(options =>
+            services.AddRouting(static opt =>
             {
-                options.LowercaseUrls = true;
+                opt.LowercaseUrls = true;
             });
 
-            services.AddSwaggerGen(options =>
+            services.AddSwaggerGen(static opt =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = appName, Version = "v1" });
-                options.SupportNonNullableReferenceTypes();
+                var appName = Assembly.GetEntryAssembly()?.GetName().Name;
+
+                opt.SwaggerDoc("v1", new OpenApiInfo { Title = appName, Version = "v1" });
+                opt.SupportNonNullableReferenceTypes();
 
                 var xmlFile = $"{appName}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                options.IncludeXmlComments(xmlPath);
+                opt.IncludeXmlComments(xmlPath);
             });
 
-            services.AddCors(options =>
+            services.AddCors(static options =>
             {
-                options.AddPolicy("Development", builder => builder
+                options.AddPolicy("Development", static builder => builder
                     .AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod()
@@ -79,16 +79,17 @@ namespace P3D.Legacy.Server
                 app.UseCors("Development");
             }
 
-            var appName = Assembly.GetEntryAssembly()!.GetName().Name;
-
             app.UseSwagger();
-            app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", appName));
+            app.UseSwaggerUI(static options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", Assembly.GetEntryAssembly()?.GetName().Name);
+            });
 
             app.UseWebSockets();
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
+            app.UseEndpoints(static endpoints =>
             {
                 endpoints.MapControllers();
             });

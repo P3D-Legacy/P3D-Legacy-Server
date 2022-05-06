@@ -9,6 +9,7 @@ using P3D.Legacy.Server.CQERS.Events;
 using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,9 +28,9 @@ namespace P3D.Legacy.Server.GUI.Views
         private readonly ILogger _logger;
         private readonly IEventDispatcher _eventDispatcher;
 
-        private readonly TextView _chatTextView;
-        private readonly TextField _commandTextField;
+        private readonly Action<ustring> _appendChatText;
 
+        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
         public ChatTabView(ILogger<ChatTabView> logger, IEventDispatcher eventDispatcher)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -40,19 +41,23 @@ namespace P3D.Legacy.Server.GUI.Views
             Height = Dim.Fill();
 
             var messageView = new FrameView("Messages") { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() - 3 };
-            _chatTextView = new TextView { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill(), ReadOnly = true, WordWrap = false };
-            messageView.Add(_chatTextView);
+            var chatTextView = new TextView { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill(), ReadOnly = true, WordWrap = false };
+            messageView.Add(chatTextView);
+            _appendChatText = text => chatTextView.Text = text + chatTextView.Text;
 
             var sendMessageView = new FrameView("Send Message") { X = 0, Y = Pos.Bottom(messageView), Width = Dim.Fill(), Height = 3 };
             var buttonSendCommand = new Button("S_end", true) { X = 0, Y = 0, Height = 1 };
+
+            var commandTextField = new TextField { X = Pos.Right(buttonSendCommand) + 1, Y = 0, Width = Dim.Fill(), Height = 1 };
+            sendMessageView.Add(commandTextField, buttonSendCommand);
+
 #pragma warning disable VSTHRD101 // Avoid unsupported async delegates
             buttonSendCommand.Clicked += async () =>
             {
                 try
                 {
-                    if (_commandTextField is null) return;
-                    var message = _commandTextField.Text.ToString() ?? string.Empty;
-                    _commandTextField.Text = ustring.Empty;
+                    var message = commandTextField.Text.ToString() ?? string.Empty;
+                    commandTextField.Text = ustring.Empty;
                     await HandleMessageAsync(message);
                 }
                 catch (Exception e)
@@ -61,8 +66,6 @@ namespace P3D.Legacy.Server.GUI.Views
                 }
             };
 #pragma warning restore VSTHRD101 // Avoid unsupported async delegates
-            _commandTextField = new TextField { X = Pos.Right(buttonSendCommand) + 1, Y = 0, Width = Dim.Fill(), Height = 1 };
-            sendMessageView.Add(_commandTextField, buttonSendCommand);
 
             Add(messageView, sendMessageView);
         }
@@ -84,7 +87,7 @@ namespace P3D.Legacy.Server.GUI.Views
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 var message = $"* Player {notification.Player.Name} joined the server!{Environment.NewLine}";
-                _chatTextView.Text = message + _chatTextView.Text;
+                _appendChatText(message);
             });
             return Task.CompletedTask;
         }
@@ -94,7 +97,7 @@ namespace P3D.Legacy.Server.GUI.Views
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 var message = $"* Player {notification.Name} left the server!{Environment.NewLine}";
-                _chatTextView.Text = message + _chatTextView.Text;
+                _appendChatText(message);
             });
             return Task.CompletedTask;
         }
@@ -104,7 +107,7 @@ namespace P3D.Legacy.Server.GUI.Views
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 var message = $"* {notification.Player.Name}: {notification.Message}{Environment.NewLine}";
-                _chatTextView.Text = message + _chatTextView.Text;
+                _appendChatText(message);
             });
             return Task.CompletedTask;
         }
@@ -114,7 +117,7 @@ namespace P3D.Legacy.Server.GUI.Views
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 var message = $"* Server: {notification.Message}{Environment.NewLine}";
-                _chatTextView.Text = message + _chatTextView.Text;
+                _appendChatText(message);
             });
             return Task.CompletedTask;
         }
@@ -124,7 +127,7 @@ namespace P3D.Legacy.Server.GUI.Views
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 var message = $"* The player {notification.Player.Name} {PlayerEventParser.AsText(notification.Event)}{Environment.NewLine}";
-                _chatTextView.Text = message + _chatTextView.Text;
+                _appendChatText(message);
             });
             return Task.CompletedTask;
         }
@@ -135,7 +138,7 @@ namespace P3D.Legacy.Server.GUI.Views
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 var message = $"* {(notification.From != IPlayer.Server ? $"{notification.From.Name}: " : string.Empty)}{notification.Message}{Environment.NewLine}";
-                _chatTextView.Text = message + _chatTextView.Text;
+                _appendChatText(message);
             });
             return Task.CompletedTask;
         }

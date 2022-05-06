@@ -91,7 +91,6 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
         {
             public DispatchStrategy DefaultStrategy { get; set; }
 
-            public Task DispatchAsync<TEvent>(TEvent rawEvent, CancellationToken ct) where TEvent : IEvent => DispatchAsync(rawEvent, DefaultStrategy, ct);
             public async Task DispatchAsync<TEvent>(TEvent rawEvent, DispatchStrategy dispatchStrategy, CancellationToken ct) where TEvent : IEvent
             {
                 switch (rawEvent)
@@ -111,73 +110,68 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
         }
 
         [Test]
-        public async Task TestAsync()
+        public async Task TestAsync() => await Common().Configure(static services =>
         {
-            await using var testService = Commnon().Configure(services =>
+            services.AddSingleton<ICommandDispatcher, CommandDispatcherMock>();
+            services.AddSingleton<IQueryDispatcher, QueryDispatcherMock>();
+            services.AddSingleton<IEventDispatcher, EventDispatcherMock>();
+        }).DoTestAsync(static async serviceProvider =>
+        {
+            var connectionFactory = serviceProvider.GetRequiredService<IConnectionFactory>();
+
+            var connection = (DefaultConnectionContext) await connectionFactory.ConnectAsync(IPEndPoint.Parse("127.0.0.1:80"));
+            var handler = serviceProvider.GetRequiredService<P3DConnectionHandler>();
+            var connectionTask = handler.OnConnectedAsync(connection);
+
+            var protocol = serviceProvider.GetRequiredService<P3DProtocol>();
+            var reader = new ProtocolReader(connection.Application!.Input);
+            var writer = new ProtocolWriter(connection.Application!.Output);
+
+            var gameData = new GameDataPacket
             {
-                services.AddSingleton<ICommandDispatcher, CommandDispatcherMock>();
-                services.AddSingleton<IQueryDispatcher, QueryDispatcherMock>();
-                services.AddSingleton<IEventDispatcher, EventDispatcherMock>();
-            });
+                GameMode = "state.GameMode",
+                IsGameJoltPlayer = false,
+                GameJoltId = 0,
+                DecimalSeparator = '.',
+                Name = "player.Name",
+                LevelFile = "state.LevelFile",
+                Position = Vector3.Zero,
+                Facing = 0,
+                Moving = false,
+                Skin = "state.Skin",
+                BusyType = "state.BusyType",
+                MonsterVisible = false,
+                MonsterPosition = Vector3.Zero,
+                MonsterSkin = "state.MonsterSkin",
+                MonsterFacing = 0
+            };
+            await writer.WriteAsync(protocol, gameData);
 
-            await testService.DoTestAsync(async serviceProvider =>
-            {
-                var connectionFactory = serviceProvider.GetRequiredService<IConnectionFactory>();
+            var idPacket = await reader.ReadAsync(protocol);
+            reader.Advance();
+            Assert.NotNull(idPacket);
+            Assert.IsFalse(idPacket.IsCanceled);
+            Assert.IsFalse(idPacket.IsCompleted);
+            Assert.NotNull(idPacket.Message);
+            Assert.IsInstanceOf<IdPacket>(idPacket.Message);
 
-                var connection = (DefaultConnectionContext) await connectionFactory.ConnectAsync(IPEndPoint.Parse("127.0.0.1:80"));
-                var handler = serviceProvider.GetRequiredService<P3DConnectionHandler>();
-                var connectionTask = handler.OnConnectedAsync(connection);
+            var worldDataPacket = await reader.ReadAsync(protocol);
+            reader.Advance();
+            Assert.NotNull(worldDataPacket);
+            Assert.IsFalse(worldDataPacket.IsCanceled);
+            Assert.IsFalse(worldDataPacket.IsCompleted);
+            Assert.NotNull(worldDataPacket.Message);
+            Assert.IsInstanceOf<WorldDataPacket>(worldDataPacket.Message);
 
-                var protocol = serviceProvider.GetRequiredService<P3DProtocol>();
-                var reader = new ProtocolReader(connection.Application!.Input);
-                var writer = new ProtocolWriter(connection.Application!.Output);
+            var kickPacket = await reader.ReadAsync(protocol);
+            reader.Advance();
+            Assert.NotNull(kickPacket);
+            Assert.IsFalse(kickPacket.IsCanceled);
+            Assert.IsFalse(kickPacket.IsCompleted);
+            Assert.NotNull(kickPacket.Message);
+            Assert.IsInstanceOf<KickedPacket>(kickPacket.Message);
 
-                var gameData = new GameDataPacket
-                {
-                    GameMode = "state.GameMode",
-                    IsGameJoltPlayer = false,
-                    GameJoltId = 0,
-                    DecimalSeparator = '.',
-                    Name = "player.Name",
-                    LevelFile = "state.LevelFile",
-                    Position = Vector3.Zero,
-                    Facing = 0,
-                    Moving = false,
-                    Skin = "state.Skin",
-                    BusyType = "state.BusyType",
-                    MonsterVisible = false,
-                    MonsterPosition = Vector3.Zero,
-                    MonsterSkin = "state.MonsterSkin",
-                    MonsterFacing = 0
-                };
-                await writer.WriteAsync(protocol, gameData);
-
-                var idPacket = await reader.ReadAsync(protocol);
-                reader.Advance();
-                Assert.NotNull(idPacket);
-                Assert.IsFalse(idPacket.IsCanceled);
-                Assert.IsFalse(idPacket.IsCompleted);
-                Assert.NotNull(idPacket.Message);
-                Assert.IsInstanceOf<IdPacket>(idPacket.Message);
-
-                var worldDataPacket = await reader.ReadAsync(protocol);
-                reader.Advance();
-                Assert.NotNull(worldDataPacket);
-                Assert.IsFalse(worldDataPacket.IsCanceled);
-                Assert.IsFalse(worldDataPacket.IsCompleted);
-                Assert.NotNull(worldDataPacket.Message);
-                Assert.IsInstanceOf<WorldDataPacket>(worldDataPacket.Message);
-
-                var kickPacket = await reader.ReadAsync(protocol);
-                reader.Advance();
-                Assert.NotNull(kickPacket);
-                Assert.IsFalse(kickPacket.IsCanceled);
-                Assert.IsFalse(kickPacket.IsCompleted);
-                Assert.NotNull(kickPacket.Message);
-                Assert.IsInstanceOf<KickedPacket>(kickPacket.Message);
-
-                await connectionTask.WaitAsync(TimeSpan.FromMilliseconds(1000));
-            });
-        }
+            await connectionTask.WaitAsync(TimeSpan.FromMilliseconds(1000));
+        });
     }
 }

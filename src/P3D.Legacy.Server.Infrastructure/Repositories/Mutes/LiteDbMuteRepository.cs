@@ -13,15 +13,15 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Infrastructure.Services.Mutes
+namespace P3D.Legacy.Server.Infrastructure.Repositories.Mutes
 {
-    public class LiteDbMuteManager : IMuteManager
+    public class LiteDbMuteRepository : IMuteRepository
     {
         private record Mute(string Id, IList<string> MutedIds);
 
         private readonly LiteDbOptions _options;
 
-        public LiteDbMuteManager(IOptionsMonitor<LiteDbOptions> options)
+        public LiteDbMuteRepository(IOptionsMonitor<LiteDbOptions> options)
         {
             _options = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
         }
@@ -34,13 +34,13 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Mutes
             var collection = db.GetCollection<Mute>("mutes");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
             if (await collection.FindByIdAsync(idStr) is { } entry)
             {
-                foreach (var playerId in entry.MutedIds.Select(x => PlayerId.Parse(x)))
+                foreach (var playerId in entry.MutedIds.Select(static x => PlayerId.Parse(x)))
                 {
                     yield return playerId;
                 }
@@ -55,7 +55,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Mutes
             var collection = db.GetCollection<Mute>("mutes");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var idStr = id.ToString();
             var toCheckIdStr = toCheckId.ToString();
@@ -71,7 +71,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Mutes
             var collection = db.GetCollection<Mute>("mutes");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
@@ -96,7 +96,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Mutes
             var collection = db.GetCollection<Mute>("mutes");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();

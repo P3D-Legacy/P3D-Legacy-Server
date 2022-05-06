@@ -5,7 +5,7 @@
     <AnalysisMode>latest-Recommended</AnalysisMode>
     <AnalysisLevel>latest</AnalysisLevel>
     
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,10 +15,11 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(ManagePackageVersionsCentrally) == 'true'">
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="IDisposableAnalyzers" />
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
+    <PackageReference Include="ReflectionAnalyzers" />
   </ItemGroup>
 
 </Project>

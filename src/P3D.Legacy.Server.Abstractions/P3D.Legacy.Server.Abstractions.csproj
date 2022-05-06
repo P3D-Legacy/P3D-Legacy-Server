@@ -23,8 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="Aragas.Extensions.Options.FluentValidation" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
+    <PackageReference Include="System.Linq.Async" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,7 +4,7 @@ using P3D.Legacy.Server.CQERS.Events;
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +13,7 @@ namespace P3D.Legacy.Server.CQERS.Services
 {
     internal sealed class EventDispatcherHelper<TEvent> where TEvent : IEvent
     {
+        [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
         private static readonly Action<ILogger, string, Exception?> ExceptionDuringPublish = LoggerMessage.Define<string>(
             LogLevel.Error, default, "Exception during publish! Strategy: {Strategy}");
 
@@ -42,13 +43,13 @@ namespace P3D.Legacy.Server.CQERS.Services
                 throw new ArgumentException($"Unknown strategy: {strategy}");
             }
 
-            return publishStrategy(_handlers.Select(handler => (Func<IEvent, CancellationToken, Task>) ((@event2, ct2) => handler.HandleAsync((TEvent) @event2, ct2))), @event, ct);
+            return publishStrategy(_handlers.Select(static x => (Func<IEvent, CancellationToken, Task>) ((@event2, ct2) => x.HandleAsync((TEvent) @event2, ct2))), @event, ct);
         }
 
 
         private Task ParallelWhenAllAsync(IEnumerable<Func<IEvent, CancellationToken, Task>> handlers, IEvent @event, CancellationToken ct)
         {
-            return Task.WhenAll(handlers.Select(handler => handler(@event, ct)).ToImmutableArray());
+            return Task.WhenAll(handlers.Select(handler => handler(@event, ct)));
         }
 
         private Task ParallelWhenAnyAsync(IEnumerable<Func<IEvent, CancellationToken, Task>> handlers, IEvent @event, CancellationToken ct)
@@ -63,7 +64,7 @@ namespace P3D.Legacy.Server.CQERS.Services
                 {
                     ExceptionDuringPublish(_logger, nameof(DispatchStrategy.ParallelWhenAny), e);
                 }
-            }).ToImmutableArray());
+            }));
         }
 
         private Task ParallelNoWaitAsync(IEnumerable<Func<IEvent, CancellationToken, Task>> handlers, IEvent @event, CancellationToken ct)

@@ -23,6 +23,6 @@ namespace P3D.Legacy.Server.Benchmark.Services
             _client = new ClientBuilder(serviceProvider).UseSockets().UseConnectionLogging(loggerFactory: loggerFactory).Build();
         }
 
-        public async Task<ConnectionContext?> GetConnectionAsync(string host, ushort port, CancellationToken ct) => await _client.ConnectAsync(GetEndPoint(host, port), ct);
+        public ValueTask<ConnectionContext?> GetConnectionAsync(string host, ushort port, CancellationToken ct) => _client.ConnectAsync(GetEndPoint(host, port), ct);
     }
 }

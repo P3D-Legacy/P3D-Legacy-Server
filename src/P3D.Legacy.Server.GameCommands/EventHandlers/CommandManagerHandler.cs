@@ -78,10 +78,10 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
         }
 
         public CommandManager? FindByName(string name) => _commandManagers
-            .Where(x => x.Permissions != PermissionTypes.None)
+            .Where(static x => x.Permissions != PermissionTypes.None)
             .FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         public CommandManager? FindByAlias(string alias) => _commandManagers
-            .Where(x => x.Permissions != PermissionTypes.None)
+            .Where(static x => x.Permissions != PermissionTypes.None)
             .FirstOrDefault(x => x.Aliases.Contains(alias, StringComparer.OrdinalIgnoreCase));
 
         public IReadOnlyList<CommandManager> GetCommands() => _commandManagers;
@@ -96,7 +96,7 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
 
             var messageArray = new Regex(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)", RegexOptions.Compiled)
                 .Split(commandWithoutSlash)
-                .Select(str => str.TrimStart('"').TrimEnd('"'))
+                .Select(static str => str.TrimStart('"').TrimEnd('"'))
                 .ToArray();
             //var messageArray = commandWithoutSlash.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 

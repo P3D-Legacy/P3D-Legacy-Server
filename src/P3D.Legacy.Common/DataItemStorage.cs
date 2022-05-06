@@ -32,7 +32,7 @@ namespace P3D.Legacy.Common
         public DataItemStorage() : this(Array.Empty<string>()) { }
         public DataItemStorage(params string[] raw)
         {
-            _dataItems = raw.Select((x, i) => new KeyValuePair<int, string>(i, x)).ToDictionary(x => x.Key, x => x.Value);
+            _dataItems = raw.Select(static (x, i) => new KeyValuePair<int, string>(i, x)).ToDictionary(static x => x.Key, static x => x.Value);
         }
 
         public IEnumerator<string> GetEnumerator() => Iterate(_dataItems).GetEnumerator();

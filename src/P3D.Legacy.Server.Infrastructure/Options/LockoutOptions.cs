@@ -8,8 +8,8 @@ namespace P3D.Legacy.Server.Infrastructure.Options
     {
         public LockoutOptionsValidator()
         {
-            RuleFor(x => x.MaxFailedAccessAttempts).NotEmpty();
-            RuleFor(x => x.DefaultLockoutTimeSpan).NotEmpty();
+            RuleFor(static x => x.MaxFailedAccessAttempts).NotEmpty();
+            RuleFor(static x => x.DefaultLockoutTimeSpan).NotEmpty();
         }
     }
 

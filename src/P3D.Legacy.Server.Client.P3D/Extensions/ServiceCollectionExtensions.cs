@@ -15,7 +15,7 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
             services.AddHostedService<P3DPlayerMovementCompensationService>();
 
             services.AddScoped<P3DConnectionContextHandler>();
-            services.AddEvents(sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<P3DConnectionContextHandler>());
+            services.AddEvents(static sp => sp.GetRequiredService<IPlayerContainerReader>().GetAll().OfType<P3DConnectionContextHandler>());
 
             services.AddScoped<P3DProtocol>();
 

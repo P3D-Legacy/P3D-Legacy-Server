@@ -39,17 +39,18 @@ namespace P3D.Legacy.Server.Client.P3D.Services
 
         protected override async Task ExecuteAsync(CancellationToken ct)
         {
+            async Task LoopAction()
+            {
+                await foreach (var group in _playerContainer.GetAllAsync(ct).OfType<IP3DPlayerState>().GroupBy(static x => x.LevelFile).WithCancellation(ct))
+                {
+                    var players = await group.Where(static x => x.Moving).OfType<IPlayer>().ToArrayAsync(ct);
+                    foreach (var player in players) await _eventDispatcher.DispatchAsync(new PlayerUpdatedPositionEvent(player), ct);
+                }
+            }
+
             while (!ct.IsCancellationRequested)
             {
-                await _timeLimiter.Enqueue(async () =>
-                {
-                    await foreach (var group in _playerContainer.GetAllAsync(ct).OfType<IP3DPlayerState>().GroupBy(x => x.LevelFile).WithCancellation(ct))
-                    {
-                        var players = await group.Where(x => x.Moving).OfType<IPlayer>().ToArrayAsync(ct);
-                        foreach (var player in players)
-                            await _eventDispatcher.DispatchAsync(new PlayerUpdatedPositionEvent(player), ct);
-                    }
-                }, ct);
+                await _timeLimiter.Enqueue(LoopAction, ct);
             }
         }
     }

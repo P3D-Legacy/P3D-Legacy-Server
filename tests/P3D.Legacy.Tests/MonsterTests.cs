@@ -22,21 +22,17 @@ namespace P3D.Legacy.Tests
 
         [Test]
         [TestCaseSource(nameof(TestCaseSources))]
-        public async Task TestMonsterCreationViaPokeAPIAsync(string line)
-        {
-            await using var testService = TestService.CreateNew()
-                .Configure(services =>
-                {
-                    services.AddTransient<IOptions<PokeAPIOptions>>(_ => new OptionsWrapper<PokeAPIOptions>(new PokeAPIOptions
-                    {
-                        GraphQLEndpoint = "https://beta.pokeapi.co/graphql/v1beta"
-                    }));
-                    services.AddTransient<PokeAPIMonsterRepository>();
-                });
-
-            await testService.DoTestAsync(async serviceProvider =>
+        public async Task TestMonsterCreationViaPokeAPIAsync(string line) => await TestService.CreateNew()
+            .Configure(static services =>
             {
-                var repository = serviceProvider.GetRequiredService<PokeAPIMonsterRepository>();
+                services.AddTransient<IOptions<PokeAPIOptions>>(static _ => new OptionsWrapper<PokeAPIOptions>(new PokeAPIOptions
+                {
+                    GraphQLEndpoint = "https://beta.pokeapi.co/graphql/v1beta"
+                }));
+                services.AddTransient<PokeAPIMonsterRepository>();
+            }).DoTestAsync(async sp =>
+            {
+                var repository = sp.GetRequiredService<PokeAPIMonsterRepository>();
                 var monster = await repository.GetByDataAsync(line, CancellationToken.None);
                 if (monster.IsValidP3D())
                 {
@@ -44,7 +40,6 @@ namespace P3D.Legacy.Tests
                     Assert.AreEqual(line, convertedBack);
                 }
             });
-        }
 
         [Test]
         [TestCaseSource(nameof(TestCaseSources))]

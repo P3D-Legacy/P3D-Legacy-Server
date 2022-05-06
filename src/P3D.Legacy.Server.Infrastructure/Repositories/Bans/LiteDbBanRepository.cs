@@ -39,7 +39,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             var collection = db.GetCollection<Ban>("bans");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
@@ -56,11 +56,11 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             var collection = db.GetCollection<Ban>("bans");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             ct.ThrowIfCancellationRequested();
             var entries = await collection.FindAllAsync();
-            foreach (var banEntity in entries.Select(ban => new BanEntity(PlayerId.Parse(ban.BannerId), PlayerId.Parse(ban.Id), IPAddress.Parse(ban.Ip), ban.ReasonId, ban.Reason, ban.Expiration)))
+            foreach (var banEntity in entries.Select(static x => new BanEntity(PlayerId.Parse(x.BannerId), PlayerId.Parse(x.Id), IPAddress.Parse(x.Ip), x.ReasonId, x.Reason, x.Expiration)))
             {
                 yield return banEntity;
             }
@@ -76,7 +76,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             var collection = db.GetCollection<Ban>("bans");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var idStr = id.ToString();
             var bannerIdStr = bannerId.ToString();
@@ -94,7 +94,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             var collection = db.GetCollection<Ban>("bans");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();

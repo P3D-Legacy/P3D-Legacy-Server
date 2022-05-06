@@ -37,9 +37,9 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
             var collection = db.GetCollection<Statistics>("statistics");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
-            await collection.EnsureIndexAsync(x => x.PlayerId);
-            await collection.EnsureIndexAsync(x => x.Action);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.PlayerId);
+            await collection.EnsureIndexAsync(static x => x.Action);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
@@ -56,13 +56,13 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
             var collection = db.GetCollection<Statistics>("statistics");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
-            await collection.EnsureIndexAsync(x => x.PlayerId);
-            await collection.EnsureIndexAsync(x => x.Action);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.PlayerId);
+            await collection.EnsureIndexAsync(static x => x.Action);
 
             ct.ThrowIfCancellationRequested();
             var entries = await collection.FindAllAsync();
-            foreach (var statisticsEntity in entries.Select(statistics => new StatisticsEntity(PlayerId.Parse(statistics.PlayerId), statistics.Action, statistics.Count)))
+            foreach (var statisticsEntity in entries.Select(static x => new StatisticsEntity(PlayerId.Parse(x.PlayerId), x.Action, x.Count)))
             {
                 yield return statisticsEntity;
             }
@@ -76,14 +76,14 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
             var collection = db.GetCollection<Statistics>("statistics");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
-            await collection.EnsureIndexAsync(x => x.PlayerId);
-            await collection.EnsureIndexAsync(x => x.Action);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.PlayerId);
+            await collection.EnsureIndexAsync(static x => x.Action);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
             var entries = await collection.FindAsync(x => x.PlayerId == idStr);
-            foreach (var statisticsEntity in entries.Select(statistics => new StatisticsEntity(PlayerId.Parse(statistics.PlayerId), statistics.Action, statistics.Count)))
+            foreach (var statisticsEntity in entries.Select(static x => new StatisticsEntity(PlayerId.Parse(x.PlayerId), x.Action, x.Count)))
             {
                 yield return statisticsEntity;
             }
@@ -97,13 +97,13 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
             var collection = db.GetCollection<Statistics>("statistics");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
-            await collection.EnsureIndexAsync(x => x.PlayerId);
-            await collection.EnsureIndexAsync(x => x.Action);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.PlayerId);
+            await collection.EnsureIndexAsync(static x => x.Action);
 
             ct.ThrowIfCancellationRequested();
             var entries = await collection.FindAsync(x => x.Action == action);
-            foreach (var statisticsEntity in entries.Select(statistics => new StatisticsEntity(PlayerId.Parse(statistics.PlayerId), statistics.Action, statistics.Count)))
+            foreach (var statisticsEntity in entries.Select(static x => new StatisticsEntity(PlayerId.Parse(x.PlayerId), x.Action, x.Count)))
             {
                 yield return statisticsEntity;
             }
@@ -117,9 +117,9 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
             var collection = db.GetCollection<Statistics>("statistics");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
-            await collection.EnsureIndexAsync(x => x.PlayerId);
-            await collection.EnsureIndexAsync(x => x.Action);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.PlayerId);
+            await collection.EnsureIndexAsync(static x => x.Action);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
@@ -131,7 +131,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
             }
 
             ct.ThrowIfCancellationRequested();
-            var result = await collection.UpdateManyAsync(x => new Statistics { Count = x.Count + 1 }, x => x.PlayerId == idStr && x.Action == action);
+            var result = await collection.UpdateManyAsync(static x => new Statistics { Count = x.Count + 1 }, x => x.PlayerId == idStr && x.Action == action);
             return result == 1;
         }
     }

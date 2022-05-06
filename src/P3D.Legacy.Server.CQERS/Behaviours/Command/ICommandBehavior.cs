@@ -7,6 +7,6 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command
 {
     public interface ICommandBehavior<in TCommand> where TCommand : ICommand
     {
-        Task<CommandResult> Handle(TCommand command, CancellationToken ct, CommandHandlerDelegate next);
+        Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct);
     }
 }

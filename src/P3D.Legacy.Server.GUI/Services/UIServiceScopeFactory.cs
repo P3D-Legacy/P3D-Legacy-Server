@@ -34,7 +34,11 @@ namespace P3D.Legacy.Server.GUI.Services
             _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
         }
 
-        public IServiceScope CreateScope() => _currentScope = new ScopeWrapper(this, _serviceScopeFactory.CreateScope());
+        public IServiceScope CreateScope()
+        {
+            _currentScope?.Dispose();
+            return _currentScope = new ScopeWrapper(this, _serviceScopeFactory.CreateScope());
+        }
 
         public object? GetService(Type serviceType) => _currentScope?.ServiceProvider.GetService(serviceType);
 

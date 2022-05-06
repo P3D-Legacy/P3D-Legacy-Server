@@ -17,6 +17,7 @@ using P3D.Legacy.Server.CQERS.Queries;
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,6 +53,7 @@ namespace P3D.Legacy.Server.Client.P3D
             _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
         }
 
+        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP003:Dispose previous before re-assigning")]
         protected override async Task OnCreatedAsync(CancellationToken ct)
         {
             _connectionSpan = _tracer.StartActiveSpan("P3D Session UNKNOWN");
@@ -70,8 +72,9 @@ namespace P3D.Legacy.Server.Client.P3D
                     State = PlayerState.Finalizing;
                     if (oldState == PlayerState.Initialized)
                     {
+                        Task<CommandResult> FinalizeAsync() => _commandDispatcher.DispatchAsync(new PlayerFinalizingCommand(this), CancellationToken.None);
                         using var jctx = new JoinableTaskContext(); // Should I create it here or in the main method?
-                        new JoinableTaskFactory(jctx).Run(() => _commandDispatcher.DispatchAsync(new PlayerFinalizingCommand(this), CancellationToken.None));
+                        new JoinableTaskFactory(jctx).Run(FinalizeAsync);
                     }
                     State = PlayerState.Finalized;
                 });

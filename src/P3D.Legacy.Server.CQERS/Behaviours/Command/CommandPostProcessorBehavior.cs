@@ -16,13 +16,13 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command
             _postProcessors = postProcessors;
         }
 
-        public async Task<CommandResult> Handle(TCommand command, CancellationToken cancellationToken, CommandHandlerDelegate next)
+        public async Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct)
         {
             var result = await next();
 
             foreach (var processor in _postProcessors)
             {
-                await processor.Process(command, result, cancellationToken);
+                await processor.ProcessAsync(command, result, ct);
             }
 
             return result;

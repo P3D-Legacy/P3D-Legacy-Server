@@ -11,6 +11,7 @@ using P3D.Legacy.Server.CQERS.Events;
 using P3D.Legacy.Server.GUI.Utils;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,6 +35,7 @@ namespace P3D.Legacy.Server.GUI.Views
         private readonly PlayerListDataSource _currentPlayers = new(new());
         private IPlayer? _selectedPlayer;
 
+        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
         public PlayerTabView(ILogger<PlayerTabView> logger, ICommandDispatcher commandDispatcher, IPlayerContainerReader playerContainer)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -44,7 +46,7 @@ namespace P3D.Legacy.Server.GUI.Views
             Height = Dim.Fill();
 
             var onlineView = new FrameView("Online") { X = 0, Y = 0, Width = 20, Height = Dim.Fill() };
-            _currentPlayers.Players.AddRange(playerContainer.GetAll().Where(x => x.Permissions > PermissionTypes.UnVerified));
+            _currentPlayers.Players.AddRange(playerContainer.GetAll().Where(static x => x.Permissions > PermissionTypes.UnVerified));
             _playerListView = new ListView(_currentPlayers) { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
             onlineView.Add(_playerListView);
 
@@ -90,6 +92,7 @@ IP: {player.IPEndPoint}";
             Add(onlineView, infoView);
         }
 
+        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
         private Dialog Kick(IPlayer player)
         {
             var dialog = new Dialog("Kick", 40, 6);
@@ -114,10 +117,12 @@ IP: {player.IPEndPoint}";
                 }
             };
 #pragma warning restore VSTHRD101 // Avoid unsupported async delegates
-            cancel.Clicked += () => Terminal.Gui.Application.RequestStop();
+            cancel.Clicked += static () => Terminal.Gui.Application.RequestStop();
             dialog.Add(reasonInfoFrameView, kick, cancel);
             return dialog;
         }
+
+        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
         private Dialog Ban(IPlayer player)
         {
             var dialog = new Dialog("Ban", 40, 11);
@@ -152,7 +157,7 @@ IP: {player.IPEndPoint}";
                 }
             };
 #pragma warning restore VSTHRD101 // Avoid unsupported async delegates
-            cancel.Clicked += () => Terminal.Gui.Application.RequestStop();
+            cancel.Clicked += static () => Terminal.Gui.Application.RequestStop();
             dialog.Add(ban, cancel, reasonInfoFrameView, durationInfoFrameView);
             return dialog;
         }

@@ -18,15 +18,15 @@ namespace P3D.Legacy.Server.GUI.Extensions
             services.AddSingleton<ILoggerProvider, UILoggerProvider>();
 
             services.AddSingleton<TaskGUIManagerService>();
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, TaskGUIManagerService>(sp => sp.GetRequiredService<TaskGUIManagerService>()));
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, TaskGUIManagerService>(static sp => sp.GetRequiredService<TaskGUIManagerService>()));
 
             services.AddScoped<ServerUI>();
 
             services.AddScoped<PlayerTabView>();
-            services.AddEvent(sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<PlayerTabView>());
+            services.AddEvent(static sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<PlayerTabView>());
 
             services.AddScoped<ChatTabView>();
-            services.AddEvent(sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<ChatTabView>());
+            services.AddEvent(static sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<ChatTabView>());
 
             services.AddScoped<LogsTabView>();
 

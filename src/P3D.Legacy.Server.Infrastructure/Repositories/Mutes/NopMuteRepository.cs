@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Infrastructure.Services.Mutes
+namespace P3D.Legacy.Server.Infrastructure.Repositories.Mutes
 {
-    public class NopMuteManager : IMuteManager
+    public class NopMuteRepository : IMuteRepository
     {
         public IAsyncEnumerable<PlayerId> GetAllAsync(PlayerId id, CancellationToken ct) => AsyncEnumerable.Empty<PlayerId>();
         public Task<bool> IsMutedAsync(PlayerId id, PlayerId toCheckId, CancellationToken ct) => Task.FromResult(false);

@@ -19,12 +19,13 @@ namespace P3D.Legacy.Tests.Client.P3D
         public void SetPosition(Vector3 position) => Position = position.ToP3DString('.');
 
         public bool Equals(P3DPacketSample? other) =>
-            string.Equals(Name, other?.Name)
-            && IsCorrect.Equals(other?.IsCorrect)
-            && IdLong.Equals(other?.IdLong)
-            && Char.Equals(other?.Char)
-            && IdInt.Equals(other?.IdInt)
-            && string.Equals(Position, other?.Position);
+            other is not null
+            && string.Equals(Name, other.Name)
+            && IsCorrect.Equals(other.IsCorrect)
+            && IdLong.Equals(other.IdLong)
+            && Char.Equals(other.Char)
+            && IdInt.Equals(other.IdInt)
+            && string.Equals(Position, other.Position);
 
         public override int GetHashCode() => HashCode.Combine(Name, IsCorrect, IdLong, Char, IdInt, Position);
     }

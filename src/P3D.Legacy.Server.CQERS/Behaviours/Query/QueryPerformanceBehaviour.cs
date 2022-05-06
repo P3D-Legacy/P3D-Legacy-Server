@@ -16,18 +16,17 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query
         private static readonly Action<ILogger, string, long, TQuery, Exception?> Query = LoggerMessage.Define<string, long, TQuery>(
             LogLevel.Warning, default, "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Query}");
 
-        private readonly Stopwatch _timer;
         private readonly ILogger<TQuery> _logger;
+        private readonly Stopwatch _timer = new();
 
         [SuppressMessage("CodeQuality", "IDE0079")]
         [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
         public QueryPerformanceBehaviour(ILogger<TQuery> logger)
         {
-            _timer = new Stopwatch();
             _logger = logger;
         }
 
-        public async Task<TQueryResult> Handle(TQuery query, CancellationToken ct, QueryHandlerDelegate<TQueryResult> next)
+        public async Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct)
         {
             _timer.Start();
 

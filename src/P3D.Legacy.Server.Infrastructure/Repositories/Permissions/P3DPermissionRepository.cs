@@ -44,7 +44,8 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 
             try
             {
-                response = await _httpClientFactory.CreateClient("P3D.API").GetAsync(
+                using var client = _httpClientFactory.CreateClient("P3D.API");
+                response = await client.GetAsync(
                     new Uri($"gamejoltaccount/{id}", UriKind.Relative),
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);
@@ -64,7 +65,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
                         permissions &= ~PermissionTypes.UnVerified;
                         permissions |= PermissionTypes.User;
 
-                        foreach (var permissionDto in dto.User.Roles?.SelectMany(x => x.Permissions) ?? Enumerable.Empty<PermissionDTO>())
+                        foreach (var permissionDto in dto.User.Roles?.SelectMany(static x => x.Permissions) ?? Enumerable.Empty<PermissionDTO>())
                         {
                             if (permissionDto.Name.Equals("gameserver.debug", StringComparison.OrdinalIgnoreCase))
                                 permissions |= PermissionTypes.Debug;

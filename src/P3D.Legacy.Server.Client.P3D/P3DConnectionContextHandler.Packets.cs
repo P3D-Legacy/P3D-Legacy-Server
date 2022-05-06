@@ -523,7 +523,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var serverOptions = await _queryDispatcher.DispatchAsync(new GetServerOptionsQuery(), ct);
 
             var players = await _queryDispatcher.DispatchAsync(new GetPlayersInitializedQuery(), ct);
-            var clientNames = players.Select(x => x.Name).ToImmutableArray();
+            var clientNames = players.Select(static x => x.Name).ToImmutableArray();
 
             await SendPacketAsync(new ServerInfoDataPacket
             {

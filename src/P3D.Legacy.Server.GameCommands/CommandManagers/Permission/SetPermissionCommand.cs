@@ -25,7 +25,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
         {
             if (arguments.Length >= 2)
             {
-                var permissions = arguments.Skip(1).Where(arg => arg is not "," and not "|").ToArray();
+                var permissions = arguments.Skip(1).Where(static arg => arg is not "," and not "|").ToArray();
 
                 var targetName = arguments[0];
                 if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
@@ -34,7 +34,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
                     return;
                 }
 
-                var permissionFlags = await GetPermissionsAsync(player, permissions, ct).AggregateAsync(PermissionTypes.None, (current, flag) => current | flag, ct);
+                var permissionFlags = await GetPermissionsAsync(player, permissions, ct).AggregateAsync(PermissionTypes.None, static (current, flag) => current | flag, ct);
 
                 var result = await CommandDispatcher.DispatchAsync(new ChangePlayerPermissionsCommand(targetPlayer, permissionFlags), ct);
                 if (result.IsSuccess)

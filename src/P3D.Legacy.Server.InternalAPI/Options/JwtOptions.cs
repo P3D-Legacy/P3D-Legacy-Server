@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 
+using System;
 using System.Security.Cryptography;
 
 namespace P3D.Legacy.Server.InternalAPI.Options
@@ -8,16 +9,15 @@ namespace P3D.Legacy.Server.InternalAPI.Options
     {
         public JwtOptionsValidator()
         {
-            RuleFor(x => x.RsaPrivateKey).MinimumLength(16).When(x => !string.IsNullOrEmpty(x.RsaPrivateKey));
+            RuleFor(static x => x.RsaPrivateKey).MinimumLength(16).When(static x => !string.IsNullOrEmpty(x.RsaPrivateKey));
         }
     }
 
-    public record JwtOptions
+    public sealed record JwtOptions : IDisposable
     {
         public string RsaPrivateKey { get; init; } = default!;
 
-
-        private RSA? _rsa; // TODO: Cache or create new?
+        private RSA? _rsa;
         public RSA GetKey()
         {
             if (_rsa is null)
@@ -27,6 +27,11 @@ namespace P3D.Legacy.Server.InternalAPI.Options
                     _rsa.ImportFromPem(RsaPrivateKey);
             }
             return _rsa;
+        }
+
+        public void Dispose()
+        {
+            _rsa?.Dispose();
         }
     }
 }

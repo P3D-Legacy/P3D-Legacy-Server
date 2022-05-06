@@ -30,7 +30,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
             public string Name { get; set; } = "";
             public Origin Origin { get; set; } = Origin.FromNumber(-1);
 
-            public Func<P3DPacket, ValueTask> SendMessage { get; set; } = packet => ValueTask.CompletedTask;
+            public Func<P3DPacket, ValueTask> SendMessage { get; set; } = static _ => ValueTask.CompletedTask;
         }
 
         private readonly ILogger _logger;
@@ -66,13 +66,8 @@ namespace P3D.Legacy.Server.Benchmark.Services
                     Name = $"Player_{_random.Next()}",
                     SendMessage = async message =>
                     {
-                        var capturedWriter = writer;
-                        var capturedConnection = connection;
-
-                        if (capturedWriter is null || capturedConnection is null) return;
-
-                        await capturedWriter.WriteAsync(protocol, message, ct);
-                        await capturedConnection.Transport.Output.FlushAsync(ct);
+                        await writer.WriteAsync(protocol, message, ct);
+                        await connection.Transport.Output.FlushAsync(ct);
                     },
                 };
                 var gameData = new GameDataPacket
@@ -187,20 +182,20 @@ namespace P3D.Legacy.Server.Benchmark.Services
             _logger.LogInformation("Start. Batch: {Batch}", batch * parallel);
             var stopwatch = Stopwatch.StartNew();
             var failedCount = 0;
-            await Parallel.ForEachAsync(Enumerable.Range(0, parallel), ct, async (i, ct) =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, parallel), ct, async (i, ct2) =>
             {
                 var stopwatch_p = Stopwatch.StartNew();
-                foreach (var result in await GetConnectionsInParallelInWithBatchesAsync(batch, ct))
+                foreach (var result in await GetConnectionsInParallelInWithBatchesAsync(batch, ct2))
                 {
                     if (result is not null)
                     {
                         if (result is not OperationCanceledException)
-                            _logger.LogError(result, "Parallel {Parallel}.", i);
+                            _logger.LogError(result, "Parallel {Parallel}", i);
                         failedCount++;
                     }
                 }
                 stopwatch_p.Stop();
-                _logger.LogInformation("Parallel End {Parallel}. Time: {Time} ms.", i, stopwatch_p.ElapsedMilliseconds);
+                _logger.LogInformation("Parallel End {Parallel}. Time: {Time} ms", i, stopwatch_p.ElapsedMilliseconds);
             });
             stopwatch.Stop();
             _logger.LogInformation("End. Time {Time} ms. Failed: {FailedCount}", stopwatch.ElapsedMilliseconds, failedCount);

@@ -3,21 +3,20 @@
 using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Infrastructure.Models.Statistics;
-using P3D.Legacy.Server.Infrastructure.Repositories.Statistics;
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Infrastructure.Services.Statistics
+namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
 {
-    public sealed class DefaultStatisticsManager : IStatisticsManager
+    public sealed class DefaultStatisticsRepository : IStatisticsRepository
     {
         private readonly ServerOptions _options;
         private readonly LiteDbStatisticsRepository _liteDbStatisticsRepository;
 
-        public DefaultStatisticsManager(IOptions<ServerOptions> options, LiteDbStatisticsRepository liteDbStatisticsRepository)
+        public DefaultStatisticsRepository(IOptions<ServerOptions> options, LiteDbStatisticsRepository liteDbStatisticsRepository)
         {
             _options = options.Value ?? throw new ArgumentNullException(nameof(options));
             _liteDbStatisticsRepository = liteDbStatisticsRepository ?? throw new ArgumentNullException(nameof(liteDbStatisticsRepository));
@@ -32,7 +31,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Statistics
             return await _liteDbStatisticsRepository.GetAsync(id, action, ct);
         }
 
-        IAsyncEnumerable<StatisticsEntity> IStatisticsManager.GetAllAsync(CancellationToken ct)
+        IAsyncEnumerable<StatisticsEntity> IStatisticsRepository.GetAllAsync(CancellationToken ct)
         {
             return _liteDbStatisticsRepository.GetAllAsync(ct);
         }

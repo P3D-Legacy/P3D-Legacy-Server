@@ -48,7 +48,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             using var span = _tracer.StartActiveSpan("P3DBanRepository GetAsync", SpanKind.Client);
 
             var actualEntry = await GetInternalAsync(id, ct);
-            return actualEntry is null
+            return actualEntry is null || actualEntry.Banner is null || actualEntry.UserGameJolt is null || actualEntry.Reason is null
                 ? null
                 : new BanEntity(
                     PlayerId.FromGameJolt(GameJoltId.FromNumber(actualEntry.Banner.Id)),
@@ -69,7 +69,8 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
             try
             {
-                response = await _httpClientFactory.CreateClient("P3D.API").GetAsync(
+                using var client = _httpClientFactory.CreateClient("P3D.API");
+                response = await client.GetAsync(
                     new Uri("ban/gamejoltaccount", UriKind.Relative),
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);
@@ -85,12 +86,12 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
                 {
                     var content = await response.Content.ReadAsStringAsync(ct);
                     var responseData = JsonConvert.DeserializeObject<BanListResponse?>(content);
-                    if (responseData is null || responseData.Entries is null)
+                    if (responseData?.Entries is null)
                         yield break;
 
                     foreach (var data in responseData.Entries)
                     {
-                        if (data is null || data.UserGameJolt is null || data.User is null)
+                        if (data is null || data.Banner is null || data.UserGameJolt is null || data.Reason is null)
                             continue;
 
                         yield return new BanEntity(
@@ -121,11 +122,12 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
             try
             {
+                using var client = _httpClientFactory.CreateClient("P3D.API");
                 response = string.IsNullOrEmpty(reason)
-                    ? await _httpClientFactory.CreateClient("P3D.API").PostAsJsonAsync(
+                    ? await client.PostAsJsonAsync(
                         new Uri("ban/gamejoltaccount", UriKind.Relative),
                         new BanRequest(GameJoltId.Parse(id.Id), reasonId, expiration, GameJoltId.Parse(bannerId.Id)), _jsonContext.BanRequest, ct)
-                    : await _httpClientFactory.CreateClient("P3D.API").PostAsJsonAsync(
+                    : await client.PostAsJsonAsync(
                         new Uri("ban/gamejoltaccount", UriKind.Relative),
                         new TextReasonBanRequest(GameJoltId.Parse(id.Id), reason, expiration, GameJoltId.Parse(bannerId.Id)), _jsonContext.TextReasonBanRequest, ct);
             }
@@ -163,7 +165,8 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
             try
             {
-                response = await _httpClientFactory.CreateClient("P3D.API").GetAsync(
+                using var client = _httpClientFactory.CreateClient("P3D.API");
+                response = await client.GetAsync(
                     new Uri($"ban/gamejoltaccount/{id.Id}", UriKind.Relative),
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);
@@ -182,7 +185,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
                     if (responseData is null || responseData.Entries is null)
                         return null;
 
-                    return responseData.Entries.FirstOrDefault(x => x.ExpireAt is null || x.ExpireAt > DateTimeOffset.UtcNow);
+                    return responseData.Entries.FirstOrDefault(static x => x is not null && (x.ExpireAt is null || x.ExpireAt > DateTimeOffset.UtcNow));
                 }
                 return null;
             }
@@ -205,7 +208,8 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
                 try
                 {
-                    response = await _httpClientFactory.CreateClient("P3D.API").DeleteAsync(
+                    using var client = _httpClientFactory.CreateClient("P3D.API");
+                    response = await client.DeleteAsync(
                         new Uri($"ban/gamejoltaccount/{currentBan.Uid}", UriKind.Relative),
                         ct);
                 }
@@ -231,17 +235,17 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 
         [SuppressMessage("Performance", "CA1812")]
         private record BanListResponse(
-            [property: JsonProperty("data")] IReadOnlyList<BanResponseEntry> Entries);
+            [property: JsonProperty("data")] IReadOnlyList<BanResponseEntry?>? Entries);
 
         [Newtonsoft.Json.JsonConverter(typeof(JsonPathConverter))]
         [SuppressMessage("Performance", "CA1812")]
         private record BanResponseEntry(
-            [property: JsonProperty("uuid")] Guid Uid,
-            [property: JsonProperty("gamejoltaccount")] GameJoltDTO UserGameJolt,
-            [property: JsonProperty("gamejoltaccount.user")] UserDTO User,
-            [property: JsonProperty("banned_by")] UserDTO Banner,
-            [property: JsonProperty("reason.name")] string Reason,
-            [property: JsonProperty("updated_at")] DateTimeOffset UpdatedAt,
+            [property: JsonProperty("uuid")] Guid? Uid,
+            [property: JsonProperty("gamejoltaccount")] GameJoltDTO? UserGameJolt,
+            [property: JsonProperty("gamejoltaccount.user")] UserDTO? User,
+            [property: JsonProperty("banned_by")] UserDTO? Banner,
+            [property: JsonProperty("reason.name")] string? Reason,
+            [property: JsonProperty("updated_at")] DateTimeOffset? UpdatedAt,
             [property: JsonProperty("expire_at")] DateTimeOffset? ExpireAt);
 
 

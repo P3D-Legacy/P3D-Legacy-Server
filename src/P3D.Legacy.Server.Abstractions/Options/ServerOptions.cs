@@ -6,9 +6,9 @@ namespace P3D.Legacy.Server.Abstractions.Options
     {
         public ServerOptionsValidator()
         {
-            RuleFor(x => x.Name).NotEmpty();
-            RuleFor(x => x.Message).NotEmpty();
-            RuleFor(x => x.MaxPlayers).NotEmpty();
+            RuleFor(static x => x.Name).NotEmpty();
+            RuleFor(static x => x.Message).NotEmpty();
+            RuleFor(static x => x.MaxPlayers).NotEmpty();
         }
     }
 

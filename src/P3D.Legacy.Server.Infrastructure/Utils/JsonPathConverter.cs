@@ -25,7 +25,7 @@ namespace P3D.Legacy.Server.Infrastructure.Utils
             var jo = JObject.Load(reader);
             var targetObj = FormatterServices.GetUninitializedObject(objectType);
 
-            foreach (var prop in objectType.GetProperties().Where(p => p.CanRead && p.CanWrite))
+            foreach (var prop in objectType.GetProperties().Where(static p => p.CanRead && p.CanWrite))
             {
                 var att = prop.GetCustomAttribute<JsonPropertyAttribute>(true);
 

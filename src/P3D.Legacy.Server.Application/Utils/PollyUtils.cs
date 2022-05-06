@@ -30,11 +30,11 @@ namespace P3D.Legacy.Server.Application.Utils
 
             return Policy
                 .Handle<Exception>()
-                .Or<HttpRequestException>(e => e.StatusCode != HttpStatusCode.Unauthorized)
+                .Or<HttpRequestException>(static e => e.StatusCode != HttpStatusCode.Unauthorized)
                 .OrTransientHttpStatusCode()
                 .WaitAndRetryAsync(
                     retryCount: 5,
-                    sleepDurationProvider: (i, result, context) =>
+                    sleepDurationProvider: static (i, result, context) =>
                     {
                         var clientWaitDuration = TimeSpan.FromSeconds(2);
                         var serverWaitDuration = GetServerWaitDuration(result);

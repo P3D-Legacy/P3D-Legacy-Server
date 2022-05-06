@@ -17,7 +17,7 @@ namespace P3D.Legacy.Server.Abstractions.Configuration
         public MemoryConfigurationProvider(IConfigurationSection section)
         {
             _basePath = section.Path;
-            _keys = typeof(TOptions).GetProperties().Where(p => p.CanRead && p.CanWrite).ToArray();
+            _keys = typeof(TOptions).GetProperties().Where(static p => p.CanRead && p.CanWrite).ToArray();
         }
 
         public bool SetProperty(PropertyInfo propertyInfo, string value)

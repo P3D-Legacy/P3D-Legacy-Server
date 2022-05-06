@@ -48,13 +48,13 @@ namespace P3D.Legacy.Server
 
         public static IHostBuilder CreateHostBuilder(string[] args) => Host
             .CreateDefaultBuilder(args)
-            .UseConsoleLifetime(opts => opts.SuppressStatusMessages = false)
-            .ConfigureAppConfiguration((ctx, builder) =>
+            .UseConsoleLifetime(static opt => opt.SuppressStatusMessages = false)
+            .ConfigureAppConfiguration(static (ctx, builder) =>
             {
                 builder.Add(new MemoryConfigurationProvider<ServerOptions>(ctx.Configuration.GetSection("Server")));
                 builder.Add(new MemoryConfigurationProvider<LiteDbOptions>(ctx.Configuration.GetSection("LiteDb")));
             })
-            .ConfigureServices((ctx, services) =>
+            .ConfigureServices(static (ctx, services) =>
             {
                 services.AddSingleton<DynamicConfigurationProviderManager>();
 
@@ -79,7 +79,7 @@ namespace P3D.Legacy.Server
                 services.AddStatistics();
                 services.AddGUI();
 
-                services.AddOpenTelemetryMetrics(b => b.Configure((sp, builder) =>
+                services.AddOpenTelemetryMetrics(static b => b.Configure(static (sp, builder) =>
                 {
                     var options = sp.GetRequiredService<IOptions<OtlpOptions>>().Value;
                     if (options.Enabled)
@@ -91,13 +91,13 @@ namespace P3D.Legacy.Server
 
                         builder.AddStatisticsInstrumentation();
 
-                        builder.AddOtlpExporter(o =>
+                        builder.AddOtlpExporter(opt =>
                         {
-                            o.Endpoint = new Uri(options.Host);
+                            opt.Endpoint = new Uri(options.Host);
                         });
                     }
                 }));
-                services.AddOpenTelemetryTracing(b => b.Configure((sp, builder) =>
+                services.AddOpenTelemetryTracing(static b => b.Configure(static (sp, builder) =>
                 {
                     var options = sp.GetRequiredService<IOptions<OtlpOptions>>().Value;
                     if (options.Enabled)
@@ -117,15 +117,15 @@ namespace P3D.Legacy.Server
                         builder.AddInternalAPIInstrumentation();
                         builder.AddStatisticsInstrumentation();
 
-                        builder.AddOtlpExporter(o =>
+                        builder.AddOtlpExporter(opt =>
                         {
-                            o.Endpoint = new Uri(options.Host);
+                            opt.Endpoint = new Uri(options.Host);
                         });
                     }
                 }));
             })
             .AddP3DServer()
-            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
+            .ConfigureWebHostDefaults(static webBuilder => webBuilder.UseStartup<Startup>())
         ;
     }
 }

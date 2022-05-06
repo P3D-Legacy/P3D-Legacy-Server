@@ -3,7 +3,7 @@
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Queries.Permission;
 using P3D.Legacy.Server.CQERS.Queries;
-using P3D.Legacy.Server.Infrastructure.Services.Permissions;
+using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -16,9 +16,9 @@ namespace P3D.Legacy.Server.Application.QueryHandlers.Permission
     internal sealed class PermissionQueryHandler : IQueryHandler<GetPlayerPermissionQuery, PermissionViewModel?>
     {
         private readonly ILogger _logger;
-        private readonly IPermissionManager _permissionRepository;
+        private readonly IPermissionRepository _permissionRepository;
 
-        public PermissionQueryHandler(ILogger<PermissionQueryHandler> logger, IPermissionManager permissionRepository)
+        public PermissionQueryHandler(ILogger<PermissionQueryHandler> logger, IPermissionRepository permissionRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _permissionRepository = permissionRepository ?? throw new ArgumentNullException(nameof(permissionRepository));

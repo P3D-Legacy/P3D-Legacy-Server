@@ -3,13 +3,10 @@
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
 using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
+using P3D.Legacy.Server.Infrastructure.Repositories.Mutes;
 using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
 using P3D.Legacy.Server.Infrastructure.Repositories.Statistics;
-using P3D.Legacy.Server.Infrastructure.Services.Bans;
-using P3D.Legacy.Server.Infrastructure.Services.Mutes;
-using P3D.Legacy.Server.Infrastructure.Services.Permissions;
-using P3D.Legacy.Server.Infrastructure.Services.Statistics;
-using P3D.Legacy.Server.Infrastructure.Services.Users;
+using P3D.Legacy.Server.Infrastructure.Repositories.Users;
 
 using System.Text.Json;
 
@@ -25,15 +22,15 @@ namespace P3D.Legacy.Server.Infrastructure.Extensions
 
             services.AddHttpClient();
 
-            services.AddTransient<IUserManager, LiteDbUserManager>();
+            services.AddTransient<IUserRepository, LiteDbUserRepository>();
 
-            services.AddTransient<IMuteManager, LiteDbMuteManager>();
+            services.AddTransient<IMuteRepository, LiteDbMuteRepository>();
 
-            services.AddTransient<IPermissionManager, DefaultPermissionManager>();
+            services.AddTransient<IPermissionRepository, DefaultPermissionRepository>();
             services.AddTransient<P3DPermissionRepository>();
             services.AddTransient<LiteDbPermissionRepository>();
 
-            services.AddTransient<IBanManager, DefaultBanManager>();
+            services.AddTransient<IBanRepository, DefaultBanRepository>();
             services.AddTransient<P3DBanRepository>();
             services.AddTransient<LiteDbBanRepository>();
 
@@ -41,7 +38,7 @@ namespace P3D.Legacy.Server.Infrastructure.Extensions
             services.AddTransient<PokeAPIMonsterRepository>();
             services.AddTransient<NopMonsterRepository>();
 
-            services.AddTransient<IStatisticsManager, DefaultStatisticsManager>();
+            services.AddTransient<IStatisticsRepository, DefaultStatisticsRepository>();
             services.AddTransient<LiteDbStatisticsRepository>();
 
             return services;

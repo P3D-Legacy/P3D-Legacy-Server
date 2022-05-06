@@ -16,7 +16,7 @@ namespace P3D.Legacy.Tests.Client.P3D
     {
         private sealed class TestPacketFactory : IP3DPacketFactory
         {
-            public P3DPacket? GetFromId(P3DPacketType id) => new P3DPacketSample();
+            public P3DPacket GetFromId(P3DPacketType id) => new P3DPacketSample();
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace P3D.Legacy.Tests.Client.P3D
             Assert.AreEqual("0.5|1|0|6|0|6|7|21|22|27|Aragas115124000000000j151241|1|1\r\n", Encoding.ASCII.GetString(writer.WrittenSpan));
 
             var pos = default(SequencePosition);
-            protocol.TryParseMessage(new ReadOnlySequence<byte>(writer.WrittenMemory), ref pos, ref pos, out var packet2);
+            Assert.IsTrue(protocol.TryParseMessage(new ReadOnlySequence<byte>(writer.WrittenMemory), ref pos, ref pos, out var packet2));
             Assert.AreEqual(packet, packet2);
         }
     }

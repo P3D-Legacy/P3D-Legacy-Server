@@ -10,8 +10,8 @@ namespace P3D.Legacy.Server.Options
     {
         public P3DSiteOptionsValidator(HttpClient httpClient)
         {
-            RuleFor(x => x.APIEndpointV1).IsUri().IsUriAvailable(httpClient).When(x => !string.IsNullOrEmpty(x.APIEndpointV1));
-            RuleFor(x => x.APIToken).NotEmpty().When(x => !string.IsNullOrEmpty(x.APIEndpointV1));
+            RuleFor(static x => x.APIEndpointV1).IsUri().IsUriAvailable(httpClient).When(static x => !string.IsNullOrEmpty(x.APIEndpointV1));
+            RuleFor(static x => x.APIToken).NotEmpty().When(static x => !string.IsNullOrEmpty(x.APIEndpointV1));
         }
     }
 

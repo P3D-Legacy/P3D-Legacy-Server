@@ -24,15 +24,15 @@ namespace P3D.Legacy.Server.Abstractions.Configuration
             }
         }
 
-        public IEnumerable<Type> GetRegisteredOptionTypes() => _configurationProviders.Select(x => x.OptionsType);
+        public IEnumerable<Type> GetRegisteredOptionTypes() => _configurationProviders.Select(static x => x.OptionsType);
 
         public IDynamicConfigurationProvider? GetProvider(Type optionsType) => _configurationProviders.FirstOrDefault(x => x.OptionsType == optionsType);
         public IDynamicConfigurationProvider? GetProvider<TOptions>() => GetProvider(typeof(TOptions));
         public object? GetOptions(Type type)
         {
-            var openMethod = typeof(DynamicConfigurationProviderManager).GetMethod("GetOptionsInternal", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var openMethod = typeof(DynamicConfigurationProviderManager).GetMethod(nameof(GetOptionsInternal), BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
             var method = openMethod?.MakeGenericMethod(type);
-            return method?.Invoke(this, Array.Empty<object>());
+            return method?.Invoke(this, null);
         }
         public TOptions? GetOptionsInternal<TOptions>() where TOptions : class => _serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;
     }

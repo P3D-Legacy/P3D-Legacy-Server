@@ -7,7 +7,7 @@ namespace P3D.Legacy.Server.DiscordBot.Options
         public DiscordOptionsValidator()
         {
             //RuleFor(x => x.BotToken).NotEmpty().NotInteger().NotBoolean();
-            RuleFor(x => x.PasstroughChannelId).NotEmpty().When(x => !string.IsNullOrEmpty(x.BotToken));
+            RuleFor(static x => x.PasstroughChannelId).NotEmpty().When(static x => !string.IsNullOrEmpty(x.BotToken));
         }
     }
 

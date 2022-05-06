@@ -16,18 +16,17 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command
         private static readonly Action<ILogger, string, long, TCommand, Exception?> Command = LoggerMessage.Define<string, long, TCommand>(
             LogLevel.Warning, default, "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Command}");
 
-        private readonly Stopwatch _timer;
         private readonly ILogger<TCommand> _logger;
+        private readonly Stopwatch _timer = new();
 
         [SuppressMessage("CodeQuality", "IDE0079")]
         [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
         public CommandPerformanceBehaviour(ILogger<TCommand> logger)
         {
-            _timer = new Stopwatch();
             _logger = logger;
         }
 
-        public async Task<CommandResult> Handle(TCommand command, CancellationToken ct, CommandHandlerDelegate next)
+        public async Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct)
         {
             _timer.Start();
 

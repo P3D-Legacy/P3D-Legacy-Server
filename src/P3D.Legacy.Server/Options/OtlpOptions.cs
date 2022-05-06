@@ -8,7 +8,7 @@ namespace P3D.Legacy.Server.Options
     {
         public OtlpOptionsValidator()
         {
-            RuleFor(x => x.Host).IsUri().IsUrlTcpEndpointAvailable().When(x => x.Enabled);
+            RuleFor(static x => x.Host).IsUri().IsUrlTcpEndpointAvailable().When(static x => x.Enabled);
         }
     }
 

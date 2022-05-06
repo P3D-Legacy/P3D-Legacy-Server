@@ -289,3 +289,6 @@ dotnet_diagnostic.IDE0057.severity = silent
 
 # IDE0001: Simplify Names
 dotnet_diagnostic.IDE0001.severity = none
+
+resharper_lambda_expression_can_be_made_static_highlighting = warning
+resharper_lambda_expression_must_be_static_highlighting = warning

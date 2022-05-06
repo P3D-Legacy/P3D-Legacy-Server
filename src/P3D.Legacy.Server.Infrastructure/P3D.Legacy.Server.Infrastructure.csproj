@@ -29,7 +29,6 @@
     <PackageReference Include="LiteDB.Async" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="OpenTelemetry.Api" />
-    <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="System.Text.Encodings.Web" />
   </ItemGroup>
 

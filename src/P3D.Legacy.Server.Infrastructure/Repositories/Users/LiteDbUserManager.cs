@@ -20,9 +20,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Infrastructure.Services.Users
+namespace P3D.Legacy.Server.Infrastructure.Repositories.Users
 {
-    public class LiteDbUserManager : IUserManager
+    public class LiteDbUserRepository : IUserRepository
     {
         private record Lockout(ObjectId Id, string UserId, DateTimeOffset LockoutEnd);
         private record User(string Id, string Name, string PasswordHash);
@@ -31,7 +31,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
         private readonly PasswordOptions _passwordOptions;
         private readonly LockoutOptions _lockoutOptions;
 
-        public LiteDbUserManager(IOptionsMonitor<LiteDbOptions> options, IOptions<PasswordOptions> passwordOptions, IOptions<LockoutOptions> lockoutOptions)
+        public LiteDbUserRepository(IOptionsMonitor<LiteDbOptions> options, IOptions<PasswordOptions> passwordOptions, IOptions<LockoutOptions> lockoutOptions)
         {
             _options = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
             _passwordOptions = passwordOptions.Value ?? throw new ArgumentNullException(nameof(passwordOptions));
@@ -46,7 +46,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             var collection = db.GetCollection<User>("users");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
@@ -65,7 +65,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             var collection = db.GetCollection<User>("users");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             var validationResult = await ValidateAsync(password, ct);
 
@@ -94,17 +94,17 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             var collection = db.GetCollection<Lockout>("lockouts");
 
             ct.ThrowIfCancellationRequested();
-            await collection.DeleteManyAsync(x => x.LockoutEnd < DateTimeOffset.UtcNow);
+            await collection.DeleteManyAsync(static x => x.LockoutEnd < DateTimeOffset.UtcNow);
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.UserId, false);
+            await collection.EnsureIndexAsync(static x => x.UserId, false);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
-            var minValue = await collection.Query().Where(x => x.UserId == idStr).OrderBy(x => x.LockoutEnd).FirstOrDefaultAsync();
+            var minValue = await collection.Query().Where(x => x.UserId == idStr).OrderBy(static x => x.LockoutEnd).FirstOrDefaultAsync();
             return minValue?.LockoutEnd;
         }
 
@@ -118,13 +118,13 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             var collection = db.GetCollection<Lockout>("lockouts");
 
             ct.ThrowIfCancellationRequested();
-            await collection.DeleteManyAsync(x => x.LockoutEnd < DateTimeOffset.UtcNow);
+            await collection.DeleteManyAsync(static x => x.LockoutEnd < DateTimeOffset.UtcNow);
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.UserId, false);
+            await collection.EnsureIndexAsync(static x => x.UserId, false);
 
             var idStr = id.ToString();
             ct.ThrowIfCancellationRequested();
@@ -146,7 +146,7 @@ namespace P3D.Legacy.Server.Infrastructure.Services.Users
             var locksCollection = db.GetCollection<Lockout>("lockouts");
 
             ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(x => x.Id, true);
+            await collection.EnsureIndexAsync(static x => x.Id, true);
 
             if (await GetAccessFailedCountAsync(userEntity, ct) >= _lockoutOptions.MaxFailedAccessAttempts)
                 return SignInResult.LockedOut;

@@ -3,7 +3,7 @@ using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.CQERS.Commands;
-using P3D.Legacy.Server.Infrastructure.Services.Bans;
+using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
 
 using System;
 using System.Diagnostics;
@@ -18,16 +18,13 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     {
         private readonly IPlayerOriginGenerator _playerIdGenerator;
         private readonly IPlayerContainerWriter _playerContainer;
-        private readonly IBanManager _banManager;
+        private readonly IBanRepository _banRepository;
 
-        public PlayerInitializingCommandHandler(
-            IPlayerContainerWriter playerContainer,
-            IPlayerOriginGenerator playerIdGenerator,
-            IBanManager banManager)
+        public PlayerInitializingCommandHandler(IPlayerContainerWriter playerContainer, IPlayerOriginGenerator playerIdGenerator, IBanRepository banRepository)
         {
             _playerIdGenerator = playerIdGenerator ?? throw new ArgumentNullException(nameof(playerIdGenerator));
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
-            _banManager = banManager ?? throw new ArgumentNullException(nameof(banManager));
+            _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
         }
 
         public async Task<CommandResult> HandleAsync(PlayerInitializingCommand command, CancellationToken ct)
@@ -38,7 +35,7 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 
             var playerId = player.GameJoltId.IsNone ? PlayerId.FromName(player.Name) : PlayerId.FromGameJolt(player.GameJoltId);
 
-            if (await _banManager.GetAsync(playerId, ct) is { } banEntity)
+            if (await _banRepository.GetAsync(playerId, ct) is { } banEntity)
             {
                 await player.KickAsync($"You are banned: {banEntity.Reason}", ct);
                 return CommandResult.Success;

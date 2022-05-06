@@ -10,7 +10,7 @@ namespace P3D.Legacy.Server.Infrastructure.Options
     {
         public PokeAPIOptionsValidator(HttpClient httpClient)
         {
-            RuleFor(x => x.GraphQLEndpoint).IsUri().IsUriAvailable(httpClient).When(x => !string.IsNullOrEmpty(x.GraphQLEndpoint));
+            RuleFor(static x => x.GraphQLEndpoint).IsUri().IsUriAvailable(httpClient).When(static x => !string.IsNullOrEmpty(x.GraphQLEndpoint));
         }
     }
 
