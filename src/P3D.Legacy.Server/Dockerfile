@@ -1,8 +1,6 @@
-# Stage 1: Build application
-FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS build-env
-
+# Stage 1: Copy .csproj
+FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS restore-base
 WORKDIR /build
-
 COPY ["src/P3D.Legacy.Common/P3D.Legacy.Common.csproj", "src/P3D.Legacy.Common/"]
 COPY ["src/P3D.Legacy.Server.CQERS/P3D.Legacy.Server.CQERS.csproj", "src/P3D.Legacy.Server.CQERS/"]
 COPY ["src/P3D.Legacy.Server.Abstractions/P3D.Legacy.Server.Abstractions.csproj", "src/P3D.Legacy.Server.Abstractions/"]
@@ -17,10 +15,20 @@ COPY ["src/P3D.Legacy.Server.Statistics/P3D.Legacy.Server.Statistics.csproj", "s
 COPY ["src/P3D.Legacy.Server.UI.Shared/P3D.Legacy.Server.UI.Shared.csproj", "src/P3D.Legacy.Server.UI.Shared/"]
 COPY ["src/P3D.Legacy.Server.GUI/P3D.Legacy.Server.GUI.csproj", "src/P3D.Legacy.Server.GUI/"]
 COPY ["src/P3D.Legacy.Server/P3D.Legacy.Server.csproj", "src/P3D.Legacy.Server/"]
+COPY ["Directory.Build.props", "./"]
 COPY ["Directory.Packages.props", "./"]
 
-RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj"
 
+# Stage 2: Restore
+FROM --platform=linux/amd64 restore-base AS restore
+RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r debian-x64;
+
+FROM --platform=linux/arm64 restore-base AS restore
+RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r debian-arm64;
+
+
+# Stage 3: Copy source files
+FROM restore AS build-base
 COPY ["src/P3D.Legacy.Common/", "src/P3D.Legacy.Common/"]
 COPY ["src/P3D.Legacy.Server.CQERS/", "src/P3D.Legacy.Server.CQERS/"]
 COPY ["src/P3D.Legacy.Server.Abstractions/", "src/P3D.Legacy.Server.Abstractions/"]
@@ -38,25 +46,29 @@ COPY ["src/P3D.Legacy.Server/", "src/P3D.Legacy.Server/"]
 
 COPY [".git", ".git"]
 
-RUN /bin/bash -c 'set -ex && \
-    ARCH=`uname -m` && \
-    if [[ "$ARCH" == "amd64" || "$ARCH" == "x86_64" ]]; then \
-       echo "x86_64" && \
-       dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output --arch x64 --os debian --self-contained true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true; \
-    elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then \
-       echo "aarch64" && \
-       dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output --arch arm64 --os debian --self-contained true; \
-    else \
-       echo "unknown arch" && \
-       dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -o ./output --arch $ARCH --os debian --self-contained true; \
-    fi'
 
-# Stage 2: Copy application artifacts into a smaller runtime environment, which is then used as our final image
+# Stage 4: Build
+FROM --platform=linux/amd64 build-base AS build
+RUN dotnet build "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r debian-x64 --self-contained true;
+
+FROM --platform=linux/arm64 build-base AS build
+RUN dotnet build "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r debian-arm64 --self-contained true;
+
+
+# Stage 5: Restore
+FROM --platform=linux/amd64 build AS publish
+RUN dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-build -c Release -o ./output -r debian-x64 --self-contained true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true;
+
+FROM --platform=linux/arm64 build AS publish
+RUN dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-build -c Release -o ./output -r debian-arm64 --self-contained true;
+
+
+# Stage 6: Copy application artifacts into a smaller runtime environment, which is then used as our final image
 FROM mcr.microsoft.com/dotnet/runtime-deps:6.0-bullseye-slim
 
 WORKDIR /app
 
-COPY --from=build-env /build/output .
+COPY --from=publish /build/output .
 
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md
 # org.opencontainers.image.base.digest
