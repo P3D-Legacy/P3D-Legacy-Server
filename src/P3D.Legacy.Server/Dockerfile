@@ -1,16 +1,8 @@
 # Stage 1: Restore, Build an Publish on x64
 FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS publish
-
 ARG TARGETPLATFORM
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-    RID=debian-x64 ; \
-    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
-    RID=debian-arm64 ; \
-    elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
-    RID=debian-arm ; \
-    fi
-
 WORKDIR /build
+
 COPY ["src/P3D.Legacy.Common/P3D.Legacy.Common.csproj", "src/P3D.Legacy.Common/"]
 COPY ["src/P3D.Legacy.Server.CQERS/P3D.Legacy.Server.CQERS.csproj", "src/P3D.Legacy.Server.CQERS/"]
 COPY ["src/P3D.Legacy.Server.Abstractions/P3D.Legacy.Server.Abstractions.csproj", "src/P3D.Legacy.Server.Abstractions/"]
@@ -28,7 +20,14 @@ COPY ["src/P3D.Legacy.Server/P3D.Legacy.Server.csproj", "src/P3D.Legacy.Server/"
 COPY ["Directory.Build.props", "./"]
 COPY ["Directory.Packages.props", "./"]
 
-RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r $RID;
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+    RID=debian-x64 ; \
+    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+    RID=debian-arm64 ; \
+    elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
+    RID=debian-arm ; \
+    fi \
+    && dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r $RID;
 
 COPY ["src/P3D.Legacy.Common/", "src/P3D.Legacy.Common/"]
 COPY ["src/P3D.Legacy.Server.CQERS/", "src/P3D.Legacy.Server.CQERS/"]
@@ -47,13 +46,26 @@ COPY ["src/P3D.Legacy.Server/", "src/P3D.Legacy.Server/"]
 
 COPY [".git", ".git"]
 
-RUN dotnet build "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained true;
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+    RID=debian-x64 ; \
+    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+    RID=debian-arm64 ; \
+    elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
+    RID=debian-arm ; \
+    fi \
+    && dotnet build "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained true;
 
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-    dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-build -c Release -o ./output -r $RID --self-contained true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true; \
-    else \
-    dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-build -c Release -o ./output -r $RID --self-contained true; \
-    fi
+    RID=debian-x64 ; \
+    RTR="/p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true" ; \
+    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+    RID=debian-arm64 ; \
+    RTR="" ; \
+    elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
+    RID=debian-arm ; \
+    RTR="" ; \
+    fi \
+    && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-build -c Release -o ./output -r $RID --self-contained true $RTR;
 
 
 # Stage 6: Copy application artifacts into a smaller runtime environment, which is then used as our final image
