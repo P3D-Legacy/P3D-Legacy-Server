@@ -16,8 +16,11 @@
   </PropertyGroup>
   
   <!-- https://github.com/dotnet/sdk/issues/3843 -->
-  <PropertyGroup Condition="$(IN_DOCKER) == 'true'">
-    <RuntimeIdentifiers>debian-x64;debian-arm64;debian-arm;win-x64</RuntimeIdentifiers>
+  <PropertyGroup Condition="$(DOCKER_UNIVERSAL) == 'true'">
+    <RuntimeIdentifiers>linux-x64;linux-arm64;linux-arm;win-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(DOCKER_ALPINE) == 'true'">
+    <RuntimeIdentifiers>alpine-x64;alpine-arm64;alpine-arm</RuntimeIdentifiers>
   </PropertyGroup>
 
   <PropertyGroup>

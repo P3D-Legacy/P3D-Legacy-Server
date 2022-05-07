@@ -3,7 +3,7 @@
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS publish
 SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 ARG TARGETPLATFORM
-ARG IN_DOCKER="true"
+ARG DOCKER_UNIVERSAL="true"
 WORKDIR /build
 
 COPY ["src/P3D.Legacy.Common/P3D.Legacy.Common.csproj", "src/P3D.Legacy.Common/"]
@@ -44,18 +44,18 @@ COPY [".git", ".git"]
 
 RUN \
     if ($env:TARGETPLATFORM -eq "linux/amd64") { \
-      $RID = "debian-x64"; \
+      $RID = "linux-x64"; \
     } elseif ($env:TARGETPLATFORM -eq "linux/arm64") { \
-      $RID = "debian-arm64"; \
+      $RID = "linux-arm64"; \
     } elseif ($env:TARGETPLATFORM -eq "linux/arm/v7") { \
-      $RID = "debian-arm"; \
+      $RID = "linux-arm"; \
     } elseif ($env:TARGETPLATFORM -eq "windows/amd64") { \
       $RID = "win-x64"; \
     } \
     dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -o ./output -r $RID --self-contained false /p:UseAppHost=false;
 
 # Stage 6: Copy application artifacts into a smaller runtime environment, which is then used as our final image
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime:6.0
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:6.0
 
 WORKDIR /app
 
