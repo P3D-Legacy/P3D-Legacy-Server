@@ -60,10 +60,10 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
     RTR="/p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true" ; \
     elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
     RID=debian-arm64 ; \
-    RTR="" ; \
+    RTR="/p:PublishReadyToRun=false" ; \
     elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
     RID=debian-arm ; \
-    RTR="" ; \
+    RTR="/p:PublishReadyToRun=false" ; \
     fi \
     && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-build -c Release -o ./output -r $RID --self-contained true $RTR;
 
