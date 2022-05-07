@@ -1,6 +1,6 @@
 # Produces a self-contained executable for linux.
 # Stage 1: Restore and Publish on AMD64 for AMD64, ARM64, ARM32
-FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS publish
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS publish
 SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 ARG TARGETPLATFORM
 ARG IN_DOCKER="true"
@@ -53,7 +53,7 @@ RUN \
     dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -o ./output -r $RID --self-contained true;
 
 # Stage 6: Copy application artifacts into a smaller runtime environment, which is then used as our final image
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/runtime-deps:6.0-bullseye-slim
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime-deps:6.0-bullseye-slim
 
 WORKDIR /app
 

@@ -1,6 +1,6 @@
 # Produces a framework-dependent executable for a specific platform, we only use the .dll
 # Stage 1: Restore and Publish
-FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS publish
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS publish
 SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 ARG TARGETPLATFORM
 ARG IN_DOCKER="true"
@@ -55,7 +55,7 @@ RUN \
     dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -o ./output -r $RID --self-contained false /p:UseAppHost=false;
 
 # Stage 6: Copy application artifacts into a smaller runtime environment, which is then used as our final image
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/runtime:6.0
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime:6.0
 
 WORKDIR /app
 
