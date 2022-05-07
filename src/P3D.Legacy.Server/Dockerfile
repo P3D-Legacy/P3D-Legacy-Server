@@ -1,5 +1,5 @@
 # Stage 1: Restore and Publish on AMD64 for AMD64, ARM64, ARM32
-FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS publish
+FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0-alpine AS publish
 ARG TARGETPLATFORM
 ARG IN_DOCKER="true"
 WORKDIR /build
@@ -41,32 +41,32 @@ COPY ["src/P3D.Legacy.Server/", "src/P3D.Legacy.Server/"]
 COPY [".git", ".git"]
 
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-    RID=debian-x64 ; \
+    RID=alpine-x64 ; \
     RTR="/p:PublishReadyToRun=false" ; \
     #RTR="/p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true" ; \
     elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
-    RID=debian-arm64 ; \
+    RID=alpine-arm64 ; \
     RTR="/p:PublishReadyToRun=false" ; \
     elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
-    RID=debian-arm ; \
+    RID=alpine-arm ; \
     RTR="/p:PublishReadyToRun=false" ; \
     fi \
     && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -o ./output -r $RID --self-contained true $RTR;
 
 
 # Stage 6: Copy application artifacts into a smaller runtime environment, which is then used as our final image
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/runtime-deps:6.0-bullseye-slim
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine
 
 WORKDIR /app
 
 COPY --from=publish /build/output .
 
+ARG DATE=unknown
+ARG REVISION=unknown
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md
 # org.opencontainers.image.base.digest
 # org.opencontainers.image.ref.name
-# org.opencontainers.image.revision
 # org.opencontainers.image.version
-# org.opencontainers.image.created
 LABEL org.opencontainers.image.title="P3D Legacy Server" \
       org.opencontainers.image.description="Server software for P3D Legacy" \
       org.opencontainers.image.url="https://github.com/P3D-Legacy/P3D-Legacy-Server" \
@@ -75,7 +75,9 @@ LABEL org.opencontainers.image.title="P3D Legacy Server" \
       org.opencontainers.image.authors="Vitaly Mikhailov (Aragas) <personal@aragas.org>" \
       org.opencontainers.image.vendor="P3D-Legacy Team" \
       org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine"
+      org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine" \
+      org.opencontainers.image.created=$DATE \
+      org.opencontainers.image.revision=$REVISION
 
 EXPOSE 80/tcp
 EXPOSE 15124/tcp
