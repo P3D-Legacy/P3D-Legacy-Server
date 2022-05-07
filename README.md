@@ -9,6 +9,16 @@
   <a href="https://codeclimate.com/github/P3D-Legacy/P3D-Legacy-Server/maintainability">
     <img alt="Code Climate maintainability" src="https://img.shields.io/codeclimate/maintainability-percentage/P3D-Legacy/P3D-Legacy-Server">
   </a>
+  <a href="https://codecov.io/gh/P3D-Legacy/P3D-Legacy-Server">
+    <img src="https://codecov.io/gh/P3D-Legacy/P3D-Legacy-Server/branch/master/graph/badge.svg" />
+  </a>
+  </br>
+  <a href="https://github.com/P3D-Legacy/P3D-Legacy-Server/actions/workflows/docker-publish.yml">
+    <img alt="Latest Build" src="https://img.shields.io/github/workflow/status/P3D-Legacy/P3D-Legacy-Server/Publish%20Docker%20Image%20on%20Release">
+  </a>
+  <a href="https://github.com/P3D-Legacy/P3D-Legacy-Server/actions/workflows/docker-publish-qa.yml">
+    <img alt="Latest QA Build" src="https://img.shields.io/github/workflow/status/P3D-Legacy/P3D-Legacy-Server/Publish%20Docker%20Image%20on%20Commit">
+  </a>
   <!--
   <a href="https://p3d-legacy.github.io/P3D-Legacy-Server/index.html" alt="Documentation">
     <img src="https://img.shields.io/badge/Documentation-%F0%9F%94%8D-blue?style=flat" />
@@ -18,14 +28,14 @@
     <img alt="Swagger Validator" src="https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fp3d-legacy.github.io%2FP3D-Legacy-Server%2Fopenapi.json">
   </a>
   </br>
-  <a href="https://github.com/P3D-Legacy/P3D-Legacy-Server/actions/workflows/docker-publish.yml">
-    <img alt="Latest Build" src="https://img.shields.io/github/workflow/status/P3D-Legacy/P3D-Legacy-Server/Publish%20Docker%20Image%20on%20Release">
+  <a href="https://karp.pokemon3d.net/">
+    <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/P3D-Legacy/P3D-Legacy-Server/p3d-backend?label=Server">
   </a>
-  <a href="https://github.com/P3D-Legacy/P3D-Legacy-Server/actions/workflows/docker-publish-qa.yml">
-    <img alt="Latest QA Build" src="https://img.shields.io/github/workflow/status/P3D-Legacy/P3D-Legacy-Server/Publish%20Docker%20Image%20on%20Commit">
+  <a href="https://karp.pokemon3d.net/">
+    <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/P3D-Legacy/P3D-Legacy-Server/next-p3d-backend?label=QA%20Server">
   </a>
-  <a href="https://codecov.io/gh/P3D-Legacy/P3D-Legacy-Server">
-    <img src="https://codecov.io/gh/P3D-Legacy/P3D-Legacy-Server/branch/master/graph/badge.svg" />
+  <a href="https://p3d-legacy.github.io/P3D-Legacy-Server/">
+    <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/P3D-Legacy/P3D-Legacy-Server/github-pages?label=OpenAPI%20Deploy">
   </a>
 </p>
 
