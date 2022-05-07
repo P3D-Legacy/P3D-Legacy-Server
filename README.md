@@ -9,8 +9,13 @@
   <a href="https://codeclimate.com/github/P3D-Legacy/P3D-Legacy-Server/maintainability">
     <img alt="Code Climate maintainability" src="https://img.shields.io/codeclimate/maintainability-percentage/P3D-Legacy/P3D-Legacy-Server">
   </a>
+  <!--
   <a href="https://p3d-legacy.github.io/P3D-Legacy-Server/index.html" alt="Documentation">
     <img src="https://img.shields.io/badge/Documentation-%F0%9F%94%8D-blue?style=flat" />
+  </a>
+  -->
+  <a href="https://p3d-legacy.github.io/P3D-Legacy-Server/index.html" alt="Swagger">
+    <img alt="Swagger Validator" src="https://img.shields.io/swagger/valid/3.0?specUrl=https%3A%2F%2Fp3d-legacy.github.io%2FP3D-Legacy-Server%2Fopenapi.json">
   </a>
   </br>
   <a href="https://github.com/P3D-Legacy/P3D-Legacy-Server/actions/workflows/docker-publish.yml">
