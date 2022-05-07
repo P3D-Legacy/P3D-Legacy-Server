@@ -14,6 +14,11 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerComposeProjectPath>..\..\docker-compose\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
+  
+  <!-- https://github.com/dotnet/sdk/issues/3843 -->
+  <PropertyGroup Condition="$(IN_DOCKER) == 'true'">
+    <RuntimeIdentifiers>debian-x64;debian-arm64;debian-arm</RuntimeIdentifiers>
+  </PropertyGroup>
 
   <PropertyGroup>
     <ServerGarbageCollection>true</ServerGarbageCollection>
