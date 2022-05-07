@@ -23,7 +23,8 @@
     <img src="https://codecov.io/gh/P3D-Legacy/P3D-Legacy-Server/branch/master/graph/badge.svg" />
   </a>
 </p>
-The new 'enterprise grade' © server for P3D-Legacy based on ASP.NET Core and
+
+The new 'enterprise grade' © server for P3D-Legacy based on ASP.NET Core and 
 [Project Bedrock](https://github.com/davidfowl/BedrockFramework).
 
 ## How To Get It
