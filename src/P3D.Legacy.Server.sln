@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root", "root", "{B8171225-F
 		..\.editorconfig = ..\.editorconfig
 		..\Directory.Packages.props = ..\Directory.Packages.props
 		..\Directory.Build.props = ..\Directory.Build.props
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{679B78EF-C627-49A7-B49E-D54B4FAF1F08}"
