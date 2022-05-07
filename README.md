@@ -30,7 +30,7 @@ The new 'enterprise grade' © server for P3D-Legacy based on ASP.NET Core and
 ## How To Get It
 ### Executable
 We provide statically compiled binaries for every supported by .NET platform.  
-Check the [Releases](https://github.com/P3D-Legacy/P3D-Legacy-Server/releases)
+Check the [Releases](https://github.com/P3D-Legacy/P3D-Legacy-Server/releases/latest)
 tab for the latest release available.
 
 ### Docker Image
