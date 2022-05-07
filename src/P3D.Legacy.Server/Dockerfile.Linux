@@ -1,5 +1,6 @@
 # Stage 1: Restore and Publish on AMD64 for AMD64, ARM64, ARM32
-FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0-alpine AS publish
+FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0-buster-slim AS publish
+SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 ARG TARGETPLATFORM
 ARG IN_DOCKER="true"
 WORKDIR /build
@@ -40,22 +41,18 @@ COPY ["src/P3D.Legacy.Server/", "src/P3D.Legacy.Server/"]
 
 COPY [".git", ".git"]
 
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-    RID=alpine-x64 ; \
-    RTR="/p:PublishReadyToRun=false" ; \
-    #RTR="/p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true" ; \
-    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
-    RID=alpine-arm64 ; \
-    RTR="/p:PublishReadyToRun=false" ; \
-    elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
-    RID=alpine-arm ; \
-    RTR="/p:PublishReadyToRun=false" ; \
-    fi \
-    && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -o ./output -r $RID --self-contained true $RTR;
-
+RUN \
+    if ($env:TARGETPLATFORM -eq "linux/amd64") { \
+      $RID = "debian-x64"; \
+    } elseif ($env:TARGETPLATFORM -eq "linux/arm64") { \
+      $RID = "debian-arm64"; \
+    } elseif ($env:TARGETPLATFORM -eq "linux/arm/v7") { \
+      $RID = "debian-arm"; \
+    } \
+    dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -o ./output -r $RID --self-contained true;
 
 # Stage 6: Copy application artifacts into a smaller runtime environment, which is then used as our final image
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/runtime-deps:6.0-buster-slim
 
 WORKDIR /app
 
