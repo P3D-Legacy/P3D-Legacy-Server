@@ -44,7 +44,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: ./src/P3D.Legacy.Server/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: ghcr.io/p3d-legacy/p3d-legacy-server:latest-qa
           cache-from: type=local,src=/tmp/.buildx-cache
