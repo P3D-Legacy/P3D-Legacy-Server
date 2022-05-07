@@ -13,71 +13,71 @@ jobs:
       matrix:
         runtime: ['win-x64', 'win-x86', 'win-arm', 'linux-x64', 'linux-arm', 'linux-arm64', 'osx-x64' ]
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Setup .NET 6
-      uses: actions/setup-dotnet@master
-      with:
-        dotnet-version: 6.0.x
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@master
+        with:
+          dotnet-version: 6.0.x
 
-    - name: Publish artifacts
-      run: dotnet publish src/P3D.Legacy.Server/P3D.Legacy.Server.csproj --configuration Release --framework net6.0 --runtime ${{ matrix.runtime }} --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true --output ./publish-${{ matrix.runtime }}
-      shell: pwsh
+      - name: Publish artifacts
+        run: dotnet publish src/P3D.Legacy.Server/P3D.Legacy.Server.csproj --configuration Release --framework net6.0 --runtime ${{ matrix.runtime }} --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true --output ./publish-${{ matrix.runtime }}
+        shell: pwsh
 
-    - name: Run ThirdPartyNoticesGenerator
-      run: >-
-        dotnet tool install -g ThirdPartyNoticesGenerator;
-        thirdpartynoticesgenerator ./src/P3D.Legacy.Server --use-unsafe-resolvers --output-filename ./publish-${{ matrix.runtime }}/third-party-notices.txt
-      shell: pwsh
+      - name: Run ThirdPartyNoticesGenerator
+        run: >-
+          dotnet tool install -g ThirdPartyNoticesGenerator;
+          thirdpartynoticesgenerator ./src/P3D.Legacy.Server --use-unsafe-resolvers --output-filename ./publish-${{ matrix.runtime }}/third-party-notices.txt
+        shell: pwsh
 
-    #- name: Set executable bit
-    #  if: ${{ matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm' || matrix.runtime == 'linux-arm64' }}
-    #  run: |
-    #    chmod +x ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server
+      #- name: Set executable bit
+      #  if: ${{ matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm' || matrix.runtime == 'linux-arm64' }}
+      #  run: |
+      #    chmod +x ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server
 
-    - name: Copy necessary files
-      run: |
-        mkdir P3D-Legacy-Server-${{ matrix.runtime }}
-        [[ -e ./publish-${{ matrix.runtime }}/P3D.Legacy.Server ]] &&     cp ./publish-${{ matrix.runtime }}/P3D.Legacy.Server       ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server
-        [[ -e ./publish-${{ matrix.runtime }}/P3D.Legacy.Server.exe ]] && cp ./publish-${{ matrix.runtime }}/P3D.Legacy.Server.exe   ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server.exe
-                                                                          cp ./publish-${{ matrix.runtime }}/appsettings.json        ./P3D-Legacy-Server-${{ matrix.runtime }}/appsettings.json
-                                                                          cp ./publish-${{ matrix.runtime }}/third-party-notices.txt ./P3D-Legacy-Server-${{ matrix.runtime }}/third-party-notices.txt
+      - name: Copy necessary files
+        run: |
+          mkdir P3D-Legacy-Server-${{ matrix.runtime }}
+          [[ -e ./publish-${{ matrix.runtime }}/P3D.Legacy.Server ]] &&     cp ./publish-${{ matrix.runtime }}/P3D.Legacy.Server       ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server
+          [[ -e ./publish-${{ matrix.runtime }}/P3D.Legacy.Server.exe ]] && cp ./publish-${{ matrix.runtime }}/P3D.Legacy.Server.exe   ./P3D-Legacy-Server-${{ matrix.runtime }}/P3D.Legacy.Server.exe
+                                                                            cp ./publish-${{ matrix.runtime }}/appsettings.json        ./P3D-Legacy-Server-${{ matrix.runtime }}/appsettings.json
+                                                                            cp ./publish-${{ matrix.runtime }}/third-party-notices.txt ./P3D-Legacy-Server-${{ matrix.runtime }}/third-party-notices.txt
 
-    - name: Zipping
-      run: |
-        7z a P3D-Legacy-Server-${{ matrix.runtime }}.zip ./P3D-Legacy-Server-${{ matrix.runtime }}/*
+      - name: Zipping
+        run: |
+          7z a P3D-Legacy-Server-${{ matrix.runtime }}.zip ./P3D-Legacy-Server-${{ matrix.runtime }}/*
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: all-artifacts
-        path: |
-          P3D-Legacy-Server-${{ matrix.runtime }}.zip
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: all-artifacts
+          path: |
+            P3D-Legacy-Server-${{ matrix.runtime }}.zip
 
   release:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-    - name: Download Artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: all-artifacts
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: all-artifacts
 
-    - name: Get tag info
-      id: tag_info
-      run: echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+      - name: Get tag info
+        id: tag_info
+        run: echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
 
-    - name: Create release
-      uses: softprops/action-gh-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.tag_info.outputs.SOURCE_TAG }}
-        name: P3D-Legacy-Server ${{ steps.tag_info.outputs.SOURCE_TAG }}
-        draft: false
-        prerelease: false
-        body: ${{ github.event.head_commit.message }}
-        files: |
-          P3D-Legacy-Server-*.zip
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag_info.outputs.SOURCE_TAG }}
+          name: P3D-Legacy-Server ${{ steps.tag_info.outputs.SOURCE_TAG }}
+          draft: false
+          prerelease: false
+          body: ${{ github.event.head_commit.message }}
+          files: |
+            P3D-Legacy-Server-*.zip

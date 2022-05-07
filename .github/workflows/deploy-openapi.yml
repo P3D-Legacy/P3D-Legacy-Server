@@ -15,34 +15,34 @@ jobs:
   job:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Setup .NET 6
-      uses: actions/setup-dotnet@master
-      with:
-        dotnet-version: 6.0.x
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@master
+        with:
+          dotnet-version: 6.0.x
 
-    - name: Build
-      run: dotnet build src/P3D.Legacy.Server/P3D.Legacy.Server.csproj -c Release
-      shell: pwsh
+      - name: Build
+        run: dotnet build src/P3D.Legacy.Server/P3D.Legacy.Server.csproj -c Release
+        shell: pwsh
 
-    - name: Restore tools
-      run: dotnet tool restore
-      shell: pwsh
+      - name: Restore tools
+        run: dotnet tool restore
+        shell: pwsh
 
-    - name: Generate OpenAPI spec
-      run: dotnet swagger tofile --output ./openapi.json ./src/P3D.Legacy.Server/bin/Release/net6.0/P3D.Legacy.Server.dll v1
-      shell: pwsh
+      - name: Generate OpenAPI spec
+        run: dotnet swagger tofile --output ./openapi.json ./src/P3D.Legacy.Server/bin/Release/net6.0/P3D.Legacy.Server.dll v1
+        shell: pwsh
 
-    - name: Generate Swagger UI
-      uses: Legion2/swagger-ui-action@v1
-      with:
-        output: swagger-ui
-        spec-file: ./openapi.json
+      - name: Generate Swagger UI
+        uses: Legion2/swagger-ui-action@v1
+        with:
+          output: swagger-ui
+          spec-file: ./openapi.json
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: swagger-ui
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: swagger-ui
