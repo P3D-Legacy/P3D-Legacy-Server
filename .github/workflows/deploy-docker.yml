@@ -11,7 +11,7 @@ jobs:
     name: "Deploy 'P3D Legacy Server'"
     runs-on: ubuntu-latest
     environment:
-      name: 'next-p3d-backend'
+      name: 'p3d-backend'
       url: 'https://karp.pokemon3d.net'
     steps:
 
