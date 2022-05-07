@@ -57,7 +57,8 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
 
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
     RID=debian-x64 ; \
-    RTR="/p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true" ; \
+    RTR="/p:PublishReadyToRun=false" ; \
+    #RTR="/p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true" ; \
     elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
     RID=debian-arm64 ; \
     RTR="/p:PublishReadyToRun=false" ; \
