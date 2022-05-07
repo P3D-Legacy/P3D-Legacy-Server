@@ -1,5 +1,6 @@
+# Produces a framework-dependent executable for a specific platform, we only use the .dll
 # Stage 1: Restore and Publish
-FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0-buster-slim AS publish
+FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS publish
 SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 ARG TARGETPLATFORM
 ARG IN_DOCKER="true"
