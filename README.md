@@ -29,10 +29,10 @@
   </a>
   </br>
   <a href="https://karp.pokemon3d.net/">
-    <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/P3D-Legacy/P3D-Legacy-Server/p3d-backend?label=Server">
+    <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/P3D-Legacy/P3D-Legacy-Server/p3d-backend?label=Server%20Deploy">
   </a>
   <a href="https://karp.pokemon3d.net/">
-    <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/P3D-Legacy/P3D-Legacy-Server/next-p3d-backend?label=QA%20Server">
+    <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/P3D-Legacy/P3D-Legacy-Server/next-p3d-backend?label=QA%20Server%20Deploy">
   </a>
   <a href="https://p3d-legacy.github.io/P3D-Legacy-Server/">
     <img alt="GitHub deployments" src="https://img.shields.io/github/deployments/P3D-Legacy/P3D-Legacy-Server/github-pages?label=OpenAPI%20Deploy">
