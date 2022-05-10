@@ -23,6 +23,6 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Monsters
                 : nopMonsterRepository;
         }
 
-        public async Task<IMonsterInstance> GetByDataAsync(string monsterData, CancellationToken ct) => await _implementation.GetByDataAsync(monsterData, ct);
+        public Task<IMonsterInstance> GetByDataAsync(string monsterData, CancellationToken ct) => _implementation.GetByDataAsync(monsterData, ct);
     }
 }

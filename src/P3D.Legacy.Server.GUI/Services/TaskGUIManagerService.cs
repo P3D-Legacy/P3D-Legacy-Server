@@ -61,7 +61,7 @@ namespace P3D.Legacy.Server.GUI.Services
                 {
                     var result = Console.ReadLine();
                     if (result is null) await Task.Delay(1000, ct);
-                    if (result == "/uimode") await LoopAsync(ct);
+                    if (string.Equals(result, "/uimode", StringComparison.Ordinal)) await LoopAsync(ct).ConfigureAwait(false);
                 }
             }
             catch (Exception e) when (e is TaskCanceledException or OperationCanceledException) { }

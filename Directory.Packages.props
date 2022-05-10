@@ -15,6 +15,7 @@
     <PackageVersion Include="Isopoh.Cryptography.Argon2" Version="1.1.11" />
     <PackageVersion Include="LiteDB" Version="5.0.11" />
     <PackageVersion Include="LiteDB.Async" Version="0.1.0" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="1.0.701" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
     <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="6.0.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.3" />

@@ -34,7 +34,7 @@ namespace P3D.Legacy.Common
 
         public override string ToString() => $"{_idType}:{_id}";
 
-        public bool Equals(PlayerId other) => _idType == other._idType && _id == other._id;
+        public bool Equals(PlayerId other) => _idType == other._idType && string.Equals(_id, other._id, StringComparison.Ordinal);
         public override bool Equals(object? obj) => obj is Origin other && Equals(other);
 
         public override int GetHashCode() => HashCode.Combine(_idType, _id);

@@ -8,6 +8,7 @@ using P3D.Legacy.Server.GameCommands.EventHandlers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,7 +58,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
                 return;
             }
 
-            if (int.TryParse(helpAlias, out var pageNumber))
+            if (int.TryParse(helpAlias, NumberStyles.Integer, CultureInfo.InvariantCulture, out var pageNumber))
             {
                 await HelpPageAsync(player, pageNumber, ct);
                 return;

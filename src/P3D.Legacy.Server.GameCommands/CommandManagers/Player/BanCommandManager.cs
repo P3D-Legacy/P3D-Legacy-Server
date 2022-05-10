@@ -4,6 +4,7 @@ using P3D.Legacy.Server.Application.Commands.Administration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                     return;
                 }
 
-                if (!int.TryParse(arguments[1], out var minutes))
+                if (!int.TryParse(arguments[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var minutes))
                 {
                     await SendMessageAsync(player, "Invalid minutes given.", ct);
                     return;
@@ -45,7 +46,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 
                 var reason = arguments[2].TrimStart('"').TrimEnd('"');
 
-                if (ulong.TryParse(reason, out var reasonId))
+                if (ulong.TryParse(reason, NumberStyles.Integer, CultureInfo.InvariantCulture, out var reasonId))
                     reason = string.Empty;
 
                 var result = await CommandDispatcher.DispatchAsync(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
@@ -69,7 +70,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                     return;
                 }
 
-                if (!int.TryParse(arguments[1], out var minutes))
+                if (!int.TryParse(arguments[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var minutes))
                 {
                     await SendMessageAsync(player, "Invalid minutes given.", ct);
                     return;
@@ -77,7 +78,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 
                 var reason = string.Join(" ", arguments.Skip(2).ToArray());
 
-                if (ulong.TryParse(reason, out var reasonId))
+                if (ulong.TryParse(reason, NumberStyles.Integer, CultureInfo.InvariantCulture, out var reasonId))
                     reason = string.Empty;
 
                 var result = await CommandDispatcher.DispatchAsync(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);

@@ -2,6 +2,8 @@
 
 using P3D.Legacy.Common.PlayerEvents;
 
+using System.Globalization;
+
 namespace P3D.Legacy.Tests
 {
     internal sealed class EventParserTests
@@ -17,7 +19,7 @@ namespace P3D.Legacy.Tests
         {
             const string arg0 = "Test";
             const string msgTemplate = "achieved the emblem \"{0}\"!";
-            var msg = string.Format(msgTemplate, arg0);
+            var msg = string.Format(CultureInfo.InvariantCulture, msgTemplate, arg0);
             Assert.True(PlayerEventParser.TryParse(msg, out var @event));
             Assert.IsInstanceOf<AchievedEmblemEvent>(@event);
             Assert.AreEqual(PlayerEventType.AchievedEmblem, @event!.EventType);
@@ -30,7 +32,7 @@ namespace P3D.Legacy.Tests
             const string arg0 = "Test";
             const string arg1 = "Test2";
             const string msgTemplate = "hosted a battle: \"Player {0} got defeated by Player {1}\".";
-            var msg = string.Format(msgTemplate, arg0, arg1);
+            var msg = string.Format(CultureInfo.InvariantCulture, msgTemplate, arg0, arg1);
             Assert.True(PlayerEventParser.TryParse(msg, out var @event));
             Assert.IsInstanceOf<HostedABattleEvent>(@event);
             Assert.AreEqual(PlayerEventType.HostedABattle, @event!.EventType);
@@ -44,7 +46,7 @@ namespace P3D.Legacy.Tests
             const string arg0 = "Test";
             const string arg1 = "Test2";
             const string msgTemplate = "evolved their {0} into a {1}!";
-            var msg = string.Format(msgTemplate, arg0, arg1);
+            var msg = string.Format(CultureInfo.InvariantCulture, msgTemplate, arg0, arg1);
             Assert.True(PlayerEventParser.TryParse(msg, out var @event));
             Assert.IsInstanceOf<EvolvedPokemonEvent>(@event);
             Assert.AreEqual(PlayerEventType.EvolvedPokemon, @event!.EventType);
@@ -57,7 +59,7 @@ namespace P3D.Legacy.Tests
         {
             const string arg0 = "Test";
             const string msgTemplate = "got defeated by a wild {0}.";
-            var msg = string.Format(msgTemplate, arg0);
+            var msg = string.Format(CultureInfo.InvariantCulture, msgTemplate, arg0);
             Assert.True(PlayerEventParser.TryParse(msg, out var @event));
             Assert.IsInstanceOf<DefeatedByWildPokemonEvent>(@event);
             Assert.AreEqual(PlayerEventType.DefeatedByWildPokemon, @event!.EventType);
@@ -69,7 +71,7 @@ namespace P3D.Legacy.Tests
         {
             const string arg0 = "Test Test2";
             const string msgTemplate = "got defeated by {0}.";
-            var msg = string.Format(msgTemplate, arg0);
+            var msg = string.Format(CultureInfo.InvariantCulture, msgTemplate, arg0);
             Assert.True(PlayerEventParser.TryParse(msg, out var @event));
             Assert.IsInstanceOf<DefeatedByTrainerEvent>(@event);
             Assert.AreEqual(PlayerEventType.DefeatedByTrainer, @event!.EventType);

@@ -21,9 +21,9 @@ namespace P3D.Legacy.Common.Extensions
             && monster.EV.IsValidEV()
             && monster.IV.IsValidIV();
 
-        public static Dictionary<string, string> ToDictionary(this IMonsterInstance monster)
+        public static IDictionary<string, string> ToDictionary(this IMonsterInstance monster)
         {
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, string>(StringComparer.Ordinal);
             dict.Add("Pokemon", $"[{monster.StaticData.Id}]");
             dict.Add("OriginalNumber", $"[{monster.Metadata["OriginalNumber"]}]");
             dict.Add("Experience", $"[{monster.Experience}]");
@@ -98,7 +98,7 @@ namespace P3D.Legacy.Common.Extensions
             return dict;
         }
 
-        public static DataItemStorage DictionaryToDataItems(Dictionary<string, string> dict)
+        public static DataItemStorage DictionaryToDataItems(IDictionary<string, string> dict)
         {
             var builder = new StringBuilder();
 
@@ -108,7 +108,7 @@ namespace P3D.Legacy.Common.Extensions
             return new DataItemStorage(builder.ToString());
         }
 
-        public static string DictionaryToString(Dictionary<string, string> dict)
+        public static string DictionaryToString(IDictionary<string, string> dict)
         {
             var builder = new StringBuilder();
 

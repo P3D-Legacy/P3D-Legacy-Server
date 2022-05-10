@@ -12,6 +12,7 @@ using P3D.Legacy.Server.GUI.Utils;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -134,7 +135,7 @@ IP: {player.IPEndPoint}";
             var durationTextField = new TextField { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
             durationTextField.TextChanged += text =>
             {
-                if (!ulong.TryParse(durationTextField.Text.ToString(), out _))
+                if (!ulong.TryParse(durationTextField.Text.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
                     durationTextField.Text = ustring.Empty;
             };
             durationInfoFrameView.Add(durationTextField);

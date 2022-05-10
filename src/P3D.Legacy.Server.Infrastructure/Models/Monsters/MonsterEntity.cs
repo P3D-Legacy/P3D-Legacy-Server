@@ -25,7 +25,7 @@ namespace P3D.Legacy.Server.Infrastructure.Models.Monsters
         public int EggSteps { get; }
         public IReadOnlyList<IAttackInstance> Attacks { get; }
         public IItemInstance? HeldItem { get; }
-        public IDictionary<string, string> Metadata { get; } = new Dictionary<string, string>();
+        public IDictionary<string, string> Metadata { get; } = new Dictionary<string, string>(StringComparer.Ordinal);
 
         public MonsterEntity(in ReadOnlySpan<char> monsterData, IMonsterStaticData monsterStaticData, IReadOnlyList<IAttackInstance> attacks, IItemInstance? heldItem)
         {
@@ -69,7 +69,7 @@ namespace P3D.Legacy.Server.Infrastructure.Models.Monsters
                 Method = dict["CatchMethod"],
                 Location = dict["CatchLocation"],
                 TrainerName = dict["CatchTrainer"],
-                TrainerId = dict.TryGetValue("OT", out var otStr) ? string.IsNullOrEmpty(otStr) ? null : uint.TryParse(otStr, out var ot) ? ot : 0 : null,
+                TrainerId = dict.TryGetValue("OT", out var otStr) ? string.IsNullOrEmpty(otStr) ? null : uint.TryParse(otStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out var ot) ? ot : 0 : null,
             };
 
             //if (short.TryParse(dict["Item"], out var itemId) && itemId != 0)

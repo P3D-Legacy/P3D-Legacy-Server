@@ -13,7 +13,7 @@ namespace P3D.Legacy.Server.Application.Utils
             if (ReferenceEquals(x, null)) return false;
             if (ReferenceEquals(y, null)) return false;
             if (x.GetType() != y.GetType()) return false;
-            return x.ConnectionId == y.ConnectionId;
+            return string.Equals(x.ConnectionId, y.ConnectionId, StringComparison.Ordinal);
         }
 
         public int GetHashCode(ConnectionContextHandler obj) => HashCode.Combine(obj.ConnectionId);

@@ -77,7 +77,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
             Assert.IsInstanceOf<ServerInfoDataPacket>(response.Message);
 
             var serverInfoDataPacket = (ServerInfoDataPacket) response.Message!;
-            Assert.NotNull(serverInfoDataPacket.PlayerNames.Single(static x => x == IPlayer.Server.Name));
+            Assert.NotNull(serverInfoDataPacket.PlayerNames.Single(static x => string.Equals(x, IPlayer.Server.Name, StringComparison.Ordinal)));
             Assert.AreEqual(1, serverInfoDataPacket.CurrentPlayers);
             Assert.AreEqual(0, serverInfoDataPacket.MaxPlayers);
 

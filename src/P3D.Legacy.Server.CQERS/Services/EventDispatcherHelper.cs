@@ -40,7 +40,7 @@ namespace P3D.Legacy.Server.CQERS.Services
         {
             if (!_publishStrategies.TryGetValue(strategy, out var publishStrategy))
             {
-                throw new ArgumentException($"Unknown strategy: {strategy}");
+                throw new ArgumentException($"Unknown strategy: {strategy}", nameof(strategy));
             }
 
             return publishStrategy(_handlers.Select(static x => (Func<IEvent, CancellationToken, Task>) ((@event2, ct2) => x.HandleAsync((TEvent) @event2, ct2))), @event, ct);

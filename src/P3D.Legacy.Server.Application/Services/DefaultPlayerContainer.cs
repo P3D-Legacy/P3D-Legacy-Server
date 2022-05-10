@@ -22,7 +22,7 @@ namespace P3D.Legacy.Server.Application.Services
                 if (ReferenceEquals(x, null)) return false;
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
-                return x.ConnectionId == y.ConnectionId;
+                return string.Equals(x.ConnectionId, y.ConnectionId, StringComparison.Ordinal);
             }
 
             public int GetHashCode(IPlayer obj) => obj.ConnectionId.GetHashCode(StringComparison.Ordinal);

@@ -19,7 +19,7 @@ namespace P3D.Legacy.Server.InternalAPI.Options
         public void Configure(string name, JwtBearerOptions options)
         {
             // Only configure the options if this is the correct instance
-            if (name == JwtBearerDefaults.AuthenticationScheme)
+            if (string.Equals(name, JwtBearerDefaults.AuthenticationScheme, StringComparison.Ordinal))
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {

@@ -4,7 +4,7 @@
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <AnalysisMode>latest-Recommended</AnalysisMode>
     <AnalysisLevel>latest</AnalysisLevel>
-    
+
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
@@ -16,6 +16,7 @@
 
   <ItemGroup Condition="$(ManagePackageVersionsCentrally) == 'true'">
     <PackageReference Include="IDisposableAnalyzers" />
+    <PackageReference Include="Meziantou.Analyzer" />
     <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />

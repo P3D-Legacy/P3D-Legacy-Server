@@ -13,6 +13,7 @@ using P3D.Legacy.Server.Infrastructure.Options;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -89,7 +90,7 @@ query MonsterStaticData($id: Int, $itemId: Int) {
         public async Task<IMonsterInstance> GetByDataAsync(string monsterDataStr, CancellationToken ct)
         {
             var dict = monsterDataStr.AsSpan().MonsterDataToDictionary();
-            var itemId = short.TryParse(dict["Item"], out var itemIdVar) ? itemIdVar : -1;
+            var itemId = short.TryParse(dict["Item"], NumberStyles.Integer, CultureInfo.InvariantCulture, out var itemIdVar) ? itemIdVar : -1;
 
             using var graphQLClient = new GraphQLHttpClient(_options.GraphQLEndpoint, new SystemTextJsonSerializer());
             var monsterStaticDataRequest = new GraphQLRequest
@@ -133,22 +134,34 @@ query MonsterStaticData($id: Int, $itemId: Int) {
             var move2 = dict["Attack3"].Split(',');
             var move3 = dict["Attack4"].Split(',');
             var moves = new List<IAttackInstance>();
-            if (move0.Length != 1 && ushort.TryParse(move0[0], out var move0Id) && byte.TryParse(move0[1], out var pp0) && byte.TryParse(move0[2], out var currentPP0))
+            if (move0.Length != 1 &&
+                ushort.TryParse(move0[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var move0Id) &&
+                byte.TryParse(move0[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var pp0) &&
+                byte.TryParse(move0[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out var currentPP0))
             {
                 var staticData = new AttackStaticDataEntity(move0Id, "", pp0);
                 moves.Add(new AttackEntity(staticData, currentPP0, 0));
             }
-            if (move1.Length != 1 && ushort.TryParse(move1[0], out var move1Id) && byte.TryParse(move1[1], out var pp1) && byte.TryParse(move1[2], out var currentPP1))
+            if (move1.Length != 1 &&
+                ushort.TryParse(move1[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var move1Id) &&
+                byte.TryParse(move1[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var pp1) &&
+                byte.TryParse(move1[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out var currentPP1))
             {
                 var staticData = new AttackStaticDataEntity(move1Id, "", pp1);
                 moves.Add(new AttackEntity(staticData, currentPP1, 0));
             }
-            if (move2.Length != 1 && ushort.TryParse(move2[0], out var move2Id) && byte.TryParse(move2[1], out var pp2) && byte.TryParse(move2[2], out var currentPP2))
+            if (move2.Length != 1 &&
+                ushort.TryParse(move2[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var move2Id) &&
+                byte.TryParse(move2[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var pp2) &&
+                byte.TryParse(move2[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out var currentPP2))
             {
                 var staticData = new AttackStaticDataEntity(move2Id, "", pp2);
                 moves.Add(new AttackEntity(staticData, currentPP2, 0));
             }
-            if (move3.Length != 1 && ushort.TryParse(move3[0], out var move3Id) && byte.TryParse(move3[1], out var pp3) && byte.TryParse(move3[2], out var currentPP3))
+            if (move3.Length != 1 &&
+                ushort.TryParse(move3[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var move3Id) &&
+                byte.TryParse(move3[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var pp3) &&
+                byte.TryParse(move3[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out var currentPP3))
             {
                 var staticData = new AttackStaticDataEntity(move3Id, "", pp3);
                 moves.Add(new AttackEntity(staticData, currentPP3, 0));

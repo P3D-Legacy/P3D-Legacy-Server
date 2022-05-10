@@ -22,13 +22,13 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
             _liteDbStatisticsRepository = liteDbStatisticsRepository ?? throw new ArgumentNullException(nameof(liteDbStatisticsRepository));
         }
 
-        public async Task<StatisticsEntity?> GetAsync(string action, CancellationToken ct)
+        public Task<StatisticsEntity?> GetAsync(string action, CancellationToken ct)
         {
-            return await _liteDbStatisticsRepository.GetAsync(PlayerId.None, action, ct);
+            return _liteDbStatisticsRepository.GetAsync(PlayerId.None, action, ct);
         }
-        public async Task<StatisticsEntity?> GetAsync(PlayerId id, string action, CancellationToken ct)
+        public Task<StatisticsEntity?> GetAsync(PlayerId id, string action, CancellationToken ct)
         {
-            return await _liteDbStatisticsRepository.GetAsync(id, action, ct);
+            return _liteDbStatisticsRepository.GetAsync(id, action, ct);
         }
 
         IAsyncEnumerable<StatisticsEntity> IStatisticsRepository.GetAllAsync(CancellationToken ct)
@@ -46,14 +46,14 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
             return _liteDbStatisticsRepository.GetAllAsync(action, ct);
         }
 
-        public async Task<bool> IncrementActionAsync(string action, CancellationToken ct)
+        public Task<bool> IncrementActionAsync(string action, CancellationToken ct)
         {
-            return await _liteDbStatisticsRepository.IncrementActionAsync(PlayerId.None, action, ct);
+            return _liteDbStatisticsRepository.IncrementActionAsync(PlayerId.None, action, ct);
         }
 
-        public async Task<bool> IncrementActionAsync(PlayerId id, string action, CancellationToken ct)
+        public Task<bool> IncrementActionAsync(PlayerId id, string action, CancellationToken ct)
         {
-            return await _liteDbStatisticsRepository.IncrementActionAsync(id, action, ct);
+            return _liteDbStatisticsRepository.IncrementActionAsync(id, action, ct);
         }
     }
 }

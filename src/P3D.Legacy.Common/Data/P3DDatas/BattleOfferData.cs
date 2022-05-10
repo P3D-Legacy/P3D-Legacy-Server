@@ -12,7 +12,7 @@ namespace P3D.Legacy.Common.Data.P3DDatas
 
         public BattleOfferData(in ReadOnlySpan<char> data) : base(in data)
         {
-            LeadMonsterIndex = int.TryParse(data, out var index) ? index : null;
+            LeadMonsterIndex = int.TryParse(data, NumberStyles.Integer, CultureInfo.InvariantCulture, out var index) ? index : null;
             MonsterDatas = ParseSeparatedData(data);
         }
 

@@ -6,9 +6,9 @@ namespace P3D.Legacy.Common.Extensions
 {
     public static class DataItemsExtensions
     {
-        public static Dictionary<string, string> MonsterDataToDictionary(this ReadOnlySpan<char> monsterData)
+        public static IDictionary<string, string> MonsterDataToDictionary(this ReadOnlySpan<char> monsterData)
         {
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, string>(StringComparer.Ordinal);
             while (monsterData.IndexOf('}') is var entryIndex && entryIndex != -1)
             {
                 var entry = monsterData.Slice(0, entryIndex);
@@ -31,7 +31,7 @@ namespace P3D.Legacy.Common.Extensions
             return dict;
         }
 
-        public static string DictionaryToMonsterData(this Dictionary<string, string> dictionary)
+        public static string DictionaryToMonsterData(this IDictionary<string, string> dictionary)
         {
             var sb = new StringBuilder();
             foreach (var (key, value) in dictionary)
