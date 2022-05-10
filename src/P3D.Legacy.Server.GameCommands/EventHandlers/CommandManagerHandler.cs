@@ -94,6 +94,7 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
 
             var commandWithoutSlash = message.TrimStart('/');
 
+            // TODO: Spans
             var messageArray = new Regex(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)", RegexOptions.Compiled)
                 .Split(commandWithoutSlash)
                 .Select(static str => str.TrimStart('"').TrimEnd('"'))
