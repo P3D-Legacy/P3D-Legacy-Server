@@ -11,11 +11,11 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Users
     public interface IUserRepository
     {
         Task<UserEntity?> FindByIdAsync(PlayerId playerId, CancellationToken ct);
-        Task<AccountResult> CreateAsync(UserEntity user, string password, bool isSha512 = true, CancellationToken ct = default);
+        Task<AccountResult> CreateAsync(UserEntity user, string password, bool isSha512 = false, CancellationToken ct = default);
 
         Task<DateTimeOffset?> GetLockoutEndDateAsync(UserEntity user, CancellationToken ct);
         Task<int> GetAccessFailedCountAsync(UserEntity user, CancellationToken ct);
 
-        Task<SignInResult> CheckPasswordSignInAsync(UserEntity user, string password, bool isSha512 = true, bool lockoutOnFailure = true, CancellationToken ct = default);
+        Task<SignInResult> CheckPasswordSignInAsync(UserEntity user, string password, bool isSha512 = false, bool lockoutOnFailure = true, CancellationToken ct = default);
     }
 }
