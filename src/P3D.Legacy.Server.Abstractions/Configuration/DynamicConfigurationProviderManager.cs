@@ -32,7 +32,7 @@ namespace P3D.Legacy.Server.Abstractions.Configuration
         {
             var openMethod = typeof(DynamicConfigurationProviderManager).GetMethod(nameof(GetOptionsInternal), BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
             var method = openMethod?.MakeGenericMethod(type);
-            return method?.Invoke(this, null);
+            return method?.Invoke(this, parameters: null);
         }
         public TOptions? GetOptionsInternal<TOptions>() where TOptions : class => _serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;
     }
