@@ -5,7 +5,7 @@
     <PackageVersion Include="Bedrock.Framework" Version="0.1.63-alpha.gf69fa1b135" />
     <PackageVersion Include="Bedrock.Framework.Experimental" Version="0.1.63-alpha.gf69fa1b135" />
     <PackageVersion Include="BetterHostedServices" Version="2.0.3" />
-    <PackageVersion Include="Discord.Net.WebSocket" Version="3.6.1" />
+    <PackageVersion Include="Discord.Net.WebSocket" Version="3.7.0" />
     <PackageVersion Include="Extensions.Logging.NUnit" Version="1.0.1" />
     <PackageVersion Include="GitInfo" Version="2.2.0" />
     <PackageVersion Include="GraphQL.Client" Version="4.0.2" />
