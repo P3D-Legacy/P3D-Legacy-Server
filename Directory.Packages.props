@@ -1,7 +1,7 @@
 ﻿<Project>
   <ItemGroup>
     <PackageVersion Include="Aragas.Coroutines" Version="1.0.0.1" />
-    <PackageVersion Include="Aragas.Extensions.Options.FluentValidation" Version="1.0.0.9" />
+    <PackageVersion Include="Aragas.Extensions.Options.FluentValidation" Version="1.0.0.11" />
     <PackageVersion Include="Bedrock.Framework" Version="0.1.63-alpha.gf69fa1b135" />
     <PackageVersion Include="Bedrock.Framework.Experimental" Version="0.1.63-alpha.gf69fa1b135" />
     <PackageVersion Include="BetterHostedServices" Version="2.0.3" />
