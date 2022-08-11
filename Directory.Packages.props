@@ -9,7 +9,7 @@
     <PackageVersion Include="Extensions.Logging.NUnit" Version="1.0.1" />
     <PackageVersion Include="GitInfo" Version="2.2.0" />
     <PackageVersion Include="GraphQL.Client" Version="4.0.2" />
-    <PackageVersion Include="GraphQL.Client.Serializer.SystemTextJson" Version="4.0.2" />
+    <PackageVersion Include="GraphQL.Client.Serializer.SystemTextJson" Version="5.1.0" />
     <PackageVersion Include="IDisposableAnalyzers" Version="4.0.2" />
     <PackageVersion Include="IPNetwork2" Version="2.5.420" />
     <PackageVersion Include="Isopoh.Cryptography.Argon2" Version="1.1.12" />
