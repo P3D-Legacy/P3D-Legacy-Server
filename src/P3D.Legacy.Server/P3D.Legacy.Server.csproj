@@ -2,9 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>0.9</Version>
     <Nullable>enable</Nullable>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <Version>0.9</Version>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>CS1591;</NoWarn>
@@ -14,7 +13,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerComposeProjectPath>..\..\docker-compose\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
-  
+
   <!-- https://github.com/dotnet/sdk/issues/3843 -->
   <PropertyGroup Condition="$(DOCKER_UNIVERSAL) == 'true'">
     <RuntimeIdentifiers>linux-x64;linux-arm64;linux-arm;win-x64</RuntimeIdentifiers>

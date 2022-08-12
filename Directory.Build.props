@@ -1,6 +1,8 @@
 ﻿<Project>
 
   <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <AnalysisMode>latest-Recommended</AnalysisMode>
     <AnalysisLevel>latest</AnalysisLevel>
