@@ -221,34 +221,34 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             _stoppingCts.Dispose();
         }
 
-        public async Task HandleAsync(PlayerJoinedEvent notification, CancellationToken cancellationToken)
+        public async Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
-                await channel.SendMessageAsync($"> `EVENT  : Player {notification.Player.Name} joined the server!`");
+                await channel.SendMessageAsync($"> `EVENT  : Player {context.Message.Player.Name} joined the server!`");
         }
 
-        public async Task HandleAsync(PlayerLeftEvent notification, CancellationToken cancellationToken)
+        public async Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
-                await channel.SendMessageAsync($"> `EVENT  : Player {notification.Name} left the server!`");
+                await channel.SendMessageAsync($"> `EVENT  : Player {context.Message.Name} left the server!`");
         }
 
-        public async Task HandleAsync(PlayerSentGlobalMessageEvent notification, CancellationToken cancellationToken)
+        public async Task HandleAsync(IReceiveContext<PlayerSentGlobalMessageEvent> context, CancellationToken ct)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
-                await channel.SendMessageAsync($"> `MESSAGE: <{notification.Player.Name}> {notification.Message}`");
+                await channel.SendMessageAsync($"> `MESSAGE: <{context.Message.Player.Name}> {context.Message.Message}`");
         }
 
-        public async Task HandleAsync(ServerMessageEvent notification, CancellationToken cancellationToken)
+        public async Task HandleAsync(IReceiveContext<ServerMessageEvent> context, CancellationToken ct)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
-                await channel.SendMessageAsync($"> `SERVER : {notification.Message}`");
+                await channel.SendMessageAsync($"> `SERVER : {context.Message.Message}`");
         }
 
-        public async Task HandleAsync(PlayerTriggeredEventEvent notification, CancellationToken cancellationToken)
+        public async Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)
         {
             if (_discordSocketClient?.GetChannel(_options.PasstroughChannelId) as ISocketMessageChannel is { } channel)
-                await channel.SendMessageAsync($"> `EVENT  : The player {notification.Player.Name} {PlayerEventParser.AsText(notification.Event)}`");
+                await channel.SendMessageAsync($"> `EVENT  : The player {context.Message.Player.Name} {PlayerEventParser.AsText(context.Message.Event)}`");
         }
     }
 }

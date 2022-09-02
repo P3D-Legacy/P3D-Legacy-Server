@@ -85,7 +85,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
         }
         private class EventDispatcherMock : IEventDispatcher
         {
-            public DispatchStrategy DefaultStrategy { get; set; }
+            public DispatchStrategy DefaultStrategy { get; set; } = DispatchStrategy.ParallelWhenAll;
 
             private readonly List<IPlayer> _list;
             private readonly TaskCompletionSource<string> _lock;
@@ -96,6 +96,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                 _lock = @lock;
             }
 
+            public Task DispatchAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IEvent => DispatchAsync(@event, DefaultStrategy, ct);
             public async Task DispatchAsync<TEvent>(TEvent rawEvent, DispatchStrategy dispatchStrategy, CancellationToken ct) where TEvent : IEvent
             {
                 switch (rawEvent)
@@ -108,7 +109,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                     case PlayerSentGlobalMessageEvent notification:
                         _lock.SetResult(notification.Message);
                         foreach (var eventHandler in _list.OfType<IEventHandler<PlayerSentGlobalMessageEvent>>())
-                            await eventHandler.HandleAsync(notification, ct);
+                            await eventHandler.HandleAsync(new NullReceiveContext<PlayerSentGlobalMessageEvent>(notification), ct);
                         return;
                     default:
                         Assert.Fail($"Missing handling of Event {typeof(TEvent)}");
@@ -164,7 +165,6 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 
             var idPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.NotNull(idPacket);
             Assert.IsFalse(idPacket.IsCanceled);
             Assert.IsFalse(idPacket.IsCompleted);
             Assert.NotNull(idPacket.Message);
@@ -174,7 +174,6 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 
             var worldDataPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.NotNull(worldDataPacket);
             Assert.IsFalse(worldDataPacket.IsCanceled);
             Assert.IsFalse(worldDataPacket.IsCompleted);
             Assert.NotNull(worldDataPacket.Message);
@@ -182,7 +181,6 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 
             var gameDataPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.NotNull(gameDataPacket);
             Assert.IsFalse(gameDataPacket.IsCanceled);
             Assert.IsFalse(gameDataPacket.IsCompleted);
             Assert.NotNull(gameDataPacket.Message);
@@ -196,7 +194,6 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 
             var chatMessage = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.NotNull(chatMessage);
             Assert.IsFalse(chatMessage.IsCanceled);
             Assert.IsFalse(chatMessage.IsCompleted);
             Assert.NotNull(chatMessage.Message);

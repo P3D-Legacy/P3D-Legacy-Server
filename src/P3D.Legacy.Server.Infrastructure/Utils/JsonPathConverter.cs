@@ -17,7 +17,7 @@ namespace P3D.Legacy.Server.Infrastructure.Utils
         public override bool CanConvert(Type objectType) => false;
 
         public override bool CanWrite => false;
-        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) => throw new NotImplementedException();
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) => throw new NotSupportedException();
 
         public override bool CanRead => true;
         public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
@@ -27,7 +27,7 @@ namespace P3D.Legacy.Server.Infrastructure.Utils
 
             foreach (var prop in objectType.GetProperties().Where(static p => p.CanRead && p.CanWrite))
             {
-                var att = prop.GetCustomAttribute<JsonPropertyAttribute>(true);
+                var att = prop.GetCustomAttribute<JsonPropertyAttribute>(inherit: true);
 
                 var jsonPath = att is not null ? att.PropertyName : prop.Name;
                 if (string.IsNullOrEmpty(jsonPath)) continue;
@@ -36,7 +36,7 @@ namespace P3D.Legacy.Server.Infrastructure.Utils
                 if (token is not null && token.Type != JTokenType.Null)
                 {
                     var value = token.ToObject(prop.PropertyType, serializer);
-                    prop.SetValue(targetObj, value, null);
+                    prop.SetValue(targetObj, value, index: null);
                 }
             }
 

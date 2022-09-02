@@ -36,8 +36,9 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             services.AddSingleton(typeof(QueryDispatcherHelper<,>));
             services.AddSingleton<IQueryDispatcher, QueryDispatcher>();
 
-            services.AddSingleton(typeof(EventDispatcherHelper<>));
             services.AddSingleton<IEventDispatcher, EventDispatcher>();
+
+            services.AddSingleton<ReceiveContextFactory>();
 
             return services;
         }

@@ -27,10 +27,10 @@ namespace P3D.Legacy.Server.CQERS.Services
             return await handler!.DispatchAsync(query, ct);
         }
 
-        private IQueryDispatcherHelper<TQueryResult>? GetCached<TQueryResult>(Type queryType, IServiceProvider serviceProvider) => _cache.GetOrAdd(queryType, _ =>
+        private IQueryDispatcherHelper<TQueryResult>? GetCached<TQueryResult>(Type queryType, IServiceProvider serviceProvider) => _cache.GetOrAdd(queryType, static (_, args) =>
         {
-            var instanceType = typeof(QueryDispatcherHelper<,>).MakeGenericType(queryType, typeof(TQueryResult));
-            return serviceProvider.GetRequiredService(instanceType);
-        }) as IQueryDispatcherHelper<TQueryResult>;
+            var instanceType = typeof(QueryDispatcherHelper<,>).MakeGenericType(args.queryType, typeof(TQueryResult));
+            return args.serviceProvider.GetRequiredService(instanceType);
+        }, (queryType, serviceProvider)) as IQueryDispatcherHelper<TQueryResult>;
     }
 }

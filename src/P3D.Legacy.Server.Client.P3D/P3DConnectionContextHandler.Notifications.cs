@@ -44,9 +44,9 @@ namespace P3D.Legacy.Server.Client.P3D
         IEventHandler<PlayerTradeOfferedPokemonEvent>,
         IEventHandler<PlayerTradeConfirmedEvent>
     {
-        public async Task HandleAsync(PlayerJoinedEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
         {
-            var player = notification.Player;
+            var player = context.Message.Player;
 
             if (Origin == player.Origin)
             {
@@ -58,17 +58,15 @@ namespace P3D.Legacy.Server.Client.P3D
                     await SendPacketAsync(GetFromP3DPlayerState(connectedPlayer, state), ct);
                 }
             }
-            else
-            {
-                await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerOrigin = player.Origin }, ct);
-            }
+
+            await SendPacketAsync(new CreatePlayerPacket { Origin = Origin.Server, PlayerOrigin = player.Origin }, ct);
 
             await SendServerMessageAsync($"Player {player.Name} joined the server!", ct);
         }
 
-        public async Task HandleAsync(PlayerLeftEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
         {
-            var (_, origin, name) = notification;
+            var (_, origin, name) = context.Message;
 
             if (Origin == origin) return;
 
@@ -76,9 +74,9 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendServerMessageAsync($"Player {name} left the server!", ct);
         }
 
-        public async Task HandleAsync(PlayerUpdatedStateEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerUpdatedStateEvent> context, CancellationToken ct)
         {
-            var player = notification.Player;
+            var player = context.Message.Player;
 
             if (player is IP3DPlayerState state)
             {
@@ -86,9 +84,9 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        public async Task HandleAsync(PlayerUpdatedPositionEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerUpdatedPositionEvent> context, CancellationToken ct)
         {
-            var player = notification.Player;
+            var player = context.Message.Player;
 
             if (player is IP3DPlayerState state && state.LevelFile.Equals(LevelFile, StringComparison.Ordinal))
             {
@@ -96,18 +94,18 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        public async Task HandleAsync(PlayerSentGlobalMessageEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentGlobalMessageEvent> context, CancellationToken ct)
         {
-            var (player, message) = notification;
+            var (player, message) = context.Message;
 
             if (Id != player.Id && await _queryDispatcher.DispatchAsync(new GetPlayerMuteStateQuery(Id, player.Id), ct)) return;
 
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
 
-        public async Task HandleAsync(PlayerSentLocalMessageEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentLocalMessageEvent> context, CancellationToken ct)
         {
-            var (player, location, message) = notification;
+            var (player, location, message) = context.Message;
 
             if (!LevelFile.Equals(location, StringComparison.OrdinalIgnoreCase)) return;
             if (Id != player.Id && await _queryDispatcher.DispatchAsync(new GetPlayerMuteStateQuery(Id, player.Id), ct)) return;
@@ -115,9 +113,9 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
 
-        public async Task HandleAsync(PlayerSentPrivateMessageEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentPrivateMessageEvent> context, CancellationToken ct)
         {
-            var (player, receiverName, message) = notification;
+            var (player, receiverName, message) = context.Message;
 
             if (!Name.Equals(receiverName, StringComparison.OrdinalIgnoreCase)) return;
             if (Id != player.Id && await _queryDispatcher.DispatchAsync(new GetPlayerMuteStateQuery(Id, player.Id), ct)) return;
@@ -125,9 +123,9 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new ChatMessagePrivatePacket { Origin = player.Origin, DestinationPlayerName = receiverName, Message = message }, ct);
         }
 
-        public async Task HandleAsync(MessageToPlayerEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<MessageToPlayerEvent> context, CancellationToken ct)
         {
-            var (from, to, message) = notification;
+            var (from, to, message) = context.Message;
 
             if (Origin != to.Origin) return;
             if (Id != from.Id && await _queryDispatcher.DispatchAsync(new GetPlayerMuteStateQuery(Id, from.Id), ct)) return;
@@ -135,9 +133,9 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = from.Origin, Message = message }, ct);
         }
 
-        public async Task HandleAsync(PlayerSentRawP3DPacketEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentRawP3DPacketEvent> context, CancellationToken ct)
         {
-            var (player, p3dPacket) = notification;
+            var (player, p3dPacket) = context.Message;
 
             if (Origin == player.Origin) return;
             if (GameJoltId.IsNone != player.GameJoltId.IsNone)
@@ -164,23 +162,23 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(p3dPacket, ct);
         }
 
-        public async Task HandleAsync(ServerMessageEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<ServerMessageEvent> context, CancellationToken ct)
         {
-            var message = notification.Message;
+            var message = context.Message.Message;
 
             await SendServerMessageAsync(message, ct);
         }
 
-        public async Task HandleAsync(PlayerTriggeredEventEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)
         {
-            var (player, @event) = notification;
+            var (player, @event) = context.Message;
 
             await SendServerMessageAsync($"The player {player.Name} {PlayerEventParser.AsText(@event)}", ct);
         }
 
-        public async Task HandleAsync(PlayerSentCommandEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentCommandEvent> context, CancellationToken ct)
         {
-            var (player, message) = notification;
+            var (player, message) = context.Message;
 
             if (Origin != player.Origin) return;
             if (message.StartsWith("/login", StringComparison.OrdinalIgnoreCase)) return;
@@ -188,9 +186,9 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new ChatMessageGlobalPacket { Origin = player.Origin, Message = message }, ct);
         }
 
-        public async Task HandleAsync(WorldUpdatedEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<WorldUpdatedEvent> context, CancellationToken ct)
         {
-            var (time, season, weather) = notification.State;
+            var (time, season, weather) = context.Message.State;
             await SendPacketAsync(new WorldDataPacket
             {
                 Origin = Origin.Server,
@@ -201,9 +199,9 @@ namespace P3D.Legacy.Server.Client.P3D
             }, ct);
         }
 
-        public async Task HandleAsync(PlayerSentLoginEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentLoginEvent> context, CancellationToken ct)
         {
-            var (player, password) = notification;
+            var (player, password) = context.Message;
 
             if (Origin != player.Origin) return;
             if (State != PlayerState.Authentication) return;
@@ -215,9 +213,9 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        public async Task HandleAsync(PlayerTradeInitiatedEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerTradeInitiatedEvent> context, CancellationToken ct)
         {
-            var (initiator, target) = notification;
+            var (initiator, target) = context.Message;
 
             if (Origin != target) return;
 
@@ -240,9 +238,9 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        public async Task HandleAsync(PlayerTradeAcceptedEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerTradeAcceptedEvent> context, CancellationToken ct)
         {
-            var (target, initiator) = notification;
+            var (target, initiator) = context.Message;
 
             if (Origin != initiator) return;
 
@@ -257,9 +255,9 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        public async Task HandleAsync(PlayerTradeAbortedEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerTradeAbortedEvent> context, CancellationToken ct)
         {
-            var (player, partner) = notification;
+            var (player, partner) = context.Message;
 
             if (Origin != partner) return;
 
@@ -267,9 +265,9 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new TradeQuitPacket { Origin = player.Origin, DestinationPlayerOrigin = partner }, ct);
         }
 
-        public async Task HandleAsync(PlayerTradeOfferedPokemonEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerTradeOfferedPokemonEvent> context, CancellationToken ct)
         {
-            var (player, target, data) = notification;
+            var (player, target, data) = context.Message;
 
             if (Origin != target) return;
 
@@ -294,9 +292,9 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
-        public async Task HandleAsync(PlayerTradeConfirmedEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerTradeConfirmedEvent> context, CancellationToken ct)
         {
-            var (player, target) = notification;
+            var (player, target) = context.Message;
 
             if (Origin != target) return;
 

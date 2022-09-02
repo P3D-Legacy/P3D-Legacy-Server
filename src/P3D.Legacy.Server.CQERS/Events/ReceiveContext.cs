@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.CQERS.Events;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -9,24 +7,28 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.CQERS.Services
+namespace P3D.Legacy.Server.CQERS.Events
 {
-    internal sealed class EventDispatcherHelper<TEvent> where TEvent : IEvent
+    public class ReceiveContext<TEvent> : IReceiveContext<TEvent> where TEvent : IEvent
     {
+        private delegate Task EventHandler(IEvent @event, CancellationToken ct);
+
         [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
         private static readonly Action<ILogger, string, Exception?> ExceptionDuringPublish = LoggerMessage.Define<string>(
             LogLevel.Error, default, "Exception during publish! Strategy: {Strategy}");
 
+        public TEvent Message { get; }
+
+        private readonly Dictionary<DispatchStrategy, Func<IEnumerable<EventHandler>, IEvent, CancellationToken, Task>> _publishStrategies = new();
+
         private readonly ILogger _logger;
         private readonly IEnumerable<IEventHandler<TEvent>> _handlers;
-        /*private readonly IEnumerable<IEventBehavior<TEvent>> _behaviors;*/
-        private readonly Dictionary<DispatchStrategy, Func<IEnumerable<Func<IEvent, CancellationToken, Task>>, IEvent, CancellationToken, Task>> _publishStrategies = new();
 
-        public EventDispatcherHelper(ILogger<EventDispatcherHelper<TEvent>> logger, IEnumerable<IEventHandler<TEvent>> handlers/*, IEnumerable<IEventBehavior<TEvent>> behaviors*/)
+        public ReceiveContext(ILogger<ReceiveContext<TEvent>> logger,IEnumerable<IEventHandler<TEvent>> handlers, TEvent @event)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
-            /*_behaviors = behaviors ?? throw new ArgumentNullException(nameof(behaviors));*/
+            Message = @event;
+            _logger = logger;
+            _handlers = handlers;
 
             _publishStrategies[DispatchStrategy.Async] = AsyncContinueOnExceptionAsync;
             _publishStrategies[DispatchStrategy.ParallelNoWait] = ParallelNoWaitAsync;
@@ -36,23 +38,23 @@ namespace P3D.Legacy.Server.CQERS.Services
             _publishStrategies[DispatchStrategy.SyncStopOnException] = SyncStopOnExceptionAsync;
         }
 
-        public Task DispatchAsync(TEvent @event, DispatchStrategy strategy, CancellationToken ct)
+        public Task PublishAsync(IEvent @event, DispatchStrategy strategy, CancellationToken ct = default)
         {
             if (!_publishStrategies.TryGetValue(strategy, out var publishStrategy))
             {
-                throw new ArgumentException($"Unknown strategy: {strategy}", nameof(strategy));
+                throw new InvalidOperationException($"Unknown strategy: {strategy}");
             }
 
-            return publishStrategy(_handlers.Select(static x => (Func<IEvent, CancellationToken, Task>) ((@event2, ct2) => x.HandleAsync((TEvent) @event2, ct2))), @event, ct);
+            return publishStrategy(_handlers.Select(x => (EventHandler) ((_, ct2) => x.HandleAsync(this, ct2))), @event, ct);
         }
 
 
-        private Task ParallelWhenAllAsync(IEnumerable<Func<IEvent, CancellationToken, Task>> handlers, IEvent @event, CancellationToken ct)
+        private Task ParallelWhenAllAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
         {
             return Task.WhenAll(handlers.Select(handler => handler(@event, ct)));
         }
 
-        private Task ParallelWhenAnyAsync(IEnumerable<Func<IEvent, CancellationToken, Task>> handlers, IEvent @event, CancellationToken ct)
+        private Task ParallelWhenAnyAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
         {
             return Task.WhenAny(handlers.Select(async handler =>
             {
@@ -67,7 +69,7 @@ namespace P3D.Legacy.Server.CQERS.Services
             }));
         }
 
-        private Task ParallelNoWaitAsync(IEnumerable<Func<IEvent, CancellationToken, Task>> handlers, IEvent @event, CancellationToken ct)
+        private Task ParallelNoWaitAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
         {
             foreach (var handler in handlers)
             {
@@ -76,7 +78,7 @@ namespace P3D.Legacy.Server.CQERS.Services
             return Task.CompletedTask;
         }
 
-        private async Task AsyncContinueOnExceptionAsync(IEnumerable<Func<IEvent, CancellationToken, Task>> handlers, IEvent @event, CancellationToken ct)
+        private async Task AsyncContinueOnExceptionAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
         {
             var tasks = new List<Task>();
             var exceptions = new List<Exception>();
@@ -112,7 +114,7 @@ namespace P3D.Legacy.Server.CQERS.Services
             }
         }
 
-        private async Task SyncStopOnExceptionAsync(IEnumerable<Func<IEvent, CancellationToken, Task>> handlers, IEvent @event, CancellationToken ct)
+        private async Task SyncStopOnExceptionAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
         {
             foreach (var handler in handlers)
             {
@@ -120,7 +122,7 @@ namespace P3D.Legacy.Server.CQERS.Services
             }
         }
 
-        private async Task SyncContinueOnExceptionAsync(IEnumerable<Func<IEvent, CancellationToken, Task>> handlers, IEvent @event, CancellationToken ct)
+        private async Task SyncContinueOnExceptionAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
         {
             var exceptions = new List<Exception>();
 

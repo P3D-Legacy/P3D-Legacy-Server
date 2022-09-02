@@ -9,8 +9,9 @@ namespace P3D.Legacy.Server.CQERS.Events
 
     public interface IEventHandler<in TEvent> : IEventHandler where TEvent : IEvent
     {
-        Task HandleAsync(TEvent @event, CancellationToken ct);
+        Task HandleAsync(IReceiveContext<TEvent> context, CancellationToken ct);
     }
+
     public class EventHandlerWrapper<TEventHandler, TEvent> : IEventHandler<TEvent>
         where TEvent : IEvent
         where TEventHandler : IEventHandler<TEvent>
@@ -24,12 +25,11 @@ namespace P3D.Legacy.Server.CQERS.Events
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        public Task HandleAsync(TEvent @event, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<TEvent> context, CancellationToken ct)
         {
             if (_factory(_serviceProvider) is { } handler)
-                return handler.HandleAsync(@event, ct);
-            else
-                return Task.CompletedTask;
+                return handler.HandleAsync(context, ct);
+            return Task.CompletedTask;
         }
     }
     public class EventHandlerEnumerableWrapper<TEventHandler, TEvent> : IEventHandler<TEvent>
@@ -45,11 +45,11 @@ namespace P3D.Legacy.Server.CQERS.Events
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        public async Task HandleAsync(TEvent @event, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<TEvent> context, CancellationToken ct)
         {
             foreach (var handler in _factory(_serviceProvider))
             {
-                await handler.HandleAsync(@event, ct);
+                await handler.HandleAsync(context, ct);
             }
         }
     }

@@ -28,10 +28,12 @@ namespace P3D.Legacy.Server.GUI.Views
         private readonly ILogger _logger;
         private readonly ICommandDispatcher _commandDispatcher;
 
+#pragma warning disable IDISP006
         private readonly ListView _playerListView;
         private readonly TextView _playerInfoTextView;
         private readonly Button _kickButton;
         private readonly Button _banButton;
+#pragma warning restore IDISP006
 
         private readonly PlayerListDataSource _currentPlayers = new(new());
         private IPlayer? _selectedPlayer;
@@ -82,12 +84,16 @@ IP: {player.IPEndPoint}";
             _kickButton.Clicked += () =>
             {
                 if (_selectedPlayer is not null)
+#pragma warning disable IDISP004
                     Terminal.Gui.Application.Run(Kick(_selectedPlayer));
+#pragma warning restore IDISP004
             };
             _banButton.Clicked += () =>
             {
                 if (_selectedPlayer is not null)
+#pragma warning disable IDISP004
                     Terminal.Gui.Application.Run(Ban(_selectedPlayer));
+#pragma warning restore IDISP004
             };
 
             Add(onlineView, infoView);
@@ -173,21 +179,21 @@ IP: {player.IPEndPoint}";
             _playerInfoTextView.Text = ustring.Empty;
         }
 
-        public Task HandleAsync(PlayerJoinedEvent notification, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
         {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
-                _currentPlayers.Players.Add(notification.Player);
+                _currentPlayers.Players.Add(context.Message.Player);
                 _playerListView.Source = _currentPlayers;
             });
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(PlayerLeftEvent notification, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
         {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
-                _currentPlayers.Players.RemoveAll(x => x.Id == notification.Id);
+                _currentPlayers.Players.RemoveAll(x => x.Id == context.Message.Id);
                 _playerListView.Source = _currentPlayers;
             });
             return Task.CompletedTask;

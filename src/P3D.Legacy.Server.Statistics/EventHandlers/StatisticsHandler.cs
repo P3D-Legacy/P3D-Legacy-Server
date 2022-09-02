@@ -33,61 +33,73 @@ namespace P3D.Legacy.Server.Statistics.EventHandlers
             _statisticsRepository = statisticsRepository ?? throw new ArgumentNullException(nameof(statisticsRepository));
         }
 
-        public async Task HandleAsync(PlayerUpdatedStateEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerUpdatedStateEvent> context, CancellationToken ct)
         {
-            var player = notification.Player;
+            var player = context.Message.Player;
             if (player is IP3DPlayerState)
             {
                 await _statisticsRepository.IncrementActionAsync(player.Id, "player_update_state", ct);
             }
         }
 
-        public async Task HandleAsync(PlayerTriggeredEventEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)
         {
-            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, $"event_{notification.Event.EventType}", ct);
+            var (player, @event) = context.Message;
+            await _statisticsRepository.IncrementActionAsync(player.Id, $"event_{@event.EventType}", ct);
         }
 
-        public async Task HandleAsync(PlayerSentGlobalMessageEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentGlobalMessageEvent> context, CancellationToken ct)
         {
-            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, "message_global", ct);
+            var player = context.Message.Player;
+            await _statisticsRepository.IncrementActionAsync(player.Id, "message_global", ct);
         }
 
-        public async Task HandleAsync(PlayerSentLocalMessageEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentLocalMessageEvent> context, CancellationToken ct)
         {
-            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, "message_local", ct);
+            var player = context.Message.Player;
+            await _statisticsRepository.IncrementActionAsync(player.Id, "message_local", ct);
         }
 
-        public async Task HandleAsync(PlayerSentPrivateMessageEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentPrivateMessageEvent> context, CancellationToken ct)
         {
-            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, "message_private", ct);
+            var player = context.Message.Player;
+            await _statisticsRepository.IncrementActionAsync(player.Id, "message_private", ct);
         }
 
-        public async Task HandleAsync(PlayerSentCommandEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentCommandEvent> context, CancellationToken ct)
         {
-            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, "message_command", ct);
+            var player = context.Message.Player;
+
+            await _statisticsRepository.IncrementActionAsync(player.Id, "message_command", ct);
         }
 
-        public async Task HandleAsync(PlayerJoinedEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
         {
-            await _statisticsRepository.IncrementActionAsync(notification.Player.Id, "player_joined", ct);
+            var player = context.Message.Player;
+
+            await _statisticsRepository.IncrementActionAsync(player.Id, "player_joined", ct);
         }
 
-        public async Task HandleAsync(PlayerLeftEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
         {
-            await _statisticsRepository.IncrementActionAsync(notification.Id, "player_left", ct);
+            var (id, _, _) = context.Message;
+
+            await _statisticsRepository.IncrementActionAsync(id, "player_left", ct);
         }
 
-        public async Task HandleAsync(WorldUpdatedEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<WorldUpdatedEvent> context, CancellationToken ct)
         {
-            if (notification.State.Season != notification.OldState.Season)
+            var (state, oldState) = context.Message;
+
+            if (state.Season != oldState.Season)
             {
                 await _statisticsRepository.IncrementActionAsync("world_update_season", ct);
             }
-            if (notification.State.Weather != notification.OldState.Weather)
+            if (state.Weather != oldState.Weather)
             {
                 await _statisticsRepository.IncrementActionAsync("world_update_weather", ct);
             }
-            if (notification.State.Time != notification.OldState.Time)
+            if (state.Time != oldState.Time)
             {
                 await _statisticsRepository.IncrementActionAsync("world_update_time", ct);
             }

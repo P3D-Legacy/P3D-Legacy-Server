@@ -196,29 +196,29 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
             await CloseAsync(WebSocketCloseStatus.Empty, "Kicked", ct);
         }
 
-        public async Task HandleAsync(PlayerJoinedEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerJoinedResponsePayload(notification.Player.Name), _jsonContext.PlayerJoinedResponsePayload), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerJoinedResponsePayload(context.Message.Player.Name), _jsonContext.PlayerJoinedResponsePayload), ct);
         }
 
-        public async Task HandleAsync(PlayerLeftEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerLeftResponsePayload(notification.Name), _jsonContext.PlayerLeftResponsePayload), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerLeftResponsePayload(context.Message.Name), _jsonContext.PlayerLeftResponsePayload), ct);
         }
 
-        public async Task HandleAsync(PlayerSentGlobalMessageEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentGlobalMessageEvent> context, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerSentGlobalMessageResponsePayload(notification.Player.Name, notification.Message), _jsonContext.PlayerSentGlobalMessageResponsePayload), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerSentGlobalMessageResponsePayload(context.Message.Player.Name, context.Message.Message), _jsonContext.PlayerSentGlobalMessageResponsePayload), ct);
         }
 
-        public async Task HandleAsync(ServerMessageEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<ServerMessageEvent> context, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ServerMessageResponsePayload(notification.Message), _jsonContext.ServerMessageResponsePayload), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ServerMessageResponsePayload(context.Message.Message), _jsonContext.ServerMessageResponsePayload), ct);
         }
 
-        public async Task HandleAsync(PlayerTriggeredEventEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(notification.Player.Name, notification.Event), _jsonContext.PlayerTriggeredEventResponsePayload), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(context.Message.Player.Name, context.Message.Event), _jsonContext.PlayerTriggeredEventResponsePayload), ct);
         }
 
         public override int GetHashCode() => _id.GetHashCode();

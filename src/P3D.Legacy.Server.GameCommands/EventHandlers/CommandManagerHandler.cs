@@ -19,11 +19,17 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.GameCommands.EventHandlers
 {
     [SuppressMessage("Performance", "CA1812")]
-    internal sealed class CommandManagerHandler :
+    internal sealed partial class CommandManagerHandler :
         IEventHandler<PlayerSentCommandEvent>
     {
         private static readonly Action<ILogger, string, string, string, Exception?> Command = LoggerMessage.Define<string, string, string>(
             LogLevel.Information, default, "{PlayerName}: /{CommandAlias} {CommandArgs}");
+
+        // TODO: NET 7
+        //[RegexGenerator(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)"", RegexOptions.IgnoreCase)]
+        //private static partial Regex Regex();
+
+        private static readonly Regex Regex = new(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)", RegexOptions.Compiled);
 
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
@@ -86,16 +92,16 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
 
         public IReadOnlyList<CommandManager> GetCommands() => _commandManagers;
 
-        public async Task HandleAsync(PlayerSentCommandEvent notification, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerSentCommandEvent> context, CancellationToken ct)
         {
             using var span = _tracer.StartActiveSpan("CommandManagerHandler Handle");
 
-            var (player, message) = notification;
+            var (player, message) = context.Message;
 
             var commandWithoutSlash = message.TrimStart('/');
 
             // TODO: Spans
-            var messageArray = new Regex(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)", RegexOptions.Compiled)
+            var messageArray = Regex
                 .Split(commandWithoutSlash)
                 .Select(static str => str.TrimStart('"').TrimEnd('"'))
                 .ToArray();

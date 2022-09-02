@@ -69,8 +69,6 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
             await writer.WriteAsync(protocol, new ServerDataRequestPacket());
             var response = await reader.ReadAsync(protocol);
             reader.Advance();
-
-            Assert.NotNull(response);
             Assert.IsFalse(response.IsCanceled);
             Assert.IsFalse(response.IsCompleted);
             Assert.NotNull(response.Message);

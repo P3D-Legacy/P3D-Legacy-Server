@@ -46,9 +46,9 @@ namespace P3D.Legacy.Server.Statistics.EventHandlers
             _worldCounter = _meter.CreateCounter<long>("world_state", "count", "occurrence of world state updates");
         }
 
-        public Task HandleAsync(PlayerUpdatedStateEvent notification, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<PlayerUpdatedStateEvent> context, CancellationToken ct)
         {
-            var player = notification.Player;
+            var player = context.Message.Player;
             if (player is IP3DPlayerState state)
             {
                 _stateCounter.Add(1,
@@ -60,74 +60,74 @@ namespace P3D.Legacy.Server.Statistics.EventHandlers
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(PlayerTriggeredEventEvent notification, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)
         {
             _eventCounter.Add(1,
-                new KVP("id", notification.Player.Id),
-                new KVP("event", notification.Event.EventType));
+                new KVP("id", context.Message.Player.Id),
+                new KVP("event", context.Message.Event.EventType));
 
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(PlayerSentGlobalMessageEvent notification, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<PlayerSentGlobalMessageEvent> context, CancellationToken ct)
         {
             _messageCounter.Add(1,
-                new KVP("id", notification.Player.Id),
+                new KVP("id", context.Message.Player.Id),
                 new KVP("type", "global"));
 
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(PlayerSentLocalMessageEvent notification, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<PlayerSentLocalMessageEvent> context, CancellationToken ct)
         {
             _messageCounter.Add(1,
-                new KVP("id", notification.Player.Id),
+                new KVP("id", context.Message.Player.Id),
                 new KVP("type", "local"));
 
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(PlayerSentPrivateMessageEvent notification, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<PlayerSentPrivateMessageEvent> context, CancellationToken ct)
         {
             _messageCounter.Add(1,
-                new KVP("id", notification.Player.Id),
+                new KVP("id", context.Message.Player.Id),
                 new KVP("type", "private"));
 
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(PlayerSentCommandEvent notification, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<PlayerSentCommandEvent> context, CancellationToken ct)
         {
             _messageCounter.Add(1,
-                new KVP("id", notification.Player.Id),
+                new KVP("id", context.Message.Player.Id),
                 new KVP("type", "command"));
 
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(PlayerJoinedEvent notification, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
         {
             _queueCounter.Add(1,
-                new KVP("id", notification.Player.Id),
+                new KVP("id", context.Message.Player.Id),
                 new KVP("type", "joined"));
 
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(PlayerLeftEvent notification, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
         {
             _queueCounter.Add(1,
-                new KVP("id", notification.Id),
+                new KVP("id", context.Message.Id),
                 new KVP("type", "left"));
 
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(WorldUpdatedEvent notification, CancellationToken ct)
+        public Task HandleAsync(IReceiveContext<WorldUpdatedEvent> context, CancellationToken ct)
         {
             _worldCounter.Add(1,
-                new KVP("season", notification.State.Season),
-                new KVP("weather", notification.State.Weather));
+                new KVP("season", context.Message.State.Season),
+                new KVP("weather", context.Message.State.Weather));
 
             return Task.CompletedTask;
         }

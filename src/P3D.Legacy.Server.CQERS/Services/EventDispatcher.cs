@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-using P3D.Legacy.Server.CQERS.Events;
+﻿using P3D.Legacy.Server.CQERS.Events;
 
 using System;
 using System.Threading;
@@ -12,16 +10,18 @@ namespace P3D.Legacy.Server.CQERS.Services
     {
         public DispatchStrategy DefaultStrategy { get; set; } = DispatchStrategy.ParallelNoWait;
 
-        private readonly IServiceProvider _serviceProvider;
+        private readonly ReceiveContextFactory _receiveContextFactory;
 
-        public EventDispatcher(IServiceProvider serviceProvider)
+        public EventDispatcher(ReceiveContextFactory receiveContextFactory)
         {
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _receiveContextFactory = receiveContextFactory ?? throw new ArgumentNullException(nameof(receiveContextFactory));
         }
 
-        public Task DispatchAsync<TEvent>(TEvent @event, DispatchStrategy strategy, CancellationToken ct) where TEvent : IEvent
+        public Task DispatchAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IEvent => DispatchAsync(@event, DefaultStrategy, ct);
+        public async Task DispatchAsync<TEvent>(TEvent @event, DispatchStrategy strategy, CancellationToken ct) where TEvent : IEvent
         {
-            return _serviceProvider.GetRequiredService<EventDispatcherHelper<TEvent>>().DispatchAsync(@event, strategy, ct);
+            var receiveContext = _receiveContextFactory.Create(@event);
+            await receiveContext.PublishAsync(@event, strategy, ct);
         }
     }
 }

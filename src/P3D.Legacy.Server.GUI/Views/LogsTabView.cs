@@ -9,7 +9,9 @@ namespace P3D.Legacy.Server.GUI.Views
 {
     public sealed class LogsTabView : View
     {
+#pragma warning disable IDISP006
         private readonly TextView _logsTextView;
+#pragma warning restore IDISP006
 
         [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
         public LogsTabView()

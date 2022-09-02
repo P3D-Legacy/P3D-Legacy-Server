@@ -120,7 +120,7 @@ query MonsterStaticData($id: Int, $itemId: Int) {
                     "medium-slow" => ExperienceType.MediumSlow,
                     "slow-then-very-fast" => ExperienceType.Erratic,
                     "fast-then-very-slow" => ExperienceType.Fluctuating,
-                    _ => throw new NotImplementedException()
+                    _ => throw new NotSupportedException()
                 },
                 monsterData.Moves.Select(static x => new AttackStaticDataEntity((ushort) x.MoveId, x.Move.Name, (byte) x.Move.PP)).ToList()
             );

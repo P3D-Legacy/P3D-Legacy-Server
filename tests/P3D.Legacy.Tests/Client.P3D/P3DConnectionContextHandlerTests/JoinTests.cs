@@ -7,6 +7,7 @@ using NUnit.Framework;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Data;
+using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Common.Packets.Common;
 using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Server.Abstractions;
@@ -89,8 +90,9 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
         }
         private class EventDispatcherMock : IEventDispatcher
         {
-            public DispatchStrategy DefaultStrategy { get; set; }
+            public DispatchStrategy DefaultStrategy { get; set; } = DispatchStrategy.ParallelWhenAll;
 
+            public Task DispatchAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IEvent => DispatchAsync(@event, DefaultStrategy, ct);
             public async Task DispatchAsync<TEvent>(TEvent rawEvent, DispatchStrategy dispatchStrategy, CancellationToken ct) where TEvent : IEvent
             {
                 switch (rawEvent)
@@ -149,7 +151,6 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 
             var idPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.NotNull(idPacket);
             Assert.IsFalse(idPacket.IsCanceled);
             Assert.IsFalse(idPacket.IsCompleted);
             Assert.NotNull(idPacket.Message);
@@ -157,7 +158,6 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 
             var worldDataPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.NotNull(worldDataPacket);
             Assert.IsFalse(worldDataPacket.IsCanceled);
             Assert.IsFalse(worldDataPacket.IsCompleted);
             Assert.NotNull(worldDataPacket.Message);
@@ -165,13 +165,23 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 
             var kickPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.NotNull(kickPacket);
             Assert.IsFalse(kickPacket.IsCanceled);
             Assert.IsFalse(kickPacket.IsCompleted);
             Assert.NotNull(kickPacket.Message);
             Assert.IsInstanceOf<KickedPacket>(kickPacket.Message);
 
+            var emptyPacket = await await Task.WhenAny(reader.ReadAsync(protocol).AsTask(), WaitNullPacket(100));
+            Assert.IsFalse(emptyPacket.IsCanceled);
+            Assert.IsFalse(emptyPacket.IsCompleted);
+            Assert.Null(emptyPacket.Message);
+
             await connectionTask.WaitAsync(TimeSpan.FromMilliseconds(1000));
         });
+
+        private static async Task<ProtocolReadResult<P3DPacket>> WaitNullPacket(int delayMs)
+        {
+            await Task.Delay(100);
+            return new ProtocolReadResult<P3DPacket>();
+        }
     }
 }
