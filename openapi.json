@@ -233,9 +233,11 @@
         "type": "object",
         "properties": {
           "username": {
+            "minLength": 1,
             "type": "string"
           },
           "password": {
+            "minLength": 1,
             "type": "string"
           },
           "rememberMe": {
@@ -296,6 +298,7 @@
         "type": "object",
         "properties": {
           "username": {
+            "minLength": 1,
             "type": "string"
           },
           "password": {
