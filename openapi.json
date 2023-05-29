@@ -397,6 +397,16 @@
             "format": "int32",
             "readOnly": true
           },
+          "microseconds": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "nanoseconds": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
           "minutes": {
             "type": "integer",
             "format": "int32",
@@ -418,6 +428,16 @@
             "readOnly": true
           },
           "totalMilliseconds": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
+          },
+          "totalMicroseconds": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
+          },
+          "totalNanoseconds": {
             "type": "number",
             "format": "double",
             "readOnly": true
