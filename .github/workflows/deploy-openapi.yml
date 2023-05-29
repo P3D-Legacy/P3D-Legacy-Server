@@ -18,10 +18,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup .NET 6
+      - name: Setup .NET 
         uses: actions/setup-dotnet@master
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 7.x.x
 
       - name: Build
         run: dotnet build src/P3D.Legacy.Server/P3D.Legacy.Server.csproj -c Release

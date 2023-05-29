@@ -1,6 +1,6 @@
 # Produces a self-contained executable for linux.
 # Stage 1: Restore and Publish on AMD64 for AMD64, ARM64, ARM32
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS publish
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS publish
 SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 ARG TARGETPLATFORM
 ARG DOCKER_ALPINE="true"
@@ -53,7 +53,7 @@ RUN \
     dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -o ./output -r $RID --self-contained true;
 
 # Stage 6: Copy application artifacts into a smaller runtime environment, which is then used as our final image
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime-deps:7.0-alpine
 
 WORKDIR /app
 
@@ -73,7 +73,7 @@ LABEL org.opencontainers.image.title="P3D Legacy Server" \
       org.opencontainers.image.authors="Vitaly Mikhailov (Aragas) <personal@aragas.org>" \
       org.opencontainers.image.vendor="P3D-Legacy Team" \
       org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine" \
+      org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/runtime-deps:7.0-alpine" \
       org.opencontainers.image.created=$DATE \
       org.opencontainers.image.revision=$REVISION
 
