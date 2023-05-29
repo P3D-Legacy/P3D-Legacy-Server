@@ -1,9 +1,9 @@
 ﻿using Aragas.Extensions.Options.FluentValidation.Extensions;
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -79,50 +79,50 @@ namespace P3D.Legacy.Server
                 services.AddStatistics();
                 services.AddGUI();
 
-                services.AddOpenTelemetryMetrics(static b => b.Configure(static (sp, builder) =>
-                {
-                    var options = sp.GetRequiredService<IOptions<OtlpOptions>>().Value;
-                    if (options.Enabled)
+                services.AddOpenTelemetry()
+                    .ConfigureResource(static builder => builder.AddService("P3D.Legacy.Server"))
+                    .WithMetrics(builder =>
                     {
-                        builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
-
-                        builder.AddAspNetCoreInstrumentation();
-                        builder.AddHttpClientInstrumentation();
-
-                        builder.AddStatisticsInstrumentation();
-
-                        builder.AddOtlpExporter(opt =>
+                        var options = ctx.Configuration.GetSection("Otlp").Get<OtlpOptions>() ?? new();
+                        if (options.Enabled)
                         {
-                            opt.Endpoint = new Uri(options.Host);
-                        });
-                    }
-                }));
-                services.AddOpenTelemetryTracing(static b => b.Configure(static (sp, builder) =>
-                {
-                    var options = sp.GetRequiredService<IOptions<OtlpOptions>>().Value;
-                    if (options.Enabled)
+                            builder.AddAspNetCoreInstrumentation();
+                            builder.AddHttpClientInstrumentation();
+
+                            builder.AddStatisticsInstrumentation();
+
+                            builder.AddOtlpExporter(opt =>
+                            {
+                                opt.Endpoint = new Uri(options.Host);
+                            });
+                        }
+                    })
+                    .WithTracing(builder =>
                     {
-                        builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
-
-                        builder.AddAspNetCoreInstrumentation();
-                        builder.AddHttpClientInstrumentation();
-
-                        builder.AddHostInstrumentation();
-                        builder.AddApplicationInstrumentation();
-                        builder.AddClientP3DInstrumentation();
-                        builder.AddCommunicationAPIInstrumentation();
-                        builder.AddDiscordBotInstrumentation();
-                        builder.AddGameCommandsInstrumentation();
-                        builder.AddInfrastructureInstrumentation();
-                        builder.AddInternalAPIInstrumentation();
-                        builder.AddStatisticsInstrumentation();
-
-                        builder.AddOtlpExporter(opt =>
+                        var options = ctx.Configuration.GetSection("Otlp").Get<OtlpOptions>() ?? new();
+                        if (options.Enabled)
                         {
-                            opt.Endpoint = new Uri(options.Host);
-                        });
-                    }
-                }));
+                            builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
+
+                            builder.AddAspNetCoreInstrumentation();
+                            builder.AddHttpClientInstrumentation();
+
+                            builder.AddHostInstrumentation();
+                            builder.AddApplicationInstrumentation();
+                            builder.AddClientP3DInstrumentation();
+                            builder.AddCommunicationAPIInstrumentation();
+                            builder.AddDiscordBotInstrumentation();
+                            builder.AddGameCommandsInstrumentation();
+                            builder.AddInfrastructureInstrumentation();
+                            builder.AddInternalAPIInstrumentation();
+                            builder.AddStatisticsInstrumentation();
+
+                            builder.AddOtlpExporter(opt =>
+                            {
+                                opt.Endpoint = new Uri(options.Host);
+                            });
+                        }
+                    });
             })
             .AddP3DServer()
             .ConfigureWebHostDefaults(static webBuilder => webBuilder.UseStartup<Startup>())

@@ -16,7 +16,7 @@ namespace P3D.Legacy.Server.Client.P3D.Options
             _options = options.Value;
         }
 
-        public void PostConfigure(string name, KestrelServerOptions options)
+        public void PostConfigure(string? name, KestrelServerOptions options)
         {
             options.Listen(new IPEndPoint(IPAddress.Parse(_options.IP), _options.Port), static builder =>
             {

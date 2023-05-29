@@ -35,6 +35,8 @@ namespace P3D.Legacy.Server.Benchmark.Services
                 _benchmarkStatusService = benchmarkStatusService ?? throw new ArgumentNullException(nameof(benchmarkStatusService));
             }
 
+            public int Invoke(InvocationContext context) => InvokeAsync(context).GetAwaiter().GetResult();
+
             public async Task<int> InvokeAsync(InvocationContext context)
             {
                 switch (_options.BenchmarkType)

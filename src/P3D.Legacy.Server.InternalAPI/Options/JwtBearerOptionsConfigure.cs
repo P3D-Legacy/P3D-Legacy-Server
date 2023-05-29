@@ -16,7 +16,7 @@ namespace P3D.Legacy.Server.InternalAPI.Options
         }
 
         public void Configure(JwtBearerOptions options) => Configure(Microsoft.Extensions.Options.Options.DefaultName, options);
-        public void Configure(string name, JwtBearerOptions options)
+        public void Configure(string? name, JwtBearerOptions options)
         {
             // Only configure the options if this is the correct instance
             if (string.Equals(name, JwtBearerDefaults.AuthenticationScheme, StringComparison.Ordinal))

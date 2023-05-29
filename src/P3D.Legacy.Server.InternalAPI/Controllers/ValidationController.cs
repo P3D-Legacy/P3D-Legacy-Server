@@ -23,7 +23,7 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
         [HttpGet]
         public IActionResult ValidateToken(CancellationToken ct)
         {
-            string authorization = Request.Headers["Authorization"];
+            string? authorization = Request.Headers["Authorization"];
 
             // If no authorization header found, nothing to process further
             if (string.IsNullOrEmpty(authorization))

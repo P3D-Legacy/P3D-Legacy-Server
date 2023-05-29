@@ -20,12 +20,12 @@ namespace P3D.Legacy.Server.Infrastructure.Utils
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) => throw new NotSupportedException();
 
         public override bool CanRead => true;
-        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.NonPublicConstructors | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] Type objectType, object? existingValue, JsonSerializer serializer)
         {
             var jo = JObject.Load(reader);
             var targetObj = FormatterServices.GetUninitializedObject(objectType);
 
-            foreach (var prop in objectType.GetProperties().Where(static p => p.CanRead && p.CanWrite))
+            foreach (var prop in objectType.GetProperties().Where(static p => p is { CanRead: true, CanWrite: true }))
             {
                 var att = prop.GetCustomAttribute<JsonPropertyAttribute>(inherit: true);
 

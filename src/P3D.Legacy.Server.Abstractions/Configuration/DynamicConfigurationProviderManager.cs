@@ -29,7 +29,7 @@ namespace P3D.Legacy.Server.Abstractions.Configuration
 
         public IDynamicConfigurationProvider? GetProvider(Type optionsType) => _configurationProviders.FirstOrDefault(x => x.OptionsType == optionsType);
         public IDynamicConfigurationProvider? GetProvider<TOptions>() => GetProvider(typeof(TOptions));
-        public object? GetOptions(Type type)
+        public object? GetOptions([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
             var openMethod = typeof(DynamicConfigurationProviderManager).GetMethod(nameof(GetOptionsInternal), BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
             var method = openMethod?.MakeGenericMethod(type);

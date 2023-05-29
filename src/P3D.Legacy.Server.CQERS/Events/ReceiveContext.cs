@@ -24,7 +24,7 @@ namespace P3D.Legacy.Server.CQERS.Events
         private readonly ILogger _logger;
         private readonly IEnumerable<IEventHandler<TEvent>> _handlers;
 
-        public ReceiveContext(ILogger<ReceiveContext<TEvent>> logger,IEnumerable<IEventHandler<TEvent>> handlers, TEvent @event)
+        public ReceiveContext(ILogger<ReceiveContext<TEvent>> logger, IEnumerable<IEventHandler<TEvent>> handlers, TEvent @event)
         {
             Message = @event;
             _logger = logger;

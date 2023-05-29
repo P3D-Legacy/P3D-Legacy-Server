@@ -20,7 +20,6 @@ using P3D.Legacy.Server.Application.Queries.World;
 using P3D.Legacy.Server.Client.P3D;
 using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.CQERS.Queries;
 
 using System;
@@ -170,7 +169,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
             Assert.NotNull(kickPacket.Message);
             Assert.IsInstanceOf<KickedPacket>(kickPacket.Message);
 
-            var emptyPacket = await await Task.WhenAny(reader.ReadAsync(protocol).AsTask(), WaitNullPacket(100));
+            var emptyPacket = await await Task.WhenAny(reader.ReadAsync(protocol).AsTask(), WaitNullPacketAsync(100));
             Assert.IsFalse(emptyPacket.IsCanceled);
             Assert.IsFalse(emptyPacket.IsCompleted);
             Assert.Null(emptyPacket.Message);
@@ -178,10 +177,10 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
             await connectionTask.WaitAsync(TimeSpan.FromMilliseconds(1000));
         });
 
-        private static async Task<ProtocolReadResult<P3DPacket>> WaitNullPacket(int delayMs)
+        private static async Task<ProtocolReadResult<P3DPacket?>> WaitNullPacketAsync(int delayMs)
         {
             await Task.Delay(100);
-            return new ProtocolReadResult<P3DPacket>();
+            return new ProtocolReadResult<P3DPacket?>();
         }
     }
 }

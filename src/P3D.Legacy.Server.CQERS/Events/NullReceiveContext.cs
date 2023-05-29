@@ -13,6 +13,6 @@ namespace P3D.Legacy.Server.CQERS.Events
             Message = @event;
         }
 
-        public Task PublishAsync(IEvent @event, DispatchStrategy strategy, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task PublishAsync(IEvent @event, DispatchStrategy strategy, CancellationToken ct = default) => throw new NotSupportedException();
     }
 }

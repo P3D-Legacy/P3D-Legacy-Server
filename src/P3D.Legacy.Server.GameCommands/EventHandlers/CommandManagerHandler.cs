@@ -5,7 +5,6 @@ using OpenTelemetry.Trace;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
 
 using System;
@@ -25,11 +24,8 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
         private static readonly Action<ILogger, string, string, string, Exception?> Command = LoggerMessage.Define<string, string, string>(
             LogLevel.Information, default, "{PlayerName}: /{CommandAlias} {CommandArgs}");
 
-        // TODO: NET 7
-        //[RegexGenerator(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)"", RegexOptions.IgnoreCase)]
-        //private static partial Regex Regex();
-
-        private static readonly Regex Regex = new(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)", RegexOptions.Compiled);
+        [GeneratedRegex(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)", RegexOptions.IgnoreCase)]
+        private static partial Regex Regex();
 
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
@@ -101,7 +97,7 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
             var commandWithoutSlash = message.TrimStart('/');
 
             // TODO: Spans
-            var messageArray = Regex
+            var messageArray = Regex()
                 .Split(commandWithoutSlash)
                 .Select(static str => str.TrimStart('"').TrimEnd('"'))
                 .ToArray();

@@ -9,6 +9,7 @@ using P3D.Legacy.Server.CQERS.Services;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -43,7 +44,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             return services;
         }
 
-        public static IServiceCollection AddEvent<TEventHandler>(this IServiceCollection services)
+        public static IServiceCollection AddEvent<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicConstructors)] TEventHandler>(this IServiceCollection services)
             where TEventHandler : IEventHandler
         {
             var @typeof = typeof(TEventHandler);
@@ -58,7 +59,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
 
             return services;
         }
-        public static IServiceCollection AddEvent<TEventHandler>(this IServiceCollection services, Func<IServiceProvider, TEventHandler?> factory)
+        public static IServiceCollection AddEvent<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]TEventHandler>(this IServiceCollection services, Func<IServiceProvider, TEventHandler?> factory)
             where TEventHandler : IEventHandler
         {
             var @typeof = typeof(TEventHandler);
@@ -73,7 +74,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
 
             return services;
         }
-        public static IServiceCollection AddEvents<TEventHandler>(this IServiceCollection services, Func<IServiceProvider, IEnumerable<TEventHandler>> factory)
+        public static IServiceCollection AddEvents<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] TEventHandler>(this IServiceCollection services, Func<IServiceProvider, IEnumerable<TEventHandler>> factory)
             where TEventHandler : IEventHandler
         {
             var @typeof = typeof(TEventHandler);
@@ -105,7 +106,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             return services;
         }
 
-        public static IServiceCollection AddCommandHandler<TCommandHandler>(this IServiceCollection services)
+        public static IServiceCollection AddCommandHandler<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicConstructors)] TCommandHandler>(this IServiceCollection services)
             where TCommandHandler : class, ICommandHandler
         {
             var @typeof = typeof(TCommandHandler);
@@ -120,7 +121,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
 
             return services;
         }
-        public static IServiceCollection AddCommandHandler<TCommandHandler>(this IServiceCollection services, Func<IServiceProvider, TCommandHandler> factory)
+        public static IServiceCollection AddCommandHandler<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] TCommandHandler>(this IServiceCollection services, Func<IServiceProvider, TCommandHandler> factory)
             where TCommandHandler : class, ICommandHandler
         {
             var @typeof = typeof(TCommandHandler);
@@ -136,7 +137,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             return services;
         }
 
-        public static IServiceCollection AddQueryHandler<TQueryHandler>(this IServiceCollection services)
+        public static IServiceCollection AddQueryHandler<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicConstructors)] TQueryHandler>(this IServiceCollection services)
             where TQueryHandler : class, IQueryHandler
         {
             var @typeof = typeof(TQueryHandler);
@@ -152,7 +153,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
 
             return services;
         }
-        public static IServiceCollection AddQueryHandler<TQueryHandler>(this IServiceCollection services, Func<IServiceProvider, TQueryHandler> factory)
+        public static IServiceCollection AddQueryHandler<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] TQueryHandler>(this IServiceCollection services, Func<IServiceProvider, TQueryHandler> factory)
             where TQueryHandler : class, IQueryHandler
         {
             var @typeof = typeof(TQueryHandler);

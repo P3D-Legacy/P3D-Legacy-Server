@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <Version>0.9</Version>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -30,7 +28,6 @@
 
   <PropertyGroup>
     <IsTrimmable>false</IsTrimmable>
-    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>

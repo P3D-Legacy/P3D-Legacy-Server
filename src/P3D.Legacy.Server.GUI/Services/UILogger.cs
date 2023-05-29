@@ -23,7 +23,8 @@ namespace P3D.Legacy.Server.GUI.Services
             _uiServiceScopeFactory = uiServiceScopeFactory ?? throw new ArgumentNullException(nameof(uiServiceScopeFactory));
         }
 
-        public IDisposable BeginScope<TState>(TState state) => new NopDisposable();
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => new NopDisposable();
 
         public bool IsEnabled(LogLevel logLevel) => true;
 
