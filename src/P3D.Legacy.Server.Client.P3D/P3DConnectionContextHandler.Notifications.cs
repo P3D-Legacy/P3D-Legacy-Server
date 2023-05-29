@@ -68,7 +68,11 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var (_, origin, name) = context.Message;
 
-            if (Origin == origin) return;
+            if (Origin == origin)
+            {
+                _finalizationDelayer.SetResult();
+                return;
+            }
 
             await SendPacketAsync(new DestroyPlayerPacket { Origin = Origin.Server, PlayerOrigin = origin }, ct);
             await SendServerMessageAsync($"Player {name} left the server!", ct);

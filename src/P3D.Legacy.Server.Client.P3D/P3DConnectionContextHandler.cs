@@ -29,6 +29,7 @@ namespace P3D.Legacy.Server.Client.P3D
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
         private readonly P3DProtocol _protocol;
+        private readonly TaskCompletionSource _finalizationDelayer = new();
 
         private readonly ICommandDispatcher _commandDispatcher;
         private readonly IQueryDispatcher _queryDispatcher;
@@ -36,6 +37,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
         private TelemetrySpan _connectionSpan = default!;
         private ProtocolWriter _writer = default!;
+
 
         public P3DConnectionContextHandler(
             ILogger<P3DConnectionContextHandler> logger,
@@ -72,6 +74,7 @@ namespace P3D.Legacy.Server.Client.P3D
                     State = PlayerState.Finalizing;
                     if (oldState == PlayerState.Initialized)
                     {
+                        // Start finalization. Here it should complete _finalizationDelayer.
                         Task<CommandResult> FinalizeAsync() => _commandDispatcher.DispatchAsync(new PlayerFinalizingCommand(this), CancellationToken.None);
                         using var jctx = new JoinableTaskContext(); // Should I create it here or in the main method?
                         new JoinableTaskFactory(jctx).Run(FinalizeAsync);
@@ -121,6 +124,9 @@ namespace P3D.Legacy.Server.Client.P3D
                 _connectionSpan.RecordException(e).SetStatus(Status.Error);
                 throw;
             }
+
+            // Exit means disposal. Delay disposal of the client. Wait for finalization if possible
+            await _finalizationDelayer.Task.WaitAsync(TimeSpan.FromSeconds(5), ct);
         }
 
         protected override void Dispose(bool disposing)
