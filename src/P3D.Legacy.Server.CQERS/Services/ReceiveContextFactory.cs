@@ -15,7 +15,7 @@ namespace P3D.Legacy.Server.CQERS.Services
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public IReceiveContext<TEvent> Create<TEvent>(TEvent @event) where TEvent : IEvent =>
+        public IReceiveContectWithPublisher<TEvent> Create<TEvent>(TEvent @event) where TEvent : IEvent =>
             ActivatorUtilities.CreateInstance<ReceiveContext<TEvent>>(_serviceProvider, @event);
     }
 }

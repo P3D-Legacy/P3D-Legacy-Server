@@ -14,7 +14,7 @@ namespace P3D.Legacy.Common.PlayerEvents
     [JsonDerivedType(typeof(EvolvedPokemonEvent), (int) PlayerEventType.EvolvedPokemon)]
     public abstract record PlayerEvent
     {
-        public PlayerEventType EventType { get; set; }
+        public PlayerEventType EventType { get; set; } // TODO: Broke
     };
     public record UnknownEvent(string RawEvent) : PlayerEvent;
     public record AchievedEmblemEvent(string Emblem) : PlayerEvent;

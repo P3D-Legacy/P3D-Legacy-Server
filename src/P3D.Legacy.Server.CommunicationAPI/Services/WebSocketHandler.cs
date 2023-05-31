@@ -45,7 +45,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
             public GameJoltId GameJoltId => GameJoltId.None;
             public PermissionTypes Permissions { get; private set; } = PermissionTypes.User;
             public IPEndPoint IPEndPoint => new(IPAddress.Loopback, 0);
-            public PlayerState State { get; internal set; }
+            public PlayerState State { get; internal set; } = PlayerState.None;
 
             public WebSocketPlayer(string botName, Func<string, CancellationToken, Task>? kickCallbackAsync)
             {

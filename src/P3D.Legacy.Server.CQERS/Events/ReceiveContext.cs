@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.CQERS.Events
 {
-    public class ReceiveContext<TEvent> : IReceiveContext<TEvent> where TEvent : IEvent
+    public class ReceiveContext<TEvent> : IReceiveContectWithPublisher<TEvent> where TEvent : IEvent
     {
         private delegate Task EventHandler(IEvent @event, CancellationToken ct);
 
