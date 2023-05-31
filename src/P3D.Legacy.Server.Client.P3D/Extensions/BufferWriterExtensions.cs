@@ -10,8 +10,8 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
 {
     internal static class BufferWriterExtensions
     {
-        private static readonly byte[] ProtocolSequenceInvalid = { (byte) '0', (byte) '.', (byte) '0' };
-        private static readonly byte[] ProtocolSequenceV1 = { (byte) '0', (byte) '.', (byte) '5' };
+        private static readonly byte[] ProtocolSequenceInvalid = "0.0"u8.ToArray();
+        private static readonly byte[] ProtocolSequenceV1 = "0.5"u8.ToArray();
 
         public static void Write(this IBufferWriter<byte> output, ReadOnlySpan<char> chars, Encoder encoder)
         {

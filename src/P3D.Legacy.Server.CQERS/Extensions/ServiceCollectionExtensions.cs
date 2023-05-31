@@ -59,7 +59,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
 
             return services;
         }
-        public static IServiceCollection AddEvent<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]TEventHandler>(this IServiceCollection services, Func<IServiceProvider, TEventHandler?> factory)
+        public static IServiceCollection AddEvent<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] TEventHandler>(this IServiceCollection services, Func<IServiceProvider, TEventHandler?> factory)
             where TEventHandler : IEventHandler
         {
             var @typeof = typeof(TEventHandler);

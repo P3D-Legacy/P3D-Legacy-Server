@@ -4,7 +4,6 @@ using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Diagnostics;

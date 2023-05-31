@@ -5,7 +5,6 @@ using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.CQERS.Queries;
 
 using System;

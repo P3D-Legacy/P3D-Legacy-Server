@@ -20,7 +20,6 @@ using P3D.Legacy.Server.Application.Queries.World;
 using P3D.Legacy.Server.Client.P3D;
 using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.CQERS.Queries;
 
 using System;

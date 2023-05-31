@@ -12,7 +12,6 @@ using P3D.Legacy.Server.Application.Commands.Trade;
 using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -199,7 +198,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
                 Season = season,
                 Weather = weather,
-                CurrentTime = $"{time.Hours:00},{time.Minutes:00},{time.Seconds:00}"
+                CurrentTime = $"{time.Hours:00},{time.Minutes:00},{time.Seconds:00}",
             }, ct);
         }
 

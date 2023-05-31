@@ -10,10 +10,8 @@ using P3D.Legacy.Server.CommunicationAPI.Models;
 using P3D.Legacy.Server.CommunicationAPI.Utils;
 using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text.Json;
@@ -32,16 +30,8 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         IDisposable,
         IAsyncDisposable
     {
-        [SuppressMessage("Performance", "CA1812")]
         [JsonSerializable(typeof(RequestPayload))]
-        [JsonSerializable(typeof(PlayerJoinedResponsePayload))]
-        [JsonSerializable(typeof(PlayerLeftResponsePayload))]
-        [JsonSerializable(typeof(PlayerSentGlobalMessageResponsePayload))]
-        [JsonSerializable(typeof(ServerMessageResponsePayload))]
-        [JsonSerializable(typeof(PlayerTriggeredEventResponsePayload))]
-        [JsonSerializable(typeof(KickedResponsePayload))]
-        [JsonSerializable(typeof(SuccessResponsePayload))]
-        [JsonSerializable(typeof(ErrorResponsePayload))]
+        [JsonSerializable(typeof(ResponsePayload))]
         internal partial class JsonContext : JsonSerializerContext { }
 
         private class WebSocketPlayer : IPlayer
@@ -55,7 +45,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
             public GameJoltId GameJoltId => GameJoltId.None;
             public PermissionTypes Permissions { get; private set; } = PermissionTypes.User;
             public IPEndPoint IPEndPoint => new(IPAddress.Loopback, 0);
-            public PlayerState State => PlayerState.Initialized;
+            public PlayerState State { get; internal set; }
 
             public WebSocketPlayer(string botName, Func<string, CancellationToken, Task>? kickCallbackAsync)
             {
@@ -90,12 +80,11 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
         }
 
         private readonly Guid _id = Guid.NewGuid();
-        private IPlayer? _bot;
+        private WebSocketPlayer? _bot;
 
         private readonly WebSocket _webSocket;
         private readonly ICommandDispatcher _commandDispatcher;
         private readonly IEventDispatcher _eventDispatcher;
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
         private readonly JsonContext _jsonContext;
         private readonly SequenceTextReader _sequenceTextReader = new();
         private readonly CancellationTokenSource _cts = new();
@@ -105,8 +94,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
             _webSocket = webSocket ?? throw new ArgumentNullException(nameof(webSocket));
             _commandDispatcher = commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
             _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
-            _jsonSerializerOptions = jsonSerializerOptions.Value ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
-            _jsonContext = new JsonContext(new JsonSerializerOptions(_jsonSerializerOptions));
+            _jsonContext = new JsonContext(new JsonSerializerOptions(jsonSerializerOptions.Value));
         }
 
         private ValueTask CheckWebSocketStateAsync(CancellationToken ct)
@@ -148,10 +136,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                     await CheckWebSocketStateAsync(ct);
 
                     await using var reader = new WebSocketMessageReaderStream(_webSocket, maxMessageSize);
-                    // TODO: Json Source generator with discriminators
-#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-                    var payload = await JsonSerializer.DeserializeAsync<RequestPayload?>(reader, _jsonSerializerOptions, ct);
-#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
+                    var payload = await JsonSerializer.DeserializeAsync<RequestPayload>(reader, _jsonContext.RequestPayload, ct);
                     if (payload is not null)
                         await ProcessPayloadAsync(payload, ct);
                 }
@@ -166,59 +151,63 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                 case RegisterBotRequestPayload(var botName, var uid):
                     if (_bot is not null)
                     {
-                        await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ErrorResponsePayload(1, "Bot initialized twice!", uid), _jsonContext.ErrorResponsePayload), ct);
+                        // Explore the idea of writing text messages via Stream to avoid buffer usage
+                        await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ErrorResponsePayload(1, "Bot initialized twice!", uid), _jsonContext.ResponsePayload), ct);
                         return;
                     }
 
                     _bot = new WebSocketPlayer(botName, KickCallbackAsync);
+                    _bot.State = PlayerState.Initializing;
                     await _commandDispatcher.DispatchAsync(new PlayerInitializingCommand(_bot), ct);
+                    _bot.State = PlayerState.Authentication;
                     await _commandDispatcher.DispatchAsync(new PlayerReadyCommand(_bot), ct);
+                    _bot.State = PlayerState.Initialized;
                     await _eventDispatcher.DispatchAsync(new PlayerUpdatedStateEvent(_bot), ct);
-                    await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid), _jsonContext.SuccessResponsePayload), ct);
+                    await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid), _jsonContext.ResponsePayload), ct);
                     break;
 
                 case MessageRequestPayload(var sender, var message, var uid):
                     if (_bot is null)
                     {
-                        await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ErrorResponsePayload(2, "Bot not initialized!", uid), _jsonContext.ErrorResponsePayload), ct);
+                        await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ErrorResponsePayload(2, "Bot not initialized!", uid), _jsonContext.ResponsePayload), ct);
                         return;
                     }
 
                     await _eventDispatcher.DispatchAsync(new PlayerSentGlobalMessageEvent(_bot, $"{sender}: {message}"), ct);
-                    await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid), _jsonContext.SuccessResponsePayload), ct);
+                    await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new SuccessResponsePayload(uid), _jsonContext.ResponsePayload), ct);
                     break;
             }
         }
 
         private async Task KickCallbackAsync(string reason, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new KickedResponsePayload(reason), _jsonContext.KickedResponsePayload), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new KickedResponsePayload(reason), _jsonContext.ResponsePayload), ct);
             await CloseAsync(WebSocketCloseStatus.Empty, "Kicked", ct);
         }
 
         public async Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerJoinedResponsePayload(context.Message.Player.Name), _jsonContext.PlayerJoinedResponsePayload), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerJoinedResponsePayload(context.Message.Player.Name), _jsonContext.ResponsePayload), ct);
         }
 
         public async Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerLeftResponsePayload(context.Message.Name), _jsonContext.PlayerLeftResponsePayload), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerLeftResponsePayload(context.Message.Name), _jsonContext.ResponsePayload), ct);
         }
 
         public async Task HandleAsync(IReceiveContext<PlayerSentGlobalMessageEvent> context, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerSentGlobalMessageResponsePayload(context.Message.Player.Name, context.Message.Message), _jsonContext.PlayerSentGlobalMessageResponsePayload), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerSentGlobalMessageResponsePayload(context.Message.Player.Name, context.Message.Message), _jsonContext.ResponsePayload), ct);
         }
 
         public async Task HandleAsync(IReceiveContext<ServerMessageEvent> context, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ServerMessageResponsePayload(context.Message.Message), _jsonContext.ServerMessageResponsePayload), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new ServerMessageResponsePayload(context.Message.Message), _jsonContext.ResponsePayload), ct);
         }
 
         public async Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)
         {
-            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(context.Message.Player.Name, context.Message.Event), _jsonContext.PlayerTriggeredEventResponsePayload), ct);
+            await SendAsync(JsonSerializer.SerializeToUtf8Bytes(new PlayerTriggeredEventResponsePayload(context.Message.Player.Name, context.Message.Event), _jsonContext.ResponsePayload), ct);
         }
 
         public override int GetHashCode() => _id.GetHashCode();

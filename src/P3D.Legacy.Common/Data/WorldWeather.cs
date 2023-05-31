@@ -11,6 +11,6 @@
         Thunderstorm,
         Sandstorm,
         Ash,
-        Blizzard
+        Blizzard,
     }
 }

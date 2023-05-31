@@ -15,7 +15,7 @@ namespace P3D.Legacy.Server.GUI.Views
         private static string ToString(object? val) => val switch
         {
             bool b => b.ToString().ToLowerInvariant(),
-            { } o => o.ToString() ?? string.Empty,
+            not null => val.ToString() ?? string.Empty,
             _ => string.Empty
         };
 

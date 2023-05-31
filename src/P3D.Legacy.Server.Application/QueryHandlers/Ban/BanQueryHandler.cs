@@ -1,5 +1,4 @@
 ﻿using P3D.Legacy.Server.Abstractions.Extensions;
-using P3D.Legacy.Server.Application.Extensions;
 using P3D.Legacy.Server.Application.Queries.Ban;
 using P3D.Legacy.Server.CQERS.Queries;
 using P3D.Legacy.Server.Infrastructure.Repositories.Bans;

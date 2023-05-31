@@ -1,13 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 
+using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,6 +32,8 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
         public async Task<CommandResult> HandleAsync(PlayerReadyCommand command, CancellationToken ct)
         {
             var player = command.Player;
+
+            Debug.Assert(player.State == PlayerState.Authentication);
 
             var permissions = await _permissionRepository.GetByIdAsync(player.Id, ct);
             await player.AssignPermissionsAsync(permissions.Permissions, ct);

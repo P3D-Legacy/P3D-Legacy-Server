@@ -38,7 +38,7 @@
         BattleEndRoundData          = 0x39,
 
         ServerInfoData              = 0x62,
-        ServerDataRequest           = 0x63
+        ServerDataRequest           = 0x63,
 #pragma warning restore format
     }
 }

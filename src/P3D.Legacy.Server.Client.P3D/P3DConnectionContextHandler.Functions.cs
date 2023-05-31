@@ -114,7 +114,7 @@ namespace P3D.Legacy.Server.Client.P3D
         private async Task SendServerMessageAsync(string text, CancellationToken ct) => await SendPacketAsync(new ChatMessageGlobalPacket
         {
             Origin = Origin.Server,
-            Message = text
+            Message = text,
         }, ct);
     }
 }

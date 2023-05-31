@@ -7,7 +7,7 @@ namespace P3D.Legacy.Common.Packets
 {
     public abstract partial record P3DPacket
     {
-        private static readonly byte[] Separator = { (byte) '|' };
+        private static readonly byte[] Separator = "|"u8.ToArray();
 
         private static ReadOnlySpan<byte> ParseSection(ref ReadOnlySequence<byte> sequence)
         {

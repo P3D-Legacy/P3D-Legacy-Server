@@ -17,7 +17,6 @@ using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Application.Queries.World;
-using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Collections.Immutable;
@@ -294,7 +293,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 await SendPacketAsync(new IdPacket
                 {
                     Origin = Origin.Server,
-                    PlayerOrigin = Origin
+                    PlayerOrigin = Origin,
 
                 }, ct);
                 var worldState = await _queryDispatcher.DispatchAsync(new GetWorldStateQuery(), ct);
@@ -304,7 +303,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
                     Season = worldState.Season,
                     Weather = worldState.Weather,
-                    CurrentTime = $"{worldState.Time.Hours:00},{worldState.Time.Minutes:00},{worldState.Time.Seconds:00}"
+                    CurrentTime = $"{worldState.Time.Hours:00},{worldState.Time.Minutes:00},{worldState.Time.Seconds:00}",
                 }, ct);
 
                 State = PlayerState.Authentication;
@@ -361,7 +360,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             var message = packet.Message;
 
-            if (message.StartsWith("/", StringComparison.Ordinal))
+            if (message.StartsWith('/'))
             {
                 await _eventDispatcher.DispatchAsync(new PlayerSentCommandEvent(this, packet.Message), ct);
             }

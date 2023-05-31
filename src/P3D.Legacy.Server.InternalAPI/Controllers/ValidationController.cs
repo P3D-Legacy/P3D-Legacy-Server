@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Threading;
 
 namespace P3D.Legacy.Server.InternalAPI.Controllers
 {
@@ -13,6 +12,8 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
     [ApiController]
     public class ValidationController : ControllerBase
     {
+        private const string Bearer = "Bearer ";
+
         private readonly JwtBearerOptions _jwtBearerOptions;
 
         public ValidationController(IOptionsSnapshot<JwtBearerOptions> jwtBearerOptions)
@@ -21,17 +22,17 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult ValidateToken(CancellationToken ct)
+        public IActionResult ValidateToken()
         {
-            string? authorization = Request.Headers["Authorization"];
+            string? authorization = Request.Headers.Authorization;
 
             // If no authorization header found, nothing to process further
             if (string.IsNullOrEmpty(authorization))
                 return BadRequest(AuthenticateResult.NoResult());
 
-            if (authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            if (authorization.StartsWith(Bearer, StringComparison.OrdinalIgnoreCase))
             {
-                var token = authorization.Substring("Bearer ".Length).Trim();
+                var token = authorization.Substring(Bearer.Length).Trim();
                 var tokenHandler = new JwtSecurityTokenHandler();
                 try
                 {

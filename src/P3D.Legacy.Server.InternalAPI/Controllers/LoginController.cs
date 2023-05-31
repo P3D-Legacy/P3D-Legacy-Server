@@ -37,7 +37,7 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
 
             if (user is null) return BadRequest(new LoginResult { Successful = false, Error = "User does not exists." });
 
-            var result = await _userRepository.CheckPasswordSignInAsync(user, login.Password, false, true, ct);
+            var result = await _userRepository.CheckPasswordSignInAsync(user, login.Password, isSha512: false, lockoutOnFailure: true, ct);
             if (!result.Succeeded)
             {
                 return BadRequest(new LoginResult { Successful = false, Error = "Username and password are invalid." });
@@ -52,11 +52,11 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
             var securityToken = GetSecurityToken(user);
             return tokenHandler.WriteToken(securityToken);
         }
-        private SecurityToken GetSecurityToken(UserEntity user)
+        private JwtSecurityToken GetSecurityToken(UserEntity user)
         {
             var signingCredentials = new SigningCredentials(new RsaSecurityKey(_jwtOptions.GetKey()), SecurityAlgorithms.RsaSha512Signature)
             {
-                CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false }
+                CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false },
             };
 
             var now = DateTime.UtcNow;
@@ -70,8 +70,8 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
                 {
                     new(JwtRegisteredClaimNames.Iat, unixTimeSeconds.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64),
                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new(nameof(user.Id), user.Id.ToString()),
-                    new(nameof(user.Name), user.Name),
+                    new(nameof(user.Id).ToLowerInvariant(), user.Id.ToString()),
+                    new(nameof(user.Name).ToLowerInvariant(), user.Name),
                 },
                 notBefore: now,
                 expires: now.AddDays(expiringDays),

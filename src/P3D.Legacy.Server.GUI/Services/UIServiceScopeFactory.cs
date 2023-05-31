@@ -27,7 +27,7 @@ namespace P3D.Legacy.Server.GUI.Services
 
 
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private IServiceScope? _currentScope;
+        private ScopeWrapper? _currentScope;
 
         public UIServiceScopeFactory(IServiceScopeFactory serviceScopeFactory)
         {

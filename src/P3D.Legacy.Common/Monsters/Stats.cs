@@ -28,7 +28,6 @@ namespace P3D.Legacy.Common.Monsters
             SpecialDefense is >= 0 and <= 31 &&
             Speed is >= 0 and <= 31;
 
-        // TODO: 255 or 252?
         public bool IsValidEV() =>
             HP is >= 0 and <= 255 &&
             Attack is >= 0 and <= 255 &&

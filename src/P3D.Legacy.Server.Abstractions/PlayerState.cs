@@ -7,6 +7,6 @@
         Authentication,
         Initialized,
         Finalizing,
-        Finalized
+        Finalized,
     }
 }

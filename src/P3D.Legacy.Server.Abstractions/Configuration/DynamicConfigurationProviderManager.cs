@@ -35,6 +35,6 @@ namespace P3D.Legacy.Server.Abstractions.Configuration
             var method = openMethod?.MakeGenericMethod(type);
             return method?.Invoke(this, parameters: null);
         }
-        public TOptions? GetOptionsInternal<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TOptions>() where TOptions : class => _serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;
+        public TOptions GetOptionsInternal<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TOptions>() where TOptions : class => _serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;
     }
 }

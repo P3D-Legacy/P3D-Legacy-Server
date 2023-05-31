@@ -6,8 +6,4 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Wivuu.JsonPolymorphism" />
-  </ItemGroup>
-
 </Project>

@@ -24,7 +24,7 @@ namespace P3D.Legacy.Server.GUI.Services
         }
 
 
-        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => new NopDisposable();
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => new NopDisposable();
 
         public bool IsEnabled(LogLevel logLevel) => true;
 

@@ -10,7 +10,7 @@ namespace P3D.Legacy.Common
 
     public readonly struct Protocol : IEquatable<Protocol>
     {
-        private static readonly byte[] SequenceV1 = { (byte) '0', (byte) '.', (byte) '5' };
+        private static readonly byte[] SequenceV1 = "0.5"u8.ToArray();
 
         public static implicit operator Protocol(ProtocolVersion value) => new(value);
         public static implicit operator ProtocolVersion(Protocol value) => value._value;

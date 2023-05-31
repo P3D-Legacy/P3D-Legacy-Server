@@ -24,7 +24,7 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
         private static readonly Action<ILogger, string, string, string, Exception?> Command = LoggerMessage.Define<string, string, string>(
             LogLevel.Information, default, "{PlayerName}: /{CommandAlias} {CommandArgs}");
 
-        [GeneratedRegex(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)", RegexOptions.IgnoreCase)]
+        [GeneratedRegex(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)", RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 1000)]
         private static partial Regex Regex();
 
         private readonly ILogger _logger;
@@ -58,7 +58,7 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
 
             if (command.LogCommand && (player.Permissions & PermissionTypes.UnVerified) == 0)
             {
-                Command(_logger, player.Name, alias, string.Join(" ", arguments), null);
+                Command(_logger, player.Name, alias, string.Join(' ', arguments), null);
             }
 
             if (command.Permissions == PermissionTypes.None)
@@ -96,12 +96,10 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
 
             var commandWithoutSlash = message.TrimStart('/');
 
-            // TODO: Spans
             var messageArray = Regex()
                 .Split(commandWithoutSlash)
                 .Select(static str => str.TrimStart('"').TrimEnd('"'))
                 .ToArray();
-            //var messageArray = commandWithoutSlash.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (messageArray.Length == 0)
             {

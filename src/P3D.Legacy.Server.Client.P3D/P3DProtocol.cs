@@ -27,9 +27,9 @@ namespace P3D.Legacy.Server.Client.P3D
         private static readonly Action<ILogger, Type, Exception?> SendingAMessage = LoggerMessage.Define<Type>(
             LogLevel.Trace, default, "Sending a message type {Type}");
 
-        private static readonly byte[] Separator = { (byte) '|' };
-        private static readonly byte[] DataItemSeparator = { (byte) '|', (byte) '0', (byte) '|' };
-        private static readonly byte[] NewLine = { (byte) '\r', (byte) '\n' };
+        private static readonly byte[] Separator = "|"u8.ToArray();
+        private static readonly byte[] DataItemSeparator = "|0|"u8.ToArray();
+        private static readonly byte[] NewLine = "\r\n"u8.ToArray();
 
         private readonly ILogger _logger;
         private readonly IP3DPacketFactory _packetFactory;

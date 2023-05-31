@@ -43,9 +43,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
                 using var connectionSpan = _tracer.StartActiveSpan("Communication WebSocket Connection", SpanKind.Server);
 
                 await using var handler = _handlerFactory.Create(await HttpContext.WebSockets.AcceptWebSocketAsync("json"));
-                // ReSharper disable AccessToDisposedClosure
-                _subscribtionManager.AddOrUpdate(HttpContext.Connection.Id, _ => handler, (_, _) => handler);
-                // ReSharper restore AccessToDisposedClosure
+                _subscribtionManager.AddOrUpdate(HttpContext.Connection.Id, static (_, x) => x, static (_, _, x) => x, handler);
 
                 try
                 {

@@ -23,9 +23,9 @@ namespace P3D.Legacy.Server.GUI.Services
 
         private Task LoopAsync(CancellationToken ct)
         {
+            using var cts = new CancellationTokenSource();
             try
             {
-                using var cts = new CancellationTokenSource();
                 using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
                 void OnServerUIOnOnStop(object? sender, EventArgs args) => cts.Cancel();
 
