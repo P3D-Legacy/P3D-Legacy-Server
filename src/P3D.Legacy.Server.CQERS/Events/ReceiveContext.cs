@@ -2,20 +2,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.CQERS.Events
 {
-    public class ReceiveContext<TEvent> : IReceiveContectWithPublisher<TEvent> where TEvent : IEvent
+    public partial class ReceiveContext<TEvent> : IReceiveContectWithPublisher<TEvent> where TEvent : IEvent
     {
-        private delegate Task EventHandler(IEvent @event, CancellationToken ct);
+        [LoggerMessage(Level = LogLevel.Error, Message = "Exception during publish! Strategy: {Strategy}")]
+        private partial void ExceptionDuringPublish(string strategy, Exception exception);
 
-        [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
-        private static readonly Action<ILogger, string, Exception?> ExceptionDuringPublish = LoggerMessage.Define<string>(
-            LogLevel.Error, default, "Exception during publish! Strategy: {Strategy}");
+        private delegate Task EventHandler(IEvent @event, CancellationToken ct);
 
         public TEvent Message { get; }
 
@@ -64,7 +62,7 @@ namespace P3D.Legacy.Server.CQERS.Events
                 }
                 catch (Exception e)
                 {
-                    ExceptionDuringPublish(_logger, nameof(DispatchStrategy.ParallelWhenAny), e);
+                    ExceptionDuringPublish(nameof(DispatchStrategy.ParallelWhenAny), e);
                 }
             }));
         }

@@ -10,10 +10,14 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.CQERS.Behaviours.Query
 {
     [SuppressMessage("Performance", "CA1812")]
-    internal class QueryUnhandledExceptionBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
+    internal partial class QueryUnhandledExceptionBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
     {
-        private static readonly Action<ILogger, string, TQuery, Exception?> Query = LoggerMessage.Define<string, TQuery>(
-            LogLevel.Error, default, "Request: Unhandled Exception for Request {Name} {@Query}");
+#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
+        [LoggerMessage(Level = LogLevel.Error, Message = "Request: Unhandled Exception for Request {Name} {@Query}")]
+#else
+        [LoggerMessage(Level = LogLevel.Error, Message = "Request: Unhandled Exception for Request {Name} {Query}")]
+#endif
+        private partial void Query(string name, TQuery query, Exception exception);
 
         private readonly ILogger<TQuery> _logger;
 
@@ -34,7 +38,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query
             {
                 var queryName = typeof(TQuery).Name;
 
-                Query(_logger, queryName, query, ex);
+                Query(queryName, query, ex);
 
                 throw;
             }

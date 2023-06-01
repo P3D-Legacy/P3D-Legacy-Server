@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,10 +7,14 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.CQERS.Behaviours.Query
 {
     [SuppressMessage("Performance", "CA1812")]
-    internal class QueryLoggingBehaviour<TQuery> : IQueryPreProcessor<TQuery> where TQuery : notnull
+    internal partial class QueryLoggingBehaviour<TQuery> : IQueryPreProcessor<TQuery> where TQuery : notnull
     {
-        private static readonly Action<ILogger, string, TQuery, Exception?> Query = LoggerMessage.Define<string, TQuery>(
-            LogLevel.Information, default, "Query: {Name} {@Query}");
+#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
+        [LoggerMessage(Level = LogLevel.Information, Message = "Query: {Name} {@Query}")]
+#else
+        [LoggerMessage(Level = LogLevel.Information, Message = "Query: {Name} {Query}")]
+#endif
+        private partial void Query(string name, TQuery query);
 
         private readonly ILogger<TQuery> _logger;
 
@@ -26,7 +29,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query
         {
             var queryName = typeof(TQuery).Name;
 
-            Query(_logger, queryName, query, null);
+            Query(queryName, query);
 
             return Task.CompletedTask;
         }

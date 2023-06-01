@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,10 +7,14 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.CQERS.Behaviours.Command
 {
     [SuppressMessage("Performance", "CA1812")]
-    internal class CommandLoggingBehaviour<TCommand> : ICommandPreProcessor<TCommand> where TCommand : notnull
+    internal partial class CommandLoggingBehaviour<TCommand> : ICommandPreProcessor<TCommand> where TCommand : notnull
     {
-        private static readonly Action<ILogger, string, TCommand, Exception?> Command = LoggerMessage.Define<string, TCommand>(
-            LogLevel.Information, default, "Command: {Name} {@Command}");
+#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
+        [LoggerMessage(Level = LogLevel.Information, Message = "Command: {Name} {@Command}")]
+#else
+        [LoggerMessage(Level = LogLevel.Information, Message = "Command: {Name} {Command}")]
+#endif
+        private partial void Command(string name, TCommand command);
 
         private readonly ILogger<TCommand> _logger;
 
@@ -26,7 +29,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command
         {
             var commandName = typeof(TCommand).Name;
 
-            Command(_logger, commandName, command, null);
+            Command(commandName, command);
 
             return Task.CompletedTask;
         }

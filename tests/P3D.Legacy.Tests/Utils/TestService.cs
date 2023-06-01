@@ -60,7 +60,7 @@ namespace P3D.Legacy.Tests.Utils
         public Task DoTestAsync(Func<IServiceProvider, Task> test) => _policy.Execute(async () =>
         {
             await using var serviceProvider = CreateAndBuildServiceProvider();
-            using var scope = serviceProvider.CreateScope();
+            await using var scope = serviceProvider.CreateAsyncScope();
             await test.Invoke(scope.ServiceProvider);
         });
     }

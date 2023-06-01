@@ -2,7 +2,6 @@
 
 using P3D.Legacy.Server.CQERS.Queries;
 
-using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -11,10 +10,14 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.CQERS.Behaviours.Query
 {
     [SuppressMessage("Performance", "CA1812")]
-    internal class QueryPerformanceBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
+    internal partial class QueryPerformanceBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
     {
-        private static readonly Action<ILogger, string, long, TQuery, Exception?> Query = LoggerMessage.Define<string, long, TQuery>(
-            LogLevel.Warning, default, "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Query}");
+#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
+        [LoggerMessage(Level = LogLevel.Warning, Message = "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Query}")]
+#else
+        [LoggerMessage(Level = LogLevel.Warning, Message = "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {Query}")]
+#endif
+        private partial void Query(string name, long elapsedMilliseconds, TQuery query);
 
         private readonly ILogger<TQuery> _logger;
         private readonly Stopwatch _timer = new();
@@ -40,7 +43,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query
             {
                 var queryName = typeof(TQuery).Name;
 
-                Query(_logger, queryName, elapsedMilliseconds, query, null);
+                Query(queryName, elapsedMilliseconds, query);
             }
 
             return response;

@@ -10,10 +10,14 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.CQERS.Behaviours.Command
 {
     [SuppressMessage("Performance", "CA1812")]
-    internal class CommandUnhandledExceptionBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
+    internal partial class CommandUnhandledExceptionBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
     {
-        private static readonly Action<ILogger, string, TCommand, Exception?> Command = LoggerMessage.Define<string, TCommand>(
-            LogLevel.Error, default, "Request: Unhandled Exception for Request {Name} {@Command}");
+#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
+        [LoggerMessage(Level = LogLevel.Error, Message = "Request: Unhandled Exception for Request {Name} {@Command}")]
+#else
+        [LoggerMessage(Level = LogLevel.Error, Message = "Request: Unhandled Exception for Request {Name} {Command}")]
+#endif
+        private partial void Command(string name, TCommand command, Exception exception);
 
         private readonly ILogger<TCommand> _logger;
 
@@ -34,7 +38,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command
             {
                 var requestName = typeof(TCommand).Name;
 
-                Command(_logger, requestName, request, ex);
+                Command(requestName, request, ex);
 
                 throw;
             }

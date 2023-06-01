@@ -11,10 +11,14 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Utils
 {
-    public sealed class PollyUtils
+    public sealed partial class PollyUtils
     {
-        private static readonly Action<ILogger, HttpResponseMessage, int, TimeSpan, Exception?> Exception = LoggerMessage.Define<HttpResponseMessage, int, TimeSpan>(
-            LogLevel.Error, default, "Exception during HTTP connection. HttpResult {@HttpResult}. Retry count {RetryCount}. Waiting {Time}...");
+#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
+        [LoggerMessage(Level = LogLevel.Error, Message = "Exception during HTTP connection. HttpResult {@HttpResult}. Retry count {RetryCount}. Waiting {Time}...")]
+#else
+        [LoggerMessage(Level = LogLevel.Error, Message = "Exception during HTTP connection. HttpResult {HttpResult}. Retry count {RetryCount}. Waiting {Time}...")]
+#endif
+        private static partial void Exception(ILogger logger, HttpResponseMessage httpResult, int retryCount, TimeSpan time, Exception exception);
 
         private static TimeSpan GetServerWaitDuration(DelegateResult<HttpResponseMessage> response)
         {

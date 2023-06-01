@@ -21,8 +21,8 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
     internal sealed partial class CommandManagerHandler :
         IEventHandler<PlayerSentCommandEvent>
     {
-        private static readonly Action<ILogger, string, string, string, Exception?> Command = LoggerMessage.Define<string, string, string>(
-            LogLevel.Information, default, "{PlayerName}: /{CommandAlias} {CommandArgs}");
+        [LoggerMessage(Level = LogLevel.Information, Message = "{PlayerName}: /{CommandAlias} {CommandArgs}")]
+        private partial void Command(string playerName, string commandAlias, string commandArgs);
 
         [GeneratedRegex(@"[ ](?=(?:[^""]*""[^""]*"")*[^""]*$)", RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 1000)]
         private static partial Regex Regex();
@@ -58,7 +58,7 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
 
             if (command.LogCommand && (player.Permissions & PermissionTypes.UnVerified) == 0)
             {
-                Command(_logger, player.Name, alias, string.Join(' ', arguments), null);
+                Command(player.Name, alias, string.Join(' ', arguments));
             }
 
             if (command.Permissions == PermissionTypes.None)

@@ -60,6 +60,9 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             _connectionSpan = _tracer.StartActiveSpan("P3D Session UNKNOWN");
 
+            using var connectionCancellationTokenSource = Connection.Features.Get<IConnectionLifetimeNotificationFeature>() is { } clnf
+                ? CancellationTokenSource.CreateLinkedTokenSource(ct, clnf.ConnectionClosedRequested)
+                : CancellationTokenSource.CreateLinkedTokenSource(ct);
             try
             {
                 if (Connection.RemoteEndPoint is IPEndPoint ipEndPoint)
@@ -67,20 +70,7 @@ namespace P3D.Legacy.Server.Client.P3D
                     IPEndPoint = ipEndPoint;
                 }
 
-                Connection.Features.Get<IConnectionLifetimeNotificationFeature>()?.ConnectionClosedRequested.Register(() =>
-                {
-                    using var finishSpan = _tracer.StartActiveSpan("P3D Client Closing", parentContext: _connectionSpan.Context);
-                    var oldState = State;
-                    State = PlayerState.Finalizing;
-                    if (oldState == PlayerState.Initialized)
-                    {
-                        // Start finalization. Here it should complete _finalizationDelayer.
-                        Task<CommandResult> FinalizeAsync() => _commandDispatcher.DispatchAsync(new PlayerFinalizingCommand(this), CancellationToken.None);
-                        using var jctx = new JoinableTaskContext(); // Should I create it here or in the main method?
-                        new JoinableTaskFactory(jctx).Run(FinalizeAsync);
-                    }
-                    State = PlayerState.Finalized;
-                });
+                connectionCancellationTokenSource.Token.Register(OnConnectionClosed, this, false);
 
                 _writer = Connection.CreateWriter();
                 await using var _ = _writer;
@@ -119,6 +109,8 @@ namespace P3D.Legacy.Server.Client.P3D
                     }
                 }
             }
+            catch (TaskCanceledException) { }
+            catch (OperationCanceledException) { }
             catch (Exception e)
             {
                 _connectionSpan.RecordException(e).SetStatus(Status.Error);
@@ -127,6 +119,24 @@ namespace P3D.Legacy.Server.Client.P3D
 
             // Exit means disposal. Delay disposal of the client. Wait for finalization if possible
             await _finalizationDelayer.Task.WaitAsync(TimeSpan.FromSeconds(5), ct);
+        }
+
+        private static void OnConnectionClosed(object? obj)
+        {
+            if (obj is not P3DConnectionContextHandler connection) return;
+
+            using var finishSpan = connection._tracer.StartActiveSpan("P3D Client Closing", parentContext: connection._connectionSpan.Context);
+            var oldState = connection.State;
+            connection.State = PlayerState.Finalizing;
+            if (oldState == PlayerState.Initialized) // If the sever initialized the player, make others aware of finalization
+            {
+                // Start finalization. Here it should complete _finalizationDelayer.
+                async Task<CommandResult> FinalizeAsync() => await connection._commandDispatcher.DispatchAsync(new PlayerFinalizingCommand(connection), CancellationToken.None);
+                using var jctx = new JoinableTaskContext(); // Should I create it here or in the main method?
+                new JoinableTaskFactory(jctx).Run(FinalizeAsync);
+            }
+
+            connection.State = PlayerState.Finalized;
         }
 
         protected override void Dispose(bool disposing)

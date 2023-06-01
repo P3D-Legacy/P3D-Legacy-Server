@@ -29,12 +29,11 @@ namespace P3D.Legacy.Server.Client.P3D
     // ReSharper disable once ArrangeTypeModifiers
     internal partial class P3DConnectionContextHandler
     {
-        private static readonly Action<ILogger, Exception?> DataItemsIsEmpty = LoggerMessage.Define(
-            LogLevel.Warning, default, "P3D Reading Error: ParseGameData DataItems is empty");
+        [LoggerMessage(Level = LogLevel.Warning, Message = "P3D Reading Error: ParseGameData DataItems is empty")]
+        public partial void DataItemsIsEmpty();
 
-        private static readonly Action<ILogger, string, Exception?> DataItemsCountLessThan14 = LoggerMessage.Define<string>(
-            LogLevel.Warning, default, "P3D Reading Error: ParseGameData DataItems < 14. Packet DataItems {DataItems}");
-
+        [LoggerMessage(Level = LogLevel.Warning, Message = "P3D Reading Error: ParseGameData DataItems < 14. Packet DataItems {DataItems}")]
+        public partial void DataItemsCountLessThan14(string dataItems);
 
         private async Task HandlePacketAsync(P3DPacket? packet, CancellationToken ct)
         {
@@ -114,13 +113,13 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (packet.DataItemStorage.Count == 0)
             {
-                DataItemsIsEmpty(_logger, null);
+                DataItemsIsEmpty();
                 return;
             }
 
             if (packet.DataItemStorage.Count < 14)
             {
-                DataItemsCountLessThan14(_logger, packet.DataItemStorage.ToString(), null);
+                DataItemsCountLessThan14(packet.DataItemStorage.ToString());
                 return;
             }
 

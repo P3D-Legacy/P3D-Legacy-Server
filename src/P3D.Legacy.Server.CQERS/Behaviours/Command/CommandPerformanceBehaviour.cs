@@ -2,7 +2,6 @@
 
 using P3D.Legacy.Server.CQERS.Commands;
 
-using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -11,10 +10,14 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.CQERS.Behaviours.Command
 {
     [SuppressMessage("Performance", "CA1812")]
-    internal class CommandPerformanceBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
+    internal partial class CommandPerformanceBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
     {
-        private static readonly Action<ILogger, string, long, TCommand, Exception?> Command = LoggerMessage.Define<string, long, TCommand>(
-            LogLevel.Warning, default, "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Command}");
+#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
+        [LoggerMessage(Level = LogLevel.Warning, Message = "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Command}")]
+#else
+        [LoggerMessage(Level = LogLevel.Warning, Message = "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {Command}")]
+#endif
+        private partial void Command(string name, long elapsedMilliseconds, TCommand command);
 
         private readonly ILogger<TCommand> _logger;
         private readonly Stopwatch _timer = new();
@@ -40,7 +43,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command
             {
                 var commandName = typeof(TCommand).Name;
 
-                Command(_logger, commandName, elapsedMilliseconds, command, null);
+                Command(commandName, elapsedMilliseconds, command);
             }
 
             return response;

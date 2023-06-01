@@ -17,7 +17,7 @@ namespace P3D.Legacy.Common.Extensions
             && monster.Ability is not null
             //&& Attacks.All(a => StaticData.LearnableAttacks.Any(la => la.Id == a.StaticData.Id))
             //&& CurrentHP <= EV.HP + IV.HP
-            && monster.Level <= 105 // We keep a margin here just for the sake
+            && monster.Level <= 100
             && monster.EV.IsValidEV()
             && monster.IV.IsValidIV();
 

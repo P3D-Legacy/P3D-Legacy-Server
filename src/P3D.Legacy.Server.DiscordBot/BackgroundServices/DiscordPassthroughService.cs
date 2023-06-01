@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 {
     [SuppressMessage("Performance", "CA1812")]
-    internal sealed class DiscordPassthroughService : IHostedService, IDisposable,
+    internal sealed partial class DiscordPassthroughService : IHostedService, IDisposable,
         IEventHandler<PlayerJoinedEvent>,
         IEventHandler<PlayerLeftEvent>,
         IEventHandler<PlayerSentGlobalMessageEvent>,
@@ -160,46 +160,47 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             stoppingToken.Register(OnCancellation, null);
         }
 
-        private static readonly Action<ILogger, string, Exception?> LogCritical = LoggerMessage.Define<string>(
-            LogLevel.Critical, default, "Critical log entry: {Message}");
-        private static readonly Action<ILogger, string, Exception?> LogError = LoggerMessage.Define<string>(
-            LogLevel.Error, default, "Error log entry: {Message}");
-        private static readonly Action<ILogger, string, Exception?> LogWarning = LoggerMessage.Define<string>(
-            LogLevel.Warning, default, "Warning log entry: {Message}");
-        private static readonly Action<ILogger, string, Exception?> LogInfo = LoggerMessage.Define<string>(
-            LogLevel.Information, default, "Info log entry: {Message}");
-        private static readonly Action<ILogger, string, Exception?> LogVerbose = LoggerMessage.Define<string>(
-            LogLevel.Trace, default, "Verbose log entry: {Message}");
-        private static readonly Action<ILogger, string, Exception?> LogDebug = LoggerMessage.Define<string>(
-            LogLevel.Debug, default, "Debug log entry: {Message}");
-        private static readonly Action<ILogger, LogSeverity, string, Exception?> LogUnknown = LoggerMessage.Define<LogSeverity, string>(
-            LogLevel.Warning, default, "Incorrect LogMessage.Severity - {Severity}, {Message}");
+        [LoggerMessage(Level = LogLevel.Critical, Message = "Critical log entry: {Message}")]
+        private partial void LogCritical(string message, Exception exception);
+        [LoggerMessage(Level = LogLevel.Error, Message = "Error log entry: {Message}")]
+        private partial void LogError(string message, Exception exception);
+        [LoggerMessage(Level = LogLevel.Warning, Message = "Warning log entry: {Message}")]
+        private partial void LogWarning(string message, Exception exception);
+        [LoggerMessage(Level = LogLevel.Information, Message = "Information log entry: {Message}")]
+        private partial void LogInfo(string message, Exception exception);
+        [LoggerMessage(Level = LogLevel.Trace, Message = "Trace log entry: {Message}")]
+        private partial void LogVerbose(string message, Exception exception);
+        [LoggerMessage(Level = LogLevel.Debug, Message = "Debug log entry: {Message}")]
+        private partial void LogDebug(string message, Exception exception);
+        [LoggerMessage(Level = LogLevel.Warning, Message = "Incorrect LogMessage.Severity - {Severity}, {Message}")]
+        private partial void LogUnknown(LogSeverity severity, string message, Exception exception);
+
 
         private Task BotLogAsync(LogMessage arg)
         {
             switch (arg.Severity)
             {
                 case LogSeverity.Critical:
-                    LogCritical(_logger, arg.Message, arg.Exception);
+                    LogCritical(arg.Message, arg.Exception);
                     break;
                 case LogSeverity.Error:
-                    LogError(_logger, arg.Message, arg.Exception);
+                    LogError(arg.Message, arg.Exception);
                     break;
                 case LogSeverity.Warning:
-                    LogWarning(_logger, arg.Message, arg.Exception);
+                    LogWarning(arg.Message, arg.Exception);
                     break;
                 case LogSeverity.Info:
-                    LogInfo(_logger, arg.Message, arg.Exception);
+                    LogInfo(arg.Message, arg.Exception);
                     break;
                 case LogSeverity.Verbose:
-                    LogVerbose(_logger, arg.Message, arg.Exception);
+                    LogVerbose(arg.Message, arg.Exception);
                     break;
                 case LogSeverity.Debug:
-                    LogDebug(_logger, arg.Message, arg.Exception);
+                    LogDebug(arg.Message, arg.Exception);
                     break;
 
                 default:
-                    LogUnknown(_logger, arg.Severity, arg.Message, arg.Exception);
+                    LogUnknown(arg.Severity, arg.Message, arg.Exception);
                     break;
             }
 

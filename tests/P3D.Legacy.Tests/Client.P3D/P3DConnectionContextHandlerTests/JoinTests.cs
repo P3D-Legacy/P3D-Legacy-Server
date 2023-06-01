@@ -120,7 +120,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
         {
             var connectionFactory = serviceProvider.GetRequiredService<IConnectionFactory>();
 
-            var connection = (DefaultConnectionContext) await connectionFactory.ConnectAsync(IPEndPoint.Parse("127.0.0.1:80"));
+            var connection = (DefaultConnectionContext) await connectionFactory.ConnectAsync(IPEndPoint.Parse("127.0.0.1:80"), CancellationToken.None);
             var handler = serviceProvider.GetRequiredService<P3DConnectionHandler>();
             var connectionTask = handler.OnConnectedAsync(connection);
 
@@ -144,7 +144,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                 MonsterVisible = false,
                 MonsterPosition = Vector3.Zero,
                 MonsterSkin = "state.MonsterSkin",
-                MonsterFacing = 0
+                MonsterFacing = 0,
             };
             await writer.WriteAsync(protocol, gameData);
 
@@ -179,7 +179,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 
         private static async Task<ProtocolReadResult<P3DPacket?>> WaitNullPacketAsync(int delayMs)
         {
-            await Task.Delay(100);
+            await Task.Delay(delayMs);
             return new ProtocolReadResult<P3DPacket?>();
         }
     }

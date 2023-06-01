@@ -15,10 +15,10 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public sealed class CommunicationController : ControllerBase
+    public sealed partial class CommunicationController : ControllerBase
     {
-        private static readonly Action<ILogger, Exception?> ConnectionReceived = LoggerMessage.Define(
-            LogLevel.Trace, default, "WebSocket connection received at 'listener/ws'");
+        [LoggerMessage(Level = LogLevel.Trace, Message = "WebSocket connection received at 'listener/ws'")]
+        private partial void ConnectionReceived();
 
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
@@ -38,7 +38,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
-                ConnectionReceived(_logger, null);
+                ConnectionReceived();
 
                 using var connectionSpan = _tracer.StartActiveSpan("Communication WebSocket Connection", SpanKind.Server);
 

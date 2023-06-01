@@ -28,13 +28,13 @@ namespace P3D.Legacy.Server.CommunicationAPI.Models
     [JsonDerivedType(typeof(KickedResponsePayload), typeDiscriminator: (int) ResponsePayloadType.Kicked)]
     [JsonDerivedType(typeof(SuccessResponsePayload), typeDiscriminator: (int) ResponsePayloadType.Success)]
     [JsonDerivedType(typeof(ErrorResponsePayload), typeDiscriminator: (int) ResponsePayloadType.Error)]
-    internal abstract record ResponsePayload(long Timestamp);
-    internal sealed record PlayerJoinedResponsePayload(string Player) : ResponsePayload(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    internal sealed record PlayerLeftResponsePayload(string Player) : ResponsePayload(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    internal sealed record PlayerSentGlobalMessageResponsePayload(string Player, string Message) : ResponsePayload(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    internal sealed record ServerMessageResponsePayload(string Message) : ResponsePayload(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    internal sealed record PlayerTriggeredEventResponsePayload(string Player, PlayerEvent Event) : ResponsePayload(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    internal sealed record KickedResponsePayload(string Reason) : ResponsePayload(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    internal sealed record SuccessResponsePayload(Guid Uid) : ResponsePayload(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    internal sealed record ErrorResponsePayload(int Code, string Message, Guid Uid) : ResponsePayload(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    internal abstract record ResponsePayload([property: JsonIgnore] ResponsePayloadType Type, long Timestamp);
+    internal sealed record PlayerJoinedResponsePayload(string Player) : ResponsePayload(ResponsePayloadType.PlayerJoined, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    internal sealed record PlayerLeftResponsePayload(string Player) : ResponsePayload(ResponsePayloadType.PlayerLeft, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    internal sealed record PlayerSentGlobalMessageResponsePayload(string Player, string Message) : ResponsePayload(ResponsePayloadType.PlayerSentGlobalMessage, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    internal sealed record ServerMessageResponsePayload(string Message) : ResponsePayload(ResponsePayloadType.ServerMessage, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    internal sealed record PlayerTriggeredEventResponsePayload(string Player, PlayerEvent Event) : ResponsePayload(ResponsePayloadType.PlayerTriggeredEvent, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    internal sealed record KickedResponsePayload(string Reason) : ResponsePayload(ResponsePayloadType.Kicked, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    internal sealed record SuccessResponsePayload(Guid Uid) : ResponsePayload(ResponsePayloadType.Success, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    internal sealed record ErrorResponsePayload(int Code, string Message, Guid Uid) : ResponsePayload(ResponsePayloadType.Error, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
 }

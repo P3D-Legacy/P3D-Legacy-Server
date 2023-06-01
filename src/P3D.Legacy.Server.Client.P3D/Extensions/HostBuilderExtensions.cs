@@ -20,10 +20,10 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Client.P3D.Extensions
 {
-    internal sealed class ConnectionThrottleMiddleware
+    internal sealed partial class ConnectionThrottleMiddleware
     {
-        private static readonly Action<ILogger, EndPoint?, Exception?> InvalidEndPoint = LoggerMessage.Define<EndPoint?>(
-            LogLevel.Critical, default, "Client's RemoteEndPoint is not IPEndPoint! {EndPoint}");
+        [LoggerMessage(Level = LogLevel.Critical, Message = "Client's RemoteEndPoint is not IPEndPoint! {EndPoint}")]
+        private partial void InvalidEndPoint(EndPoint? endPoint);
 
         private static readonly IPAddress Netmask = IPAddress.Parse("255.255.0.0");
 
@@ -43,7 +43,7 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
         {
             if (connectionContext.RemoteEndPoint is not IPEndPoint ipEndPoint)
             {
-                InvalidEndPoint(_logger, connectionContext.RemoteEndPoint, null);
+                InvalidEndPoint(connectionContext.RemoteEndPoint);
                 return;
             }
 
