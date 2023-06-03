@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 
 namespace P3D.Legacy.Common
 {
-    public record DataItemStorage : IReadOnlyCollection<string>
+    public sealed record DataItemStorage : IReadOnlyCollection<string>
     {
         private static int BootlegCount(IReadOnlyDictionary<int, string> dataItems) => dataItems.Count > 0 ? dataItems.LastOrDefault().Key + 1 : 0;
 
@@ -54,6 +55,11 @@ namespace P3D.Legacy.Common
         public long GetInt64(int index) => long.TryParse(Get(index), NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : 0L;
         public Origin GetOrigin(int index) => Origin.FromNumber(GetInt64(index));
 
+        public void Set(int index, ImmutableArray<string> value)
+        {
+            for (var i = 0; i < value.Length; i++)
+                Set(index + i, value[i]);
+        }
         public void Set(int index, in ReadOnlySpan<char> value) => _dataItems[index] = value.ToString();
         public void Set(int index, char? value) => Set(index, value?.ToString(CultureInfo.InvariantCulture) ?? ".");
         public void Set(int index, bool value) => Set(index, value ? 1 : 0);
@@ -62,6 +68,6 @@ namespace P3D.Legacy.Common
         public void Set(int index, long value) => Set(index, value.ToString(CultureInfo.InvariantCulture));
         public void Set(int index, Origin value) => Set(index, (long) value);
 
-        public override string ToString() => string.Join("*", _dataItems.Values);
+        public override string ToString() => string.Join('*', _dataItems.Values);
     }
 }

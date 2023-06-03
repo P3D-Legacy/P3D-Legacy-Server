@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace P3D.Legacy.Common
 {
-    public readonly struct Origin : IEquatable<Origin>, IComparable<Origin>
+    public readonly record struct Origin : IComparable<Origin>
     {
         public static Origin Parse(string id) => new(long.Parse(id, CultureInfo.InvariantCulture));
 
@@ -21,14 +21,6 @@ namespace P3D.Legacy.Common
         private Origin(long origin) => _value = origin;
 
         public override string ToString() => _value.ToString(CultureInfo.InvariantCulture);
-
-        public override int GetHashCode() => HashCode.Combine(_value);
-
-        public bool Equals(Origin other) => _value == other._value;
-        public override bool Equals(object? obj) => obj is Origin other && Equals(other);
-        public static bool operator ==(Origin left, Origin right) => left.Equals(right);
-        public static bool operator !=(Origin left, Origin right) => !(left == right);
-
 
         public int CompareTo(Origin other) => _value.CompareTo(other._value);
         public static bool operator <(Origin left, Origin right) => left.CompareTo(right) < 0;

@@ -12,20 +12,20 @@ namespace P3D.Legacy.Common.Monsters
         protected ExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
     [Serializable]
-    public class IncorrectExperienceTypeExperienceCalculatorException : ExperienceCalculatorException
+    public sealed class IncorrectExperienceTypeExperienceCalculatorException : ExperienceCalculatorException
     {
         public IncorrectExperienceTypeExperienceCalculatorException() { }
         public IncorrectExperienceTypeExperienceCalculatorException(string message) : base(message) { }
         public IncorrectExperienceTypeExperienceCalculatorException(string message, Exception innerException) : base(message, innerException) { }
-        protected IncorrectExperienceTypeExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        public IncorrectExperienceTypeExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
     [Serializable]
-    public class LevelTooHighExperienceCalculatorException : ExperienceCalculatorException
+    public sealed class LevelTooHighExperienceCalculatorException : ExperienceCalculatorException
     {
         public LevelTooHighExperienceCalculatorException() { }
         public LevelTooHighExperienceCalculatorException(string message) : base(message) { }
         public LevelTooHighExperienceCalculatorException(string message, Exception innerException) : base(message, innerException) { }
-        protected LevelTooHighExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        public LevelTooHighExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 
     public static class ExperienceCalculator

@@ -10,12 +10,17 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
 {
     internal static class BufferWriterExtensions
     {
-        private static readonly byte[] ProtocolSequenceInvalid = "0.0"u8.ToArray();
-        private static readonly byte[] ProtocolSequenceV1 = "0.5"u8.ToArray();
+        private static readonly Encoder ASCII = Encoding.ASCII.GetEncoder();
 
-        public static void Write(this IBufferWriter<byte> output, ReadOnlySpan<char> chars, Encoder encoder)
+        public static void WriteItems(this IBufferWriter<byte> output, DataItemStorage storage)
         {
-            encoder.Convert(chars, output, false, out _, out _);
+            foreach (var (_, dataItem, _, isLast) in storage.WithMetadata())
+                ASCII.Convert(dataItem, output, flush: isLast, out _, out _);
+        }
+
+        public static void Write(this IBufferWriter<byte> output, in ReadOnlySpan<char> chars, Encoder encoder)
+        {
+            encoder.Convert(chars, output, flush: false, out _, out _);
         }
 
         public static void WriteAsText(this IBufferWriter<byte> output, long val)
@@ -26,12 +31,12 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
             output.Advance(bytesWritten);
         }
 
-        public static void Write(this IBufferWriter<byte> output, in Protocol protocol)
+        public static void Write(this IBufferWriter<byte> output, Protocol protocol)
         {
-            output.Write(protocol == ProtocolVersion.V1 ? ProtocolSequenceV1 : ProtocolSequenceInvalid);
+            output.Write(protocol == ProtocolVersion.V1 ? Protocol.SequenceV1 : Protocol.SequenceInvalid);
         }
 
-        public static void Write(this IBufferWriter<byte> output, in Origin origin)
+        public static void Write(this IBufferWriter<byte> output, Origin origin)
         {
             const int maxDigitCount = 20;
             var span = output.GetSpan(maxDigitCount);

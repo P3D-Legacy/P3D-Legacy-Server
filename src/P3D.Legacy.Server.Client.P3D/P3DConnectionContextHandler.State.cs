@@ -18,22 +18,22 @@ namespace P3D.Legacy.Server.Client.P3D
         public PlayerState State { get; private set; } = PlayerState.None;
 
 
-        public string GameMode { get; private set; } = default!;
-        public bool IsGameJoltPlayer { get; private set; } = default!;
-        public char DecimalSeparator { get; private set; } = default!;
+        public string GameMode { get; private set; } = string.Empty;
+        public bool IsGameJoltPlayer { get; private set; }
+        public char DecimalSeparator { get; private set; }
 
-        public string LevelFile { get; private set; } = default!;
-        public Vector3 Position { get; private set; } = default!;
-        public int Facing { get; private set; } = default!;
-        public bool Moving { get; private set; } = default!;
+        public string LevelFile { get; private set; } = string.Empty;
+        public Vector3 Position { get; private set; }
+        public int Facing { get; private set; }
+        public bool Moving { get; private set; }
 
-        public string Skin { get; private set; } = default!;
-        public string BusyType { get; private set; } = default!;
+        public string Skin { get; private set; } = string.Empty;
+        public string BusyType { get; private set; } = string.Empty;
 
-        public bool MonsterVisible { get; private set; } = default!;
-        public Vector3 MonsterPosition { get; private set; } = default!;
-        public string MonsterSkin { get; private set; } = default!;
-        public int MonsterFacing { get; private set; } = default!;
+        public bool MonsterVisible { get; private set; }
+        public Vector3 MonsterPosition { get; private set; }
+        public string MonsterSkin { get; private set; } = string.Empty;
+        public int MonsterFacing { get; private set; }
 
     }
 }

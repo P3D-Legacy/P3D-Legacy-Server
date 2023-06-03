@@ -120,11 +120,7 @@ namespace P3D.Legacy.Server.Client.P3D
                     output.Write(Separator);
                 }
 
-                var encoder = Encoding.ASCII.GetEncoder();
-                foreach (var dataItem in message.DataItemStorage)
-                {
-                    output.Write(dataItem, encoder);
-                }
+                output.WriteItems(message.DataItemStorage);
             }
 
             output.Write(NewLine);

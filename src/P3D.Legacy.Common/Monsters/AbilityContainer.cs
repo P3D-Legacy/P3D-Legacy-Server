@@ -4,7 +4,7 @@ using System.Text;
 
 namespace P3D.Legacy.Common.Monsters
 {
-    public class AbilityContainer
+    public sealed record AbilityContainer
     {
         public IAbilityInstance First { get; } = default!;
         public IAbilityInstance? Second { get; } = default!;
