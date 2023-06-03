@@ -18,7 +18,7 @@ namespace P3D.Legacy.Common.Packets
         {
             P3DPacketType.GameData => new GameDataPacket(),
             P3DPacketType.NotUsed => null,
-            P3DPacketType.ChatMessagePrivate => new ChatMessagePrivatePacket(),
+            P3DPacketType.ChatMessagePrivate => new ChatMessagePrivateServerPacket(),
             P3DPacketType.ChatMessageGlobal => new ChatMessageGlobalPacket(),
             P3DPacketType.Kicked => new KickedPacket(),
             P3DPacketType.Id => new IdPacket(),
@@ -54,7 +54,7 @@ namespace P3D.Legacy.Common.Packets
         {
             P3DPacketType.GameData => new GameDataPacket(),
             P3DPacketType.NotUsed => null,
-            P3DPacketType.ChatMessagePrivate => new ChatMessagePrivatePacket(),
+            P3DPacketType.ChatMessagePrivate => new ChatMessagePrivateClientPacket(),
             P3DPacketType.ChatMessageGlobal => new ChatMessageGlobalPacket(),
             P3DPacketType.Kicked => new KickedPacket(),
             P3DPacketType.Id => new IdPacket(),

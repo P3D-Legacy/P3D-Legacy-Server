@@ -123,7 +123,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (!Name.Equals(receiverName, StringComparison.OrdinalIgnoreCase)) return;
             if (Id != player.Id && await _queryDispatcher.DispatchAsync(new GetPlayerMuteStateQuery(Id, player.Id), ct)) return;
 
-            await SendPacketAsync(new ChatMessagePrivatePacket { Origin = player.Origin, DestinationPlayerName = receiverName, Message = message }, ct);
+            await SendPacketAsync(new ChatMessagePrivateServerPacket { Origin = player.Origin, DestinationPlayerName = receiverName, Message = message }, ct);
         }
 
         public async Task HandleAsync(IReceiveContext<MessageToPlayerEvent> context, CancellationToken ct)

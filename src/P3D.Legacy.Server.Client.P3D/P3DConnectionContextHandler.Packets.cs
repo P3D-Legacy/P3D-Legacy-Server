@@ -71,7 +71,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 case ChatMessageGlobalPacket chatMessageGlobalPacket:
                     await HandleChatMessageAsync(chatMessageGlobalPacket, ct);
                     break;
-                case ChatMessagePrivatePacket chatMessagePrivatePacket:
+                case ChatMessagePrivateClientPacket chatMessagePrivatePacket:
                     await HandlePrivateMessageAsync(chatMessagePrivatePacket, ct);
                     break;
 
@@ -369,7 +369,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 await _eventDispatcher.DispatchAsync(new PlayerSentGlobalMessageEvent(this, packet.Message), ct);
             }
         }
-        private async Task HandlePrivateMessageAsync(ChatMessagePrivatePacket packet, CancellationToken ct)
+        private async Task HandlePrivateMessageAsync(ChatMessagePrivateClientPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
