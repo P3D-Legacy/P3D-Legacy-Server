@@ -2,7 +2,7 @@
 
 namespace P3D.Legacy.Common.Packets.Battle
 {
-    public sealed record BattleHostDataPacket() : P3DPacket(P3DPacketType.BattleHostData)
+    public sealed record BattleHostDataFromClientPacket() : P3DPacket(P3DPacketType.BattleHostData)
     {
         public Origin DestinationPlayerOrigin { get => DataItemStorage.GetOrigin(0); init => DataItemStorage.Set(0, value); }
         public BattleHostData BattleData { get => new(DataItemStorage.Get(1)); init => DataItemStorage.Set(1, value.ToP3DString()); }

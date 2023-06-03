@@ -41,10 +41,8 @@ namespace P3D.Legacy.Server.Client.P3D.Services
             async Task LoopAction()
             {
                 await foreach (var group in _playerContainer.GetAllAsync(ct).OfType<IP3DPlayerState>().GroupBy(static x => x.LevelFile).WithCancellation(ct))
-                {
-                    var players = await group.Where(static x => x.Moving).OfType<IPlayer>().ToArrayAsync(ct);
-                    foreach (var player in players) await _eventDispatcher.DispatchAsync(new PlayerUpdatedPositionEvent(player), ct);
-                }
+                    await foreach (var player in group.Where(static x => x.Moving).OfType<IPlayer>().WithCancellation(ct))
+                        await _eventDispatcher.DispatchAsync(new PlayerUpdatedPositionEvent(player), ct);
             }
 
             while (!ct.IsCancellationRequested)

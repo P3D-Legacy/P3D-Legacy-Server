@@ -47,7 +47,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 case BattleClientDataPacket battleClientDataPacket:
                     await HandleBattleClientDataAsync(battleClientDataPacket, ct);
                     break;
-                case BattleHostDataPacket battleHostDataPacket:
+                case BattleHostDataFromClientPacket battleHostDataPacket:
                     await HandleBattleHostDataAsync(battleHostDataPacket, ct);
                     break;
                 case BattleJoinPacket battleJoinPacket:
@@ -56,7 +56,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 case BattleOfferFromClientPacket battleOfferPacket:
                     await HandleBattleOfferAsync(battleOfferPacket, ct);
                     break;
-                case BattleEndRoundDataPacket battleEndRoundDataPacket:
+                case BattleEndRoundDataFromClientPacket battleEndRoundDataPacket:
                     await HandleBattlePokemonDataAsync(battleEndRoundDataPacket, ct);
                     break;
                 case BattleQuitPacket battleQuitPacket:
@@ -71,7 +71,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 case ChatMessageGlobalPacket chatMessageGlobalPacket:
                     await HandleChatMessageAsync(chatMessageGlobalPacket, ct);
                     break;
-                case ChatMessagePrivateClientPacket chatMessagePrivatePacket:
+                case ChatMessagePrivateFromClientPacket chatMessagePrivatePacket:
                     await HandlePrivateMessageAsync(chatMessagePrivatePacket, ct);
                     break;
 
@@ -369,7 +369,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 await _eventDispatcher.DispatchAsync(new PlayerSentGlobalMessageEvent(this, packet.Message), ct);
             }
         }
-        private async Task HandlePrivateMessageAsync(ChatMessagePrivateClientPacket packet, CancellationToken ct)
+        private async Task HandlePrivateMessageAsync(ChatMessagePrivateFromClientPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
@@ -437,12 +437,12 @@ namespace P3D.Legacy.Server.Client.P3D
 
             await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
         }
-        private async Task HandleBattleHostDataAsync(BattleHostDataPacket packet, CancellationToken ct)
+        private async Task HandleBattleHostDataAsync(BattleHostDataFromClientPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
 
-            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, new BattleHostDataToClientPacket { BattleData = packet.BattleData }), ct);
         }
         private async Task HandleBattleJoinAsync(BattleJoinPacket packet, CancellationToken ct)
         {
@@ -485,12 +485,12 @@ namespace P3D.Legacy.Server.Client.P3D
                 await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
             }
         }
-        private async Task HandleBattlePokemonDataAsync(BattleEndRoundDataPacket packet, CancellationToken ct)
+        private async Task HandleBattlePokemonDataAsync(BattleEndRoundDataFromClientPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
 
-            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, new BattleEndRoundDataToClientPacket { BattleData = packet.BattleData }), ct);
         }
         private async Task HandleBattleQuitAsync(BattleQuitPacket packet, CancellationToken ct)
         {

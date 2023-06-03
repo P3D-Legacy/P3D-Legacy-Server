@@ -18,7 +18,7 @@ namespace P3D.Legacy.Common.Packets
         {
             P3DPacketType.GameData => new GameDataPacket(),
             P3DPacketType.NotUsed => null,
-            P3DPacketType.ChatMessagePrivate => new ChatMessagePrivateServerPacket(),
+            P3DPacketType.ChatMessagePrivate => new ChatMessagePrivateToClientPacket(),
             P3DPacketType.ChatMessageGlobal => new ChatMessageGlobalPacket(),
             P3DPacketType.Kicked => new KickedPacket(),
             P3DPacketType.Id => new IdPacket(),
@@ -40,8 +40,8 @@ namespace P3D.Legacy.Common.Packets
             P3DPacketType.BattleOffer => new BattleOfferToClientPacket(),
             P3DPacketType.BattleStart => new BattleStartPacket(),
             P3DPacketType.BattleClientData => new BattleClientDataPacket(),
-            P3DPacketType.BattleHostData => new BattleHostDataPacket(),
-            P3DPacketType.BattleEndRoundData => new BattleEndRoundDataPacket(),
+            P3DPacketType.BattleHostData => new BattleHostDataToClientPacket(),
+            P3DPacketType.BattleEndRoundData => new BattleEndRoundDataToClientPacket(),
             P3DPacketType.ServerInfoData => new ServerInfoDataPacket(),
             P3DPacketType.ServerDataRequest => new ServerDataRequestPacket(),
             _ => null
@@ -54,7 +54,7 @@ namespace P3D.Legacy.Common.Packets
         {
             P3DPacketType.GameData => new GameDataPacket(),
             P3DPacketType.NotUsed => null,
-            P3DPacketType.ChatMessagePrivate => new ChatMessagePrivateClientPacket(),
+            P3DPacketType.ChatMessagePrivate => new ChatMessagePrivateFromClientPacket(),
             P3DPacketType.ChatMessageGlobal => new ChatMessageGlobalPacket(),
             P3DPacketType.Kicked => new KickedPacket(),
             P3DPacketType.Id => new IdPacket(),
@@ -76,8 +76,8 @@ namespace P3D.Legacy.Common.Packets
             P3DPacketType.BattleOffer => new BattleOfferFromClientPacket(),
             P3DPacketType.BattleStart => new BattleStartPacket(),
             P3DPacketType.BattleClientData => new BattleClientDataPacket(),
-            P3DPacketType.BattleHostData => new BattleHostDataPacket(),
-            P3DPacketType.BattleEndRoundData => new BattleEndRoundDataPacket(),
+            P3DPacketType.BattleHostData => new BattleHostDataFromClientPacket(),
+            P3DPacketType.BattleEndRoundData => new BattleEndRoundDataFromClientPacket(),
             P3DPacketType.ServerInfoData => new ServerInfoDataPacket(),
             P3DPacketType.ServerDataRequest => new ServerDataRequestPacket(),
             _ => null
