@@ -1,4 +1,4 @@
-﻿namespace P3D.Legacy.Common.Packets.Client
+﻿namespace P3D.Legacy.Common.Packets.Chat
 {
     public sealed record ChatMessagePrivateFromClientPacket() : P3DPacket(P3DPacketType.ChatMessagePrivate)
     {

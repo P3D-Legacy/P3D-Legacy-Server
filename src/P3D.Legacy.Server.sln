@@ -61,6 +61,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		..\.github\workflows\docker-publish-qa.yml = ..\.github\workflows\docker-publish-qa.yml
 		..\.github\workflows\docker-publish.yml = ..\.github\workflows\docker-publish.yml
 		..\.github\workflows\release-tags.yml = ..\.github\workflows\release-tags.yml
+		..\.github\workflows\restart-qa.yml = ..\.github\workflows\restart-qa.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P3D.Legacy.Server.CQERS", "P3D.Legacy.Server.CQERS\P3D.Legacy.Server.CQERS.csproj", "{D88D41B4-6AD5-4E66-8DE0-D7C01DFA61A7}"

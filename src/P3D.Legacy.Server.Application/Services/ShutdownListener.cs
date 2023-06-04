@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Hosting;
 
+using P3D.Legacy.Server.Abstractions.Events;
+using P3D.Legacy.Server.CQERS.Events;
+
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,12 +11,12 @@ namespace P3D.Legacy.Server.Application.Services
     public sealed class ShutdownListener : BackgroundService
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
-        private readonly IPlayerContainerReader _playerContainer;
+        private readonly IEventDispatcher _eventDispatcher;
 
-        public ShutdownListener(IHostApplicationLifetime hostApplicationLifetime, IPlayerContainerReader playerContainer)
+        public ShutdownListener(IHostApplicationLifetime hostApplicationLifetime, IEventDispatcher eventDispatcher)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
-            _playerContainer = playerContainer;
+            _eventDispatcher = eventDispatcher;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -28,8 +31,7 @@ namespace P3D.Legacy.Server.Application.Services
 
             await waitForStop.Task;
 
-            await foreach (var player in _playerContainer.GetAllAsync(CancellationToken.None))
-                await player.KickAsync("Server stopping!", CancellationToken.None);
+            await _eventDispatcher.DispatchAsync(new ServerStoppingEvent("Server stopping!"), CancellationToken.None);
         }
     }
 }

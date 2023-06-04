@@ -41,7 +41,8 @@ namespace P3D.Legacy.Server.Client.P3D
         IEventHandler<PlayerTradeAcceptedEvent>,
         IEventHandler<PlayerTradeAbortedEvent>,
         IEventHandler<PlayerTradeOfferedPokemonEvent>,
-        IEventHandler<PlayerTradeConfirmedEvent>
+        IEventHandler<PlayerTradeConfirmedEvent>,
+        IEventHandler<ServerStoppingEvent>
     {
         public async Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
         {
@@ -305,6 +306,13 @@ namespace P3D.Legacy.Server.Client.P3D
                 await SendPacketAsync(new TradeStartPacket { Origin = player.Origin, DestinationPlayerOrigin = target }, ct);
             else
                 await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(player, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = player.Origin }), ct);
+        }
+
+        public async Task HandleAsync(IReceiveContext<ServerStoppingEvent> context, CancellationToken ct)
+        {
+            var reason = context.Message.Reason;
+
+            await SendPacketAsync(new ServerClosePacket { Reason = reason }, CancellationToken.None);
         }
     }
 }
