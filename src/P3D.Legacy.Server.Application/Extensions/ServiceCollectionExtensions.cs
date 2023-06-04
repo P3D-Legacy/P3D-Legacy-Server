@@ -63,6 +63,7 @@ namespace P3D.Legacy.Server.Application.Extensions
 
             services.AddSingleton<WorldService>();
             services.AddHostedService<WorldService>(static sp => sp.GetRequiredService<WorldService>());
+            services.AddHostedService<ShutdownListener>();
 
             return services;
         }
