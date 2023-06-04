@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.CQERS.Events;
 using P3D.Legacy.Server.Infrastructure.Repositories.Statistics;
@@ -14,7 +13,6 @@ namespace P3D.Legacy.Server.Statistics.EventHandlers
 {
     [SuppressMessage("Performance", "CA1812")]
     internal sealed class StatisticsHandler :
-        IEventHandler<PlayerUpdatedStateEvent>,
         IEventHandler<PlayerTriggeredEventEvent>,
         IEventHandler<PlayerSentGlobalMessageEvent>,
         IEventHandler<PlayerSentLocalMessageEvent>,
@@ -31,15 +29,6 @@ namespace P3D.Legacy.Server.Statistics.EventHandlers
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _statisticsRepository = statisticsRepository ?? throw new ArgumentNullException(nameof(statisticsRepository));
-        }
-
-        public async Task HandleAsync(IReceiveContext<PlayerUpdatedStateEvent> context, CancellationToken ct)
-        {
-            var player = context.Message.Player;
-            if (player is IP3DPlayerState)
-            {
-                await _statisticsRepository.IncrementActionAsync(player.Id, "player_update_state", ct);
-            }
         }
 
         public async Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)

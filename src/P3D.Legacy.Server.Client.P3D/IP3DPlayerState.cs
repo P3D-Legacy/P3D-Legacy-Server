@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace P3D.Legacy.Server.Abstractions
+namespace P3D.Legacy.Server.Client.P3D
 {
     public interface IP3DPlayerState
     {

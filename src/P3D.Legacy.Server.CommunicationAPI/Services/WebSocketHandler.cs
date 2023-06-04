@@ -42,7 +42,6 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
             public PlayerId Id { get; private set; }
             public Origin Origin { get; private set; }
             public string Name { get; }
-            public GameJoltId GameJoltId => GameJoltId.None;
             public PermissionTypes Permissions { get; private set; } = PermissionTypes.User;
             public IPEndPoint IPEndPoint => new(IPAddress.Loopback, 0);
             public PlayerState State { get; internal set; } = PlayerState.None;
@@ -53,6 +52,8 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
                 Name = $"<BOT> {botName}";
                 _kickCallbackAsync = kickCallbackAsync;
             }
+
+            public Task<GameJoltId> GetGameJoltIdOrNoneAsync(CancellationToken ct) => Task.FromResult(GameJoltId.None);
 
             public Task AssignIdAsync(PlayerId id, CancellationToken ct)
             {

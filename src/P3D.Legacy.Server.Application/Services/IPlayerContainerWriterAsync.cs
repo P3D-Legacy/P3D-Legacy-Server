@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Services
 {
-    public interface IPlayerContainerWriter
+    public interface IPlayerContainerWriterAsync
     {
         Task AddAsync(IPlayer player, CancellationToken ct);
         Task<bool> RemoveAsync(IPlayer player, CancellationToken ct);

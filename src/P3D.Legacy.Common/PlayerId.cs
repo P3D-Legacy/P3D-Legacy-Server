@@ -14,7 +14,11 @@ namespace P3D.Legacy.Common
         public static PlayerId FromName(in ReadOnlySpan<char> name) => new(PlayerIdType.Name, name.ToString());
         public static PlayerId FromGameJolt(GameJoltId gameJoltId) => new(PlayerIdType.GameJolt, gameJoltId.ToString());
 
+        public string NameOrEmpty => IdType == PlayerIdType.Name ? Id : string.Empty;
+        public GameJoltId GameJoltIdOrNone => IdType == PlayerIdType.GameJolt ? GameJoltId.Parse(Id) : GameJoltId.None;
+
         public bool IsEmpty => IdType == PlayerIdType.None;
+        private string Id { get; init; } = Id;
 
         public override string ToString() => $"{IdType}:{Id}";
     }

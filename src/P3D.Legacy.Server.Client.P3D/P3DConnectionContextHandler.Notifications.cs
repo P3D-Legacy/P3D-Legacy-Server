@@ -11,6 +11,7 @@ using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Commands.Trade;
 using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
+using P3D.Legacy.Server.Client.P3D.Events;
 using P3D.Legacy.Server.CQERS.Events;
 
 using System;
@@ -142,7 +143,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var (player, p3dPacket) = context.Message;
 
             if (Origin == player.Origin) return;
-            if (GameJoltId.IsNone != player.GameJoltId.IsNone)
+            if (Id.GameJoltIdOrNone.IsNone != player.Id.GameJoltIdOrNone.IsNone)
             {
                 switch (p3dPacket)
                 {
@@ -223,7 +224,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (Origin != target) return;
 
-            if (GameJoltId.IsNone != initiator.GameJoltId.IsNone)
+            if (Id.GameJoltIdOrNone.IsNone != initiator.Id.GameJoltIdOrNone.IsNone)
             {
                 await _eventDispatcher.DispatchAsync(new MessageToPlayerEvent(IPlayer.Server, initiator, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
                 await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);

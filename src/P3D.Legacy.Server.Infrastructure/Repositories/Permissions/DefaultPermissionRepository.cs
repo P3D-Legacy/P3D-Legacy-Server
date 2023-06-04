@@ -26,10 +26,10 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 
         public async Task<PermissionEntity> GetByIdAsync(PlayerId id, CancellationToken ct) => id.IdType switch
         {
-            PlayerIdType.Name => await _liteDbPermissionRepository.GetByNameIdAsync(id.Id, ct),
+            PlayerIdType.Name => await _liteDbPermissionRepository.GetByNameIdAsync(id.NameOrEmpty, ct),
             PlayerIdType.GameJolt => _options.IsOfficial
-                ? await _p3dPermissionRepository.GetByGameJoltIdAsync(GameJoltId.Parse(id.Id), ct)
-                : await _liteDbPermissionRepository.GetByGameJoltIdAsync(GameJoltId.Parse(id.Id), ct),
+                ? await _p3dPermissionRepository.GetByGameJoltIdAsync(id.GameJoltIdOrNone, ct)
+                : await _liteDbPermissionRepository.GetByGameJoltIdAsync(id.GameJoltIdOrNone, ct),
             _ => new PermissionEntity(PermissionTypes.UnVerified)
         };
 

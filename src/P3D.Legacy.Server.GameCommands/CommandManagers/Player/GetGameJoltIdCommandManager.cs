@@ -29,7 +29,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                     return;
                 }
 
-                await SendMessageAsync(player, $"GameJolt Id: {targetPlayer.GameJoltId}", ct);
+                await SendMessageAsync(player, $"GameJolt Id: {targetPlayer.Id.GameJoltIdOrNone}", ct);
             }
             else
                 await SendMessageAsync(player, "Invalid arguments given.", ct);

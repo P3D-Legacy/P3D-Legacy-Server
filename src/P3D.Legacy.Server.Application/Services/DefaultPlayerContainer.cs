@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.Application.Services
 {
     [SuppressMessage("Performance", "CA1812")]
-    internal class DefaultPlayerContainer : IPlayerContainerWriter, IPlayerContainerReader
+    internal class DefaultPlayerContainer : IPlayerContainerWriterAsync, IPlayerContainerReader
     {
         private class PlayerEqualityComparer : IEqualityComparer<IPlayer>
         {
@@ -30,8 +30,7 @@ namespace P3D.Legacy.Server.Application.Services
 
         private ImmutableHashSet<IPlayer> _connections = ImmutableHashSet.Create<IPlayer>().WithComparer(new PlayerEqualityComparer());
 
-        public Task<IPlayer?> GetAsync(Origin origin, CancellationToken ct) => Task.FromResult(_connections.FirstOrDefault(x => x.Origin == origin));
-        public IAsyncEnumerable<IPlayer> GetAllAsync(CancellationToken ct) => _connections.ToAsyncEnumerable();
+        public IPlayer? Get(Origin origin) => _connections.FirstOrDefault(x => x.Origin == origin);
         public IEnumerable<IPlayer> GetAll() => _connections;
 
         public Task AddAsync(IPlayer player, CancellationToken ct)

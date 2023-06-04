@@ -69,3 +69,16 @@ So `Server:Name` will be `Server__Name` as an env variable.
 ## UI
 The server has a basic UI. Type `/uimode` when the server is running.
 ![image](https://media.discordapp.net/attachments/422092475163869201/972552577189294141/unknown.png?width=800&height=428)
+
+## About
+Project uses guidelines from Clean Architecture with CQERS (CQRS with Events).
+Features:
+* Custom Mediator for proper DI integration of Commands, Queries and Events
+* `Terminal.Gui` for a console UI
+* `OpenTelemetry` for Metrics and Tracing. Metrics are based on Application Events
+* `FluentValidation` for IOptions validation at startup
+* Two main Repository implementations - `LiteDb` for player hosted and `pokemon3d.net API` for the official server
+* WebSocket endpoint for custom integrations - the ability to create bots
+* Game Commands
+* Direct Discord integration
+* Performance oriented implementation of the P3D-Legacy game protocol

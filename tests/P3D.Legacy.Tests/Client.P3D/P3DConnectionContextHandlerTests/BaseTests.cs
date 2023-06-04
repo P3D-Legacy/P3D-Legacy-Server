@@ -76,7 +76,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                 var pair = DuplexPipe.CreateConnectionPair(options, options);
                 var connectionContext = new DefaultConnectionContext(Guid.NewGuid().ToString(), pair.Transport, pair.Application);
                 connectionContext.Features.Set<IConnectionLifetimeNotificationFeature>(new TestConnectionLifetimeNotificationFeature(connectionContext));
-                return new ValueTask<ConnectionContext>(connectionContext);
+                return ValueTask.FromResult<ConnectionContext>(connectionContext);
             }
         }
 

@@ -17,10 +17,10 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     internal sealed class PlayerInitializingCommandHandler : ICommandHandler<PlayerInitializingCommand>
     {
         private readonly IPlayerOriginGenerator _playerIdGenerator;
-        private readonly IPlayerContainerWriter _playerContainer;
+        private readonly IPlayerContainerWriterAsync _playerContainer;
         private readonly IBanRepository _banRepository;
 
-        public PlayerInitializingCommandHandler(IPlayerContainerWriter playerContainer, IPlayerOriginGenerator playerIdGenerator, IBanRepository banRepository)
+        public PlayerInitializingCommandHandler(IPlayerContainerWriterAsync playerContainer, IPlayerOriginGenerator playerIdGenerator, IBanRepository banRepository)
         {
             _playerIdGenerator = playerIdGenerator ?? throw new ArgumentNullException(nameof(playerIdGenerator));
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
@@ -33,7 +33,8 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 
             Debug.Assert(player.State == PlayerState.Initializing);
 
-            var playerId = player.GameJoltId.IsNone ? PlayerId.FromName(player.Name) : PlayerId.FromGameJolt(player.GameJoltId);
+            var gameJoltId = await player.GetGameJoltIdOrNoneAsync(ct);
+            var playerId = gameJoltId.IsNone ? PlayerId.FromName(player.Name) : PlayerId.FromGameJolt(player.Id.GameJoltIdOrNone);
 
             if (await _banRepository.GetAsync(playerId, ct) is { } banEntity)
             {

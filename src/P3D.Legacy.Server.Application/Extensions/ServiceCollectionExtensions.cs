@@ -58,7 +58,7 @@ namespace P3D.Legacy.Server.Application.Extensions
             services.AddSingleton<IPlayerOriginGenerator, DefaultPlayerOriginGenerator>();
 
             services.AddSingleton<DefaultPlayerContainer>();
-            services.AddTransient<IPlayerContainerWriter>(static sp => sp.GetRequiredService<DefaultPlayerContainer>());
+            services.AddTransient<IPlayerContainerWriterAsync>(static sp => sp.GetRequiredService<DefaultPlayerContainer>());
             services.AddTransient<IPlayerContainerReader>(static sp => sp.GetRequiredService<DefaultPlayerContainer>());
 
             services.AddSingleton<WorldService>();

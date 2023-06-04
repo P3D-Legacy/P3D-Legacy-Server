@@ -9,8 +9,7 @@ namespace P3D.Legacy.Server.Application.Services
 {
     public interface IPlayerContainerReader
     {
-        Task<IPlayer?> GetAsync(Origin origin, CancellationToken ct);
-        IAsyncEnumerable<IPlayer> GetAllAsync(CancellationToken ct);
+        IPlayer? Get(Origin origin);
         IEnumerable<IPlayer> GetAll();
     }
 }

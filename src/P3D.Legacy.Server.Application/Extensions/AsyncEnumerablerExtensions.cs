@@ -7,6 +7,6 @@ namespace P3D.Legacy.Server.Application.Extensions
 {
     public static class AsyncEnumerablerExtensions
     {
-        public static IAsyncEnumerable<IPlayer> AreInitializedAsync(this IAsyncEnumerable<IPlayer> query) => query.Where(static x => x.State == PlayerState.Initialized);
+        public static IEnumerable<IPlayer> AreInitialized(this IEnumerable<IPlayer> query) => query.Where(static x => x.State == PlayerState.Initialized);
     }
 }

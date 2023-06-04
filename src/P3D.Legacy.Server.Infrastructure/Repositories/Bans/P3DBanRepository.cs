@@ -126,10 +126,10 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
                 response = string.IsNullOrEmpty(reason)
                     ? await client.PostAsJsonAsync(
                         new Uri("ban/gamejoltaccount", UriKind.Relative),
-                        new BanRequest(GameJoltId.Parse(id.Id), reasonId, expiration, GameJoltId.Parse(bannerId.Id)), _jsonContext.BanRequest, ct)
+                        new BanRequest(id.GameJoltIdOrNone, reasonId, expiration, bannerId.GameJoltIdOrNone), _jsonContext.BanRequest, ct)
                     : await client.PostAsJsonAsync(
                         new Uri("ban/gamejoltaccount", UriKind.Relative),
-                        new TextReasonBanRequest(GameJoltId.Parse(id.Id), reason, expiration, GameJoltId.Parse(bannerId.Id)), _jsonContext.TextReasonBanRequest, ct);
+                        new TextReasonBanRequest(id.GameJoltIdOrNone, reason, expiration, bannerId.GameJoltIdOrNone), _jsonContext.TextReasonBanRequest, ct);
             }
             catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
             {
@@ -167,7 +167,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             {
                 using var client = _httpClientFactory.CreateClient("P3D.API");
                 response = await client.GetAsync(
-                    new Uri($"ban/gamejoltaccount/{id.Id}", UriKind.Relative),
+                    new Uri($"ban/gamejoltaccount/{id.GameJoltIdOrNone}", UriKind.Relative),
                     HttpCompletionOption.ResponseHeadersRead,
                     ct);
             }

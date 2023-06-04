@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Services
 {
-    public sealed class ShutdownListener : BackgroundService
+    public sealed class ShutdownListener : LongRunningBackgroundService
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IEventDispatcher _eventDispatcher;
@@ -23,7 +23,7 @@ namespace P3D.Legacy.Server.Application.Services
         {
             var waitForStop = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            _hostApplicationLifetime.ApplicationStopping.Register(static obj =>
+            await using var registration =_hostApplicationLifetime.ApplicationStopping.Register(static obj =>
             {
                 if (obj is not TaskCompletionSource tcs) return;
                 tcs.TrySetResult();

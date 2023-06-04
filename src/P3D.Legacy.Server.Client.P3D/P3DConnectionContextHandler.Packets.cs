@@ -17,6 +17,7 @@ using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Application.Queries.World;
+using P3D.Legacy.Server.Client.P3D.Events;
 
 using System;
 using System.Collections.Immutable;
@@ -325,7 +326,7 @@ namespace P3D.Legacy.Server.Client.P3D
                         }
                         break;
                     case PlayerIdType.GameJolt:
-                        if (await _commandDispatcher.DispatchAsync(new PlayerAuthenticateGameJoltCommand(this, GameJoltId), ct) is { IsSuccess: true })
+                        if (await _commandDispatcher.DispatchAsync(new PlayerAuthenticateGameJoltCommand(this, Id.GameJoltIdOrNone), ct) is { IsSuccess: true })
                         {
                             await _commandDispatcher.DispatchAsync(new PlayerReadyCommand(this), ct);
                             State = PlayerState.Initialized;

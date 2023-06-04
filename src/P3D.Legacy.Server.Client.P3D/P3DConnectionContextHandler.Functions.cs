@@ -31,7 +31,7 @@ namespace P3D.Legacy.Server.Client.P3D
             Origin = player.Origin,
             GameMode = state.GameMode,
             IsGameJoltPlayer = state.IsGameJoltPlayer,
-            GameJoltId = player.GameJoltId,
+            GameJoltId = player.Id.GameJoltIdOrNone,
             DecimalSeparator = state.DecimalSeparator,
             Name = player.Name,
             LevelFile = state.LevelFile,
@@ -45,6 +45,8 @@ namespace P3D.Legacy.Server.Client.P3D
             MonsterSkin = state.MonsterSkin,
             MonsterFacing = state.MonsterFacing
         };
+
+        public Task<GameJoltId> GetGameJoltIdOrNoneAsync(CancellationToken ct) => Task.FromResult(GameJoltId);
 
         public Task AssignIdAsync(PlayerId id, CancellationToken ct)
         {

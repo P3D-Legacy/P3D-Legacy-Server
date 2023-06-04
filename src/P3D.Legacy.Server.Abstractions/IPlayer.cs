@@ -15,11 +15,11 @@ namespace P3D.Legacy.Server.Abstractions
             public PlayerId Id => PlayerId.None;
             public Origin Origin => Origin.Server;
             public string Name => "Server";
-            public GameJoltId GameJoltId => GameJoltId.None;
             public PermissionTypes Permissions => PermissionTypes.Server;
             public IPEndPoint IPEndPoint => new(IPAddress.None, 0);
             public PlayerState State => PlayerState.Initialized;
 
+            public Task<GameJoltId> GetGameJoltIdOrNoneAsync(CancellationToken ct) => Task.FromResult(GameJoltId.None);
             public Task AssignIdAsync(PlayerId id, CancellationToken ct) => throw new NotSupportedException();
             public Task AssignOriginAsync(Origin origin, CancellationToken ct) => throw new NotSupportedException();
             public Task AssignPermissionsAsync(PermissionTypes permissions, CancellationToken ct) => throw new NotSupportedException();
@@ -33,11 +33,11 @@ namespace P3D.Legacy.Server.Abstractions
         PlayerId Id { get; }
         Origin Origin { get; }
         string Name { get; }
-        GameJoltId GameJoltId { get; }
         PermissionTypes Permissions { get; }
         IPEndPoint IPEndPoint { get; }
         PlayerState State { get; }
 
+        Task<GameJoltId> GetGameJoltIdOrNoneAsync(CancellationToken ct);
         Task AssignIdAsync(PlayerId id, CancellationToken ct);
         Task AssignOriginAsync(Origin origin, CancellationToken ct);
         Task AssignPermissionsAsync(PermissionTypes permissions, CancellationToken ct);

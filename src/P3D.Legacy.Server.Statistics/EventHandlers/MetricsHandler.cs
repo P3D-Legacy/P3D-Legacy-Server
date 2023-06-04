@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.CQERS.Events;
 
@@ -16,7 +15,6 @@ namespace P3D.Legacy.Server.Statistics.EventHandlers
 {
     [SuppressMessage("Performance", "CA1812")]
     internal sealed class MetricsHandler :
-        IEventHandler<PlayerUpdatedStateEvent>,
         IEventHandler<PlayerTriggeredEventEvent>,
         IEventHandler<PlayerSentGlobalMessageEvent>,
         IEventHandler<PlayerSentLocalMessageEvent>,
@@ -29,7 +27,6 @@ namespace P3D.Legacy.Server.Statistics.EventHandlers
     {
         private readonly ILogger _logger;
         private readonly Meter _meter;
-        private readonly Counter<long> _stateCounter;
         private readonly Counter<long> _eventCounter;
         private readonly Counter<long> _messageCounter;
         private readonly Counter<long> _queueCounter;
@@ -39,25 +36,10 @@ namespace P3D.Legacy.Server.Statistics.EventHandlers
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _meter = new Meter("P3D.Legacy.Server.Statistics");
-            _stateCounter = _meter.CreateCounter<long>("player_p3d_state", "count", "occurrence of tags sent by player");
             _eventCounter = _meter.CreateCounter<long>("player_event", "count", "occurrence of event triggered by player");
             _messageCounter = _meter.CreateCounter<long>("player_message", "count", "occurrence of messages sent by player");
             _queueCounter = _meter.CreateCounter<long>("player_queue", "count", "occurrence of queue actions by player");
             _worldCounter = _meter.CreateCounter<long>("world_state", "count", "occurrence of world state updates");
-        }
-
-        public Task HandleAsync(IReceiveContext<PlayerUpdatedStateEvent> context, CancellationToken ct)
-        {
-            var player = context.Message.Player;
-            if (player is IP3DPlayerState state)
-            {
-                _stateCounter.Add(1,
-                    new KVP("id", player.Id),
-                    new KVP("location", state.LevelFile),
-                    new KVP("decimal_separator", state.DecimalSeparator),
-                    new KVP("gamemode", state.GameMode));
-            }
-            return Task.CompletedTask;
         }
 
         public Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)

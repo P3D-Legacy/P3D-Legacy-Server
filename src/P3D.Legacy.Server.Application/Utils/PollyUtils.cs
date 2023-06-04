@@ -38,14 +38,14 @@ namespace P3D.Legacy.Server.Application.Utils
                 .OrTransientHttpStatusCode()
                 .WaitAndRetryAsync(
                     retryCount: 5,
-                    sleepDurationProvider: static (i, result, context) =>
+                    sleepDurationProvider: static (_, result, _) =>
                     {
                         var clientWaitDuration = TimeSpan.FromSeconds(2);
                         var serverWaitDuration = GetServerWaitDuration(result);
                         var waitDuration = Math.Max(clientWaitDuration.TotalMilliseconds, serverWaitDuration.TotalMilliseconds);
                         return TimeSpan.FromMilliseconds(waitDuration);
                     },
-                    onRetryAsync: (result, timeSpan, retryCount, context) =>
+                    onRetryAsync: (result, timeSpan, retryCount, _) =>
                     {
                         Exception(logger, result.Result, retryCount, timeSpan, result.Exception);
                         return Task.CompletedTask;

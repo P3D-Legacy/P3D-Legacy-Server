@@ -17,9 +17,9 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
     internal sealed class PlayerFinalizingCommandHandler : ICommandHandler<PlayerFinalizingCommand>
     {
         private readonly IEventDispatcher _eventDispatcher;
-        private readonly IPlayerContainerWriter _playerContainer;
+        private readonly IPlayerContainerWriterAsync _playerContainer;
 
-        public PlayerFinalizingCommandHandler(IEventDispatcher eventDispatcher, IPlayerContainerWriter playerContainer)
+        public PlayerFinalizingCommandHandler(IEventDispatcher eventDispatcher, IPlayerContainerWriterAsync playerContainer)
         {
             _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
