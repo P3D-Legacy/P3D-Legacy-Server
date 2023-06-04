@@ -1,0 +1,32 @@
+name: "Restart 'P3D Legacy Server Next'"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  restart:
+    name: "Restart 'P3D Legacy Server Next'"
+    runs-on: ubuntu-latest
+    environment:
+      name: 'next-p3d-backend'
+      url: 'https://karp.pokemon3d.net'
+    steps:
+      - uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            docker service update --force nextp3dlegacyserver_next_p3d_legacy_server;
+
+      - name: Checkout Repository
+        if: always()
+        uses: actions/checkout@v3
+
+      - name: Notify
+        if: always()
+        env:
+          BUILD_STATUS: ${{ job.status }}
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_QA }}
+        run: bash ./.github/workflows/discord.sh
