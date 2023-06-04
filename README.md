@@ -82,3 +82,4 @@ Features:
 * Game Commands
 * Direct Discord integration
 * Performance oriented implementation of the P3D-Legacy game protocol
+* REST API based on Queries

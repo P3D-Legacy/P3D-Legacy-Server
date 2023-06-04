@@ -38,9 +38,7 @@ COPY ["src/P3D.Legacy.Server.UI.Shared/", "src/P3D.Legacy.Server.UI.Shared/"]
 COPY ["src/P3D.Legacy.Server.GUI/", "src/P3D.Legacy.Server.GUI/"]
 COPY ["src/P3D.Legacy.Server/", "src/P3D.Legacy.Server/"]
 
-COPY [".git/HEAD", ".git/HEAD"]
-COPY [".git/config", ".git/config"]
-COPY [".git/refs/heads/", ".git/refs/heads/"]
+VOLUME [".git", ".git"]
 
 FROM restore AS publish
 WORKDIR /build

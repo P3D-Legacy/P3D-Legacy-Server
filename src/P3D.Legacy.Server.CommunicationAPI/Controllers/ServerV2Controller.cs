@@ -64,7 +64,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
             return StatusCode(StatusCodes.Status200OK, new PagingResponse<StatusResponseV2Player>
             {
                 Items = models.Select(static x => new StatusResponseV2Player(x.Name, x.GameJoltId)),
-                Metadata = metadata
+                Metadata = metadata,
             });
         }
 
