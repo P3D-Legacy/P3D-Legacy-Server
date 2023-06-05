@@ -160,7 +160,20 @@ namespace P3D.Legacy.Server.Client.P3D
 
             if (p3dPacket is BattleOfferFromClientPacket battleOfferFromClientPacket)
             {
+                if (battleOfferFromClientPacket.DestinationPlayerOrigin != Origin) return;
                 await SendPacketAsync(new BattleOfferToClientPacket { Origin = battleOfferFromClientPacket.Origin, BattleData = battleOfferFromClientPacket.BattleData }, ct);
+                return;
+            }
+            if (p3dPacket is BattleHostDataFromClientPacket battleHostDataFromClientPacket)
+            {
+                if (battleHostDataFromClientPacket.DestinationPlayerOrigin != Origin) return;
+                await SendPacketAsync(new BattleHostDataToClientPacket { Origin = battleHostDataFromClientPacket.Origin, BattleData = battleHostDataFromClientPacket.BattleData }, ct);
+                return;
+            }
+            if (p3dPacket is BattleEndRoundDataFromClientPacket battleEndRoundDataFromClientPacket)
+            {
+                if (battleEndRoundDataFromClientPacket.DestinationPlayerOrigin != Origin) return;
+                await SendPacketAsync(new BattleEndRoundDataToClientPacket { Origin = battleEndRoundDataFromClientPacket.Origin, BattleData = battleEndRoundDataFromClientPacket.BattleData }, ct);
                 return;
             }
 

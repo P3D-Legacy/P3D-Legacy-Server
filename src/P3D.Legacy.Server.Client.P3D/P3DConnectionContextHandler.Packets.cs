@@ -444,7 +444,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (State != PlayerState.Initialized)
                 return;
 
-            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, new BattleHostDataToClientPacket { Origin = packet.Origin, BattleData = packet.BattleData }), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
         }
         private async Task HandleBattleJoinAsync(BattleJoinPacket packet, CancellationToken ct)
         {
@@ -492,7 +492,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (State != PlayerState.Initialized)
                 return;
 
-            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, new BattleEndRoundDataToClientPacket { Origin = packet.Origin, BattleData = packet.BattleData }), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
         }
         private async Task HandleBattleQuitAsync(BattleQuitPacket packet, CancellationToken ct)
         {
