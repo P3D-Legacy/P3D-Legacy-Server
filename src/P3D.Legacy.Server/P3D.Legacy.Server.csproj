@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <Version>0.9</Version>
+    <InvariantGlobalization>true</InvariantGlobalization>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>CS1591;</NoWarn>
@@ -11,15 +12,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerComposeProjectPath>..\..\docker-compose\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
-
-  <!-- https://github.com/dotnet/sdk/issues/3843 -->
-  <PropertyGroup Condition="$(DOCKER_UNIVERSAL) == 'true'">
-    <RuntimeIdentifiers>linux-x64;linux-arm64;linux-arm;win-x64</RuntimeIdentifiers>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(DOCKER_ALPINE) == 'true'">
-    <RuntimeIdentifiers>alpine-x64;alpine-arm64;alpine-arm</RuntimeIdentifiers>
-  </PropertyGroup>
-
+  
   <PropertyGroup>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>

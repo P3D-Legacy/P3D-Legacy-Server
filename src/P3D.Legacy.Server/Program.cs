@@ -36,15 +36,7 @@ namespace P3D.Legacy.Server
 {
     public static class Program
     {
-        public static async Task Main(string[] args)
-        {
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-
-            Activity.DefaultIdFormat = ActivityIdFormat.W3C;
-            Activity.ForceDefaultIdFormat = true;
-
-            await CreateHostBuilder(args).Build().RunAsync();
-        }
+        public static Task Main(string[] args) => CreateHostBuilder(args).Build().RunAsync();
 
         public static IHostBuilder CreateHostBuilder(string[] args) => Host
             .CreateDefaultBuilder(args)

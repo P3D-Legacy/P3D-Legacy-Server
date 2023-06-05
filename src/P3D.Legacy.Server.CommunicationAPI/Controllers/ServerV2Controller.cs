@@ -82,7 +82,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
                 yield return $"Binary Build Date: {buildDateTime:O}";
                 yield return $"Binary Name: {assembly?.GetName().Name}";
                 yield return $"Binary Version: {assembly?.GetName().Version}";
-                yield return $"Git IsDirty: {ThisAssembly.Git.IsDirty}";
+                yield return $"Git IsDirty: {ThisAssembly.Git.IsDirty}"; // Will be always true because the Dockerfile doesn't copy everything
                 yield return $"Git Repository: {ThisAssembly.Git.RepositoryUrl}";
                 yield return $"Git Branch: {ThisAssembly.Git.Branch}";
                 yield return $"Git Commit: {ThisAssembly.Git.Commit}";

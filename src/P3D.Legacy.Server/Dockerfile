@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS base
+FROM mcr.microsoft.com/dotnet/nightly/runtime-deps:7.0-jammy-chiseled-amd64 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS restore
+FROM mcr.microsoft.com/dotnet/nightly/sdk:7.0-jammy-amd64 AS restore
 WORKDIR /build
 
 COPY ["src/P3D.Legacy.Common/P3D.Legacy.Common.csproj", "src/P3D.Legacy.Common/"]
@@ -21,7 +21,7 @@ COPY ["src/P3D.Legacy.Server/P3D.Legacy.Server.csproj", "src/P3D.Legacy.Server/"
 COPY ["Directory.Build.props", "./"]
 COPY ["Directory.Packages.props", "./"]
 
-RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj";
+RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r linux-x64;
 
 COPY ["src/P3D.Legacy.Common/", "src/P3D.Legacy.Common/"]
 COPY ["src/P3D.Legacy.Server.CQERS/", "src/P3D.Legacy.Server.CQERS/"]
@@ -42,10 +42,9 @@ COPY [".git", ".git"]
 
 FROM restore AS publish
 WORKDIR /build
-RUN dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -c Release -r linux-musl-x64 -p:PublishReadyToRun=true -o /app/publish
+RUN dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r linux-x64 --self-contained true -o /app/publish -p:PublishReadyToRun=true;
 
 FROM base AS final
-
 WORKDIR /app
 COPY --from=publish /app/publish .
 
@@ -66,6 +65,7 @@ LABEL org.opencontainers.image.title="P3D Legacy Server" \
       org.opencontainers.image.created=$DATE \
       org.opencontainers.image.revision=$REVISION
 
-EXPOSE 80/tcp
+ENV DOTNET_EnableDiagnostics=0
+EXPOSE 8080/tcp
 EXPOSE 15124/tcp
-ENTRYPOINT ["dotnet", "P3D.Legacy.Server.dll"]
+ENTRYPOINT ["./P3D.Legacy.Server"]
