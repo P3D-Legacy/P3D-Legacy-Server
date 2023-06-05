@@ -74,6 +74,7 @@ ARG DATE=unknown
 ARG REVISION=unknown
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md
 # org.opencontainers.image.base.digest
+# org.opencontainers.image.base.name
 # org.opencontainers.image.ref.name
 # org.opencontainers.image.version
 LABEL org.opencontainers.image.title="P3D Legacy Server" \
