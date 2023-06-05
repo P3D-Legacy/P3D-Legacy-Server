@@ -1,4 +1,4 @@
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime-deps:7.0 AS base
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 AS restore
@@ -64,7 +64,7 @@ RUN \
     elif [ $TARGETPLATFORM = "windows/amd64" ]; then \
         RID="win-x64"; \
     fi \
-    && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained true -o /app/publish -p:PublishReadyToRun=true;
+    && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained false -o /app/publish -p:PublishReadyToRun=true;
 
 FROM base AS final
 WORKDIR /app
@@ -91,4 +91,4 @@ LABEL org.opencontainers.image.title="P3D Legacy Server" \
 ENV DOTNET_EnableDiagnostics=0
 EXPOSE 8080/tcp
 EXPOSE 15124/tcp
-ENTRYPOINT ["./P3D.Legacy.Server"]
+ENTRYPOINT ["dotnet", "P3D.Legacy.Server.dll"]
