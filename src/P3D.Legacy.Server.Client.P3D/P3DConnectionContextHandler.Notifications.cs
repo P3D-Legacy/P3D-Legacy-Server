@@ -143,41 +143,33 @@ namespace P3D.Legacy.Server.Client.P3D
             var (player, p3dPacket) = context.Message;
 
             if (Origin == player.Origin) return;
-            if (Id.GameJoltIdOrNone.IsNone != player.Id.GameJoltIdOrNone.IsNone)
-            {
-                switch (p3dPacket)
-                {
-                    case BattleRequestPacket:
-                        await _eventDispatcher.DispatchAsync(new MessageToPlayerEvent(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
-                        await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(player, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
-                        break;
-                    case BattleQuitPacket:
-                        await SendPacketAsync(p3dPacket, ct);
-                        break;
-                }
-                return;
-            }
 
-            if (p3dPacket is BattleOfferFromClientPacket battleOfferFromClientPacket)
+            switch (p3dPacket)
             {
-                if (battleOfferFromClientPacket.DestinationPlayerOrigin != Origin) return;
-                await SendPacketAsync(new BattleOfferToClientPacket { Origin = battleOfferFromClientPacket.Origin, BattleData = battleOfferFromClientPacket.BattleData }, ct);
-                return;
+                case BattleRequestPacket when Id.GameJoltIdOrNone.IsNone != player.Id.GameJoltIdOrNone.IsNone:
+                    await _eventDispatcher.DispatchAsync(new MessageToPlayerEvent(IPlayer.Server, player, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
+                    await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(player, new BattleQuitPacket { Origin = Origin, DestinationPlayerOrigin = player.Origin }), ct);
+                    return;
+                case BattleOfferFromClientPacket packet when packet.DestinationPlayerOrigin != Origin: return;
+                case BattleOfferFromClientPacket packet:
+                    await SendPacketAsync(new BattleOfferToClientPacket { Origin = packet.Origin, BattleData = packet.BattleData }, ct);
+                    return;
+                case BattleClientDataFromClientPacket packet when packet.DestinationPlayerOrigin != Origin: return;
+                case BattleClientDataFromClientPacket packet:
+                    await SendPacketAsync(new BattleClientDataToClientPacket { Origin = packet.Origin, BattleData = packet.BattleData }, ct);
+                    return;
+                case BattleHostDataFromClientPacket packet when packet.DestinationPlayerOrigin != Origin: return;
+                case BattleHostDataFromClientPacket packet:
+                    await SendPacketAsync(new BattleHostDataToClientPacket { Origin = packet.Origin, BattleData = packet.BattleData }, ct);
+                    return;
+                case BattleEndRoundDataFromClientPacket packet when packet.DestinationPlayerOrigin != Origin: return;
+                case BattleEndRoundDataFromClientPacket packet:
+                    await SendPacketAsync(new BattleEndRoundDataToClientPacket { Origin = packet.Origin, BattleData = packet.BattleData }, ct);
+                    return;
+                default:
+                    await SendPacketAsync(p3dPacket, ct);
+                    return;
             }
-            if (p3dPacket is BattleHostDataFromClientPacket battleHostDataFromClientPacket)
-            {
-                if (battleHostDataFromClientPacket.DestinationPlayerOrigin != Origin) return;
-                await SendPacketAsync(new BattleHostDataToClientPacket { Origin = battleHostDataFromClientPacket.Origin, BattleData = battleHostDataFromClientPacket.BattleData }, ct);
-                return;
-            }
-            if (p3dPacket is BattleEndRoundDataFromClientPacket battleEndRoundDataFromClientPacket)
-            {
-                if (battleEndRoundDataFromClientPacket.DestinationPlayerOrigin != Origin) return;
-                await SendPacketAsync(new BattleEndRoundDataToClientPacket { Origin = battleEndRoundDataFromClientPacket.Origin, BattleData = battleEndRoundDataFromClientPacket.BattleData }, ct);
-                return;
-            }
-
-            await SendPacketAsync(p3dPacket, ct);
         }
 
         public async Task HandleAsync(IReceiveContext<ServerMessageEvent> context, CancellationToken ct)
@@ -241,18 +233,17 @@ namespace P3D.Legacy.Server.Client.P3D
             {
                 await _eventDispatcher.DispatchAsync(new MessageToPlayerEvent(IPlayer.Server, initiator, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
                 await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
+                return;
+            }
+
+            if (await _commandDispatcher.DispatchAsync(new TradeOfferCommand(initiator, this), ct) is { IsSuccess: true })
+            {
+                await SendPacketAsync(new TradeRequestPacket { Origin = initiator.Origin, DestinationPlayerOrigin = target }, ct);
             }
             else
             {
-                if (await _commandDispatcher.DispatchAsync(new TradeOfferCommand(initiator, this), ct) is { IsSuccess: true })
-                {
-                    await SendPacketAsync(new TradeRequestPacket { Origin = initiator.Origin, DestinationPlayerOrigin = target }, ct);
-                }
-                else
-                {
-                    await _commandDispatcher.DispatchAsync(new TradeAbortCommand(initiator, this), ct);
-                    await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
-                }
+                await _commandDispatcher.DispatchAsync(new TradeAbortCommand(initiator, this), ct);
+                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
             }
         }
 

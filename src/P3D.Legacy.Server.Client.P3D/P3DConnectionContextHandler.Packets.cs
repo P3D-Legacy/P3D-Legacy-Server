@@ -45,7 +45,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
             switch (packet)
             {
-                case BattleClientDataPacket battleClientDataPacket:
+                case BattleClientDataFromClientPacket battleClientDataPacket:
                     await HandleBattleClientDataAsync(battleClientDataPacket, ct);
                     break;
                 case BattleHostDataFromClientPacket battleHostDataPacket:
@@ -432,7 +432,7 @@ namespace P3D.Legacy.Server.Client.P3D
             await _eventDispatcher.DispatchAsync(new PlayerTradeConfirmedEvent(this, packet.DestinationPlayerOrigin), ct);
         }
 
-        private async Task HandleBattleClientDataAsync(BattleClientDataPacket packet, CancellationToken ct)
+        private async Task HandleBattleClientDataAsync(BattleClientDataFromClientPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
