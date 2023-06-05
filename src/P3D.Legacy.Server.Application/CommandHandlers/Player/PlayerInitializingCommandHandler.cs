@@ -34,7 +34,7 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
             Debug.Assert(player.State == PlayerState.Initializing);
 
             var gameJoltId = await player.GetGameJoltIdOrNoneAsync(ct);
-            var playerId = gameJoltId.IsNone ? PlayerId.FromName(player.Name) : PlayerId.FromGameJolt(player.Id.GameJoltIdOrNone);
+            var playerId = gameJoltId.IsNone ? PlayerId.FromName(player.Name) : PlayerId.FromGameJolt(gameJoltId);
 
             if (await _banRepository.GetAsync(playerId, ct) is { } banEntity)
             {
