@@ -3,6 +3,7 @@ WORKDIR /app
 
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/nightly/sdk:7.0-jammy AS restore
 WORKDIR /build
+ARG TARGETPLATFORM
 
 COPY ["src/P3D.Legacy.Common/P3D.Legacy.Common.csproj", "src/P3D.Legacy.Common/"]
 COPY ["src/P3D.Legacy.Server.CQERS/P3D.Legacy.Server.CQERS.csproj", "src/P3D.Legacy.Server.CQERS/"]
@@ -21,7 +22,17 @@ COPY ["src/P3D.Legacy.Server/P3D.Legacy.Server.csproj", "src/P3D.Legacy.Server/"
 COPY ["Directory.Build.props", "./"]
 COPY ["Directory.Packages.props", "./"]
 
-RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r linux-x64 -p:PublishReadyToRun=true;
+RUN \
+    if [ $TARGETPLATFORM = "linux/amd64" ]; then \
+        RID="linux-x64"; \
+    elif [ $TARGETPLATFORM = "linux/arm64" ]; then \
+        RID="linux-arm64"; \
+    elif [ $TARGETPLATFORM = "linux/arm/v7" ]; then \
+        RID="linux-arm"; \
+    elif [ $TARGETPLATFORM = "windows/amd64" ]; then \
+        RID="win-x64"; \
+    fi \
+    && dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r $RID -p:PublishReadyToRun=true;
 
 COPY ["src/P3D.Legacy.Common/", "src/P3D.Legacy.Common/"]
 COPY ["src/P3D.Legacy.Server.CQERS/", "src/P3D.Legacy.Server.CQERS/"]
@@ -52,8 +63,8 @@ RUN \
         RID="linux-arm"; \
     elif [ $TARGETPLATFORM = "windows/amd64" ]; then \
         RID="win-x64"; \
-    fi && \
-    dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained true -o /app/publish -p:PublishReadyToRun=true;
+    fi \
+    && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained true -o /app/publish -p:PublishReadyToRun=true;
 
 FROM base AS final
 WORKDIR /app
