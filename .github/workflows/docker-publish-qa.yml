@@ -50,7 +50,7 @@ jobs:
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
-          file: ./src/P3D.Legacy.Server/Dockerfile
+          file: ./src/P3D.Legacy.Server/Image.Universal.Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/amd64
           build-args: |
             DATE=$(date --iso-8601=s)
