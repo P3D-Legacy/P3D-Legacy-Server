@@ -8,7 +8,7 @@ namespace P3D.Legacy.Server.CQERS.Services
 {
     public sealed class EventDispatcher : IEventDispatcher
     {
-        public DispatchStrategy DefaultStrategy { get; set; } = DispatchStrategy.ParallelNoWait;
+        public DispatchStrategy DefaultStrategy { get; set; } = DispatchStrategy.ParallelWhenAll;
 
         private readonly ReceiveContextFactory _receiveContextFactory;
 

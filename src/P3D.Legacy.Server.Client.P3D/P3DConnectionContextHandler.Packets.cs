@@ -375,6 +375,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (State != PlayerState.Initialized)
                 return;
 
+            await SendPacketAsync(packet, ct); // That's nice
             await _eventDispatcher.DispatchAsync(new PlayerSentPrivateMessageEvent(this, packet.DestinationPlayerName, packet.Message), ct);
         }
 
