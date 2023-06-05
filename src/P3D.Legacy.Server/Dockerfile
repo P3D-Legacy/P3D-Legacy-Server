@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/nightly/runtime-deps:7.0-jammy-chiseled-amd64 AS base
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/nightly/runtime-deps:7.0-jammy-chiseled AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/nightly/sdk:7.0-jammy-amd64 AS restore
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/nightly/sdk:7.0-jammy AS restore
 WORKDIR /build
 
 COPY ["src/P3D.Legacy.Common/P3D.Legacy.Common.csproj", "src/P3D.Legacy.Common/"]
@@ -42,7 +42,18 @@ COPY [".git", ".git"]
 
 FROM restore AS publish
 WORKDIR /build
-RUN dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r linux-x64 --self-contained true -o /app/publish -p:PublishReadyToRun=true;
+ARG TARGETPLATFORM
+RUN \
+    if [ $TARGETPLATFORM = "linux/amd64" ]; then \
+        RID="linux-x64"; \
+    elif [ $TARGETPLATFORM = "linux/arm64" ]; then \
+        RID="linux-arm64"; \
+    elif [ $TARGETPLATFORM = "linux/arm/v7" ]; then \
+        RID="linux-arm"; \
+    elif [ $TARGETPLATFORM = "windows/amd64" ]; then \
+        RID="win-x64"; \
+    fi && \
+    dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained true -o /app/publish -p:PublishReadyToRun=true;
 
 FROM base AS final
 WORKDIR /app

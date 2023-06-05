@@ -23,7 +23,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
-          platforms: all
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
 
       - name: Set up Docker Buildx
         id: buildx
@@ -51,8 +51,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: ./src/P3D.Legacy.Server/Dockerfile
-          platforms: linux/amd64
-          #platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           build-args: |
             DATE=$(date --iso-8601=s)
             REVISION=$(git rev-parse --short HEAD)
