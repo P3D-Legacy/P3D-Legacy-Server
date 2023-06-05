@@ -21,7 +21,7 @@ COPY ["src/P3D.Legacy.Server/P3D.Legacy.Server.csproj", "src/P3D.Legacy.Server/"
 COPY ["Directory.Build.props", "./"]
 COPY ["Directory.Packages.props", "./"]
 
-RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r linux-x64;
+RUN dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r linux-x64 -p:PublishReadyToRun=true;
 
 COPY ["src/P3D.Legacy.Common/", "src/P3D.Legacy.Common/"]
 COPY ["src/P3D.Legacy.Server.CQERS/", "src/P3D.Legacy.Server.CQERS/"]
