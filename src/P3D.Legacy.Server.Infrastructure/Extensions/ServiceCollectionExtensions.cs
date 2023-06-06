@@ -42,6 +42,8 @@ namespace P3D.Legacy.Server.Infrastructure.Extensions
             services.AddTransient<IStatisticsRepository, DefaultStatisticsRepository>();
             services.AddTransient<LiteDbStatisticsRepository>();
 
+            services.AddTransient<IMonsterDataProvider, PokeAPIMonsterDataProvider>();
+
             return services;
         }
     }

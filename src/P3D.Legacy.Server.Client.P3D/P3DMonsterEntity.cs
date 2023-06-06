@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace P3D.Legacy.Server.Client.P3D.Models.Monsters
+namespace P3D.Legacy.Server.Client.P3D
 {
     public sealed class P3DMonsterEntity : IMonsterInstance
     {
@@ -69,7 +69,11 @@ namespace P3D.Legacy.Server.Client.P3D.Models.Monsters
                 Method = dict["CatchMethod"],
                 Location = dict["CatchLocation"],
                 TrainerName = dict["CatchTrainer"],
-                TrainerId = dict.TryGetValue("OT", out var otStr) ? string.IsNullOrEmpty(otStr) ? null : uint.TryParse(otStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out var ot) ? ot : 0 : null,
+                TrainerId = dict.TryGetValue("OT", out var otStr)
+                    ? string.IsNullOrEmpty(otStr)
+                        ? null
+                        : uint.TryParse(otStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out var ot) ? ot : 0
+                    : null,
             };
 
             //if (short.TryParse(dict["Item"], out var itemId) && itemId != 0)
@@ -105,6 +109,7 @@ namespace P3D.Legacy.Server.Client.P3D.Models.Monsters
             Metadata.Add("Status", dict["Status"]);
         }
 
-        public override string ToString() => !string.IsNullOrWhiteSpace(CatchInfo.Nickname) ? CatchInfo.Nickname : StaticData.Name;
+        public override string ToString() =>
+            !string.IsNullOrWhiteSpace(CatchInfo.Nickname) ? CatchInfo.Nickname : StaticData.Name;
     }
 }

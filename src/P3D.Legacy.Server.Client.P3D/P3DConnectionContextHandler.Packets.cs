@@ -10,7 +10,6 @@ using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Application.Queries.World;
 using P3D.Legacy.Server.Client.P3D.Events;
-using P3D.Legacy.Server.Client.P3D.Extensions;
 using P3D.Legacy.Server.Client.P3D.Packets;
 using P3D.Legacy.Server.Client.P3D.Packets.Battle;
 using P3D.Legacy.Server.Client.P3D.Packets.Chat;
@@ -459,24 +458,19 @@ namespace P3D.Legacy.Server.Client.P3D
                 return;
 
             var cancel = false;
-            /*
             var serverOptions = await _queryDispatcher.DispatchAsync(new GetServerOptionsQuery(), ct);
             if (serverOptions.ValidationEnabled)
             {
-                var query = packet.BattleData.MonsterDatas
-                    .ToAsyncEnumerable()
-                    .SelectAwait(async x => await _queryDispatcher.DispatchAsync(new GetMonsterByDataQuery(x), ct))
-                    .WithCancellation(ct);
-                await foreach (var monster in query)
+                foreach (var monsterDataStr in packet.BattleData.MonsterDatas)
                 {
-                    if (!monster.IsValidP3D())
+                    var monster = await _p3dMonsterConverter.FromP3DString(monsterDataStr, ct);
+                    if (!await _monsterValidator.ValidateAsync(monster, ct))
                     {
                         cancel = true;
                         break;
                     }
                 }
             }
-            */
 
             if (cancel)
             {

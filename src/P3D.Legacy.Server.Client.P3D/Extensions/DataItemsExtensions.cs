@@ -38,5 +38,15 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
                 sb.Append("{\"").Append(key).Append('"').Append('[').Append(value).Append("]}");
             return sb.ToString();
         }
+
+        public static DataItemStorage DictionaryToDataItems(IDictionary<string, string> dict)
+        {
+            var builder = new StringBuilder();
+
+            foreach (var (key, value) in dict)
+                builder.Append("{\"").Append(key).Append('\"').Append(value).Append('}');
+
+            return new DataItemStorage(builder.ToString());
+        }
     }
 }

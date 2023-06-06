@@ -3,8 +3,11 @@ using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
+using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Client.P3D.Data.P3DDatas;
 using P3D.Legacy.Server.Client.P3D.Extensions;
+using P3D.Legacy.Server.Client.P3D.Services;
+using P3D.Legacy.Server.Infrastructure;
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Tests.Utils;
 
@@ -19,7 +22,6 @@ namespace P3D.Legacy.Tests
     {
         private static string[] TestCaseSources() => File.ReadAllLines("./Data/Monsters.txt");
 
-        /*
         [Test]
         [TestCaseSource(nameof(TestCaseSources))]
         public async Task TestMonsterCreationViaPokeAPIAsync(string line) => await TestService.CreateNew()
@@ -29,18 +31,20 @@ namespace P3D.Legacy.Tests
                 {
                     GraphQLEndpoint = "https://beta.pokeapi.co/graphql/v1beta"
                 }));
-                services.AddTransient<PokeAPIMonsterRepository>();
+                services.AddTransient<IMonsterDataProvider, PokeAPIMonsterDataProvider>();
+                services.AddTransient<IMonsterValidator, DefaultMonsterValidator>();
+                services.AddTransient<P3DMonsterConverter>();
             }).DoTestAsync(async sp =>
             {
-                var repository = sp.GetRequiredService<PokeAPIMonsterRepository>();
-                var monster = await repository.GetByDataAsync(line, CancellationToken.None);
-                if (monster.IsValidP3D())
+                var converter = sp.GetRequiredService<P3DMonsterConverter>();
+                var validator = sp.GetRequiredService<IMonsterValidator>();
+                var monster = await converter.FromP3DString(line, CancellationToken.None);
+                if (await validator.ValidateAsync(monster, CancellationToken.None))
                 {
-                    var convertedBack = MonsterExtensions.DictionaryToString(monster.ToDictionary());
+                    var convertedBack = await converter.ToP3DString(monster);
                     Assert.AreEqual(line, convertedBack);
                 }
             });
-        */
 
         [Test]
         [TestCaseSource(nameof(TestCaseSources))]

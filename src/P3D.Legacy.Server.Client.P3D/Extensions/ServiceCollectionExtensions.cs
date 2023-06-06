@@ -20,6 +20,8 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
             //services.AddTransient<StatisticsHandler>();
             //services.AddEvents(sp => sp.GetRequiredService<StatisticsHandler>());
 
+            services.AddSingleton<P3DMonsterConverter>();
+
             services.AddSingleton<IP3DPacketFactory, P3DPacketServerFactory>();
 
             services.AddHostedService<P3DPlayerMovementCompensationService>();

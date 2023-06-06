@@ -7,7 +7,6 @@ using P3D.Legacy.Server.Application.Commands.Trade;
 using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Client.P3D.Events;
-using P3D.Legacy.Server.Client.P3D.Extensions;
 using P3D.Legacy.Server.Client.P3D.Packets.Battle;
 using P3D.Legacy.Server.Client.P3D.Packets.Chat;
 using P3D.Legacy.Server.Client.P3D.Packets.Server;
@@ -281,14 +280,12 @@ namespace P3D.Legacy.Server.Client.P3D
             if (Origin != target) return;
 
             var cancel = false;
-            /*
             var serverOptions = await _queryDispatcher.DispatchAsync(new GetServerOptionsQuery(), ct);
             if (serverOptions.ValidationEnabled)
             {
-                var monster = await _queryDispatcher.DispatchAsync(new GetMonsterByDataQuery(data.MonsterData), ct);
-                cancel = !monster.IsValidP3D();
+                var monster = await _p3dMonsterConverter.FromP3DString(data.MonsterData, ct);
+                cancel = !await _monsterValidator.ValidateAsync(monster, ct);
             }
-            */
 
             if (cancel)
             {
