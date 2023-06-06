@@ -89,11 +89,9 @@ namespace P3D.Legacy.Server.Client.P3D
                 {
                     try
                     {
-                        if (await reader.ReadAsync(_protocol, ct) is
-                            {Message: { } message, IsCompleted: var isCompleted, IsCanceled: var isCanceled})
+                        if (await reader.ReadAsync(_protocol, ct) is { Message: { } message, IsCompleted: var isCompleted, IsCanceled: var isCanceled })
                         {
-                            using var span = _tracer.StartActiveSpan($"P3D Client Reading {message.GetType().FullName}",
-                                SpanKind.Server);
+                            using var span = _tracer.StartActiveSpan($"P3D Client Reading {message.GetType().FullName}", SpanKind.Server);
                             span.SetAttribute("net.peer.ip", IPEndPoint.Address.ToString());
                             span.SetAttribute("net.peer.port", IPEndPoint.Port);
                             span.SetAttribute("net.transport", "ip_tcp");
@@ -114,7 +112,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
                     if (State == PlayerState.Initialized && watch.ElapsedMilliseconds >= 5000)
                     {
-                        await SendPacketAsync(new PingPacket {Origin = Origin.Server}, ct);
+                        await SendPacketAsync(new PingPacket { Origin = Origin.Server }, ct);
                         watch.Restart();
                     }
                 }

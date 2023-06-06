@@ -20,10 +20,10 @@ namespace P3D.Legacy.Server.Client.P3D.Services
             _monsterDataProvider = monsterDataProvider;
         }
 
-        public async Task<IMonsterInstance> FromP3DString(string monsterDataStr, CancellationToken ct)
+        public async Task<IMonsterInstance> FromP3DStringAsync(string monsterDataStr, CancellationToken ct)
         {
             var dict = monsterDataStr.AsSpan().MonsterDataToDictionary();
-            var id = int.Parse(dict["Pokemon"]);
+            var id = int.Parse(dict["Pokemon"], CultureInfo.InvariantCulture);
             var itemId = short.TryParse(dict["Item"], NumberStyles.Integer, CultureInfo.InvariantCulture, out var itemIdVar) ? itemIdVar : -1;
 
             var (monsterStaticData, helItem) = await _monsterDataProvider.GetStaticDataAsync(id, itemId, ct);
@@ -93,7 +93,7 @@ namespace P3D.Legacy.Server.Client.P3D.Services
             return new P3DMonsterEntity(monsterDataStr, monsterStaticData, moves, helItem);
         }
 
-        public async Task<string> ToP3DString(IMonsterInstance monster)
+        public async Task<string> ToP3DStringAsync(IMonsterInstance monster)
         {
             var dict = new Dictionary<string, string>(StringComparer.Ordinal);
             dict.Add("Pokemon", $"[{monster.StaticData.Id}]");

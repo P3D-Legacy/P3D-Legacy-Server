@@ -283,7 +283,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var serverOptions = await _queryDispatcher.DispatchAsync(new GetServerOptionsQuery(), ct);
             if (serverOptions.ValidationEnabled)
             {
-                var monster = await _p3dMonsterConverter.FromP3DString(data.MonsterData, ct);
+                var monster = await _p3dMonsterConverter.FromP3DStringAsync(data.MonsterData, ct);
                 cancel = !await _monsterValidator.ValidateAsync(monster, ct);
             }
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace P3D.Legacy.Common
+namespace P3D.Legacy.Server.Client.P3D
 {
     public enum ProtocolVersion { Invalid, V1, }
 

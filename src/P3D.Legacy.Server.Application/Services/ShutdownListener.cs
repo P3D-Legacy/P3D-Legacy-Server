@@ -23,7 +23,7 @@ namespace P3D.Legacy.Server.Application.Services
         {
             var waitForStop = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            await using var registration =_hostApplicationLifetime.ApplicationStopping.Register(static obj =>
+            await using var registration = _hostApplicationLifetime.ApplicationStopping.Register(static obj =>
             {
                 if (obj is not TaskCompletionSource tcs) return;
                 tcs.TrySetResult();

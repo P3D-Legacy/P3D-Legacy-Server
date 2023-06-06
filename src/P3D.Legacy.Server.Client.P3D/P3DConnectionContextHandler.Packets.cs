@@ -463,7 +463,7 @@ namespace P3D.Legacy.Server.Client.P3D
             {
                 foreach (var monsterDataStr in packet.BattleData.MonsterDatas)
                 {
-                    var monster = await _p3dMonsterConverter.FromP3DString(monsterDataStr, ct);
+                    var monster = await _p3dMonsterConverter.FromP3DStringAsync(monsterDataStr, ct);
                     if (!await _monsterValidator.ValidateAsync(monster, ct))
                     {
                         cancel = true;

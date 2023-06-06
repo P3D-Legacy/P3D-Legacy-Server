@@ -38,10 +38,10 @@ namespace P3D.Legacy.Tests
             {
                 var converter = sp.GetRequiredService<P3DMonsterConverter>();
                 var validator = sp.GetRequiredService<IMonsterValidator>();
-                var monster = await converter.FromP3DString(line, CancellationToken.None);
+                var monster = await converter.FromP3DStringAsync(line, CancellationToken.None);
                 if (await validator.ValidateAsync(monster, CancellationToken.None))
                 {
-                    var convertedBack = await converter.ToP3DString(monster);
+                    var convertedBack = await converter.ToP3DStringAsync(monster);
                     Assert.AreEqual(line, convertedBack);
                 }
             });
