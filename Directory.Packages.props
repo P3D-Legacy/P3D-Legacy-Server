@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
   <ItemGroup>
     <PackageVersion Include="Aragas.Coroutines" Version="1.0.0.1" />
     <PackageVersion Include="Aragas.Extensions.Options.FluentValidation" Version="1.0.0.11" />
@@ -7,7 +7,7 @@
     <PackageVersion Include="BetterHostedServices" Version="2.0.3" />
     <PackageVersion Include="Discord.Net.WebSocket" Version="3.10.0" />
     <PackageVersion Include="Extensions.Logging.NUnit" Version="1.0.1" />
-    <PackageVersion Include="GitInfo" Version="2.3.0" />
+    <PackageVersion Include="GitInfo" Version="3.1.0" />
     <PackageVersion Include="GraphQL.Client" Version="6.0.0" />
     <PackageVersion Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.0.0" />
     <PackageVersion Include="IDisposableAnalyzers" Version="4.0.6" />
