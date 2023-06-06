@@ -3,10 +3,9 @@ using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
-using P3D.Legacy.Common.Data.P3DDatas;
-using P3D.Legacy.Common.Extensions;
+using P3D.Legacy.Server.Client.P3D.Data.P3DDatas;
+using P3D.Legacy.Server.Client.P3D.Extensions;
 using P3D.Legacy.Server.Infrastructure.Options;
-using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
 using P3D.Legacy.Tests.Utils;
 
 using System;
@@ -20,6 +19,7 @@ namespace P3D.Legacy.Tests
     {
         private static string[] TestCaseSources() => File.ReadAllLines("./Data/Monsters.txt");
 
+        /*
         [Test]
         [TestCaseSource(nameof(TestCaseSources))]
         public async Task TestMonsterCreationViaPokeAPIAsync(string line) => await TestService.CreateNew()
@@ -40,6 +40,7 @@ namespace P3D.Legacy.Tests
                     Assert.AreEqual(line, convertedBack);
                 }
             });
+        */
 
         [Test]
         [TestCaseSource(nameof(TestCaseSources))]

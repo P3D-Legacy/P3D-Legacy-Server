@@ -2,14 +2,6 @@
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Common.Extensions;
-using P3D.Legacy.Common.Packets;
-using P3D.Legacy.Common.Packets.Battle;
-using P3D.Legacy.Common.Packets.Chat;
-using P3D.Legacy.Common.Packets.Client;
-using P3D.Legacy.Common.Packets.Common;
-using P3D.Legacy.Common.Packets.Server;
-using P3D.Legacy.Common.Packets.Trade;
 using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Events;
@@ -18,6 +10,14 @@ using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Application.Queries.World;
 using P3D.Legacy.Server.Client.P3D.Events;
+using P3D.Legacy.Server.Client.P3D.Extensions;
+using P3D.Legacy.Server.Client.P3D.Packets;
+using P3D.Legacy.Server.Client.P3D.Packets.Battle;
+using P3D.Legacy.Server.Client.P3D.Packets.Chat;
+using P3D.Legacy.Server.Client.P3D.Packets.Client;
+using P3D.Legacy.Server.Client.P3D.Packets.Common;
+using P3D.Legacy.Server.Client.P3D.Packets.Server;
+using P3D.Legacy.Server.Client.P3D.Packets.Trade;
 
 using System;
 using System.Collections.Immutable;
@@ -422,7 +422,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (State != PlayerState.Initialized)
                 return;
 
-            await _eventDispatcher.DispatchAsync(new PlayerTradeOfferedPokemonEvent(this, packet.DestinationPlayerOrigin, packet.TradeData), ct);
+            await _eventDispatcher.DispatchAsync(new PlayerTradeOfferedP3DMonsterEvent(this, packet.DestinationPlayerOrigin, packet.TradeData), ct);
         }
         private async Task HandleTradeStartAsync(TradeStartPacket packet, CancellationToken ct)
         {
@@ -459,6 +459,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 return;
 
             var cancel = false;
+            /*
             var serverOptions = await _queryDispatcher.DispatchAsync(new GetServerOptionsQuery(), ct);
             if (serverOptions.ValidationEnabled)
             {
@@ -475,6 +476,7 @@ namespace P3D.Legacy.Server.Client.P3D
                     }
                 }
             }
+            */
 
             if (cancel)
             {

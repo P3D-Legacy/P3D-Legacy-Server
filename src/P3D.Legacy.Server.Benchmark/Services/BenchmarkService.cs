@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Common.Packets;
-using P3D.Legacy.Common.Packets.Chat;
-using P3D.Legacy.Common.Packets.Common;
-using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Server.Benchmark.Options;
 using P3D.Legacy.Server.Client.P3D;
+using P3D.Legacy.Server.Client.P3D.Packets;
+using P3D.Legacy.Server.Client.P3D.Packets.Chat;
+using P3D.Legacy.Server.Client.P3D.Packets.Common;
+using P3D.Legacy.Server.Client.P3D.Packets.Server;
 
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Server.Application.CommandHandlers.Administration;
 using P3D.Legacy.Server.Application.CommandHandlers.Player;
 using P3D.Legacy.Server.Application.CommandHandlers.Trade;
@@ -51,7 +50,6 @@ namespace P3D.Legacy.Server.Application.Extensions
             services.AddQueryHandler<GetWorldStateQueryHandler>();
 
 
-            services.AddSingleton<IP3DPacketFactory, P3DPacketServerFactory>();
 
             services.AddScoped<ConnectionContextHandlerFactory>();
 

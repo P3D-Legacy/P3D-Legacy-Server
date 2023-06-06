@@ -3,10 +3,10 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using P3D.Legacy.Common.Packets.Client;
-using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Server.Benchmark.Options;
 using P3D.Legacy.Server.Client.P3D;
+using P3D.Legacy.Server.Client.P3D.Packets.Client;
+using P3D.Legacy.Server.Client.P3D.Packets.Server;
 
 using System;
 using System.Diagnostics;

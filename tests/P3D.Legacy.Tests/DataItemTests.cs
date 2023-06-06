@@ -1,7 +1,8 @@
 ﻿using NUnit.Framework;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Common.Extensions;
+using P3D.Legacy.Server.Client.P3D;
+using P3D.Legacy.Server.Client.P3D.Extensions;
 
 using System.Numerics;
 

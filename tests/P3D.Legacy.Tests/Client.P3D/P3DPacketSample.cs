@@ -1,5 +1,5 @@
-﻿using P3D.Legacy.Common.Extensions;
-using P3D.Legacy.Common.Packets;
+﻿using P3D.Legacy.Server.Client.P3D.Extensions;
+using P3D.Legacy.Server.Client.P3D.Packets;
 
 using System;
 using System.Numerics;

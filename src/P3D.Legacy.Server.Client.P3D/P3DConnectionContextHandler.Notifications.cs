@@ -1,9 +1,4 @@
 ﻿using P3D.Legacy.Common;
-using P3D.Legacy.Common.Extensions;
-using P3D.Legacy.Common.Packets.Battle;
-using P3D.Legacy.Common.Packets.Chat;
-using P3D.Legacy.Common.Packets.Server;
-using P3D.Legacy.Common.Packets.Trade;
 using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Events;
@@ -12,6 +7,11 @@ using P3D.Legacy.Server.Application.Commands.Trade;
 using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Client.P3D.Events;
+using P3D.Legacy.Server.Client.P3D.Extensions;
+using P3D.Legacy.Server.Client.P3D.Packets.Battle;
+using P3D.Legacy.Server.Client.P3D.Packets.Chat;
+using P3D.Legacy.Server.Client.P3D.Packets.Server;
+using P3D.Legacy.Server.Client.P3D.Packets.Trade;
 using P3D.Legacy.Server.CQERS.Events;
 
 using System;
@@ -41,7 +41,7 @@ namespace P3D.Legacy.Server.Client.P3D
         IEventHandler<PlayerTradeInitiatedEvent>,
         IEventHandler<PlayerTradeAcceptedEvent>,
         IEventHandler<PlayerTradeAbortedEvent>,
-        IEventHandler<PlayerTradeOfferedPokemonEvent>,
+        IEventHandler<PlayerTradeOfferedP3DMonsterEvent>,
         IEventHandler<PlayerTradeConfirmedEvent>,
         IEventHandler<ServerStoppingEvent>
     {
@@ -274,19 +274,21 @@ namespace P3D.Legacy.Server.Client.P3D
             await SendPacketAsync(new TradeQuitPacket { Origin = player.Origin, DestinationPlayerOrigin = partner }, ct);
         }
 
-        public async Task HandleAsync(IReceiveContext<PlayerTradeOfferedPokemonEvent> context, CancellationToken ct)
+        public async Task HandleAsync(IReceiveContext<PlayerTradeOfferedP3DMonsterEvent> context, CancellationToken ct)
         {
             var (player, target, data) = context.Message;
 
             if (Origin != target) return;
 
             var cancel = false;
+            /*
             var serverOptions = await _queryDispatcher.DispatchAsync(new GetServerOptionsQuery(), ct);
             if (serverOptions.ValidationEnabled)
             {
                 var monster = await _queryDispatcher.DispatchAsync(new GetMonsterByDataQuery(data.MonsterData), ct);
                 cancel = !monster.IsValidP3D();
             }
+            */
 
             if (cancel)
             {

@@ -7,13 +7,13 @@ using Moq;
 
 using NUnit.Framework;
 
-using P3D.Legacy.Common.Packets.Client;
-using P3D.Legacy.Common.Packets.Server;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Options;
 using P3D.Legacy.Server.Application.Queries.Options;
 using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Client.P3D;
+using P3D.Legacy.Server.Client.P3D.Packets.Client;
+using P3D.Legacy.Server.Client.P3D.Packets.Server;
 using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.CQERS.Events;
 using P3D.Legacy.Server.CQERS.Queries;

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿/*
+using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common.Monsters;
 using P3D.Legacy.Server.Abstractions.Options;
@@ -26,3 +27,4 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Monsters
         public Task<IMonsterInstance> GetByDataAsync(string monsterData, CancellationToken ct) => _implementation.GetByDataAsync(monsterData, ct);
     }
 }
+*/

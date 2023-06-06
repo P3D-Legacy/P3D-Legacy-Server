@@ -1,4 +1,5 @@
-﻿using GraphQL;
+﻿/*
+using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 
@@ -166,32 +167,30 @@ query MonsterStaticData($id: Int, $itemId: Int) {
                 var staticData = new AttackStaticDataEntity(move3Id, "", pp3);
                 moves.Add(new AttackEntity(staticData, currentPP3, 0));
             }
-            /*
-            if (move0.Length != 1 && ushort.TryParse(move0[0], out var move0Id) && monsterData.Moves.FirstOrDefault(x => x.MoveId == move0Id) is var (_, _, (_, pp0)))
-            {
-                var ppUps = (byte) Math.Round((double) (byte.Parse(move0[1]) - pp0) / pp0 / 0.2D);
-                var staticData = monsterStaticData.LearnableAttacks.First(x => x.Id == move0Id);
-                moves.Add(new AttackEntity(staticData, byte.Parse(move0[2]), ppUps));
-            }
-            if (move1.Length != 1 && ushort.TryParse(move1[0], out var move1Id) && monsterData.Moves.FirstOrDefault(x => x.MoveId == move1Id) is var (_, _, (_, pp1)))
-            {
-                var ppUps = (byte) Math.Round((double) (byte.Parse(move1[1]) - pp1) / pp1 / 0.2D);
-                var staticData = monsterStaticData.LearnableAttacks.First(x => x.Id == move1Id);
-                moves.Add(new AttackEntity(staticData, byte.Parse(move1[2]), ppUps));
-            }
-            if (move2.Length != 1 && ushort.TryParse(move2[0], out var move2Id) && monsterData.Moves.FirstOrDefault(x => x.MoveId == move2Id) is var (_, _, (_, pp2)))
-            {
-                var ppUps = (byte) Math.Round((double) (byte.Parse(move2[1]) - pp2) / pp2 / 0.2D);
-                var staticData = monsterStaticData.LearnableAttacks.First(x => x.Id == move2Id);
-                moves.Add(new AttackEntity(staticData, byte.Parse(move2[2]), ppUps));
-            }
-            if (move3.Length != 1 && ushort.TryParse(move3[0], out var move3Id) && monsterData.Moves.FirstOrDefault(x => x.MoveId == move3Id) is var (_, _, (_, pp3)))
-            {
-                var ppUps = (byte) Math.Round((double) (byte.Parse(move3[1]) - pp3) / pp3 / 0.2D);
-                var staticData = monsterStaticData.LearnableAttacks.First(x => x.Id == move3Id);
-                moves.Add(new AttackEntity(staticData, byte.Parse(move3[2]), ppUps));
-            }
-            */
+            //if (move0.Length != 1 && ushort.TryParse(move0[0], out var move0Id) && monsterData.Moves.FirstOrDefault(x => x.MoveId == move0Id) is var (_, _, (_, pp0)))
+            //{
+            //    var ppUps = (byte) Math.Round((double) (byte.Parse(move0[1]) - pp0) / pp0 / 0.2D);
+            //    var staticData = monsterStaticData.LearnableAttacks.First(x => x.Id == move0Id);
+            //    moves.Add(new AttackEntity(staticData, byte.Parse(move0[2]), ppUps));
+            //}
+            //if (move1.Length != 1 && ushort.TryParse(move1[0], out var move1Id) && monsterData.Moves.FirstOrDefault(x => x.MoveId == move1Id) is var (_, _, (_, pp1)))
+            //{
+            //    var ppUps = (byte) Math.Round((double) (byte.Parse(move1[1]) - pp1) / pp1 / 0.2D);
+            //    var staticData = monsterStaticData.LearnableAttacks.First(x => x.Id == move1Id);
+            //    moves.Add(new AttackEntity(staticData, byte.Parse(move1[2]), ppUps));
+            //}
+            //if (move2.Length != 1 && ushort.TryParse(move2[0], out var move2Id) && monsterData.Moves.FirstOrDefault(x => x.MoveId == move2Id) is var (_, _, (_, pp2)))
+            //{
+            //    var ppUps = (byte) Math.Round((double) (byte.Parse(move2[1]) - pp2) / pp2 / 0.2D);
+            //    var staticData = monsterStaticData.LearnableAttacks.First(x => x.Id == move2Id);
+            //    moves.Add(new AttackEntity(staticData, byte.Parse(move2[2]), ppUps));
+            //}
+            //if (move3.Length != 1 && ushort.TryParse(move3[0], out var move3Id) && monsterData.Moves.FirstOrDefault(x => x.MoveId == move3Id) is var (_, _, (_, pp3)))
+            //{
+            //    var ppUps = (byte) Math.Round((double) (byte.Parse(move3[1]) - pp3) / pp3 / 0.2D);
+            //    var staticData = monsterStaticData.LearnableAttacks.First(x => x.Id == move3Id);
+            //    moves.Add(new AttackEntity(staticData, byte.Parse(move3[2]), ppUps));
+            //}
 
             var monster = new MonsterEntity(monsterDataStr, monsterStaticData, moves, heldItem);
             return monster;
@@ -283,3 +282,4 @@ query MonsterStaticData($id: Int, $itemId: Int) {
         );
     }
 }
+*/

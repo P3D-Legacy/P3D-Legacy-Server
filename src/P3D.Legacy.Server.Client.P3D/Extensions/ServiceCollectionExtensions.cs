@@ -2,6 +2,7 @@
 
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Client.P3D.EventHandlers;
+using P3D.Legacy.Server.Client.P3D.Packets;
 using P3D.Legacy.Server.Client.P3D.Services;
 using P3D.Legacy.Server.CQERS.Extensions;
 
@@ -18,6 +19,8 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
 
             //services.AddTransient<StatisticsHandler>();
             //services.AddEvents(sp => sp.GetRequiredService<StatisticsHandler>());
+
+            services.AddSingleton<IP3DPacketFactory, P3DPacketServerFactory>();
 
             services.AddHostedService<P3DPlayerMovementCompensationService>();
 

@@ -2,10 +2,10 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Server.Benchmark.Options;
 using P3D.Legacy.Server.Benchmark.Services;
 using P3D.Legacy.Server.Client.P3D;
+using P3D.Legacy.Server.Client.P3D.Packets;
 
 using System.CommandLine.Binding;
 using System.CommandLine.Builder;

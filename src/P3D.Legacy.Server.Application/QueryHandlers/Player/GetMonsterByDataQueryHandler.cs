@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿/*
+using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common.Monsters;
 using P3D.Legacy.Server.Application.Queries.Player;
@@ -32,3 +33,4 @@ namespace P3D.Legacy.Server.Application.QueryHandlers.Player
         }
     }
 }
+*/

@@ -2,8 +2,8 @@
 
 using NUnit.Framework;
 
-using P3D.Legacy.Common.Packets;
 using P3D.Legacy.Server.Client.P3D;
+using P3D.Legacy.Server.Client.P3D.Packets;
 
 using System;
 using System.Buffers;

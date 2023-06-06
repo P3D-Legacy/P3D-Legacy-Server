@@ -2,7 +2,6 @@
 
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
-using P3D.Legacy.Server.Infrastructure.Repositories.Monsters;
 using P3D.Legacy.Server.Infrastructure.Repositories.Mutes;
 using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
 using P3D.Legacy.Server.Infrastructure.Repositories.Statistics;
@@ -34,9 +33,11 @@ namespace P3D.Legacy.Server.Infrastructure.Extensions
             services.AddTransient<P3DBanRepository>();
             services.AddTransient<LiteDbBanRepository>();
 
+            /*
             services.AddTransient<IMonsterRepository, MonsterRepository>();
             services.AddTransient<PokeAPIMonsterRepository>();
             services.AddTransient<NopMonsterRepository>();
+            */
 
             services.AddTransient<IStatisticsRepository, DefaultStatisticsRepository>();
             services.AddTransient<LiteDbStatisticsRepository>();
