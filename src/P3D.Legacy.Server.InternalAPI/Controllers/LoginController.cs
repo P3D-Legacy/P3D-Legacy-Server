@@ -54,9 +54,10 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
         }
         private JwtSecurityToken GetSecurityToken(UserEntity user)
         {
-            var signingCredentials = new SigningCredentials(new RsaSecurityKey(_jwtOptions.GetKey()), SecurityAlgorithms.RsaSha512Signature)
+            var signingCredentials = _jwtOptions.KeyType switch
             {
-                CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false },
+                KeyType.Rsa => new SigningCredentials(new RsaSecurityKey(_jwtOptions.GetRSAKey()), SecurityAlgorithms.RsaSha512Signature),
+                KeyType.ECDsa => new SigningCredentials(new ECDsaSecurityKey(_jwtOptions.GetECDsaKey()), SecurityAlgorithms.EcdsaSha512Signature),
             };
 
             var now = DateTime.UtcNow;

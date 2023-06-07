@@ -9,29 +9,50 @@ namespace P3D.Legacy.Server.InternalAPI.Options
     {
         public JwtOptionsValidator()
         {
-            RuleFor(static x => x.RsaPrivateKey).MinimumLength(16).When(static x => !string.IsNullOrEmpty(x.RsaPrivateKey));
+            RuleFor(static x => x.PrivateKey).MinimumLength(16).When(static x => x.KeyType == KeyType.Rsa);
+            RuleFor(static x => x.PrivateKey).MinimumLength(16).When(static x => x.KeyType == KeyType.ECDsa);
         }
     }
 
+    public enum KeyType { None, Rsa, ECDsa }
+
     public sealed record JwtOptions : IDisposable
     {
-        public string RsaPrivateKey { get; init; } = default!;
+        public string PrivateKey { get; init; } = default!;
+        public KeyType KeyType { get; init; } = default!;
 
         private RSA? _rsa;
-        public RSA GetKey()
+        public RSA GetRSAKey()
         {
+            if (KeyType != KeyType.Rsa) throw new NotSupportedException();
+
             if (_rsa is null)
             {
                 _rsa = RSA.Create();
-                if (!string.IsNullOrEmpty(RsaPrivateKey))
-                    _rsa.ImportFromPem(RsaPrivateKey);
+                if (!string.IsNullOrEmpty(PrivateKey))
+                    _rsa.ImportFromPem(PrivateKey);
             }
             return _rsa;
+        }
+
+        private ECDsa? _ecdsa;
+        public ECDsa GetECDsaKey()
+        {
+            if (KeyType != KeyType.ECDsa) throw new NotSupportedException();
+
+            if (_ecdsa is null)
+            {
+                _ecdsa = ECDsa.Create();
+                if (!string.IsNullOrEmpty(PrivateKey))
+                    _ecdsa.ImportFromPem(PrivateKey);
+            }
+            return _ecdsa;
         }
 
         public void Dispose()
         {
             _rsa?.Dispose();
+            _ecdsa?.Dispose();
         }
     }
 }
