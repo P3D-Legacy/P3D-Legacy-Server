@@ -268,6 +268,7 @@ namespace P3D.Legacy.Server.Client.P3D
             {
                 _connectionSpan.UpdateName($"P3D Session {Name}");
                 _connectionSpan.SetAttribute("enduser.id", Name);
+                _connectionSpan.SetAttribute("enduser.role", Permissions.ToString());
 
                 State = PlayerState.Initializing;
                 await _commandDispatcher.DispatchAsync(new PlayerInitializingCommand(this), ct);

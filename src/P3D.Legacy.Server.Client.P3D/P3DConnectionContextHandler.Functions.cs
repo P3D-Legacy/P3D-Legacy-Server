@@ -101,10 +101,13 @@ namespace P3D.Legacy.Server.Client.P3D
             try
             {
                 using var span = _tracer.StartActiveSpan($"P3D Client Sending {packet.GetType().Name}", SpanKind.Client, parentSpan: _connectionSpan);
-                span.SetAttribute("net.peer.ip", IPEndPoint.Address.ToString());
-                span.SetAttribute("net.peer.port", IPEndPoint.Port);
-                span.SetAttribute("net.transport", "ip_tcp");
+                span.SetAttribute("client.address", IPEndPoint.Address.ToString());
+                span.SetAttribute("client.port", IPEndPoint.Port);
+                span.SetAttribute("network.transport", "tcp");
+                span.SetAttribute("network.protocol.name", "p3d");
+                span.SetAttribute("network.protocol.version", packet.Protocol.ToString());
                 span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
+                span.SetAttribute("peer.service", "P3D-Legacy");
 
                 await _writer.WriteAsync(_protocol, packet, cts.Token);
             }
