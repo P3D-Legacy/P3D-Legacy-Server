@@ -96,6 +96,7 @@ namespace P3D.Legacy.Server.Client.P3D
                             span.SetAttribute("net.peer.port", IPEndPoint.Port);
                             span.SetAttribute("net.transport", "ip_tcp");
                             span.SetAttribute("p3dclient.packet_type", message.GetType().FullName);
+                            span.SetAttribute("peer.service", $"{IPEndPoint.Address}:{IPEndPoint.Port}");
 
                             await HandlePacketAsync(message, ct);
 
