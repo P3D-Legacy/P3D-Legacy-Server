@@ -10,6 +10,7 @@ namespace P3D.Legacy.Server.Client.P3D.Options
         {
             RuleFor(static x => x.IP).NotEmpty().IsIPAddress();
             RuleFor(static x => x.Port).NotEmpty();
+            RuleFor(static x => x.PortForwardTimeoutMilliseconds).GreaterThanOrEqualTo(0).When(static x => x.PortForward);
         }
     }
 
@@ -17,5 +18,7 @@ namespace P3D.Legacy.Server.Client.P3D.Options
     {
         public string IP { get; init; } = default!;
         public ushort Port { get; init; } = default!;
+        public bool PortForward { get; init; } = true;
+        public int PortForwardTimeoutMilliseconds { get; init; } = 10000;
     }
 }

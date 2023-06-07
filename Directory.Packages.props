@@ -30,6 +30,7 @@
     <PackageVersion Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageVersion Include="Nerdbank.Streams" Version="2.9.112" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="Open.NAT.NET5" Version="1.0.0" />
     <PackageVersion Include="OpenTelemetry.Api" Version="1.5.0-rc.1" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.5.0-rc.1" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.5.0-rc.1" />

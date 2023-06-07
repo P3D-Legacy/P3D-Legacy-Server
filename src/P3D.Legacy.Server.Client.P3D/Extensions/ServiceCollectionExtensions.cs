@@ -24,6 +24,7 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
 
             services.AddSingleton<IP3DPacketFactory, P3DPacketServerFactory>();
 
+            services.AddHostedService<P3DNATHandler>();
             services.AddHostedService<P3DPlayerMovementCompensationService>();
 
             services.AddScoped<P3DConnectionContextHandler>();
