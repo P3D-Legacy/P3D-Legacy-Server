@@ -30,13 +30,19 @@ using P3D.Legacy.Server.Statistics.Extensions;
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server
 {
     public static class Program
     {
-        public static Task Main(string[] args) => CreateHostBuilder(args).Build().RunAsync();
+        public static Task Main(string[] args)
+        {
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+            return CreateHostBuilder(args).Build().RunAsync();
+        }
 
         public static IHostBuilder CreateHostBuilder(string[] args) => Host
             .CreateDefaultBuilder(args)
