@@ -69,3 +69,61 @@ jobs:
           token: ${{ secrets.TOKEN_GPR }}
           repository: P3D-Legacy/P3D-Legacy-Server
           event-type: deploy-docker-image-qa-slim
+
+  build-and-publish-slim-docker-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: linux/amd64
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-linux-slim-x64-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-linux-slim-x64-
+
+      - name: Login to Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: P3D-Legacy
+          password: ${{ secrets.TOKEN_GPR }}
+
+      - name: Build and Push
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          file: ./src/P3D.Legacy.Server/Image.Slim.Dockerfile
+          platforms: linux/amd64
+          build-args: |
+            DATE=$(date --iso-8601=s)
+            REVISION=$(git rev-parse --short HEAD)
+          push: true
+          tags: ghcr.io/p3d-legacy/p3d-legacy-server:latest-qa-slim-x64
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: Trigger Deploy
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.TOKEN_GPR }}
+          repository: P3D-Legacy/P3D-Legacy-Server
+          event-type: deploy-docker-image-qa-slim-x64

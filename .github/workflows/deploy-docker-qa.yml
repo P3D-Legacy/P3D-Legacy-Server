@@ -3,7 +3,7 @@ name: "Deploy 'P3D Legacy Server Next'"
 on:
   repository_dispatch:
     types:
-      - deploy-docker-image-qa-slim
+      - deploy-docker-image-qa-slim-x64
   workflow_dispatch:
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             docker login -u=P3D-Legacy -p=${{ secrets.TOKEN_GPR }} ghcr.io
-            docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest-qa-slim;
+            docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest-qa-slim-x64;
             docker stack deploy --prune --resolve-image always -c /deploy/next-p3d-legacy-server/docker-compose.yml nextp3dlegacyserver;
 
       - name: Checkout Repository
