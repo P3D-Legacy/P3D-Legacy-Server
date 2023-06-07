@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
+using OpenTelemetry.Trace;
+
 using P3D.Legacy.Common.Data;
 using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.CQERS.Events;
@@ -21,12 +23,14 @@ namespace P3D.Legacy.Server.Application.Services
         public TimeSpan CurrentTime { get => State.Time; set => State = State with { Time = value }; }
 
         private readonly ILogger _logger;
+        private readonly Tracer _tracer;
         private readonly IEventDispatcher _eventDispatcher;
         private readonly TimeLimiter _checkTimeLimiter;
 
-        public WorldService(ILogger<WorldService> logger, IEventDispatcher eventDispatcher)
+        public WorldService(ILogger<WorldService> logger, TracerProvider traceProvider, IEventDispatcher eventDispatcher)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Application");
             _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
 
             var now = DateTime.UtcNow;
@@ -36,6 +40,8 @@ namespace P3D.Legacy.Server.Application.Services
 
         protected override async Task ExecuteAsync(CancellationToken ct)
         {
+            using var span = _tracer.StartActiveSpan("P3D Player Movement Compensation Service");
+
             try
             {
                 while (!ct.IsCancellationRequested)
