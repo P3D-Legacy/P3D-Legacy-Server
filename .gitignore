@@ -350,3 +350,4 @@ MigrationBackup/
 .ionide/
 docker-compose/docker-compose.override.yml
 /src/P3D.Legacy.Server/database.litedb
+/src/P3D.Legacy.Server/appsettings.Development.json
