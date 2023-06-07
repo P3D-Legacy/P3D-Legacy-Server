@@ -65,7 +65,8 @@ namespace P3D.Legacy.Server.Client.P3D.Packets
             if (!Utf8Parser.TryParse(ParseSection(ref sequence), out int dataItemsCount, out _))
                 return false;
 
-            var offsets = dataItemsCount * 4 < 1024 ? stackalloc int[dataItemsCount] : new int[dataItemsCount];
+            using var heapMemory = dataItemsCount * 4 >= 512 ? MemoryPool<int>.Shared.Rent(dataItemsCount) : null;
+            var offsets = heapMemory is not null ? heapMemory.Memory.Span : stackalloc int[dataItemsCount];
 
             //Count from 4th item to second last item. Those are the offsets.
             for (var i = 0; i < dataItemsCount; i++)
@@ -77,12 +78,12 @@ namespace P3D.Legacy.Server.Client.P3D.Packets
             }
 
             //Cutting the data:
-            for (var i = 0; i < offsets.Length; i++)
+            for (var i = 0; i < dataItemsCount; i++)
             {
                 var cOffset = offsets[i];
                 var length = sequence.Length - cOffset;
 
-                if (i < offsets.Length - 1)
+                if (i < dataItemsCount - 1)
                     length = offsets[i + 1] - cOffset;
 
                 if (length < 0)

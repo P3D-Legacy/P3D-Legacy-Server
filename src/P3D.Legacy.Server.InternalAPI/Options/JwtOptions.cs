@@ -9,6 +9,7 @@ namespace P3D.Legacy.Server.InternalAPI.Options
     {
         public JwtOptionsValidator()
         {
+            RuleFor(static x => x.KeyType).NotEqual(KeyType.None);
             RuleFor(static x => x.PrivateKey).MinimumLength(16).When(static x => x.KeyType == KeyType.Rsa);
             RuleFor(static x => x.PrivateKey).MinimumLength(16).When(static x => x.KeyType == KeyType.ECDsa);
         }
