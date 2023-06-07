@@ -100,7 +100,7 @@ namespace P3D.Legacy.Server.Client.P3D
 
             try
             {
-                using var span = _tracer.StartActiveSpan($"P3D Client Sending {packet.GetType().Name}", SpanKind.Client, parentSpan: _connectionSpan);
+                using var span = _tracer.StartActiveSpan($"P3D Client Sending {packet.GetType().Name}", SpanKind.Client, parentSpan: Tracer.CurrentSpan ?? _connectionSpan);
                 span.SetAttribute("client.address", IPEndPoint.Address.ToString());
                 span.SetAttribute("client.port", IPEndPoint.Port);
                 span.SetAttribute("network.transport", "tcp");
