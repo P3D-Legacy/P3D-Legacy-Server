@@ -91,7 +91,7 @@ namespace P3D.Legacy.Server.Client.P3D
                     {
                         if (await reader.ReadAsync(_protocol, ct) is { Message: { } message, IsCompleted: var isCompleted, IsCanceled: var isCanceled })
                         {
-                            using var span = _tracer.StartActiveSpan($"P3D Client Reading {message.GetType().FullName}", SpanKind.Server);
+                            using var span = _tracer.StartActiveSpan($"P3D Client Reading {message.GetType().FullName}", SpanKind.Server, parentSpan: _connectionSpan);
                             span.SetAttribute("net.peer.ip", IPEndPoint.Address.ToString());
                             span.SetAttribute("net.peer.port", IPEndPoint.Port);
                             span.SetAttribute("net.transport", "ip_tcp");
@@ -133,8 +133,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             if (obj is not P3DConnectionContextHandler connection) return;
 
-            using var finishSpan = connection._tracer.StartActiveSpan("P3D Client Closing",
-                parentContext: connection._connectionSpan.Context);
+            using var finishSpan = connection._tracer.StartActiveSpan("P3D Client Closing", SpanKind.Internal, parentSpan: connection._connectionSpan);
             var oldState = connection.State;
             connection.State = PlayerState.Finalizing;
             if (oldState ==

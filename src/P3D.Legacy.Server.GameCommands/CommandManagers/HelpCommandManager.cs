@@ -34,7 +34,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
 
         public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
         {
-            using var span = _tracer.StartActiveSpan($"HelpCommandManager Handle");
+            using var span = _tracer.StartActiveSpan("HelpCommandManager Handle");
 
             if (arguments.Length > 1)
             {
@@ -67,7 +67,7 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers
         }
         private async Task HelpPageAsync(IPlayer client, int page, CancellationToken ct)
         {
-            using var span = _tracer.StartActiveSpan($"HelpCommandManager HelpPage");
+            using var span = _tracer.StartActiveSpan("HelpCommandManager HelpPage");
 
             // Circumventing circular refs
             var commandManagerService = _serviceProvider.GetRequiredService<CommandManagerHandler>();

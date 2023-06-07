@@ -42,7 +42,7 @@ namespace P3D.Legacy.Server.Client.P3D.Services
 
         protected override async Task ExecuteAsync(CancellationToken ct)
         {
-            using var span = _tracer.StartActiveSpan("P3D Player Movement Compensation Service");
+            using var span = _tracer.StartActiveSpan("P3D Player Movement Compensation Service", SpanKind.Internal);
 
             async Task LoopAction()
             {

@@ -123,7 +123,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 
         private async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            using var span = _tracer.StartActiveSpan("Discord Bot");
+            using var span = _tracer.StartActiveSpan("Discord Bot", SpanKind.Internal);
 
             void OnCancellation(object? _, CancellationToken ct)
             {

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.Extensions.Logging;
 
+using OpenTelemetry.Trace;
+
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
@@ -39,7 +41,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             if (packet is null) return;
 
-            using var span = _tracer.StartActiveSpan($"P3D Client Handle {packet.GetType().Name}");
+            using var span = _tracer.StartActiveSpan($"P3D Client Handle {packet.GetType().Name}", SpanKind.Internal, parentSpan: _connectionSpan);
             span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
 
             switch (packet)
