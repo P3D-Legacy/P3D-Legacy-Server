@@ -38,7 +38,7 @@ namespace P3D.Legacy.Server.GUI.Views
                     X = 0,
                     Y = views.Count == 0 ? 0 : Pos.Bottom(views.Last()),
                     Width = Dim.Fill(),
-                    Height = 3 + propertyCount
+                    Height = 3 + propertyCount,
                 };
                 var maxLength = manager.AvailableProperties.Max(static x => x.Name.Length);
                 var i = 0;
@@ -46,7 +46,7 @@ namespace P3D.Legacy.Server.GUI.Views
                 foreach (var property in manager.AvailableProperties)
                 {
                     var value = property.GetValue(currentOptions);
-                    var textView = new TextView { X = 0, Y = i, Width = property.Name.Length + 2, Height = 1, Text = $"{property.Name}:", ReadOnly = true, Multiline = false };
+                    var textView = new Label { X = 0, Y = i, Width = property.Name.Length + 2, Height = 1, Text = $"{property.Name}: " };
                     var textField = new TextField { X = maxLength + 1, Y = i, Width = Dim.Fill(), Height = 1, Text = ToString(value) };
                     view.Add(textView, textField);
                     propertyViews.Add(property, textField);

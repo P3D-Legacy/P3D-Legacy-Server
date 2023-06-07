@@ -14,10 +14,10 @@ namespace P3D.Legacy.Server.GUI.Views
         {
             var win = new Window("Server Management Panel") { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() - 1 };
             var tabView = new TabView { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
-            tabView.AddTab(new TabView.Tab("Players", playerTabView), true);
-            tabView.AddTab(new TabView.Tab("Chat", chatTabView), false);
-            tabView.AddTab(new TabView.Tab("Logs", logsTabView), false);
-            tabView.AddTab(new TabView.Tab("Settings", settingsTabView), false);
+            tabView.AddTab(new TabView.Tab("Players", playerTabView), andSelect: true);
+            tabView.AddTab(new TabView.Tab("Chat", chatTabView), andSelect: false);
+            tabView.AddTab(new TabView.Tab("Logs", logsTabView), andSelect: false);
+            tabView.AddTab(new TabView.Tab("Settings", settingsTabView), andSelect: false);
             win.Add(tabView);
 
             var statusBar = new StatusBar(new StatusItem[]

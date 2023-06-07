@@ -27,17 +27,24 @@ namespace P3D.Legacy.Server.GUI.Services
             try
             {
                 using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token);
-                void OnServerUIOnOnStop(object? sender, EventArgs args) => cts.Cancel();
 
                 using var _ = _scopeFactory.CreateScope();
                 Terminal.Gui.Application.Init();
                 using var serverUI = _scopeFactory.GetRequiredService<ServerUI>();
-                serverUI.OnStop += OnServerUIOnOnStop;
                 using var runState = Terminal.Gui.Application.Begin(serverUI);
+
+                void OnServerUIOnOnStop(object? sender, EventArgs args)
+                {
+                    cts.Cancel();
+                    Terminal.Gui.Application.RequestStop(runState.Toplevel);
+                }
+                serverUI.OnStop += OnServerUIOnOnStop;
+
                 while (!combinedCts.IsCancellationRequested)
                 {
                     Terminal.Gui.Application.RunLoop(runState, false);
                 }
+
                 Terminal.Gui.Application.End(runState);
                 serverUI.OnStop -= OnServerUIOnOnStop;
             }

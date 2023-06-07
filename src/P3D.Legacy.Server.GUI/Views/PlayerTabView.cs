@@ -68,13 +68,14 @@ namespace P3D.Legacy.Server.GUI.Views
                     _kickButton.Visible = true;
                     _banButton.Visible = true;
 
-                    _playerInfoTextView.Text = @$"
+                    _playerInfoTextView.Text = $"""
 Connection Id: {player.ConnectionId}
 Id: {player.Id}
 Origin: {player.Origin}
 Name: {player.Name}
 Permissions: {player.Permissions}
-IP: {player.IPEndPoint}";
+IP: {player.IPEndPoint}
+""";
                 }
                 else
                 {
