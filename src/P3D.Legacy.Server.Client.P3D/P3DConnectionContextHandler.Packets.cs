@@ -41,7 +41,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             if (packet is null) return;
 
-            using var span = _tracer.StartActiveSpan($"P3D Client Handle {packet.GetType().Name}", SpanKind.Internal, parentSpan: Tracer.CurrentSpan ?? _connectionSpan);
+            using var span = _tracer.StartActiveSpan($"P3D Client Handle {packet.GetType().Name}", SpanKind.Internal, parentSpan: Tracer.CurrentSpan.ParentSpanId == default ? _connectionSpan : Tracer.CurrentSpan);
             span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
 
             switch (packet)
