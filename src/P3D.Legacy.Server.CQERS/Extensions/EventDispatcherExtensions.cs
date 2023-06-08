@@ -8,6 +8,6 @@ namespace P3D.Legacy.Server.CQERS.Extensions
     public static class EventDispatcherExtensions
     {
         public static Task DispatchAsync<TEvent>(this IEventDispatcher eventDispatcher, TEvent @event, CancellationToken ct) where TEvent : IEvent =>
-            eventDispatcher.DispatchAsync(@event, eventDispatcher.DefaultStrategy, ct);
+            eventDispatcher.DispatchAsync(@event, eventDispatcher.DefaultStrategy, trace: true, ct);
     }
 }

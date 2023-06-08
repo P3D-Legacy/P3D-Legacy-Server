@@ -6,6 +6,8 @@ using LiteDB.Async;
 
 using Microsoft.Extensions.Options;
 
+using OpenTelemetry.Trace;
+
 using P3D.Legacy.Common;
 using P3D.Legacy.Server.Infrastructure.Models;
 using P3D.Legacy.Server.Infrastructure.Models.Users;
@@ -30,19 +32,27 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Users
         private readonly LiteDbOptions _options;
         private readonly PasswordOptions _passwordOptions;
         private readonly LockoutOptions _lockoutOptions;
+        private readonly Tracer _tracer;
 
-        public LiteDbUserRepository(IOptionsMonitor<LiteDbOptions> options, IOptions<PasswordOptions> passwordOptions, IOptions<LockoutOptions> lockoutOptions)
+        public LiteDbUserRepository(IOptionsMonitor<LiteDbOptions> options, IOptions<PasswordOptions> passwordOptions, IOptions<LockoutOptions> lockoutOptions, TracerProvider traceProvider)
         {
             _options = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
             _passwordOptions = passwordOptions.Value ?? throw new ArgumentNullException(nameof(passwordOptions));
             _lockoutOptions = lockoutOptions.Value ?? throw new ArgumentNullException(nameof(lockoutOptions));
+            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Infrastructure");
         }
 
         public async Task<UserEntity?> FindByIdAsync(PlayerId id, CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Find User By Id", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<User>("users");
 
             ct.ThrowIfCancellationRequested();
@@ -55,13 +65,19 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Users
 
         public async Task<AccountResult> CreateAsync(UserEntity userEntity, string password, bool isSha512 = false, CancellationToken ct = default)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Create User", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             var (playerId, name) = userEntity;
 
             ct.ThrowIfCancellationRequested();
 
             if (isSha512) password += "A!";
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<User>("users");
 
             ct.ThrowIfCancellationRequested();
@@ -86,11 +102,17 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Users
 
         public async Task<DateTimeOffset?> GetLockoutEndDateAsync(UserEntity userEntity, CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Get User lockout", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             var (id, _) = userEntity;
 
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Lockout>("lockouts");
 
             ct.ThrowIfCancellationRequested();
@@ -110,11 +132,17 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Users
 
         public async Task<int> GetAccessFailedCountAsync(UserEntity userEntity, CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Get User Access Failed Count", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             var (id, _) = userEntity;
 
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Lockout>("lockouts");
 
             ct.ThrowIfCancellationRequested();
@@ -135,13 +163,19 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Users
 
         public async Task<SignInResult> CheckPasswordSignInAsync(UserEntity userEntity, string password, bool isSha512 = false, bool lockoutOnFailure = true, CancellationToken ct = default)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Check User Password", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             var (id, _) = userEntity;
 
             ct.ThrowIfCancellationRequested();
 
             if (isSha512) password += "A!";
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<User>("users");
             var locksCollection = db.GetCollection<Lockout>("lockouts");
 

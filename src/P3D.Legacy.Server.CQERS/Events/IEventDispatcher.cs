@@ -43,7 +43,6 @@ namespace P3D.Legacy.Server.CQERS.Events
     {
         DispatchStrategy DefaultStrategy { get; set; }
 
-        Task DispatchAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IEvent;
-        Task DispatchAsync<TEvent>(TEvent @event, DispatchStrategy dispatchStrategy, CancellationToken ct) where TEvent : IEvent;
+        Task DispatchAsync<TEvent>(TEvent @event, DispatchStrategy dispatchStrategy, bool trace, CancellationToken ct) where TEvent : IEvent;
     }
 }

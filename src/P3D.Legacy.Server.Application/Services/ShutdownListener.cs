@@ -2,6 +2,7 @@
 
 using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System.Threading;
 using System.Threading.Tasks;

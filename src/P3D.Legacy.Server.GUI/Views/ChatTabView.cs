@@ -6,6 +6,7 @@ using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -71,7 +72,7 @@ namespace P3D.Legacy.Server.GUI.Views
 
         private async Task HandleMessageAsync(string message)
         {
-            if (message.StartsWith("/", StringComparison.Ordinal))
+            if (message.StartsWith('/'))
             {
                 await _eventDispatcher.DispatchAsync(new PlayerSentCommandEvent(IPlayer.Server, message), CancellationToken.None);
             }

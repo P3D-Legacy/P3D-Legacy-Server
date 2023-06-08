@@ -32,6 +32,7 @@ namespace P3D.Legacy.Server.Client.P3D
         private readonly P3DProtocol _protocol;
         private readonly P3DMonsterConverter _p3dMonsterConverter;
         private readonly IMonsterValidator _monsterValidator;
+        private readonly P3DPlayerMovementCompensationService _movementCompensationService;
         private readonly TaskCompletionSource _finalizationDelayer = new();
 
         private readonly ICommandDispatcher _commandDispatcher;
@@ -48,6 +49,7 @@ namespace P3D.Legacy.Server.Client.P3D
             P3DProtocol protocol,
             P3DMonsterConverter p3dMonsterConverter,
             IMonsterValidator monsterValidator,
+            P3DPlayerMovementCompensationService movementCompensationService,
             ICommandDispatcher commandDispatcher,
             IQueryDispatcher queryDispatcher,
             IEventDispatcher eventDispatcher)
@@ -57,6 +59,7 @@ namespace P3D.Legacy.Server.Client.P3D
             _protocol = protocol ?? throw new ArgumentNullException(nameof(protocol));
             _p3dMonsterConverter = p3dMonsterConverter ?? throw new ArgumentNullException(nameof(p3dMonsterConverter));
             _monsterValidator = monsterValidator ?? throw new ArgumentNullException(nameof(monsterValidator));
+            _movementCompensationService = movementCompensationService ?? throw new ArgumentNullException(nameof(movementCompensationService));
             _commandDispatcher = commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
             _queryDispatcher = queryDispatcher ?? throw new ArgumentNullException(nameof(queryDispatcher));
             _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
@@ -91,14 +94,16 @@ namespace P3D.Legacy.Server.Client.P3D
                     {
                         if (await reader.ReadAsync(_protocol, ct) is { Message: { } message, IsCompleted: var isCompleted, IsCanceled: var isCanceled })
                         {
-                            using var span = _tracer.StartActiveSpan($"P3D Client Reading {message.GetType().FullName}", SpanKind.Server, parentSpan: Tracer.CurrentSpan.ParentSpanId == default ? _connectionSpan : Tracer.CurrentSpan);
+                            using var span = _tracer.StartActiveSpan($"P3D Client Receiving {message.GetType().Name}", SpanKind.Server);
                             span.SetAttribute("server.address", IPEndPoint.Address.ToString());
                             span.SetAttribute("server.port", IPEndPoint.Port);
                             span.SetAttribute("network.transport", "tcp");
                             span.SetAttribute("network.protocol.name", "p3d");
                             span.SetAttribute("network.protocol.version", message.Protocol.ToString());
+                            span.SetAttribute("enduser.id", Name);
+                            span.SetAttribute("enduser.role", Permissions.ToString());
                             span.SetAttribute("p3dclient.packet_type", message.GetType().FullName);
-                            span.SetAttribute("peer.service", "P3D-Legacy");
+                            span.SetAttribute("peer.service", $"{Name} (P3D-Legacy)");
 
                             await HandlePacketAsync(message, ct);
 
@@ -136,7 +141,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             if (obj is not P3DConnectionContextHandler connection) return;
 
-            using var finishSpan = connection._tracer.StartActiveSpan("P3D Client Closing", SpanKind.Internal, parentSpan: Tracer.CurrentSpan.ParentSpanId == default ? connection._connectionSpan : Tracer.CurrentSpan);
+            using var finishSpan = connection._tracer.StartActiveSpan("P3D Client Closing", SpanKind.Internal, parentSpan: connection._connectionSpan);
             var oldState = connection.State;
             connection.State = PlayerState.Finalizing;
             if (oldState ==

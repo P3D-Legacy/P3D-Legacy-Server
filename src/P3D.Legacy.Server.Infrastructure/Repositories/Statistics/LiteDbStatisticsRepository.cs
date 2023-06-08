@@ -1,6 +1,9 @@
-﻿using LiteDB.Async;
+﻿using LiteDB;
+using LiteDB.Async;
 
 using Microsoft.Extensions.Options;
+
+using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Server.Infrastructure.Models.Statistics;
@@ -23,17 +26,25 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
         }
 
         private readonly LiteDbOptions _options;
+        private readonly Tracer _tracer;
 
-        public LiteDbStatisticsRepository(IOptionsMonitor<LiteDbOptions> options)
+        public LiteDbStatisticsRepository(IOptionsMonitor<LiteDbOptions> options, TracerProvider traceProvider)
         {
             _options = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
+            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Infrastructure");
         }
 
         public async Task<StatisticsEntity?> GetAsync(PlayerId id, string action, CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Get Statistics", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Statistics>("statistics");
 
             ct.ThrowIfCancellationRequested();
@@ -50,9 +61,15 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
 
         public async IAsyncEnumerable<StatisticsEntity> GetAllAsync([EnumeratorCancellation] CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Get All Statistics", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Statistics>("statistics");
 
             ct.ThrowIfCancellationRequested();
@@ -70,9 +87,15 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
 
         public async IAsyncEnumerable<StatisticsEntity> GetAllAsync(PlayerId id, [EnumeratorCancellation] CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Get All Statistics By Id", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Statistics>("statistics");
 
             ct.ThrowIfCancellationRequested();
@@ -91,9 +114,15 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
 
         public async IAsyncEnumerable<StatisticsEntity> GetAllAsync(string action, [EnumeratorCancellation] CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Get All Statistics By Action", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Statistics>("statistics");
 
             ct.ThrowIfCancellationRequested();
@@ -111,9 +140,15 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
 
         public async Task<bool> IncrementActionAsync(PlayerId id, string action, CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Increment Statistics", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Statistics>("statistics");
 
             ct.ThrowIfCancellationRequested();

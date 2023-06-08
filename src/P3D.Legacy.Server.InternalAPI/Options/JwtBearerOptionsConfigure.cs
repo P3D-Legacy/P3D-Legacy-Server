@@ -30,7 +30,12 @@ namespace P3D.Legacy.Server.InternalAPI.Options
                     ValidateIssuerSigningKey = true,
                     ValidateActor = false,
                     ValidateTokenReplay = false,
-                    IssuerSigningKey = _jwtOptions.KeyType switch { KeyType.Rsa => new RsaSecurityKey(_jwtOptions.GetRSAKey()), KeyType.ECDsa => new ECDsaSecurityKey(_jwtOptions.GetECDsaKey()) },
+                    IssuerSigningKey = _jwtOptions.KeyType switch
+                    {
+                        KeyType.Rsa => new RsaSecurityKey(_jwtOptions.GetRSAKey()),
+                        KeyType.ECDsa => new ECDsaSecurityKey(_jwtOptions.GetECDsaKey()),
+                        _ => throw new NotSupportedException()
+                    },
                     ClockSkew = TimeSpan.FromMinutes(5),
                 };
             }

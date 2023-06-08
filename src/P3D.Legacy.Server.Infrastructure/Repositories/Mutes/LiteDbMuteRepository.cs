@@ -3,6 +3,8 @@ using LiteDB.Async;
 
 using Microsoft.Extensions.Options;
 
+using OpenTelemetry.Trace;
+
 using P3D.Legacy.Common;
 using P3D.Legacy.Server.Infrastructure.Options;
 
@@ -20,17 +22,25 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Mutes
         private record Mute(string Id, IList<string> MutedIds);
 
         private readonly LiteDbOptions _options;
+        private readonly Tracer _tracer;
 
-        public LiteDbMuteRepository(IOptionsMonitor<LiteDbOptions> options)
+        public LiteDbMuteRepository(IOptionsMonitor<LiteDbOptions> options, TracerProvider traceProvider)
         {
             _options = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
+            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Infrastructure");
         }
 
         public async IAsyncEnumerable<PlayerId> GetAllAsync(PlayerId id, [EnumeratorCancellation] CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Get All Mutes", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Mute>("mutes");
 
             ct.ThrowIfCancellationRequested();
@@ -49,9 +59,15 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Mutes
 
         public async Task<bool> IsMutedAsync(PlayerId id, PlayerId toCheckId, CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Is Muted", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Mute>("mutes");
 
             ct.ThrowIfCancellationRequested();
@@ -65,9 +81,15 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Mutes
 
         public async Task<bool> MuteAsync(PlayerId id, PlayerId toMuteId, CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Mute", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Mute>("mutes");
 
             ct.ThrowIfCancellationRequested();
@@ -90,9 +112,15 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Mutes
 
         public async Task<bool> UnmuteAsync(PlayerId id, PlayerId toUnmuteId, CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Unmute", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Mute>("mutes");
 
             ct.ThrowIfCancellationRequested();

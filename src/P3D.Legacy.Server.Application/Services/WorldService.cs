@@ -5,6 +5,7 @@ using OpenTelemetry.Trace;
 using P3D.Legacy.Common.Data;
 using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using RateLimiter;
 

@@ -1,6 +1,7 @@
 ﻿using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Collections.Generic;

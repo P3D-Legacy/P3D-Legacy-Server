@@ -10,6 +10,7 @@ using P3D.Legacy.Server.CommunicationAPI.Models;
 using P3D.Legacy.Server.CommunicationAPI.Utils;
 using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Net;

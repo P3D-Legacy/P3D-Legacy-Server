@@ -93,7 +93,7 @@ namespace P3D.Legacy.Server.Client.P3D.Services
             return new P3DMonsterEntity(monsterDataStr, monsterStaticData, moves, helItem);
         }
 
-        public async Task<string> ToP3DStringAsync(IMonsterInstance monster)
+        public Task<string> ToP3DStringAsync(IMonsterInstance monster)
         {
             var dict = new Dictionary<string, string>(StringComparer.Ordinal);
             dict.Add("Pokemon", $"[{monster.StaticData.Id}]");
@@ -167,7 +167,7 @@ namespace P3D.Legacy.Server.Client.P3D.Services
             dict.Add("AdditionalData", $"[{monster.Metadata["AdditionalData"]}]");
             dict.Add("IDValue", $"[{monster.Metadata["IDValue"]}]");
 
-            return dict.DictionaryToMonsterData();
+            return Task.FromResult(dict.DictionaryToMonsterData());
         }
     }
 }

@@ -5,6 +5,7 @@ using OpenTelemetry.Trace;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Events;
 using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
 
 using System;
@@ -56,7 +57,7 @@ namespace P3D.Legacy.Server.GameCommands.EventHandlers
                 return;
             }
 
-            if (command.LogCommand && (player.Permissions & PermissionTypes.UnVerified) == 0)
+            if (command.LogCommand && (player.Permissions & PermissionTypes.UnVerified) == PermissionTypes.None)
             {
                 Command(player.Name, alias, string.Join(' ', arguments));
             }

@@ -58,6 +58,7 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
             {
                 KeyType.Rsa => new SigningCredentials(new RsaSecurityKey(_jwtOptions.GetRSAKey()), SecurityAlgorithms.RsaSha512Signature),
                 KeyType.ECDsa => new SigningCredentials(new ECDsaSecurityKey(_jwtOptions.GetECDsaKey()), SecurityAlgorithms.EcdsaSha512Signature),
+                _ => throw new NotSupportedException()
             };
 
             var now = DateTime.UtcNow;

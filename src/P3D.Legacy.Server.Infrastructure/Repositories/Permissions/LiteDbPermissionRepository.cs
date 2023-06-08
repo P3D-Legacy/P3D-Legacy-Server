@@ -3,6 +3,8 @@ using LiteDB.Async;
 
 using Microsoft.Extensions.Options;
 
+using OpenTelemetry.Trace;
+
 using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Infrastructure.Models.Permissions;
@@ -22,17 +24,25 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
         }
 
         private readonly LiteDbOptions _options;
+        private readonly Tracer _tracer;
 
-        public LiteDbPermissionRepository(IOptionsMonitor<LiteDbOptions> options)
+        public LiteDbPermissionRepository(IOptionsMonitor<LiteDbOptions> options, TracerProvider traceProvider)
         {
             _options = options.CurrentValue ?? throw new ArgumentNullException(nameof(options));
+            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Infrastructure");
         }
 
         public async Task<PermissionEntity> GetByNameIdAsync(string name, CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Get Permission By Id", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Permission>("permissions");
 
             ct.ThrowIfCancellationRequested();
@@ -47,9 +57,15 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 
         public async Task<PermissionEntity> GetByGameJoltIdAsync(GameJoltId gameJoltId, CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Get Permission By GameJolt", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Permission>("permissions");
 
             ct.ThrowIfCancellationRequested();
@@ -64,9 +80,15 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 
         public async Task<bool> UpdateAsync(PlayerId id, PermissionTypes permissions, CancellationToken ct)
         {
+            var connectionString = new ConnectionString(_options.ConnectionString);
+
+            using var span = _tracer.StartActiveSpan("Update Permission", SpanKind.Client);
+            span.SetAttribute("client.address", connectionString.Filename);
+            span.SetAttribute("peer.service", "LiteDB");
+
             ct.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabaseAsync(_options.ConnectionString);
+            using var db = new LiteDatabaseAsync(connectionString);
             var collection = db.GetCollection<Permission>("permissions");
 
             ct.ThrowIfCancellationRequested();

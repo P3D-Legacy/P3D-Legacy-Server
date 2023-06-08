@@ -8,6 +8,7 @@ using P3D.Legacy.Server.Client.P3D.Packets;
 using P3D.Legacy.Server.Client.P3D.Packets.Chat;
 using P3D.Legacy.Server.Client.P3D.Packets.Common;
 using P3D.Legacy.Server.Client.P3D.Packets.Server;
+using P3D.Legacy.Server.Client.P3D.Services;
 
 using System;
 using System.Diagnostics;
@@ -100,14 +101,20 @@ namespace P3D.Legacy.Server.Client.P3D
 
             try
             {
-                using var span = _tracer.StartActiveSpan($"P3D Client Sending {packet.GetType().Name}", SpanKind.Client, parentSpan: Tracer.CurrentSpan.ParentSpanId == default ? _connectionSpan : Tracer.CurrentSpan);
+                using var span = _tracer.StartActiveSpan($"P3D Client Sending {packet.GetType().Name}", SpanKind.Client);
                 span.SetAttribute("client.address", IPEndPoint.Address.ToString());
                 span.SetAttribute("client.port", IPEndPoint.Port);
                 span.SetAttribute("network.transport", "tcp");
                 span.SetAttribute("network.protocol.name", "p3d");
                 span.SetAttribute("network.protocol.version", packet.Protocol.ToString());
+                span.SetAttribute("enduser.id", Name);
+                span.SetAttribute("enduser.role", Permissions.ToString());
                 span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
-                span.SetAttribute("peer.service", "P3D-Legacy");
+                span.SetAttribute("peer.service", $"{Name} (P3D-Legacy)");
+
+                // Disable tracing if it's from non trackable services. TODO: Remove direct service dependance
+                if (_movementCompensationService.IsFromService.Value && Activity.Current is not null)
+                    Activity.Current.IsAllDataRequested = false;
 
                 await _writer.WriteAsync(_protocol, packet, cts.Token);
             }

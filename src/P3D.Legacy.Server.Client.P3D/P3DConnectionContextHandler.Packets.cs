@@ -19,9 +19,11 @@ using P3D.Legacy.Server.Client.P3D.Packets.Client;
 using P3D.Legacy.Server.Client.P3D.Packets.Common;
 using P3D.Legacy.Server.Client.P3D.Packets.Server;
 using P3D.Legacy.Server.Client.P3D.Packets.Trade;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,9 +42,6 @@ namespace P3D.Legacy.Server.Client.P3D
         private async Task HandlePacketAsync(P3DPacket? packet, CancellationToken ct)
         {
             if (packet is null) return;
-
-            using var span = _tracer.StartActiveSpan($"P3D Client Handle {packet.GetType().Name}", SpanKind.Internal, parentSpan: Tracer.CurrentSpan.ParentSpanId == default ? _connectionSpan : Tracer.CurrentSpan);
-            span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
 
             switch (packet)
             {
@@ -100,6 +99,9 @@ namespace P3D.Legacy.Server.Client.P3D
                     break;
                 case TradeStartPacket tradeStartPacket:
                     await HandleTradeStartAsync(tradeStartPacket, ct);
+                    break;
+                case PingPacket pingPacket:
+                    await HandlePingAsync(pingPacket, ct);
                     break;
                 default:
                     if (State != PlayerState.Initialized) return;
@@ -349,13 +351,18 @@ namespace P3D.Legacy.Server.Client.P3D
                 {
                     await _eventDispatcher.DispatchAsync(new PlayerUpdatedStateEvent(this), ct);
                 }
+                /* P3DPlayerMovementCompensationService does this
                 if (positionUpdated)
                 {
-                    //await _eventDispatcher.Dispatch(new PlayerUpdatedPositionEvent(this), ct);
+                    await _eventDispatcher.DispatchAsync(new PlayerUpdatedPositionEvent(this), ct);
+                }
+                */
+                // Tracing optimization: Do not record spans for movement updates
+                if (!stateUpdated && positionUpdated && Activity.Current is not null)
+                {
+                    Activity.Current.IsAllDataRequested = false;
                 }
             }
-
-            await SendPacketAsync(GetFromP3DPlayerState(this, this), ct);
         }
 
         private async Task HandleChatMessageAsync(ChatMessageGlobalPacket packet, CancellationToken ct)
@@ -513,6 +520,12 @@ namespace P3D.Legacy.Server.Client.P3D
                 return;
 
             await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
+        }
+
+
+        private Task HandlePingAsync(PingPacket packet, CancellationToken ct)
+        {
+            return Task.CompletedTask;
         }
 
 

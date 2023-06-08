@@ -11,6 +11,8 @@ using P3D.Legacy.Server.CQERS.Events;
 using RateLimiter;
 
 using System;
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -25,6 +27,8 @@ namespace P3D.Legacy.Server.Client.P3D.Services
     [SuppressMessage("Performance", "CA1812")]
     internal class P3DPlayerMovementCompensationService : BackgroundService
     {
+        public readonly AsyncLocal<bool> IsFromService = new();
+
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
         private readonly IPlayerContainerReader _playerContainer;
@@ -42,18 +46,23 @@ namespace P3D.Legacy.Server.Client.P3D.Services
 
         protected override async Task ExecuteAsync(CancellationToken ct)
         {
-            using var span = _tracer.StartActiveSpan("P3D Player Movement Compensation Service", SpanKind.Internal);
-
-            async Task LoopAction()
-            {
-                foreach (var group in _playerContainer.GetAll().OfType<IP3DPlayerState>().GroupBy(static x => x.LevelFile, StringComparer.Ordinal))
-                    foreach (var player in group.Where(static x => x.Moving).OfType<IPlayer>())
-                        await _eventDispatcher.DispatchAsync(new PlayerUpdatedPositionEvent(player), ct);
-            }
+            // We will overwhelm tracing with this
+            //using var span = _tracer.StartActiveSpan("P3D Player Movement Compensation Service", SpanKind.Internal);
 
             while (!ct.IsCancellationRequested)
             {
-                await _timeLimiter.Enqueue(LoopAction, ct);
+                await _timeLimiter.Enqueue(async () =>
+                {
+                    IsFromService.Value = true;
+                    var playersInLevel = _playerContainer.GetAll()
+                        .OfType<IP3DPlayerState>()
+                        .GroupBy(static x => x.LevelFile, StringComparer.Ordinal)
+                        .Where(static x => x.Skip(1).Any());
+
+                    foreach (var players in playersInLevel)
+                        foreach (var player in players.Where(static x => x.Moving).OfType<IPlayer>())
+                            await _eventDispatcher.DispatchAsync(new PlayerUpdatedStateEvent(player), DispatchStrategy.ParallelWhenAll, trace: false, ct);
+                }, ct);
             }
         }
     }

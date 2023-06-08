@@ -100,6 +100,7 @@ namespace P3D.Legacy.Server
 
                             builder.AddHostInstrumentation();
                             builder.AddApplicationInstrumentation();
+                            builder.AddCQERSInstrumentation();
                             builder.AddClientP3DInstrumentation();
                             builder.AddCommunicationAPIInstrumentation();
                             builder.AddDiscordBotInstrumentation();

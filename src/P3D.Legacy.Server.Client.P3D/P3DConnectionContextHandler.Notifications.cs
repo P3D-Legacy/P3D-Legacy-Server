@@ -12,6 +12,7 @@ using P3D.Legacy.Server.Client.P3D.Packets.Chat;
 using P3D.Legacy.Server.Client.P3D.Packets.Server;
 using P3D.Legacy.Server.Client.P3D.Packets.Trade;
 using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -26,7 +27,7 @@ namespace P3D.Legacy.Server.Client.P3D
         IEventHandler<PlayerJoinedEvent>,
         IEventHandler<PlayerLeftEvent>,
         IEventHandler<PlayerUpdatedStateEvent>,
-        IEventHandler<PlayerUpdatedPositionEvent>,
+        //IEventHandler<PlayerUpdatedPositionEvent>,
         IEventHandler<PlayerSentGlobalMessageEvent>,
         IEventHandler<PlayerSentLocalMessageEvent>,
         IEventHandler<PlayerSentPrivateMessageEvent>,
@@ -88,15 +89,19 @@ namespace P3D.Legacy.Server.Client.P3D
             }
         }
 
+        /* We delegate it to PlayerUpdatedStateEvent. TODO: Do something better
         public async Task HandleAsync(IReceiveContext<PlayerUpdatedPositionEvent> context, CancellationToken ct)
         {
             var player = context.Message.Player;
+
+            if (Id == player.Id) return;
 
             if (player is IP3DPlayerState state && state.LevelFile.Equals(LevelFile, StringComparison.Ordinal))
             {
                 await SendPacketAsync(GetFromP3DPlayerState(player, state), ct);
             }
         }
+        */
 
         public async Task HandleAsync(IReceiveContext<PlayerSentGlobalMessageEvent> context, CancellationToken ct)
         {

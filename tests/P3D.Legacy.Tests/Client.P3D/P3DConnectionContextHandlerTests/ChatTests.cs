@@ -20,6 +20,7 @@ using P3D.Legacy.Server.Client.P3D.Packets.Common;
 using P3D.Legacy.Server.Client.P3D.Packets.Server;
 using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.CQERS.Queries;
 
 using System;
@@ -95,8 +96,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                 _lock = @lock;
             }
 
-            public Task DispatchAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IEvent => DispatchAsync(@event, DefaultStrategy, ct);
-            public async Task DispatchAsync<TEvent>(TEvent rawEvent, DispatchStrategy dispatchStrategy, CancellationToken ct) where TEvent : IEvent
+            public async Task DispatchAsync<TEvent>(TEvent rawEvent, DispatchStrategy dispatchStrategy, bool trace, CancellationToken ct) where TEvent : IEvent
             {
                 switch (rawEvent)
                 {
