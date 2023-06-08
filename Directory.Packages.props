@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
   <ItemGroup>
     <PackageVersion Include="Aragas.Coroutines" Version="1.0.0.1" />
     <PackageVersion Include="Aragas.Extensions.Options.FluentValidation" Version="1.0.0.11" />
@@ -28,7 +28,7 @@
     <PackageVersion Include="Moq" Version="4.18.4" />
     <PackageVersion Include="NUnit" Version="3.13.3" />
     <PackageVersion Include="NUnit3TestAdapter" Version="4.5.0" />
-    <PackageVersion Include="Nerdbank.Streams" Version="2.9.112" />
+    <PackageVersion Include="Nerdbank.Streams" Version="2.10.66" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="Open.NAT.NET5" Version="1.0.0" />
     <PackageVersion Include="OpenTelemetry.Api" Version="1.5.0" />
