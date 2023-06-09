@@ -3,7 +3,7 @@ using P3D.Legacy.Server.Client.P3D.Data.P3DDatas;
 
 namespace P3D.Legacy.Server.Client.P3D.Packets.Battle
 {
-    public sealed record BattleEndRoundDataFromClientPacket() : P3DPacket(P3DPacketType.BattleEndRoundData)
+    public sealed record BattleHostEndRoundDataFromClientPacket() : P3DPacket(P3DPacketType.BattleEndRoundData)
     {
         public Origin DestinationPlayerOrigin { get => DataItemStorage.GetOrigin(0); init => DataItemStorage.Set(0, value); }
         public BattleEndRoundData BattleData { get => new(DataItemStorage.Get(1)); init => DataItemStorage.Set(1, value.ToP3DString()); }

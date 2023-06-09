@@ -92,25 +92,27 @@ namespace P3D.Legacy.Server.Client.P3D
                 {
                     try
                     {
-                        if (await reader.ReadAsync(_protocol, ct) is { Message: { } message, IsCompleted: var isCompleted, IsCanceled: var isCanceled })
+                        if (await reader.ReadAsync(_protocol, ct) is { Message: { } packet, IsCompleted: var isCompleted, IsCanceled: var isCanceled })
                         {
-                            using var span = _tracer.StartActiveSpan($"P3D Client Receiving {message.GetType().Name}", SpanKind.Server);
+                            using var span = _tracer.StartActiveSpan($"P3D Client Receiving {packet.GetType().Name}", SpanKind.Server);
                             span.SetAttribute("server.address", IPEndPoint.Address.ToString());
                             span.SetAttribute("server.port", IPEndPoint.Port);
                             span.SetAttribute("network.transport", "tcp");
                             span.SetAttribute("network.protocol.name", "p3d");
-                            span.SetAttribute("network.protocol.version", message.Protocol.ToString());
+                            span.SetAttribute("network.protocol.version", packet.Protocol.ToString());
                             span.SetAttribute("enduser.id", Name);
                             span.SetAttribute("enduser.role", Permissions.ToString());
-                            span.SetAttribute("p3dclient.packet_type", message.GetType().FullName);
+                            span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
                             span.SetAttribute("peer.service", $"{Name} (P3D-Legacy)");
 
-                            await HandlePacketAsync(message, ct);
+                            // Do not trace the ping packet
+                            if (packet is PingPacket && Activity.Current is not null)
+                                Activity.Current.IsAllDataRequested = false;
+
+                            await HandlePacketAsync(packet, ct);
 
                             if (isCompleted || isCanceled)
-                            {
                                 break;
-                            }
                         }
                     }
                     finally

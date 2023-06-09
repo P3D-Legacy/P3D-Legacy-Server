@@ -41,7 +41,7 @@ namespace P3D.Legacy.Server.Client.P3D.Packets
             P3DPacketType.BattleStart => new BattleStartPacket(),
             P3DPacketType.BattleClientData => new BattleClientDataToClientPacket(),
             P3DPacketType.BattleHostData => new BattleHostDataToClientPacket(),
-            P3DPacketType.BattleEndRoundData => new BattleEndRoundDataToClientPacket(),
+            P3DPacketType.BattleEndRoundData => new BattleHostEndRoundDataToClientPacket(),
             P3DPacketType.ServerInfoData => new ServerInfoDataPacket(),
             P3DPacketType.ServerDataRequest => new ServerDataRequestPacket(),
             _ => null
@@ -77,7 +77,7 @@ namespace P3D.Legacy.Server.Client.P3D.Packets
             P3DPacketType.BattleStart => new BattleStartPacket(),
             P3DPacketType.BattleClientData => new BattleClientDataFromClientPacket(),
             P3DPacketType.BattleHostData => new BattleHostDataFromClientPacket(),
-            P3DPacketType.BattleEndRoundData => new BattleEndRoundDataFromClientPacket(),
+            P3DPacketType.BattleEndRoundData => new BattleHostEndRoundDataFromClientPacket(),
             P3DPacketType.ServerInfoData => new ServerInfoDataPacket(),
             P3DPacketType.ServerDataRequest => new ServerDataRequestPacket(),
             _ => null

@@ -57,8 +57,8 @@ namespace P3D.Legacy.Server.Client.P3D
                 case BattleOfferFromClientPacket battleOfferPacket:
                     await HandleBattleOfferAsync(battleOfferPacket, ct);
                     break;
-                case BattleEndRoundDataFromClientPacket battleEndRoundDataPacket:
-                    await HandleBattlePokemonDataAsync(battleEndRoundDataPacket, ct);
+                case BattleHostEndRoundDataFromClientPacket battleEndRoundDataPacket:
+                    await HandleBattleHostEndRoundDataAsync(battleEndRoundDataPacket, ct);
                     break;
                 case BattleQuitPacket battleQuitPacket:
                     await HandleBattleQuitAsync(battleQuitPacket, ct);
@@ -493,7 +493,7 @@ namespace P3D.Legacy.Server.Client.P3D
                 await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(this, packet), ct);
             }
         }
-        private async Task HandleBattlePokemonDataAsync(BattleEndRoundDataFromClientPacket packet, CancellationToken ct)
+        private async Task HandleBattleHostEndRoundDataAsync(BattleHostEndRoundDataFromClientPacket packet, CancellationToken ct)
         {
             if (State != PlayerState.Initialized)
                 return;
@@ -523,10 +523,7 @@ namespace P3D.Legacy.Server.Client.P3D
         }
 
 
-        private Task HandlePingAsync(PingPacket packet, CancellationToken ct)
-        {
-            return Task.CompletedTask;
-        }
+        private Task HandlePingAsync(PingPacket packet, CancellationToken ct) => Task.CompletedTask;
 
 
         // ReSharper disable once UnusedParameter.Local

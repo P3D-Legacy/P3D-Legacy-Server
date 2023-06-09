@@ -6,6 +6,7 @@ using P3D.Legacy.Common;
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Client.P3D.Packets;
 using P3D.Legacy.Server.Client.P3D.Packets.Chat;
+using P3D.Legacy.Server.Client.P3D.Packets.Client;
 using P3D.Legacy.Server.Client.P3D.Packets.Common;
 using P3D.Legacy.Server.Client.P3D.Packets.Server;
 using P3D.Legacy.Server.Client.P3D.Services;
@@ -112,6 +113,9 @@ namespace P3D.Legacy.Server.Client.P3D
                 span.SetAttribute("p3dclient.packet_type", packet.GetType().FullName);
                 span.SetAttribute("peer.service", $"{Name} (P3D-Legacy)");
 
+                // Do not trace the ping packet
+                if (packet is PingPacket && Activity.Current is not null)
+                    Activity.Current.IsAllDataRequested = false;
                 // Disable tracing if it's from non trackable services. TODO: Remove direct service dependance
                 if (_movementCompensationService.IsFromService.Value && Activity.Current is not null)
                     Activity.Current.IsAllDataRequested = false;

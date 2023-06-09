@@ -166,9 +166,9 @@ namespace P3D.Legacy.Server.Client.P3D
                 case BattleHostDataFromClientPacket packet:
                     await SendPacketAsync(new BattleHostDataToClientPacket { Origin = packet.Origin, BattleData = packet.BattleData }, ct);
                     return;
-                case BattleEndRoundDataFromClientPacket packet when packet.DestinationPlayerOrigin != Origin: return;
-                case BattleEndRoundDataFromClientPacket packet:
-                    await SendPacketAsync(new BattleEndRoundDataToClientPacket { Origin = packet.Origin, BattleData = packet.BattleData }, ct);
+                case BattleHostEndRoundDataFromClientPacket packet when packet.DestinationPlayerOrigin != Origin: return;
+                case BattleHostEndRoundDataFromClientPacket packet:
+                      await SendPacketAsync(new BattleHostEndRoundDataToClientPacket { Origin = packet.Origin, BattleData = packet.BattleData }, ct);
                     return;
                 default:
                     await SendPacketAsync(p3dPacket, ct);
