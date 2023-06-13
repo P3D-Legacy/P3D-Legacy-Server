@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.QueryHandlers.Ban
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class BanQueryHandler : IQueryHandler<GetPlayerBanQuery, BanViewModel?>
     {
         private readonly IBanRepository _banRepository;

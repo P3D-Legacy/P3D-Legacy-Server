@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal class ShowPermissionsCommandManager : CommandManager
     {
         public override string Name => "showperm";

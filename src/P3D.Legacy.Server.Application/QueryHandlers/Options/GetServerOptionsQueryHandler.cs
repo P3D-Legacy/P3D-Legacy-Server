@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.QueryHandlers.Options
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class GetServerOptionsQueryHandler : IQueryHandler<GetServerOptionsQuery, ServerOptions>
     {
         private readonly ILogger _logger;

@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal class HelpCommandManager : CommandManager
     {
         public override string Name => "help";

@@ -24,7 +24,6 @@ namespace P3D.Legacy.Server.Client.P3D.Services
     /// Instead of having the player handler sending all movement packets, let an external service
     /// handle that
     /// </summary>
-    [SuppressMessage("Performance", "CA1812")]
     internal class P3DPlayerMovementCompensationService : BackgroundService
     {
         public readonly AsyncLocal<bool> IsFromService = new();

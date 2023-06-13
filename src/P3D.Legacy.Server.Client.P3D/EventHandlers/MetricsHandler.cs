@@ -13,7 +13,6 @@ using KVP = System.Collections.Generic.KeyValuePair<string, object?>;
 
 namespace P3D.Legacy.Server.Client.P3D.EventHandlers
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class MetricsHandler :
         IEventHandler<PlayerUpdatedStateEvent>,
         IDisposable

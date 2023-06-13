@@ -22,7 +22,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed partial class DiscordPassthroughService : IHostedService, IDisposable,
         IEventHandler<PlayerJoinedEvent>,
         IEventHandler<PlayerLeftEvent>,

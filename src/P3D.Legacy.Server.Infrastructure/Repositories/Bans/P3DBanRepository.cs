@@ -18,7 +18,8 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
         private readonly Tracer _tracer;
         private readonly Pokemon3DAPIClient _apiClient;
 
-        public P3DBanRepository(ILogger<P3DBanRepository> logger, TracerProvider traceProvider, Pokemon3DAPIClient apiClient)
+        // TODO: public constructor
+        internal P3DBanRepository(ILogger<P3DBanRepository> logger, TracerProvider traceProvider, Pokemon3DAPIClient apiClient)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Infrastructure");

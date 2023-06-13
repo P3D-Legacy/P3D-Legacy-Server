@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal class SetTimeCommandManager : CommandManager
     {
         public override string Name => "settime";

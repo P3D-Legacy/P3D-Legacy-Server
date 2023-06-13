@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.CQERS.Behaviours.Command
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal partial class CommandUnhandledExceptionBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
     {
 #if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
@@ -21,7 +20,6 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command
 
         private readonly ILogger<TCommand> _logger;
 
-        [SuppressMessage("CodeQuality", "IDE0079")]
         [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
         public CommandUnhandledExceptionBehaviour(ILogger<TCommand> logger)
         {

@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class PlayerInitializingCommandHandler : ICommandHandler<PlayerInitializingCommand>
     {
         private readonly IPlayerOriginGenerator _playerIdGenerator;

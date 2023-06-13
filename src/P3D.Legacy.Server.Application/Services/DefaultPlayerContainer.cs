@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Services
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal class DefaultPlayerContainer : IPlayerContainerWriterAsync, IPlayerContainerReader
     {
         private class PlayerEqualityComparer : IEqualityComparer<IPlayer>

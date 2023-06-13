@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.QueryHandlers.Player
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class GetPlayerMuteStateQueryHandler : IQueryHandler<GetPlayerMuteStateQuery, bool>
     {
         private readonly ILogger _logger;

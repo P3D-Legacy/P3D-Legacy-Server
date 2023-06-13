@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.QueryHandlers.Permission
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class PermissionQueryHandler : IQueryHandler<GetPlayerPermissionQuery, PermissionViewModel?>
     {
         private readonly ILogger _logger;

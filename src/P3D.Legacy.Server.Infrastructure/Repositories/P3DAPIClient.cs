@@ -210,7 +210,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories
             }
         }
 
-        public async Task<UserDTO?> GetUser(ulong userId, CancellationToken ct)
+        public async Task<UserDTO?> GetUserAsync(ulong userId, CancellationToken ct)
         {
             HttpResponseMessage response;
 
@@ -245,7 +245,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories
             }
         }
 
-        public async Task<ReasonDTO?> GetReason(ulong reasonId, CancellationToken ct)
+        public async Task<ReasonDTO?> GetReasonAsync(ulong reasonId, CancellationToken ct)
         {
             HttpResponseMessage response;
 

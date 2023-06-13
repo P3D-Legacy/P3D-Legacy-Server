@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.QueryHandlers.World
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class GetWorldStateQueryHandler : IQueryHandler<GetWorldStateQuery, WorldState>
     {
         private readonly ILogger _logger;

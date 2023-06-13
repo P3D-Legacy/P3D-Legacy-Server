@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal class UnmuteCommandManager : CommandManager
     {
         public override string Name => "unmute";

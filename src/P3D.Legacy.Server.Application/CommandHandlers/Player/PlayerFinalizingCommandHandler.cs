@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class PlayerFinalizingCommandHandler : ICommandHandler<PlayerFinalizingCommand>
     {
         private readonly IEventDispatcher _eventDispatcher;

@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.World
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class ChangeWorldSeasonCommandHandler : ICommandHandler<ChangeWorldSeasonCommand>
     {
         private readonly ILogger _logger;

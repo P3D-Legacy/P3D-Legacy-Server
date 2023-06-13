@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal class SetSeasonCommandManager : CommandManager
     {
         public override string Name => "setseason";

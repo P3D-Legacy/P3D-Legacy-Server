@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.Services
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal class DefaultPlayerOriginGenerator : IPlayerOriginGenerator
     {
         private long _globalPlayerIncrement;

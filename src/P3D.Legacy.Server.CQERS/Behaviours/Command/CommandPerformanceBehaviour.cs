@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.CQERS.Behaviours.Command
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal partial class CommandPerformanceBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
     {
 #if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
@@ -22,7 +21,6 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command
         private readonly ILogger<TCommand> _logger;
         private readonly Stopwatch _timer = new();
 
-        [SuppressMessage("CodeQuality", "IDE0079")]
         [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
         public CommandPerformanceBehaviour(ILogger<TCommand> logger)
         {

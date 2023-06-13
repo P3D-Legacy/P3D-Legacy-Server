@@ -22,7 +22,6 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.Client.P3D
 {
     // ReSharper disable once ArrangeTypeModifiers
-    [SuppressMessage("Performance", "CA1812")]
     internal partial class P3DConnectionContextHandler :
         IEventHandler<PlayerJoinedEvent>,
         IEventHandler<PlayerLeftEvent>,

@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class KickPlayerCommandHandler : ICommandHandler<KickPlayerCommand>
     {
         private readonly ILogger _logger;

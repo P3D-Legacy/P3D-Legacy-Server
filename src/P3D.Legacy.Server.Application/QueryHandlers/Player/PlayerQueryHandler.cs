@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.QueryHandlers.Player
 {
-    [SuppressMessage("Performance", "CA1812")]
     public class PlayerQueryHandler :
         IQueryHandler<GetPlayersInitializedQuery, ImmutableArray<IPlayer>>,
         IQueryHandler<GetPlayerViewModelsPaginatedQuery, (long Count, ImmutableArray<PlayerViewModel> Models)>,

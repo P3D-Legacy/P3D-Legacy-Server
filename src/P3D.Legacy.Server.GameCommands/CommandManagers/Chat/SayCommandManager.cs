@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.CommandManagers.Chat
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal class SayCommandManager : CommandManager
     {
         public override string Name => "say";

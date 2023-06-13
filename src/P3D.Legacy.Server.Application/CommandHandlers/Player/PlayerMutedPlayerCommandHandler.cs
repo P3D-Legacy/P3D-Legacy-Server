@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class PlayerMutedPlayerCommandHandler : ICommandHandler<PlayerMutedPlayerCommand>
     {
         private readonly ILogger _logger;

@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Client.P3D
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class P3DConnectionHandler : ConnectionHandler
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.CQERS.Behaviours.Query
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal partial class QueryLoggingBehaviour<TQuery> : IQueryPreProcessor<TQuery> where TQuery : notnull
     {
 #if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
@@ -18,7 +17,6 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query
 
         private readonly ILogger<TQuery> _logger;
 
-        [SuppressMessage("CodeQuality", "IDE0079")]
         [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
         public QueryLoggingBehaviour(ILogger<TQuery> logger)
         {

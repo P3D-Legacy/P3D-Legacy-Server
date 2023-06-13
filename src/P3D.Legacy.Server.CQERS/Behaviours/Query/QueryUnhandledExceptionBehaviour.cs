@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.CQERS.Behaviours.Query
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal partial class QueryUnhandledExceptionBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
     {
 #if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
@@ -21,7 +20,6 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query
 
         private readonly ILogger<TQuery> _logger;
 
-        [SuppressMessage("CodeQuality", "IDE0079")]
         [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
         public QueryUnhandledExceptionBehaviour(ILogger<TQuery> logger)
         {

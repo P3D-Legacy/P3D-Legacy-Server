@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Application.CommandHandlers.Administration
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class UnbanPlayerCommandHandler : ICommandHandler<UnbanPlayerCommand>
     {
         private readonly ILogger _logger;

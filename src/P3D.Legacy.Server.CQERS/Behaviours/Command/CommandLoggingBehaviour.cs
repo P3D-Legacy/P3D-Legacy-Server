@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.CQERS.Behaviours.Command
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal partial class CommandLoggingBehaviour<TCommand> : ICommandPreProcessor<TCommand> where TCommand : notnull
     {
 #if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
@@ -18,7 +17,6 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command
 
         private readonly ILogger<TCommand> _logger;
 
-        [SuppressMessage("CodeQuality", "IDE0079")]
         [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
         public CommandLoggingBehaviour(ILogger<TCommand> logger)
         {
