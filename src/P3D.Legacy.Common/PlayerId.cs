@@ -17,8 +17,8 @@ namespace P3D.Legacy.Common
         public string NameOrEmpty => IdType == PlayerIdType.Name ? Id : string.Empty;
         public GameJoltId GameJoltIdOrNone => IdType == PlayerIdType.GameJolt ? GameJoltId.Parse(Id) : GameJoltId.None;
 
-        public bool IsEmpty => IdType == PlayerIdType.None;
-        private string Id { get; init; } = Id;
+        public bool IsNone => IdType == PlayerIdType.None;
+        private string Id { get; } = Id;
 
         public override string ToString() => $"{IdType}:{Id}";
     }

@@ -14,9 +14,9 @@ namespace P3D.Legacy.Common.PlayerEvents
     [JsonDerivedType(typeof(EvolvedPokemonEvent), (int) PlayerEventType.EvolvedPokemon)]
     public abstract record PlayerEvent([property: JsonIgnore] PlayerEventType EventType);
     public sealed record UnknownEvent(string RawEvent) : PlayerEvent(PlayerEventType.Unknown);
-    public sealed record AchievedEmblemEvent(string Emblem) : PlayerEvent(PlayerEventType.AchievedEmblem);
+    public sealed record AchievedEmblemEvent(string EmblemName) : PlayerEvent(PlayerEventType.AchievedEmblem);
     public sealed record DefeatedByTrainerEvent(string TrainerTypeAndName) : PlayerEvent(PlayerEventType.DefeatedByTrainer);
     public sealed record DefeatedByWildPokemonEvent(string PokemonName) : PlayerEvent(PlayerEventType.DefeatedByWildPokemon);
-    public sealed record HostedABattleEvent(string Trainer, string DefeatedTrainer) : PlayerEvent(PlayerEventType.HostedABattle);
+    public sealed record HostedABattleEvent(string TrainerName, string DefeatedTrainerName) : PlayerEvent(PlayerEventType.HostedABattle);
     public sealed record EvolvedPokemonEvent(string PokemonName, string EvolvedPokemonName) : PlayerEvent(PlayerEventType.EvolvedPokemon);
 }

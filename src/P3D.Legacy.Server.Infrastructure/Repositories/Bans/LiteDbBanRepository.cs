@@ -10,10 +10,7 @@ using P3D.Legacy.Server.Infrastructure.Models.Bans;
 using P3D.Legacy.Server.Infrastructure.Options;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -56,29 +53,6 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             var entry = await collection.FindByIdAsync(idStr) is { } ban ? new BanEntity(PlayerId.Parse(ban.BannerId), PlayerId.Parse(ban.Id), IPAddress.Parse(ban.Ip), ban.ReasonId, ban.Reason, ban.Expiration) : null;
 
             return entry;
-        }
-
-        public async IAsyncEnumerable<BanEntity> GetAllAsync([EnumeratorCancellation] CancellationToken ct)
-        {
-            var connectionString = new ConnectionString(_options.ConnectionString);
-
-            using var span = _tracer.StartActiveSpan("Get All Bans", SpanKind.Client);
-            span.SetAttribute("client.address", connectionString.Filename);
-
-            ct.ThrowIfCancellationRequested();
-
-            using var db = new LiteDatabaseAsync(connectionString);
-            var collection = db.GetCollection<Ban>("bans");
-
-            ct.ThrowIfCancellationRequested();
-            await collection.EnsureIndexAsync(static x => x.Id, true);
-
-            ct.ThrowIfCancellationRequested();
-            var entries = await collection.FindAllAsync();
-            foreach (var banEntity in entries.Select(static x => new BanEntity(PlayerId.Parse(x.BannerId), PlayerId.Parse(x.Id), IPAddress.Parse(x.Ip), x.ReasonId, x.Reason, x.Expiration)))
-            {
-                yield return banEntity;
-            }
         }
 
         public async Task<bool> BanAsync(BanEntity banEntity, CancellationToken ct)

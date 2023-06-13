@@ -74,8 +74,11 @@ namespace P3D.Legacy.Server
                     .ConfigureResource(static builder => builder.AddService("P3D.Legacy.Server"))
                     .WithMetrics(builder =>
                     {
-                        var options = ctx.Configuration.GetSection("Otlp").Get<OtlpOptions>() ?? new();
-                        if (options.Enabled)
+#pragma warning disable IL2026
+                        var enabled = ctx.Configuration.GetSection("Otlp").GetValue<bool>(nameof(OtlpOptions.Enabled));
+                        var host = ctx.Configuration.GetSection("Otlp").GetValue<string>(nameof(OtlpOptions.Host)) ?? string.Empty;
+#pragma warning restore IL2026
+                        if (enabled)
                         {
                             builder.AddAspNetCoreInstrumentation();
                             builder.AddHttpClientInstrumentation();
@@ -84,14 +87,17 @@ namespace P3D.Legacy.Server
 
                             builder.AddOtlpExporter(opt =>
                             {
-                                opt.Endpoint = new Uri(options.Host);
+                                opt.Endpoint = new Uri(host);
                             });
                         }
                     })
                     .WithTracing(builder =>
                     {
-                        var options = ctx.Configuration.GetSection("Otlp").Get<OtlpOptions>() ?? new();
-                        if (options.Enabled)
+#pragma warning disable IL2026
+                        var enabled = ctx.Configuration.GetSection("Otlp").GetValue<bool>(nameof(OtlpOptions.Enabled));
+                        var host = ctx.Configuration.GetSection("Otlp").GetValue<string>(nameof(OtlpOptions.Host)) ?? string.Empty;
+#pragma warning restore IL2026
+                        if (enabled)
                         {
                             builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
 
@@ -111,7 +117,7 @@ namespace P3D.Legacy.Server
 
                             builder.AddOtlpExporter(opt =>
                             {
-                                opt.Endpoint = new Uri(options.Host);
+                                opt.Endpoint = new Uri(host);
                             });
                         }
                     });

@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Statistics.EventHandlers
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed class StatisticsHandler :
         IEventHandler<PlayerTriggeredEventEvent>,
         IEventHandler<PlayerSentGlobalMessageEvent>,

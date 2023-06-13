@@ -3,13 +3,21 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <MSBuildWarningsAsMessages>SYSLIB1006;SYSLIB1037</MSBuildWarningsAsMessages>
 
+    <PublishTrimmed>true</PublishTrimmed>
     <IsTrimmable>true</IsTrimmable>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <TrimMode>full</TrimMode>
+    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+
+    <!-- Additional 30MB at least
+    <PublishReadyToRun>true</PublishReadyToRun>
+    -->
     
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 
-    <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <AnalysisMode>latest-Recommended</AnalysisMode>
     <AnalysisLevel>latest</AnalysisLevel>
 

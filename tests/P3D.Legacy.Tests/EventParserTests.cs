@@ -23,7 +23,7 @@ namespace P3D.Legacy.Tests
             Assert.True(PlayerEventParser.TryParse(msg, out var @event));
             Assert.IsInstanceOf<AchievedEmblemEvent>(@event);
             Assert.AreEqual(PlayerEventType.AchievedEmblem, @event!.EventType);
-            Assert.AreEqual(arg0, ((AchievedEmblemEvent) @event).Emblem);
+            Assert.AreEqual(arg0, ((AchievedEmblemEvent) @event).EmblemName);
         }
 
         [Test]
@@ -36,8 +36,8 @@ namespace P3D.Legacy.Tests
             Assert.True(PlayerEventParser.TryParse(msg, out var @event));
             Assert.IsInstanceOf<HostedABattleEvent>(@event);
             Assert.AreEqual(PlayerEventType.HostedABattle, @event!.EventType);
-            Assert.AreEqual(arg0, ((HostedABattleEvent) @event).DefeatedTrainer);
-            Assert.AreEqual(arg1, ((HostedABattleEvent) @event).Trainer);
+            Assert.AreEqual(arg0, ((HostedABattleEvent) @event).DefeatedTrainerName);
+            Assert.AreEqual(arg1, ((HostedABattleEvent) @event).TrainerName);
         }
 
         [Test]

@@ -54,7 +54,7 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             Debug.Assert(State == PlayerState.Initializing);
 
-            if (!Id.IsEmpty)
+            if (!Id.IsNone)
                 throw new InvalidOperationException("Id was already assigned!");
 
             Id = id;

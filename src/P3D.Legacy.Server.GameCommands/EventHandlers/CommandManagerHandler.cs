@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.GameCommands.EventHandlers
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal sealed partial class CommandManagerHandler :
         IEventHandler<PlayerSentCommandEvent>
     {

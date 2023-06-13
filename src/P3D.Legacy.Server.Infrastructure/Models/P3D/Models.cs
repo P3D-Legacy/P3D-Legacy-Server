@@ -1,51 +1,53 @@
-﻿using Newtonsoft.Json;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace P3D.Legacy.Server.Infrastructure.Models.P3D
 {
-    [SuppressMessage("Performance", "CA1812")]
+    internal record ReasonDTO(
+        [property: JsonPropertyName("name")] string Name,
+        [property: JsonPropertyName("created_at")] DateTime CreatedAt,
+        [property: JsonPropertyName("updated_at")] DateTime UpdatedAt);
+
     internal record UserDTO(
-        [property: JsonProperty("id")] ulong Id,
-        [property: JsonProperty("name")] string Name,
-        [property: JsonProperty("email")] string Email,
-        [property: JsonProperty("username")] string Username,
-        [property: JsonProperty("created_at")] DateTime CreatedAt,
-        [property: JsonProperty("updated_at")] DateTime UpdatedAt,
-        [property: JsonProperty("profile_photo_url")] string ProfilePhotoUrl,
-        [property: JsonProperty("roles")] IReadOnlyList<RoleDTO>? Roles);
+        [property: JsonPropertyName("id")] ulong Id,
+        [property: JsonPropertyName("name")] string Name,
+        [property: JsonPropertyName("email")] string Email,
+        [property: JsonPropertyName("username")] string Username,
+        [property: JsonPropertyName("created_at")] DateTime CreatedAt,
+        [property: JsonPropertyName("updated_at")] DateTime UpdatedAt,
+        [property: JsonPropertyName("profile_photo_url")] string ProfilePhotoUrl,
+        [property: JsonPropertyName("roles")] IReadOnlyList<RoleDTO>? Roles,
+        [property: JsonPropertyName("gamejolt")] GameJoltDTO? GameJolt,
+        [property: JsonPropertyName("forum")] ForumDTO? UserForum);
 
-    [SuppressMessage("Performance", "CA1812")]
     internal record GameJoltDTO(
-        [property: JsonProperty("id")] ulong Id,
-        [property: JsonProperty("username")] string Username,
-        [property: JsonProperty("verified_at")] DateTime VerifiedAt,
-        [property: JsonProperty("created_at")] DateTime CreatedAt,
-        [property: JsonProperty("updated_at")] DateTime UpdatedAt,
-        [property: JsonProperty("deleted_at")] DateTime? DeletedAt);
+        [property: JsonPropertyName("id")] ulong Id,
+        [property: JsonPropertyName("username")] string Username,
+        [property: JsonPropertyName("verified_at")] DateTime VerifiedAt,
+        [property: JsonPropertyName("created_at")] DateTime CreatedAt,
+        [property: JsonPropertyName("updated_at")] DateTime UpdatedAt,
+        [property: JsonPropertyName("deleted_at")] DateTime? DeletedAt,
+        [property: JsonPropertyName("user")] UserDTO? User);
 
-    [SuppressMessage("Performance", "CA1812")]
     internal record ForumDTO(
-        [property: JsonProperty("username")] string Username,
-        [property: JsonProperty("verified_at")] DateTime VerifiedAt,
-        [property: JsonProperty("created_at")] DateTime CreatedAt,
-        [property: JsonProperty("updated_at")] DateTime UpdatedAt,
-        [property: JsonProperty("deleted_at")] DateTime? DeletedAt);
+        [property: JsonPropertyName("username")] string Username,
+        [property: JsonPropertyName("verified_at")] DateTime VerifiedAt,
+        [property: JsonPropertyName("created_at")] DateTime CreatedAt,
+        [property: JsonPropertyName("updated_at")] DateTime UpdatedAt,
+        [property: JsonPropertyName("deleted_at")] DateTime? DeletedAt,
+        [property: JsonPropertyName("user")] UserDTO? User);
 
-    [SuppressMessage("Performance", "CA1812")]
     internal record RoleDTO(
-        [property: JsonProperty("id")] ulong Id,
-        [property: JsonProperty("name")] string Name,
-        [property: JsonProperty("created_at")] DateTime CreatedAt,
-        [property: JsonProperty("updated_at")] DateTime UpdatedAt,
-        [property: JsonProperty("permissions")] IReadOnlyList<PermissionDTO> Permissions);
+        [property: JsonPropertyName("id")] ulong Id,
+        [property: JsonPropertyName("name")] string Name,
+        [property: JsonPropertyName("created_at")] DateTime CreatedAt,
+        [property: JsonPropertyName("updated_at")] DateTime UpdatedAt,
+        [property: JsonPropertyName("permissions")] IReadOnlyList<PermissionDTO> Permissions);
 
-    [SuppressMessage("Performance", "CA1812")]
     internal record PermissionDTO(
-        [property: JsonProperty("id")] ulong Id,
-        [property: JsonProperty("name")] string Name,
-        [property: JsonProperty("created_at")] DateTime CreatedAt,
-        [property: JsonProperty("updated_at")] DateTime UpdatedAt);
+        [property: JsonPropertyName("id")] ulong Id,
+        [property: JsonPropertyName("name")] string Name,
+        [property: JsonPropertyName("created_at")] DateTime CreatedAt,
+        [property: JsonPropertyName("updated_at")] DateTime UpdatedAt);
 }

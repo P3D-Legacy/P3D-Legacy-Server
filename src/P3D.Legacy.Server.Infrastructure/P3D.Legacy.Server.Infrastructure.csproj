@@ -1,9 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsTrimmable>false</IsTrimmable>
-  </PropertyGroup>
-
   <ItemGroup>
     <AssemblyAttribute Include="CLSCompliantAttribute">
       <_Parameter1>false</_Parameter1>
@@ -20,7 +16,6 @@
     <PackageReference Include="Isopoh.Cryptography.Argon2" />
     <PackageReference Include="LiteDB" />
     <PackageReference Include="LiteDB.Async" />
-    <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="OpenTelemetry.Api" />
     <PackageReference Include="System.Text.Encodings.Web" />
   </ItemGroup>

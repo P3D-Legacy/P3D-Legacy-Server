@@ -84,7 +84,7 @@ query MonsterStaticData($id: Int, $itemId: Int) {
         }
 
         /// <inheritdoc />
-        public async Task<(IMonsterStaticData, IItemInstance)> GetStaticDataAsync(int id, int itemId, CancellationToken ct)
+        public async Task<(IMonsterStaticData, IItemInstance?)> GetStaticDataAsync(int id, int itemId, CancellationToken ct)
         {
             using var graphQLClient = new GraphQLHttpClient(_options.GraphQLEndpoint, new SystemTextJsonSerializer());
             var monsterStaticDataRequest = new GraphQLRequest

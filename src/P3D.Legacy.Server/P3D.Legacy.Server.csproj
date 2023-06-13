@@ -19,10 +19,6 @@
     <RetainVMGarbageCollection>false</RetainVMGarbageCollection>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <IsTrimmable>false</IsTrimmable>
-  </PropertyGroup>
-
   <ItemGroup>
     <AssemblyAttribute Include="CLSCompliantAttribute">
       <_Parameter1>false</_Parameter1>

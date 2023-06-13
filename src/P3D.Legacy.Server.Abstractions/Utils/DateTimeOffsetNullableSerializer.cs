@@ -10,7 +10,7 @@ namespace P3D.Legacy.Server.Abstractions.Utils
         public override DateTimeOffset? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.GetString() is { } raw)
-                return DateTimeOffset.ParseExact(raw, "yyyy-MM-dd HH:mm:ss", DateTimeFormatInfo.InvariantInfo);
+                return DateTimeOffset.Parse(raw, DateTimeFormatInfo.InvariantInfo);
 
             return null;
         }
@@ -20,7 +20,7 @@ namespace P3D.Legacy.Server.Abstractions.Utils
             if (value == null)
                 writer.WriteNullValue();
             else
-                writer.WriteStringValue(value.Value.ToString("yyyy-MM-dd HH:mm:ss", DateTimeFormatInfo.InvariantInfo));
+                writer.WriteStringValue(value.Value.ToString("O", DateTimeFormatInfo.InvariantInfo));
         }
     }
 }

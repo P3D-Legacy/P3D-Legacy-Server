@@ -65,11 +65,11 @@ namespace P3D.Legacy.Common.PlayerEvents
 
         public static string AsText(PlayerEvent @event) => @event switch
         {
-            AchievedEmblemEvent achievedEmblemEvent => $"achieved the emblem {achievedEmblemEvent.Emblem}!",
+            AchievedEmblemEvent achievedEmblemEvent => $"achieved the emblem {achievedEmblemEvent.EmblemName}!",
             DefeatedByTrainerEvent defeatedByTrainerEvent => $"got defeated by {defeatedByTrainerEvent.TrainerTypeAndName}!",
             DefeatedByWildPokemonEvent defeatedByWildPokemonEvent => $"got defeated by a wild {defeatedByWildPokemonEvent.PokemonName}!",
             EvolvedPokemonEvent evolvedPokemonEvent => $"evolved their {evolvedPokemonEvent.PokemonName} into a {evolvedPokemonEvent.EvolvedPokemonName}!",
-            HostedABattleEvent hostedABattleEvent => $"hosted a battle: \"Player {hostedABattleEvent.DefeatedTrainer} got defeated by Player {hostedABattleEvent.Trainer}\"!",
+            HostedABattleEvent hostedABattleEvent => $"hosted a battle: \"Player {hostedABattleEvent.DefeatedTrainerName} got defeated by Player {hostedABattleEvent.TrainerName}\"!",
             UnknownEvent unknownEvent => unknownEvent.RawEvent,
             _ => throw new ArgumentOutOfRangeException(nameof(@event))
         };

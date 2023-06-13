@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Behaviours
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal class CommandValidationBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
     {
         private readonly IEnumerable<IValidator<TCommand>> _validators;
@@ -40,7 +39,6 @@ namespace P3D.Legacy.Server.Behaviours
         }
     }
 
-    [SuppressMessage("Performance", "CA1812")]
     internal class QueryValidationBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
     {
         private readonly IEnumerable<IValidator<TQuery>> _validators;

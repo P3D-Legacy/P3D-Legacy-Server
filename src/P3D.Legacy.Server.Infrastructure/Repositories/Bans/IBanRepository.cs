@@ -10,7 +10,6 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
     public interface IBanRepository
     {
         Task<BanEntity?> GetAsync(PlayerId id, CancellationToken ct);
-        IAsyncEnumerable<BanEntity> GetAllAsync(CancellationToken ct);
 
         Task<bool> BanAsync(BanEntity banEntity, CancellationToken ct);
         Task<bool> UnbanAsync(PlayerId id, CancellationToken ct);

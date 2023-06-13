@@ -1,4 +1,5 @@
-﻿using P3D.Legacy.Server.Abstractions;
+﻿using P3D.Legacy.Common;
+using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Commands.Administration;
 
 using System;
@@ -24,19 +25,14 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
             if (arguments.Length == 1)
             {
                 var targetName = arguments[0];
-                if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
+                var playerId = PlayerId.Parse(targetName);
+                if (playerId == PlayerId.None)
                 {
-                    await SendMessageAsync(player, $"Player {targetName} not found!", ct);
+                    await SendMessageAsync(player, $"Please input the player id as \"GameJolt:GAMEJOLTID\" for GameJolt and \"Name:NAME\" for offline players", ct);
                     return;
                 }
 
-                if (targetPlayer.Id == player.Id)
-                {
-                    await SendMessageAsync(player, "You can't unban yourself!", ct);
-                    return;
-                }
-
-                var result = await CommandDispatcher.DispatchAsync(new UnbanPlayerCommand(targetPlayer.Id), ct);
+                var result = await CommandDispatcher.DispatchAsync(new UnbanPlayerCommand(playerId), ct);
                 if (!result.IsSuccess)
                     await SendMessageAsync(player, $"Failed to unban player {targetName}!", ct);
             }

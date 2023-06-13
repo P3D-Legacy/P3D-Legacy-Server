@@ -32,22 +32,6 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             _ => null
         };
 
-        public async IAsyncEnumerable<BanEntity> GetAllAsync([EnumeratorCancellation] CancellationToken ct)
-        {
-            if (_options.IsOfficial)
-            {
-                await foreach (var banEntity in _p3dBanRepository.GetAllAsync(ct))
-                {
-                    yield return banEntity;
-                }
-            }
-
-            await foreach (var banEntity in _p3dBanRepository.GetAllAsync(ct))
-            {
-                yield return banEntity;
-            }
-        }
-
         public async Task<bool> BanAsync(BanEntity banEntity, CancellationToken ct) => banEntity.Id.IdType switch
         {
             PlayerIdType.Name => await _liteDbBanRepository.BanAsync(banEntity, ct),

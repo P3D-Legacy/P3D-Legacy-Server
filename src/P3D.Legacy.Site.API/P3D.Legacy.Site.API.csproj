@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Linq.Async" />
+    </ItemGroup>
+
+    <Target Name="RemoveGenerateSources" BeforeTargets="CoreClean">
+        <Delete Files="Clients.g.cs" />
+    </Target>
+
+    <Target Name="GenerateOpenApi" BeforeTargets="PreBuildEvent">
+        <ItemGroup>
+            <ExecPreprocessArgs Include="/input:swagger.json /classname:&quot;{controller}Client&quot; /namespace:$(RootNamespace) /output:Clients.g.cs" />
+            <ExecPreprocessArgs Include="/InjectHttpClient:true /UseBaseUrl:false /GenerateClientInterfaces:true" />
+            <ExecPreprocessArgs Include="/RequiredPropertiesMustBeDefined:true /GenerateNullableReferenceTypes:true /GenerateImmutableArrayProperties:true /GenerateImmutableDictionaryProperties:true" />
+            <ExecPreprocessArgs Include="/ClassStyle:Record /TemplateDirectory:Templates /GenerateOptionalParameters:true /UseCancellationToken:true" />
+            <ExecPreprocessArgs Include="/OperationGenerationMode:MultipleClientsFromFirstTagAndPathSegments /JsonLibrary:SystemTextJson" />
+        </ItemGroup>
+
+        <ItemGroup>
+            <Compile Include="Clients.g.cs" />
+        </ItemGroup>
+
+        <Exec Command="dotnet new tool-manifest --force" />
+        <Exec Command="dotnet tool install --local NSwag.ConsoleCore --version 13.19.0" />
+        <Exec Command="dotnet nswag openapi2csclient @(ExecPreprocessArgs, ' ')" />
+
+    </Target>
+
+</Project>

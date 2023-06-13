@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Behaviours
 {
-    [SuppressMessage("Performance", "CA1812")]
     internal class CommandTracingBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
     {
         private readonly Tracer _tracer;
@@ -40,7 +39,6 @@ namespace P3D.Legacy.Server.Behaviours
         }
     }
 
-    [SuppressMessage("Performance", "CA1812")]
     internal class QueryTracingBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
     {
         private readonly Tracer _tracer;

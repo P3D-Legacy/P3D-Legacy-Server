@@ -44,7 +44,9 @@ namespace P3D.Legacy.Server.Client.P3D.Services
                     return;
                 }
 
+#pragma warning disable VSTHRD003
                 var device = await result;
+#pragma warning restore VSTHRD003
                 var ip = await device.GetExternalIPAsync();
                 _logger.LogWarning("The public IP Address for P3D is: {PublicIPAddres}", ip);
 

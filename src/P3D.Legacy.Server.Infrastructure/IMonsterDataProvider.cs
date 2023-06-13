@@ -7,6 +7,6 @@ namespace P3D.Legacy.Server.Infrastructure
 {
     public interface IMonsterDataProvider
     {
-        Task<(IMonsterStaticData, IItemInstance)> GetStaticDataAsync(int id, int itemId, CancellationToken ct);
+        Task<(IMonsterStaticData, IItemInstance?)> GetStaticDataAsync(int id, int itemId, CancellationToken ct);
     }
 }

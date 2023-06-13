@@ -33,6 +33,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
     {
         [JsonSerializable(typeof(RequestPayload))]
         [JsonSerializable(typeof(ResponsePayload))]
+        [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default)]
         internal partial class JsonContext : JsonSerializerContext { }
 
         private class WebSocketPlayer : IPlayer

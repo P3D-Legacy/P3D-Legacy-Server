@@ -13,9 +13,7 @@ using System.Threading.Tasks;
 namespace P3D.Legacy.Server.Application.QueryHandlers.Ban
 {
     [SuppressMessage("Performance", "CA1812")]
-    internal sealed class BanQueryHandler :
-        IQueryHandler<GetPlayerBanQuery, BanViewModel?>,
-        IQueryHandler<GetPlayerBansQuery, ImmutableArray<BanViewModel>>
+    internal sealed class BanQueryHandler : IQueryHandler<GetPlayerBanQuery, BanViewModel?>
     {
         private readonly IBanRepository _banRepository;
 
@@ -29,11 +27,6 @@ namespace P3D.Legacy.Server.Application.QueryHandlers.Ban
             var id = query.Id;
 
             return await _banRepository.GetAsync(id, ct) is { } ban ? new BanViewModel(ban.BannerId, ban.Id, ban.Ip, ban.Reason, ban.Expiration) : null;
-        }
-
-        public async Task<ImmutableArray<BanViewModel>> HandleAsync(GetPlayerBansQuery query, CancellationToken ct)
-        {
-            return await _banRepository.GetAllAsync(ct).Select(static x => new BanViewModel(x.BannerId, x.Id, x.Ip, x.Reason, x.Expiration)).ToImmutableArrayAsync(ct);
         }
     }
 }
