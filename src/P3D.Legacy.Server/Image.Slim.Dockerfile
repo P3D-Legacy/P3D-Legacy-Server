@@ -30,7 +30,7 @@ RUN \
     elif [ $TARGETPLATFORM = "linux/arm/v7" ]; then \
         RID="linux-arm"; \
     fi \
-    && dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r $RID -p:PublishReadyToRun=true;
+    && dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r $RID;
 
 COPY ["src/P3D.Legacy.Common/", "src/P3D.Legacy.Common/"]
 COPY ["src/P3D.Legacy.Server.CQERS/", "src/P3D.Legacy.Server.CQERS/"]
@@ -60,7 +60,7 @@ RUN \
     elif [ $TARGETPLATFORM = "linux/arm/v7" ]; then \
         RID="linux-arm"; \
     fi \
-    && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained true -o /app/publish -p:PublishReadyToRun=true;
+    && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained true -o /app/publish;
 
 FROM base AS final
 WORKDIR /app

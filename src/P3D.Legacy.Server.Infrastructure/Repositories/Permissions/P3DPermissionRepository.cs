@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 {
-    public partial class P3DPermissionRepository
+    // TODO: public
+    internal class P3DPermissionRepository
     {
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
         private readonly Pokemon3DAPIClient _apiClient;
 
-        // TODO: public constructor
-        internal P3DPermissionRepository(ILogger<P3DPermissionRepository> logger, TracerProvider traceProvider, Pokemon3DAPIClient apiClient)
+        public P3DPermissionRepository(ILogger<P3DPermissionRepository> logger, TracerProvider traceProvider, Pokemon3DAPIClient apiClient)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Infrastructure");

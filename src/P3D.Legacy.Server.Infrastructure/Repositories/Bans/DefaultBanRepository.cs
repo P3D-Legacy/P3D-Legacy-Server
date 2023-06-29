@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 {
-    public sealed class DefaultBanRepository : IBanRepository
+    internal sealed class DefaultBanRepository : IBanRepository
     {
         private readonly P3DIntegrationOptions _options;
         private readonly LiteDbBanRepository _liteDbBanRepository;

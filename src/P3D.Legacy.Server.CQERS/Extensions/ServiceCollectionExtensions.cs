@@ -44,7 +44,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             return services;
         }
 
-        public static IServiceCollection AddEvent<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicConstructors)] TEventHandler>(this IServiceCollection services)
+        public static IServiceCollection AddEventHandler<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicConstructors)] TEventHandler>(this IServiceCollection services)
             where TEventHandler : IEventHandler
         {
             var @typeof = typeof(TEventHandler);
@@ -59,7 +59,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
 
             return services;
         }
-        public static IServiceCollection AddEvent<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] TEventHandler>(this IServiceCollection services, Func<IServiceProvider, TEventHandler?> factory)
+        public static IServiceCollection AddEventHandler<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] TEventHandler>(this IServiceCollection services, Func<IServiceProvider, TEventHandler?> factory)
             where TEventHandler : IEventHandler
         {
             var @typeof = typeof(TEventHandler);
@@ -67,14 +67,14 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             foreach (var eventHandlerInterface in @typeofEventInterfaces)
             {
                 var genericType = eventHandlerInterface.GenericTypeArguments[0];
-                var openMethod = typeof(ServiceCollectionExtensions).GetMethod(nameof(AddEvent), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                var openMethod = typeof(ServiceCollectionExtensions).GetMethod(nameof(AddEventHandler), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
                 var method = openMethod?.MakeGenericMethod(@typeof, genericType);
                 method?.Invoke(null, new object?[] { services, factory });
             }
 
             return services;
         }
-        public static IServiceCollection AddEvents<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] TEventHandler>(this IServiceCollection services, Func<IServiceProvider, IEnumerable<TEventHandler>> factory)
+        public static IServiceCollection AddEventHandlers<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] TEventHandler>(this IServiceCollection services, Func<IServiceProvider, IEnumerable<TEventHandler>> factory)
             where TEventHandler : IEventHandler
         {
             var @typeof = typeof(TEventHandler);
@@ -82,14 +82,14 @@ namespace P3D.Legacy.Server.CQERS.Extensions
             foreach (var eventHandlerInterface in @typeofEventInterfaces)
             {
                 var genericType = eventHandlerInterface.GenericTypeArguments[0];
-                var openMethod = typeof(ServiceCollectionExtensions).GetMethod(nameof(AddEvents), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                var openMethod = typeof(ServiceCollectionExtensions).GetMethod(nameof(AddEventHandlers), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
                 var method = openMethod?.MakeGenericMethod(@typeof, genericType);
                 method?.Invoke(null, new object?[] { services, factory });
             }
 
             return services;
         }
-        private static IServiceCollection AddEvent<TEventHandler, TEvent>(this IServiceCollection services, Func<IServiceProvider, TEventHandler?> factory)
+        private static IServiceCollection AddEventHandler<TEventHandler, TEvent>(this IServiceCollection services, Func<IServiceProvider, TEventHandler?> factory)
             where TEvent : IEvent
             where TEventHandler : IEventHandler<TEvent>
         {
@@ -97,7 +97,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions
 
             return services;
         }
-        private static IServiceCollection AddEvents<TEventHandler, TEvent>(this IServiceCollection services, Func<IServiceProvider, IEnumerable<TEventHandler>> factory)
+        private static IServiceCollection AddEventHandlers<TEventHandler, TEvent>(this IServiceCollection services, Func<IServiceProvider, IEnumerable<TEventHandler>> factory)
             where TEvent : IEvent
             where TEventHandler : IEventHandler<TEvent>
         {

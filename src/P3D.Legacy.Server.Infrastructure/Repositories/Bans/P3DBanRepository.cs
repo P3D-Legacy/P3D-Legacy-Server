@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
 {
-    public partial class P3DBanRepository
+    // TODO: public
+    internal class P3DBanRepository
     {
         private readonly ILogger _logger;
         private readonly Tracer _tracer;
         private readonly Pokemon3DAPIClient _apiClient;
 
-        // TODO: public constructor
-        internal P3DBanRepository(ILogger<P3DBanRepository> logger, TracerProvider traceProvider, Pokemon3DAPIClient apiClient)
+        public P3DBanRepository(ILogger<P3DBanRepository> logger, TracerProvider traceProvider, Pokemon3DAPIClient apiClient)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Infrastructure");

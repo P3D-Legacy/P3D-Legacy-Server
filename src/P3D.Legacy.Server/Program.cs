@@ -49,14 +49,14 @@ namespace P3D.Legacy.Server
             {
                 services.AddSingleton<DynamicConfigurationProviderManager>();
 
-                services.AddValidatedOptions<ServerOptions, ServerOptionsValidator>(ctx.Configuration.GetSection("Server"));
-                services.AddValidatedOptions<P3DIntegrationOptions, P3DIntegrationOptionsValidator>(ctx.Configuration.GetSection("Server"));
-                services.AddValidatedOptionsWithHttp<P3DSiteOptions, P3DSiteOptionsValidator>(ctx.Configuration.GetSection("OfficialSite"));
-                services.AddValidatedOptions<P3DServerOptions, P3DServerOptionsValidator>(ctx.Configuration.GetSection("P3DServer"));
-                services.AddValidatedOptions<DiscordOptions, DiscordOptionsValidator>(ctx.Configuration.GetSection("DiscordBot"));
-                services.AddValidatedOptions<LiteDbOptions, LiteDbOptionsValidator>(ctx.Configuration.GetSection("LiteDb"));
-                services.AddValidatedOptions<JwtOptions, JwtOptionsValidator>(ctx.Configuration.GetSection("Jwt"));
-                services.AddValidatedOptions<OtlpOptions, OtlpOptionsValidator>(ctx.Configuration.GetSection("Otlp"));
+                services.AddValidatedOptions<ServerOptions, ServerOptionsValidator>().Bind(ctx.Configuration.GetSection("Server"));
+                services.AddValidatedOptions<P3DIntegrationOptions, P3DIntegrationOptionsValidator>().Bind(ctx.Configuration.GetSection("Server"));
+                services.AddValidatedOptionsWithHttp<P3DSiteOptions, P3DSiteOptionsValidator>().Bind(ctx.Configuration.GetSection("OfficialSite"));
+                services.AddValidatedOptions<P3DServerOptions, P3DServerOptionsValidator>().Bind(ctx.Configuration.GetSection("P3DServer"));
+                services.AddValidatedOptions<DiscordOptions, DiscordOptionsValidator>().Bind(ctx.Configuration.GetSection("DiscordBot"));
+                services.AddValidatedOptions<LiteDbOptions, LiteDbOptionsValidator>().Bind(ctx.Configuration.GetSection("LiteDb"));
+                services.AddValidatedOptions<JwtOptions, JwtOptionsValidator>().Bind(ctx.Configuration.GetSection("Jwt"));
+                services.AddValidatedOptions<OtlpOptions, OtlpOptionsValidator>().Bind(ctx.Configuration.GetSection("Otlp"));
 
                 services.AddMediator();
                 services.AddHost();
@@ -71,13 +71,11 @@ namespace P3D.Legacy.Server
                 services.AddGUI();
 
                 services.AddOpenTelemetry()
-                    .ConfigureResource(static builder => builder.AddService("P3D.Legacy.Server"))
+                    .ConfigureResource(static builder => builder.AddService(typeof(Program).Namespace!))
                     .WithMetrics(builder =>
                     {
-#pragma warning disable IL2026
                         var enabled = ctx.Configuration.GetSection("Otlp").GetValue<bool>(nameof(OtlpOptions.Enabled));
                         var host = ctx.Configuration.GetSection("Otlp").GetValue<string>(nameof(OtlpOptions.Host)) ?? string.Empty;
-#pragma warning restore IL2026
                         if (enabled)
                         {
                             builder.AddAspNetCoreInstrumentation();
@@ -93,10 +91,8 @@ namespace P3D.Legacy.Server
                     })
                     .WithTracing(builder =>
                     {
-#pragma warning disable IL2026
                         var enabled = ctx.Configuration.GetSection("Otlp").GetValue<bool>(nameof(OtlpOptions.Enabled));
                         var host = ctx.Configuration.GetSection("Otlp").GetValue<string>(nameof(OtlpOptions.Host)) ?? string.Empty;
-#pragma warning restore IL2026
                         if (enabled)
                         {
                             builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));

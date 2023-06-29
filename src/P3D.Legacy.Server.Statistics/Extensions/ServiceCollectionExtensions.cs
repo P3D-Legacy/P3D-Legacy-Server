@@ -10,7 +10,7 @@ namespace P3D.Legacy.Server.Statistics.Extensions
         public static IServiceCollection AddStatistics(this IServiceCollection services)
         {
             services.AddTransient<MetricsHandler>();
-            services.AddEvent(static sp => sp.GetRequiredService<MetricsHandler>());
+            services.AddEventHandler(static sp => sp.GetRequiredService<MetricsHandler>());
 
             //services.AddTransient<StatisticsHandler>();
             //services.AddEvents(sp => sp.GetRequiredService<StatisticsHandler>());

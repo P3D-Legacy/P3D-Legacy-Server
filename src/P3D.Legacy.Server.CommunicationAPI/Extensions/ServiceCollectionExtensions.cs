@@ -13,9 +13,13 @@ namespace P3D.Legacy.Server.CommunicationAPI.Extensions
             services.AddTransient<CommunicationController>();
 
             services.AddScoped<WebSocketHandlerFactory>();
-            services.AddEvents(static sp => sp.GetRequiredService<WebSocketSubscribtionManager>().Values);
+            services.AddEventHandlers(static sp => sp.GetRequiredService<WebSocketSubscribtionManager>().Values);
 
             services.AddSingleton<WebSocketSubscribtionManager>();
+
+            services.AddTransient<CommunicationController>();
+            services.AddTransient<ServerV1Controller>();
+            services.AddTransient<ServerV2Controller>();
 
             return services;
         }

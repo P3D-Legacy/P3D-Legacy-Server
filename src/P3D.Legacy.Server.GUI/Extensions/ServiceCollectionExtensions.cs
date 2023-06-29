@@ -23,10 +23,10 @@ namespace P3D.Legacy.Server.GUI.Extensions
             services.AddScoped<ServerUI>();
 
             services.AddScoped<PlayerTabView>();
-            services.AddEvent(static sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<PlayerTabView>());
+            services.AddEventHandler(static sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<PlayerTabView>());
 
             services.AddScoped<ChatTabView>();
-            services.AddEvent(static sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<ChatTabView>());
+            services.AddEventHandler(static sp => sp.GetRequiredService<UIServiceScopeFactory>().GetService<ChatTabView>());
 
             services.AddScoped<LogsTabView>();
 

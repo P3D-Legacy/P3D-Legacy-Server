@@ -8,14 +8,14 @@
     <PublishTrimmed>true</PublishTrimmed>
     <IsTrimmable>true</IsTrimmable>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-    <TrimMode>full</TrimMode>
+    <!-- full breaks OpenTelemetry. Additional 20MB at least -->
+    <TrimMode>partial</TrimMode>
     <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
 
-    <!-- Additional 30MB at least
-    <PublishReadyToRun>true</PublishReadyToRun>
-    -->
-    
+    <!-- Additional 30MB at least -->
+    <PublishReadyToRun>false</PublishReadyToRun>
+
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 
     <AnalysisMode>latest-Recommended</AnalysisMode>

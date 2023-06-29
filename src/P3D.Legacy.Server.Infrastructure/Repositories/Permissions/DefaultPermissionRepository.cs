@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Infrastructure.Repositories.Permissions
 {
-    public class DefaultPermissionRepository : IPermissionRepository
+    internal class DefaultPermissionRepository : IPermissionRepository
     {
         private readonly P3DIntegrationOptions _options;
         private readonly LiteDbPermissionRepository _liteDbPermissionRepository;
