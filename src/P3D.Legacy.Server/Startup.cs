@@ -55,9 +55,9 @@ namespace P3D.Legacy.Server
                 opt.SwaggerDoc("v1", new OpenApiInfo { Title = appName, Version = "v1" });
                 opt.SupportNonNullableReferenceTypes();
 
-                var xmlFile = $"{appName}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                opt.IncludeXmlComments(xmlPath);
+                //var xmlFile = $"{appName}.xml";
+                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                //opt.IncludeXmlComments(xmlPath);
             });
 
             services.AddCors(static options =>

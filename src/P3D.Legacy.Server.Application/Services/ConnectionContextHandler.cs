@@ -24,11 +24,14 @@ namespace P3D.Legacy.Server.Application.Services
             var lifetimeNotificationFeature = Connection.Features.Get<IConnectionLifetimeNotificationFeature>();
             _stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(Connection.ConnectionClosed, lifetimeNotificationFeature?.ConnectionClosedRequested ?? CancellationToken.None);
             _executingTask = OnCreatedAsync(_stoppingCts.Token);
+            _stoppingCts.Token.Register(_ => OnConnectionClosed(this), state: null, useSynchronizationContext: false);
 
             return Task.FromResult(this);
         }
 
         protected abstract Task OnCreatedAsync(CancellationToken ct);
+
+        protected abstract void OnConnectionClosed(ConnectionContextHandler connectionContextHandler);
 
         public async Task ListenAsync()
         {

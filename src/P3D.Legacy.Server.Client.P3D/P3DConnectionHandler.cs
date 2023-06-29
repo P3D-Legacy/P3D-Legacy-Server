@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using P3D.Legacy.Server.Application.Services;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.Client.P3D
@@ -25,11 +24,7 @@ namespace P3D.Legacy.Server.Client.P3D
             var connectionContextHandlerFactory = connectionScope.ServiceProvider.GetRequiredService<ConnectionContextHandlerFactory>();
             using var connectionContextHandler = await connectionContextHandlerFactory.CreateAsync<P3DConnectionContextHandler>(connection);
 
-            try
-            {
-                await connectionContextHandler.ListenAsync();
-            }
-            catch (Exception e) when (e is TaskCanceledException or OperationCanceledException) { }
+            await connectionContextHandler.ListenAsync();
         }
     }
 }

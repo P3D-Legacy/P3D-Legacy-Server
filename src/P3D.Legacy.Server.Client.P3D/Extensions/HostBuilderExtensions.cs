@@ -3,6 +3,7 @@
 using ComposableAsync;
 
 using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -70,15 +71,9 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
         public static IHostBuilder AddP3DServer(this IHostBuilder hostBuilder) => hostBuilder.ConfigureServer(static (ctx, server) =>
         {
             var p3dServerOptions = server.ApplicationServices.GetRequiredService<IOptions<P3DServerOptions>>().Value;
-            server.UseSockets(sockets =>
-            {
-                sockets.Listen(new IPEndPoint(IPAddress.Parse(p3dServerOptions.IP), p3dServerOptions.Port), static builder =>
-                {
-                    builder
-                        .UseConnectionThrottle()
-                        .UseConnectionHandler<P3DConnectionHandler>();
-                });
-            });
+            server.Listen<SocketTransportFactory>(new IPEndPoint(IPAddress.Parse(p3dServerOptions.IP), p3dServerOptions.Port), static builder => builder
+                .UseConnectionThrottle()
+                .UseConnectionHandler<P3DConnectionHandler>());
         });
     }
 }

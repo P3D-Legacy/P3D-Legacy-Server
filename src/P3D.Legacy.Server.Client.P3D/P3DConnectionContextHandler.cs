@@ -1,6 +1,5 @@
 ﻿using Bedrock.Framework.Protocols;
 
-using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Threading;
 
@@ -70,18 +69,12 @@ namespace P3D.Legacy.Server.Client.P3D
         {
             _connectionSpan = _tracer.StartActiveSpan("P3D Session UNKNOWN");
 
-            using var connectionCancellationTokenSource =
-                Connection.Features.Get<IConnectionLifetimeNotificationFeature>() is { } clnf
-                    ? CancellationTokenSource.CreateLinkedTokenSource(ct, clnf.ConnectionClosedRequested)
-                    : CancellationTokenSource.CreateLinkedTokenSource(ct);
             try
             {
                 if (Connection.RemoteEndPoint is IPEndPoint ipEndPoint)
                 {
                     IPEndPoint = ipEndPoint;
                 }
-
-                connectionCancellationTokenSource.Token.Register(OnConnectionClosed, this, false);
 
                 _writer = Connection.CreateWriter();
                 await using var _ = _writer;
@@ -139,9 +132,9 @@ namespace P3D.Legacy.Server.Client.P3D
             await _finalizationDelayer.Task.WaitAsync(TimeSpan.FromSeconds(5), ct);
         }
 
-        private static void OnConnectionClosed(object? obj)
+        protected override void OnConnectionClosed(ConnectionContextHandler connectionContextHandler)
         {
-            if (obj is not P3DConnectionContextHandler connection) return;
+            if (connectionContextHandler is not P3DConnectionContextHandler connection) return;
 
             using var finishSpan = connection._tracer.StartActiveSpan("P3D Client Closing", SpanKind.Internal, parentSpan: connection._connectionSpan);
             var oldState = connection.State;

@@ -29,10 +29,12 @@ using P3D.Legacy.Server.Options;
 using P3D.Legacy.Server.Statistics.Extensions;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server
 {
+    [RequiresUnreferencedCode("Configuration and OpenTelemetry")]
     public static class Program
     {
         public static Task Main(string[] args) => CreateHostBuilder(args).Build().RunAsync();
