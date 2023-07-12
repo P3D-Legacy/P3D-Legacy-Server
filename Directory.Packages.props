@@ -31,7 +31,7 @@
     <PackageVersion Include="Nerdbank.Streams" Version="2.1.66" />
     <PackageVersion Include="Open.NAT.NET5" Version="1.0.0" />
     <PackageVersion Include="OpenTelemetry.Api" Version="1.5.0" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.5.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.5.1" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.5.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.5.0-beta.1" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.5.0-beta.1" />
