@@ -28,7 +28,7 @@ jobs:
 
       - name: Checkout Repository
         if: always()
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Notify
         if: always()
