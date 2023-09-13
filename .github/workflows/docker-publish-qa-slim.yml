@@ -38,7 +38,7 @@ jobs:
             ${{ runner.os }}-buildx-linux-slim-
 
       - name: Login to Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: P3D-Legacy
@@ -96,7 +96,7 @@ jobs:
             ${{ runner.os }}-buildx-linux-slim-x64-
 
       - name: Login to Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: P3D-Legacy
