@@ -30,6 +30,7 @@ using P3D.Legacy.Server.Statistics.Extensions;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter;
@@ -43,6 +44,14 @@ namespace P3D.Legacy.Server
     [RequiresUnreferencedCode("Configuration and OpenTelemetry")]
     public static class Program
     {
+        private const string ServerSectionName = "Server";
+        private const string LiteDbSectionName = "LiteDb";
+        private const string OfficialSiteSectionName = "OfficialSite";
+        private const string P3DServerSectionName = "P3DServer";
+        private const string DiscordBotSectionName = "DiscordBot";
+        private const string JwtSectionName = "Jwt";
+        private const string OtlpSectionName = "Otlp";
+
         public static async Task Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
@@ -75,21 +84,21 @@ namespace P3D.Legacy.Server
             .UseConsoleLifetime(static opt => opt.SuppressStatusMessages = false)
             .ConfigureAppConfiguration(static (ctx, builder) =>
             {
-                builder.Add(new MemoryConfigurationProvider<ServerOptions>(ctx.Configuration.GetSection("Server")));
-                builder.Add(new MemoryConfigurationProvider<LiteDbOptions>(ctx.Configuration.GetSection("LiteDb")));
+                builder.Add(new MemoryConfigurationProvider<ServerOptions>(ctx.Configuration.GetSection(ServerSectionName)));
+                builder.Add(new MemoryConfigurationProvider<LiteDbOptions>(ctx.Configuration.GetSection(LiteDbSectionName)));
             })
             .ConfigureServices(static (ctx, services) =>
             {
                 services.AddSingleton<DynamicConfigurationProviderManager>();
 
-                services.AddValidatedOptions<ServerOptions, ServerOptionsValidator>().Bind(ctx.Configuration.GetSection("Server"));
-                services.AddValidatedOptions<P3DIntegrationOptions, P3DIntegrationOptionsValidator>().Bind(ctx.Configuration.GetSection("Server"));
-                services.AddValidatedOptionsWithHttp<P3DSiteOptions, P3DSiteOptionsValidator>().Bind(ctx.Configuration.GetSection("OfficialSite"));
-                services.AddValidatedOptions<P3DServerOptions, P3DServerOptionsValidator>().Bind(ctx.Configuration.GetSection("P3DServer"));
-                services.AddValidatedOptions<DiscordOptions, DiscordOptionsValidator>().Bind(ctx.Configuration.GetSection("DiscordBot"));
-                services.AddValidatedOptions<LiteDbOptions, LiteDbOptionsValidator>().Bind(ctx.Configuration.GetSection("LiteDb"));
-                services.AddValidatedOptions<JwtOptions, JwtOptionsValidator>().Bind(ctx.Configuration.GetSection("Jwt"));
-                services.AddValidatedOptions<OtlpOptions, OtlpOptionsValidator>().Bind(ctx.Configuration.GetSection("Otlp"));
+                services.AddValidatedOptions<ServerOptions, ServerOptionsValidator>().Bind(ctx.Configuration.GetSection(ServerSectionName));
+                services.AddValidatedOptions<P3DIntegrationOptions, P3DIntegrationOptionsValidator>().Bind(ctx.Configuration.GetSection(ServerSectionName));
+                services.AddValidatedOptionsWithHttp<P3DSiteOptions, P3DSiteOptionsValidator>().Bind(ctx.Configuration.GetSection(OfficialSiteSectionName));
+                services.AddValidatedOptions<P3DServerOptions, P3DServerOptionsValidator>().Bind(ctx.Configuration.GetSection(P3DServerSectionName));
+                services.AddValidatedOptions<DiscordOptions, DiscordOptionsValidator>().Bind(ctx.Configuration.GetSection(DiscordBotSectionName));
+                services.AddValidatedOptions<LiteDbOptions, LiteDbOptionsValidator>().Bind(ctx.Configuration.GetSection(LiteDbSectionName));
+                services.AddValidatedOptions<JwtOptions, JwtOptionsValidator>().Bind(ctx.Configuration.GetSection(JwtSectionName));
+                services.AddValidatedOptions<OtlpOptions, OtlpOptionsValidator>().Bind(ctx.Configuration.GetSection(OtlpSectionName));
 
                 services.AddMediator();
                 services.AddHost();
@@ -102,6 +111,16 @@ namespace P3D.Legacy.Server
                 services.AddInternalAPI();
                 services.AddStatistics();
                 services.AddGUI();
+
+                // Sorry (not sorry) for this hack
+                // Will show the application name in OpenObserve UI as show in the P3D Client
+                if (services.FirstOrDefault(sp => typeof(IHostEnvironment).IsAssignableFrom(sp.ServiceType))?.ImplementationInstance is IHostEnvironment he)
+                {
+                    var serverName = ctx.Configuration.GetSection(ServerSectionName).GetValue<string>(nameof(ServerOptions.Name))
+                                     ?? typeof(Program).Assembly.GetName().Name
+                                     ?? "P3D.Legacy.Server";
+                    he.ApplicationName = serverName;
+                }
             })
            .ConfigureServices((ctx, services) =>
             {
@@ -110,7 +129,7 @@ namespace P3D.Legacy.Server
                     .WithTracing()
                     .WithLogging();
 
-                if (ctx.Configuration.GetSection("Oltp") is { } oltpSection)
+                if (ctx.Configuration.GetSection(OtlpSectionName) is { } oltpSection)
                 {
                     openTelemetry
                         .ConfigureResource(builder =>
@@ -125,9 +144,9 @@ namespace P3D.Legacy.Server
                             builder.AddTelemetrySdk();
                         });
 
-                    if (oltpSection.GetValue<string?>("MetricsEndpoint") is { } metricsEndpoint)
+                    if (oltpSection.GetValue<string?>(nameof(OtlpOptions.MetricsEndpoint)) is { } metricsEndpoint)
                     {
-                        var metricsProtocol = oltpSection.GetValue<OtlpExportProtocol>("MetricsProtocol");
+                        var metricsProtocol = oltpSection.GetValue<OtlpExportProtocol>(nameof(OtlpOptions.MetricsProtocol));
                         openTelemetry.WithMetrics(builder => builder
                             .AddProcessInstrumentation()
                             .AddRuntimeInstrumentation(instrumentationOptions =>
@@ -144,9 +163,9 @@ namespace P3D.Legacy.Server
                             }));
                     }
 
-                    if (oltpSection.GetValue<string?>("TracingEndpoint") is { } tracingEndpoint)
+                    if (oltpSection.GetValue<string?>(nameof(OtlpOptions.TracingEndpoint)) is { } tracingEndpoint)
                     {
-                        var tracingProtocol = oltpSection.GetValue<OtlpExportProtocol>("TracingProtocol");
+                        var tracingProtocol = oltpSection.GetValue<OtlpExportProtocol>(nameof(OtlpOptions.TracingProtocol));
                         openTelemetry.WithTracing(builder => builder
                             .AddGrpcClientInstrumentation(instrumentationOptions =>
                             {
@@ -180,12 +199,12 @@ namespace P3D.Legacy.Server
             })
             .ConfigureLogging((ctx, builder) =>
             {
-                var oltpSection = ctx.Configuration.GetSection("Oltp");
+                var oltpSection = ctx.Configuration.GetSection(OtlpSectionName);
                 if (oltpSection == null!) return;
 
-                var loggingEndpoint = oltpSection.GetValue<string>("LoggingEndpoint");
+                var loggingEndpoint = oltpSection.GetValue<string>(nameof(OtlpOptions.LoggingEndpoint));
                 if (loggingEndpoint is null) return;
-                var loggingProtocol = oltpSection.GetValue<OtlpExportProtocol>("LoggingProtocol");
+                var loggingProtocol = oltpSection.GetValue<OtlpExportProtocol>(nameof(OtlpOptions.LoggingProtocol));
 
                 builder.AddOpenTelemetry(o =>
                 {
