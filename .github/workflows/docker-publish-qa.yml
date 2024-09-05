@@ -24,7 +24,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
         with:
           #platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/amd64
-          platforms: linux/amd64,linux/arm64,windows/amd64
+          platforms: linux/amd64,linux/arm64
 
       - name: Set up Docker Buildx
         id: buildx
@@ -43,7 +43,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ github.token }}
 
       - name: Build and Push
         id: docker_build
