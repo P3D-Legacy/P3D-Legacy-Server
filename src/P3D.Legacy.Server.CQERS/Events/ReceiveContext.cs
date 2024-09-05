@@ -10,8 +10,8 @@ namespace P3D.Legacy.Server.CQERS.Events
 {
     public partial class ReceiveContext<TEvent> : IReceiveContectWithPublisher<TEvent> where TEvent : IEvent
     {
-        [LoggerMessage(Level = LogLevel.Error, Message = "Exception during publish! Strategy: {Strategy}")]
-        private partial void ExceptionDuringPublish(string strategy, Exception exception);
+        [LoggerMessage(Level = LogLevel.Error, Message = "Exception during publish! Strategy: {Strategy}; Event: {@Event}")]
+        private partial void ExceptionDuringPublish(string strategy, IEvent @event, Exception exception);
 
         private delegate Task EventHandler(IEvent @event, CancellationToken ct);
 
@@ -47,9 +47,10 @@ namespace P3D.Legacy.Server.CQERS.Events
         }
 
 
-        private Task ParallelWhenAllAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
+        private async Task ParallelWhenAllAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
         {
-            return Task.WhenAll(handlers.Select(async handler =>
+            var timeoutTask = Task.Delay(TimeSpan.FromSeconds(5), ct);
+            var completedTask = await Task.WhenAny(Task.WhenAll(handlers.Select(async handler =>
             {
                 try
                 {
@@ -57,14 +58,19 @@ namespace P3D.Legacy.Server.CQERS.Events
                 }
                 catch (Exception e)
                 {
-                    ExceptionDuringPublish(nameof(DispatchStrategy.ParallelWhenAll), e);
+                    ExceptionDuringPublish(nameof(DispatchStrategy.ParallelWhenAll), @event, e);
                 }
-            }));
+            })), timeoutTask);
+
+            if (completedTask == timeoutTask)
+            {
+                _logger.LogError("Exception during publish! ParallelWhenAll timed out after 5 seconds, Event: {@Event}", @event);
+            }
         }
 
-        private Task ParallelWhenAnyAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
+        private async Task ParallelWhenAnyAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
         {
-            return Task.WhenAny(handlers.Select(async handler =>
+            await Task.WhenAny(handlers.Select(async handler =>
             {
                 try
                 {
@@ -72,7 +78,7 @@ namespace P3D.Legacy.Server.CQERS.Events
                 }
                 catch (Exception e)
                 {
-                    ExceptionDuringPublish(nameof(DispatchStrategy.ParallelWhenAny), e);
+                    ExceptionDuringPublish(nameof(DispatchStrategy.ParallelWhenAny), @event, e);
                 }
             }));
         }
