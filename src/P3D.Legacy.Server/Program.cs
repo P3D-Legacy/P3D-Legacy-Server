@@ -31,7 +31,9 @@ using P3D.Legacy.Server.Statistics.Extensions;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
 using OpenTelemetry.ResourceDetectors.Container;
 
 namespace P3D.Legacy.Server
@@ -143,6 +145,27 @@ namespace P3D.Legacy.Server
                             }));
                     }
                 }
+            })
+            .ConfigureLogging((ctx, builder) =>
+            {
+                var oltpSection = ctx.Configuration.GetSection("Oltp");
+                if (oltpSection == null!) return;
+
+                var loggingEndpoint = oltpSection.GetValue<string>("LoggingEndpoint");
+                if (loggingEndpoint is null) return;
+                var loggingProtocol = oltpSection.GetValue<OtlpExportProtocol>("LoggingProtocol");
+
+                builder.AddOpenTelemetry(o =>
+                {
+                    o.IncludeScopes = true;
+                    o.ParseStateValues = true;
+                    o.IncludeFormattedMessage = true;
+                    o.AddOtlpExporter((options, processorOptions) =>
+                    {
+                        options.Endpoint = new Uri(loggingEndpoint);
+                        options.Protocol = loggingProtocol;
+                    });
+                });
             })
             .AddP3DServer()
             .ConfigureWebHostDefaults(static webBuilder => webBuilder.UseStartup<Startup>())
