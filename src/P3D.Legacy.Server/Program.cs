@@ -31,6 +31,8 @@ using P3D.Legacy.Server.Statistics.Extensions;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.ResourceDetectors.Container;
 
 namespace P3D.Legacy.Server
 {
@@ -71,54 +73,76 @@ namespace P3D.Legacy.Server
                 services.AddInternalAPI();
                 services.AddStatistics();
                 services.AddGUI();
-
-                services.AddOpenTelemetry()
-                    .ConfigureResource(static builder => builder.AddService(typeof(Program).Namespace!))
-                    .WithMetrics(builder =>
-                    {
-                        var enabled = ctx.Configuration.GetSection("Otlp").GetValue<bool>(nameof(OtlpOptions.Enabled));
-                        var host = ctx.Configuration.GetSection("Otlp").GetValue<string>(nameof(OtlpOptions.Host)) ?? string.Empty;
-                        if (enabled)
+            })
+           .ConfigureServices((ctx, services) =>
+            {
+                if (ctx.Configuration.GetSection("Oltp") is { } oltpSection)
+                {
+                    var openTelemetry = services.AddOpenTelemetry()
+                        .ConfigureResource(builder =>
                         {
-                            builder.AddAspNetCoreInstrumentation();
-                            builder.AddHttpClientInstrumentation();
+                            builder.AddDetector(new ContainerResourceDetector());
+                            builder.AddService(
+                                ctx.HostingEnvironment.ApplicationName,
+                                ctx.HostingEnvironment.EnvironmentName,
+                                typeof(Program).Assembly.GetName().Version?.ToString(),
+                                false,
+                                Environment.MachineName);
+                            builder.AddTelemetrySdk();
+                        });
 
-                            builder.AddStatisticsInstrumentation();
-
-                            builder.AddOtlpExporter(opt =>
-                            {
-                                opt.Endpoint = new Uri(host);
-                            });
-                        }
-                    })
-                    .WithTracing(builder =>
+                    if (oltpSection.GetValue<string?>("MetricsEndpoint") is { } metricsEndpoint)
                     {
-                        var enabled = ctx.Configuration.GetSection("Otlp").GetValue<bool>(nameof(OtlpOptions.Enabled));
-                        var host = ctx.Configuration.GetSection("Otlp").GetValue<string>(nameof(OtlpOptions.Host)) ?? string.Empty;
-                        if (enabled)
-                        {
-                            builder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("P3D.Legacy.Server"));
-
-                            builder.AddAspNetCoreInstrumentation();
-                            builder.AddHttpClientInstrumentation();
-
-                            builder.AddHostInstrumentation();
-                            builder.AddApplicationInstrumentation();
-                            builder.AddCQERSInstrumentation();
-                            builder.AddClientP3DInstrumentation();
-                            builder.AddCommunicationAPIInstrumentation();
-                            builder.AddDiscordBotInstrumentation();
-                            builder.AddGameCommandsInstrumentation();
-                            builder.AddInfrastructureInstrumentation();
-                            builder.AddInternalAPIInstrumentation();
-                            builder.AddStatisticsInstrumentation();
-
-                            builder.AddOtlpExporter(opt =>
+                        var metricsProtocol = oltpSection.GetValue<OtlpExportProtocol>("MetricsProtocol");
+                        openTelemetry.WithMetrics(builder => builder
+                            .AddProcessInstrumentation()
+                            .AddRuntimeInstrumentation(instrumentationOptions =>
                             {
-                                opt.Endpoint = new Uri(host);
-                            });
-                        }
-                    });
+
+                            })
+                            .AddHttpClientInstrumentation()
+                            .AddAspNetCoreInstrumentation()
+                            .AddStatisticsInstrumentation()
+                            .AddOtlpExporter(o =>
+                            {
+                                o.Endpoint = new Uri(metricsEndpoint);
+                                o.Protocol = metricsProtocol;
+                            }));
+                    }
+
+                    if (oltpSection.GetValue<string?>("TracingEndpoint") is { } tracingEndpoint)
+                    {
+                        var tracingProtocol = oltpSection.GetValue<OtlpExportProtocol>("TracingProtocol");
+                        openTelemetry.WithTracing(builder => builder
+                            .AddGrpcClientInstrumentation(instrumentationOptions =>
+                            {
+
+                            })
+                            .AddHttpClientInstrumentation(instrumentationOptions =>
+                            {
+                                instrumentationOptions.RecordException = true;
+                            })
+                            .AddAspNetCoreInstrumentation(instrumentationOptions =>
+                            {
+                                instrumentationOptions.RecordException = true;
+                            })
+                            .AddHostInstrumentation()
+                            .AddApplicationInstrumentation()
+                            .AddCQERSInstrumentation()
+                            .AddClientP3DInstrumentation()
+                            .AddCommunicationAPIInstrumentation()
+                            .AddDiscordBotInstrumentation()
+                            .AddGameCommandsInstrumentation()
+                            .AddInfrastructureInstrumentation()
+                            .AddInternalAPIInstrumentation()
+                            .AddStatisticsInstrumentation()
+                            .AddOtlpExporter(o =>
+                            {
+                                o.Endpoint = new Uri(tracingEndpoint);
+                                o.Protocol = tracingProtocol;
+                            }));
+                    }
+                }
             })
             .AddP3DServer()
             .ConfigureWebHostDefaults(static webBuilder => webBuilder.UseStartup<Startup>())
