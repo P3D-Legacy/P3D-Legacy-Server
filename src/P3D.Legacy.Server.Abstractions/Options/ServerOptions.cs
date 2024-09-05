@@ -14,10 +14,10 @@ namespace P3D.Legacy.Server.Abstractions.Options
 
     public sealed record ServerOptions
     {
-        public required string Name { get; init; } = default!;
-        public required string Message { get; init; } = default!;
-        public required int MaxPlayers { get; init; } = default!;
-        public required bool OfflineEnabled { get; init; } = default!;
-        public required bool ValidationEnabled { get; init; } = default!;
+        public string Name { get; init; } = default!;
+        public string Message { get; init; } = default!;
+        public int MaxPlayers { get; init; } = default!;
+        public bool OfflineEnabled { get; init; } = default!;
+        public bool ValidationEnabled { get; init; } = default!;
     }
 }

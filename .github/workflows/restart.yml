@@ -1,0 +1,29 @@
+name: "Restart 'P3D Legacy Server'"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  restart:
+    name: "Restart 'P3D Legacy Server'"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            docker service update --force p3dlegacyserver_p3d_legacy_server;
+
+      - name: Checkout Repository
+        if: always()
+        uses: actions/checkout@v4
+
+      - name: Notify
+        if: always()
+        env:
+          BUILD_STATUS: ${{ job.status }}
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_QA }}
+        run: bash ./.github/workflows/discord.sh

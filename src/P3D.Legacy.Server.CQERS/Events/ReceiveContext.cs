@@ -49,7 +49,17 @@ namespace P3D.Legacy.Server.CQERS.Events
 
         private Task ParallelWhenAllAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
         {
-            return Task.WhenAll(handlers.Select(handler => handler(@event, ct)));
+            return Task.WhenAll(handlers.Select(async handler =>
+            {
+                try
+                {
+                    await handler(@event, ct);
+                }
+                catch (Exception e)
+                {
+                    ExceptionDuringPublish(nameof(DispatchStrategy.ParallelWhenAll), e);
+                }
+            }));
         }
 
         private Task ParallelWhenAnyAsync(IEnumerable<EventHandler> handlers, IEvent @event, CancellationToken ct)
