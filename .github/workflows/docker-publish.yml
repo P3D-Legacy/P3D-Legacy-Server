@@ -37,8 +37,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: P3D-Legacy
+          password: ${{ secrets.TOKEN_GPR }}
 
       - name: Build and Push
         id: docker_build
