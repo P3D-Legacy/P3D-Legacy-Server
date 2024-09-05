@@ -35,13 +35,40 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.ResourceDetectors.Container;
+using Serilog;
+using Serilog.Events;
 
 namespace P3D.Legacy.Server
 {
     [RequiresUnreferencedCode("Configuration and OpenTelemetry")]
     public static class Program
     {
-        public static Task Main(string[] args) => CreateHostBuilder(args).Build().RunAsync();
+        public static async Task Main(string[] args)
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .CreateBootstrapLogger();
+
+            try
+            {
+                Log.Information("Starting web application");
+
+                var host = CreateHostBuilder(args).Build();
+
+                await host
+                    .RunAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application terminated unexpectedly");
+            }
+            finally
+            {
+                await Log.CloseAndFlushAsync();
+            }
+        }
 
         public static IHostBuilder CreateHostBuilder(string[] args) => Host
             .CreateDefaultBuilder(args)
@@ -78,9 +105,14 @@ namespace P3D.Legacy.Server
             })
            .ConfigureServices((ctx, services) =>
             {
+                var openTelemetry = services.AddOpenTelemetry()
+                    .WithMetrics()
+                    .WithTracing()
+                    .WithLogging();
+
                 if (ctx.Configuration.GetSection("Oltp") is { } oltpSection)
                 {
-                    var openTelemetry = services.AddOpenTelemetry()
+                    openTelemetry
                         .ConfigureResource(builder =>
                         {
                             builder.AddDetector(new ContainerResourceDetector());
