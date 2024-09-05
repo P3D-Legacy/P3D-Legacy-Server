@@ -3,11 +3,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Application.Services
+namespace P3D.Legacy.Server.Application.Services;
+
+public interface IPlayerContainerWriterAsync
 {
-    public interface IPlayerContainerWriterAsync
-    {
-        Task AddAsync(IPlayer player, CancellationToken ct);
-        Task<bool> RemoveAsync(IPlayer player, CancellationToken ct);
-    }
+    Task AddAsync(IPlayer player, CancellationToken ct);
+    Task<bool> RemoveAsync(IPlayer player, CancellationToken ct);
 }

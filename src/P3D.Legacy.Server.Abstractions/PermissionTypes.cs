@@ -1,22 +1,21 @@
 ﻿using System;
 
-namespace P3D.Legacy.Server.Abstractions
+namespace P3D.Legacy.Server.Abstractions;
+
+[Flags]
+public enum PermissionTypes
 {
-    [Flags]
-    public enum PermissionTypes
-    {
-        None = 0,
-        UnVerified = 1,
-        User = 2,
-        Debug = 4,
-        Moderator = 8,
-        Administrator = 16,
-        Server = 32,
+    None = 0,
+    UnVerified = 1,
+    User = 2,
+    Debug = 4,
+    Moderator = 8,
+    Administrator = 16,
+    Server = 32,
 
 
-        UnVerifiedOrHigher = UnVerified | User | Moderator | Administrator | Server,
-        UserOrHigher = User | Moderator | Administrator | Server,
-        ModeratorOrHigher = Moderator | Administrator | Server,
-        AdministratorOrHigher = Administrator | Server,
-    }
+    UnVerifiedOrHigher = UnVerified | User | Moderator | Administrator | Server,
+    UserOrHigher = User | Moderator | Administrator | Server,
+    ModeratorOrHigher = Moderator | Administrator | Server,
+    AdministratorOrHigher = Administrator | Server,
 }

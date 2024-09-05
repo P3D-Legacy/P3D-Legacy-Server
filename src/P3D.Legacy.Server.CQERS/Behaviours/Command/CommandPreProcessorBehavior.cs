@@ -4,25 +4,24 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.CQERS.Behaviours.Command
+namespace P3D.Legacy.Server.CQERS.Behaviours.Command;
+
+public class CommandPreProcessorBehavior<TCommand> : ICommandBehavior<TCommand>
+    where TCommand : ICommand
 {
-    public class CommandPreProcessorBehavior<TCommand> : ICommandBehavior<TCommand>
-        where TCommand : ICommand
+    private readonly IEnumerable<ICommandPreProcessor<TCommand>> _preProcessors;
+
+    public CommandPreProcessorBehavior(IEnumerable<ICommandPreProcessor<TCommand>> preProcessors)
     {
-        private readonly IEnumerable<ICommandPreProcessor<TCommand>> _preProcessors;
+        _preProcessors = preProcessors;
+    }
 
-        public CommandPreProcessorBehavior(IEnumerable<ICommandPreProcessor<TCommand>> preProcessors)
+    public async Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct)
+    {
+        foreach (var processor in _preProcessors)
         {
-            _preProcessors = preProcessors;
+            await processor.ProcessAsync(command, ct);
         }
-
-        public async Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct)
-        {
-            foreach (var processor in _preProcessors)
-            {
-                await processor.ProcessAsync(command, ct);
-            }
-            return await next();
-        }
+        return await next();
     }
 }

@@ -14,86 +14,85 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 
-namespace P3D.Legacy.Server
+namespace P3D.Legacy.Server;
+
+public class Startup
 {
-    public class Startup
+    private static JsonSerializerOptions ConfigureSite(JsonSerializerOptions opt)
     {
-        private static JsonSerializerOptions ConfigureSite(JsonSerializerOptions opt)
+        opt.Converters.Add(new DateTimeOffsetSerializer());
+        opt.Converters.Add(new DateTimeOffsetNullableSerializer());
+        return Configure(opt);
+    }
+    private static JsonSerializerOptions Configure(JsonSerializerOptions opt)
+    {
+        opt.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        opt.PropertyNameCaseInsensitive = true;
+        opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+        opt.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+        opt.Converters.Add(new DateTimeOffsetSerializer());
+        opt.Converters.Add(new DateTimeOffsetNullableSerializer());
+        return opt;
+    }
+
+    [RequiresUnreferencedCode()]
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.Configure<JsonSerializerOptions>(static opt => Configure(opt));
+        services.Configure<JsonSerializerOptions>("P3D", static opt => ConfigureSite(opt));
+
+        services.AddControllers()
+            .AddControllersAsServices()
+            .AddJsonOptions(static opt => Configure(opt.JsonSerializerOptions));
+
+        services.AddRouting(static opt =>
         {
-            opt.Converters.Add(new DateTimeOffsetSerializer());
-            opt.Converters.Add(new DateTimeOffsetNullableSerializer());
-            return Configure(opt);
-        }
-        private static JsonSerializerOptions Configure(JsonSerializerOptions opt)
+            opt.LowercaseUrls = true;
+        });
+
+        services.AddSwaggerGen(static opt =>
         {
-            opt.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            opt.PropertyNameCaseInsensitive = true;
-            opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
-            opt.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-            opt.Converters.Add(new DateTimeOffsetSerializer());
-            opt.Converters.Add(new DateTimeOffsetNullableSerializer());
-            return opt;
-        }
+            var appName = typeof(Startup).Assembly.GetName().Name;
 
-        [RequiresUnreferencedCode()]
-        public void ConfigureServices(IServiceCollection services)
+            opt.SwaggerDoc("v1", new OpenApiInfo { Title = appName, Version = "v1" });
+            opt.SupportNonNullableReferenceTypes();
+
+            //var xmlFile = $"{appName}.xml";
+            //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            //opt.IncludeXmlComments(xmlPath);
+        });
+
+        services.AddCors(static options =>
         {
-            services.Configure<JsonSerializerOptions>(static opt => Configure(opt));
-            services.Configure<JsonSerializerOptions>("P3D", static opt => ConfigureSite(opt));
+            options.AddPolicy("Development", static builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+            );
+        });
+    }
 
-            services.AddControllers()
-                .AddControllersAsServices()
-                .AddJsonOptions(static opt => Configure(opt.JsonSerializerOptions));
-
-            services.AddRouting(static opt =>
-            {
-                opt.LowercaseUrls = true;
-            });
-
-            services.AddSwaggerGen(static opt =>
-            {
-                var appName = typeof(Startup).Assembly.GetName().Name;
-
-                opt.SwaggerDoc("v1", new OpenApiInfo { Title = appName, Version = "v1" });
-                opt.SupportNonNullableReferenceTypes();
-
-                //var xmlFile = $"{appName}.xml";
-                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                //opt.IncludeXmlComments(xmlPath);
-            });
-
-            services.AddCors(static options =>
-            {
-                options.AddPolicy("Development", static builder => builder
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                );
-            });
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseCors("Development");
-            }
-
-            app.UseSwagger();
-            app.UseSwaggerUI(static options =>
-            {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", typeof(Startup).Assembly.GetName().Name);
-            });
-
-            app.UseWebSockets();
-
-            app.UseRouting();
-
-            app.UseEndpoints(static endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseDeveloperExceptionPage();
+            app.UseCors("Development");
         }
+
+        app.UseSwagger();
+        app.UseSwaggerUI(static options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", typeof(Startup).Assembly.GetName().Name);
+        });
+
+        app.UseWebSockets();
+
+        app.UseRouting();
+
+        app.UseEndpoints(static endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 }

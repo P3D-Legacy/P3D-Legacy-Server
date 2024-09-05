@@ -3,15 +3,15 @@ using System.Diagnostics.CodeAnalysis;
 
 using Terminal.Gui;
 
-namespace P3D.Legacy.Server.GUI.Views
-{
-    public sealed class ServerUI : Toplevel
-    {
-        public event EventHandler? OnStop;
+namespace P3D.Legacy.Server.GUI.Views;
 
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
-        public ServerUI(PlayerTabView playerTabView, ChatTabView chatTabView, LogsTabView logsTabView, SettingsTabView settingsTabView)
-        {
+public sealed class ServerUI : Toplevel
+{
+    public event EventHandler? OnStop;
+
+    [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
+    public ServerUI(PlayerTabView playerTabView, ChatTabView chatTabView, LogsTabView logsTabView, SettingsTabView settingsTabView)
+    {
             var win = new Window("Server Management Panel") { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() - 1 };
             var tabView = new TabView { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
             tabView.AddTab(new TabView.Tab("Players", playerTabView), andSelect: true);
@@ -29,5 +29,4 @@ namespace P3D.Legacy.Server.GUI.Views
 
             Add(win, statusBar);
         }
-    }
 }

@@ -15,24 +15,24 @@ using System.Threading.Tasks;
 
 using Terminal.Gui;
 
-namespace P3D.Legacy.Server.GUI.Views
+namespace P3D.Legacy.Server.GUI.Views;
+
+public sealed class ChatTabView : View,
+    IEventHandler<PlayerJoinedEvent>,
+    IEventHandler<PlayerLeftEvent>,
+    IEventHandler<PlayerSentGlobalMessageEvent>,
+    IEventHandler<ServerMessageEvent>,
+    IEventHandler<PlayerTriggeredEventEvent>,
+    IEventHandler<MessageToPlayerEvent>
 {
-    public sealed class ChatTabView : View,
-        IEventHandler<PlayerJoinedEvent>,
-        IEventHandler<PlayerLeftEvent>,
-        IEventHandler<PlayerSentGlobalMessageEvent>,
-        IEventHandler<ServerMessageEvent>,
-        IEventHandler<PlayerTriggeredEventEvent>,
-        IEventHandler<MessageToPlayerEvent>
+    private readonly ILogger _logger;
+    private readonly IEventDispatcher _eventDispatcher;
+
+    private readonly Action<ustring> _appendChatText;
+
+    [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
+    public ChatTabView(ILogger<ChatTabView> logger, IEventDispatcher eventDispatcher)
     {
-        private readonly ILogger _logger;
-        private readonly IEventDispatcher _eventDispatcher;
-
-        private readonly Action<ustring> _appendChatText;
-
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
-        public ChatTabView(ILogger<ChatTabView> logger, IEventDispatcher eventDispatcher)
-        {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
 
@@ -70,8 +70,8 @@ namespace P3D.Legacy.Server.GUI.Views
             Add(messageView, sendMessageView);
         }
 
-        private async Task HandleMessageAsync(string message)
-        {
+    private async Task HandleMessageAsync(string message)
+    {
             if (message.StartsWith('/'))
             {
                 await _eventDispatcher.DispatchAsync(new PlayerSentCommandEvent(IPlayer.Server, message), CancellationToken.None);
@@ -82,8 +82,8 @@ namespace P3D.Legacy.Server.GUI.Views
             //}
         }
 
-        public Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
-        {
+    public Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
+    {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 var message = $"* Player {context.Message.Player.Name} joined the server!{Environment.NewLine}";
@@ -92,8 +92,8 @@ namespace P3D.Legacy.Server.GUI.Views
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
-        {
+    public Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
+    {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 var message = $"* Player {context.Message.Name} left the server!{Environment.NewLine}";
@@ -102,8 +102,8 @@ namespace P3D.Legacy.Server.GUI.Views
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(IReceiveContext<PlayerSentGlobalMessageEvent> context, CancellationToken ct)
-        {
+    public Task HandleAsync(IReceiveContext<PlayerSentGlobalMessageEvent> context, CancellationToken ct)
+    {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 var message = $"* {context.Message.Player.Name}: {context.Message.Message}{Environment.NewLine}";
@@ -112,8 +112,8 @@ namespace P3D.Legacy.Server.GUI.Views
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(IReceiveContext<ServerMessageEvent> context, CancellationToken ct)
-        {
+    public Task HandleAsync(IReceiveContext<ServerMessageEvent> context, CancellationToken ct)
+    {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 var message = $"* Server: {context.Message.Message}{Environment.NewLine}";
@@ -122,8 +122,8 @@ namespace P3D.Legacy.Server.GUI.Views
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)
-        {
+    public Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)
+    {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 var message = $"* The player {context.Message.Player.Name} {PlayerEventParser.AsText(context.Message.Event)}{Environment.NewLine}";
@@ -132,8 +132,8 @@ namespace P3D.Legacy.Server.GUI.Views
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(IReceiveContext<MessageToPlayerEvent> context, CancellationToken ct)
-        {
+    public Task HandleAsync(IReceiveContext<MessageToPlayerEvent> context, CancellationToken ct)
+    {
             if (context.Message.To != IPlayer.Server) return Task.CompletedTask;
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
@@ -142,5 +142,4 @@ namespace P3D.Legacy.Server.GUI.Views
             });
             return Task.CompletedTask;
         }
-    }
 }

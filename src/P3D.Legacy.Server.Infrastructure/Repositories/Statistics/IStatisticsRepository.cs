@@ -5,17 +5,16 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics
-{
-    public interface IStatisticsRepository
-    {
-        Task<StatisticsEntity?> GetAsync(string action, CancellationToken ct);
-        Task<StatisticsEntity?> GetAsync(PlayerId id, string action, CancellationToken ct);
-        IAsyncEnumerable<StatisticsEntity> GetAllAsync(CancellationToken ct);
-        IAsyncEnumerable<StatisticsEntity> GetAllAsync(PlayerId id, CancellationToken ct);
-        IAsyncEnumerable<StatisticsEntity> GetAllAsync(string action, CancellationToken ct);
+namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics;
 
-        Task<bool> IncrementActionAsync(string action, CancellationToken ct);
-        Task<bool> IncrementActionAsync(PlayerId id, string action, CancellationToken ct);
-    }
+public interface IStatisticsRepository
+{
+    Task<StatisticsEntity?> GetAsync(string action, CancellationToken ct);
+    Task<StatisticsEntity?> GetAsync(PlayerId id, string action, CancellationToken ct);
+    IAsyncEnumerable<StatisticsEntity> GetAllAsync(CancellationToken ct);
+    IAsyncEnumerable<StatisticsEntity> GetAllAsync(PlayerId id, CancellationToken ct);
+    IAsyncEnumerable<StatisticsEntity> GetAllAsync(string action, CancellationToken ct);
+
+    Task<bool> IncrementActionAsync(string action, CancellationToken ct);
+    Task<bool> IncrementActionAsync(PlayerId id, string action, CancellationToken ct);
 }

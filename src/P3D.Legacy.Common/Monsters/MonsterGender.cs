@@ -1,9 +1,8 @@
-﻿namespace P3D.Legacy.Common.Monsters
+﻿namespace P3D.Legacy.Common.Monsters;
+
+public enum MonsterGender
 {
-    public enum MonsterGender
-    {
-        Male = 2,
-        Female = 1,
-        Genderless = 3
-    }
+    Male = 2,
+    Female = 1,
+    Genderless = 3
 }

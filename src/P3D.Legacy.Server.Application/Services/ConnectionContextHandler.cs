@@ -6,73 +6,72 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Application.Services
+namespace P3D.Legacy.Server.Application.Services;
+
+public abstract class ConnectionContextHandler : IDisposable
 {
-    public abstract class ConnectionContextHandler : IDisposable
+    public string ConnectionId => Connection.ConnectionId;
+    protected ConnectionContext Connection { get; private set; } = default!;
+
+    private CancellationTokenSource? _stoppingCts;
+    private Task? _executingTask;
+
+    [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP003:Dispose previous before re-assigning")]
+    public Task<ConnectionContextHandler> SetConnectionContextAsync(ConnectionContext connectionContext)
     {
-        public string ConnectionId => Connection.ConnectionId;
-        protected ConnectionContext Connection { get; private set; } = default!;
+        Connection = connectionContext;
 
-        private CancellationTokenSource? _stoppingCts;
-        private Task? _executingTask;
+        var lifetimeNotificationFeature = Connection.Features.Get<IConnectionLifetimeNotificationFeature>();
+        _stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(Connection.ConnectionClosed, lifetimeNotificationFeature?.ConnectionClosedRequested ?? CancellationToken.None);
+        _executingTask = OnCreatedAsync(_stoppingCts.Token);
+        _stoppingCts.Token.Register(_ => OnConnectionClosed(this), state: null, useSynchronizationContext: false);
 
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP003:Dispose previous before re-assigning")]
-        public Task<ConnectionContextHandler> SetConnectionContextAsync(ConnectionContext connectionContext)
+        return Task.FromResult(this);
+    }
+
+    protected abstract Task OnCreatedAsync(CancellationToken ct);
+
+    protected abstract void OnConnectionClosed(ConnectionContextHandler connectionContextHandler);
+
+    public async Task ListenAsync()
+    {
+        try { await (_executingTask ?? Task.CompletedTask); }
+        catch (Exception e) when (e is TaskCanceledException or OperationCanceledException) { }
+    }
+
+    public virtual async Task StopAsync(CancellationToken ct)
+    {
+        if (_stoppingCts is null || _executingTask is null)
         {
-            Connection = connectionContext;
-
-            var lifetimeNotificationFeature = Connection.Features.Get<IConnectionLifetimeNotificationFeature>();
-            _stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(Connection.ConnectionClosed, lifetimeNotificationFeature?.ConnectionClosedRequested ?? CancellationToken.None);
-            _executingTask = OnCreatedAsync(_stoppingCts.Token);
-            _stoppingCts.Token.Register(_ => OnConnectionClosed(this), state: null, useSynchronizationContext: false);
-
-            return Task.FromResult(this);
+            return;
         }
 
-        protected abstract Task OnCreatedAsync(CancellationToken ct);
-
-        protected abstract void OnConnectionClosed(ConnectionContextHandler connectionContextHandler);
-
-        public async Task ListenAsync()
+        try
         {
-            try { await (_executingTask ?? Task.CompletedTask); }
-            catch (Exception e) when (e is TaskCanceledException or OperationCanceledException) { }
+            // Signal cancellation to the executing method
+            await _stoppingCts.CancelAsync();
         }
-
-        public virtual async Task StopAsync(CancellationToken ct)
+        finally
         {
-            if (_stoppingCts is null || _executingTask is null)
-            {
-                return;
-            }
-
-            try
-            {
-                // Signal cancellation to the executing method
-                await _stoppingCts.CancelAsync();
-            }
-            finally
-            {
-                // Wait until the task completes or the stop token triggers
+            // Wait until the task completes or the stop token triggers
 #pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
-                await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, ct));
+            await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, ct));
 #pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
-            }
         }
+    }
 
-        protected virtual void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
         {
-            if (disposing)
-            {
-                _stoppingCts?.Dispose();
-                _executingTask?.Dispose();
-            }
+            _stoppingCts?.Dispose();
+            _executingTask?.Dispose();
         }
+    }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

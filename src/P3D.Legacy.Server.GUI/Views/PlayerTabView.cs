@@ -19,28 +19,28 @@ using System.Threading.Tasks;
 
 using Terminal.Gui;
 
-namespace P3D.Legacy.Server.GUI.Views
+namespace P3D.Legacy.Server.GUI.Views;
+
+public sealed class PlayerTabView : View,
+    IEventHandler<PlayerJoinedEvent>,
+    IEventHandler<PlayerLeftEvent>
 {
-    public sealed class PlayerTabView : View,
-        IEventHandler<PlayerJoinedEvent>,
-        IEventHandler<PlayerLeftEvent>
-    {
-        private readonly ILogger _logger;
-        private readonly ICommandDispatcher _commandDispatcher;
+    private readonly ILogger _logger;
+    private readonly ICommandDispatcher _commandDispatcher;
 
 #pragma warning disable IDISP006
-        private readonly ListView _playerListView;
-        private readonly TextView _playerInfoTextView;
-        private readonly Button _kickButton;
-        private readonly Button _banButton;
+    private readonly ListView _playerListView;
+    private readonly TextView _playerInfoTextView;
+    private readonly Button _kickButton;
+    private readonly Button _banButton;
 #pragma warning restore IDISP006
 
-        private readonly PlayerListDataSource _currentPlayers = new(new());
-        private IPlayer? _selectedPlayer;
+    private readonly PlayerListDataSource _currentPlayers = new(new());
+    private IPlayer? _selectedPlayer;
 
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
-        public PlayerTabView(ILogger<PlayerTabView> logger, ICommandDispatcher commandDispatcher, IPlayerContainerReader playerContainer)
-        {
+    [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
+    public PlayerTabView(ILogger<PlayerTabView> logger, ICommandDispatcher commandDispatcher, IPlayerContainerReader playerContainer)
+    {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _commandDispatcher = commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
 
@@ -100,9 +100,9 @@ IP: {player.IPEndPoint}
             Add(onlineView, infoView);
         }
 
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
-        private Dialog Kick(IPlayer player)
-        {
+    [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
+    private Dialog Kick(IPlayer player)
+    {
             var dialog = new Dialog("Kick", 40, 6);
             var reasonInfoFrameView = new FrameView("Write a reason for kicking:") { X = 0, Y = 0, Width = Dim.Fill(), Height = 3 };
             var reasonTextField = new TextField { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
@@ -130,9 +130,9 @@ IP: {player.IPEndPoint}
             return dialog;
         }
 
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
-        private Dialog Ban(IPlayer player)
-        {
+    [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
+    private Dialog Ban(IPlayer player)
+    {
             var dialog = new Dialog("Ban", 40, 11);
             var reasonInfoFrameView = new FrameView("Write a reason for banning:") { X = 0, Y = 0, Width = Dim.Fill(), Height = 3 + 2 };
             var reasonTextView = new ComboBox("Select a reason for banning") { X = 0, Y = 0, Width = Dim.Fill(), Height = Dim.Fill() };
@@ -170,8 +170,8 @@ IP: {player.IPEndPoint}
             return dialog;
         }
 
-        private void RemovePlayerInfo()
-        {
+    private void RemovePlayerInfo()
+    {
             _selectedPlayer = null;
 
             _kickButton.Visible = false;
@@ -180,8 +180,8 @@ IP: {player.IPEndPoint}
             _playerInfoTextView.Text = ustring.Empty;
         }
 
-        public Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
-        {
+    public Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
+    {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 _currentPlayers.Players.Add(context.Message.Player);
@@ -190,8 +190,8 @@ IP: {player.IPEndPoint}
             return Task.CompletedTask;
         }
 
-        public Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
-        {
+    public Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
+    {
             Terminal.Gui.Application.MainLoop.Invoke(() =>
             {
                 _currentPlayers.Players.RemoveAll(x => x.Id == context.Message.Id);
@@ -199,5 +199,4 @@ IP: {player.IPEndPoint}
             });
             return Task.CompletedTask;
         }
-    }
 }

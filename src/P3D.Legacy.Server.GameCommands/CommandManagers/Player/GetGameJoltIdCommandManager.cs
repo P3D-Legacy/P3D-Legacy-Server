@@ -6,19 +6,19 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
+namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player;
+
+internal class GetGameJoltIdCommandManager : CommandManager
 {
-    internal class GetGameJoltIdCommandManager : CommandManager
+    public override string Name => "getgamejolt";
+    public override string Description => "Returns the player's GameJolt Id";
+    public override IEnumerable<string> Aliases => new[] { "ggj" };
+    public override PermissionTypes Permissions => PermissionTypes.ModeratorOrHigher;
+
+    public GetGameJoltIdCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
+    public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
     {
-        public override string Name => "getgamejolt";
-        public override string Description => "Returns the player's GameJolt Id";
-        public override IEnumerable<string> Aliases => new[] { "ggj" };
-        public override PermissionTypes Permissions => PermissionTypes.ModeratorOrHigher;
-
-        public GetGameJoltIdCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
-
-        public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
-        {
             if (arguments.Length == 1)
             {
                 var targetName = arguments[0];
@@ -34,9 +34,8 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
         }
 
-        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
-        {
+    public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
+    {
             await SendMessageAsync(player, $"Correct usage is /{alias} <playername>", ct);
         }
-    }
 }

@@ -1,37 +1,37 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace P3D.Legacy.Common.Monsters
-{
-    [Serializable]
-    public class ExperienceCalculatorException : Exception
-    {
-        protected ExperienceCalculatorException() { }
-        protected ExperienceCalculatorException(string message) : base(message) { }
-        protected ExperienceCalculatorException(string message, Exception innerException) : base(message, innerException) { }
-        protected ExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-    }
-    [Serializable]
-    public sealed class IncorrectExperienceTypeExperienceCalculatorException : ExperienceCalculatorException
-    {
-        public IncorrectExperienceTypeExperienceCalculatorException() { }
-        public IncorrectExperienceTypeExperienceCalculatorException(string message) : base(message) { }
-        public IncorrectExperienceTypeExperienceCalculatorException(string message, Exception innerException) : base(message, innerException) { }
-        public IncorrectExperienceTypeExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-    }
-    [Serializable]
-    public sealed class LevelTooHighExperienceCalculatorException : ExperienceCalculatorException
-    {
-        public LevelTooHighExperienceCalculatorException() { }
-        public LevelTooHighExperienceCalculatorException(string message) : base(message) { }
-        public LevelTooHighExperienceCalculatorException(string message, Exception innerException) : base(message, innerException) { }
-        public LevelTooHighExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-    }
+namespace P3D.Legacy.Common.Monsters;
 
-    public static class ExperienceCalculator
+[Serializable]
+public class ExperienceCalculatorException : Exception
+{
+    protected ExperienceCalculatorException() { }
+    protected ExperienceCalculatorException(string message) : base(message) { }
+    protected ExperienceCalculatorException(string message, Exception innerException) : base(message, innerException) { }
+    protected ExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+}
+[Serializable]
+public sealed class IncorrectExperienceTypeExperienceCalculatorException : ExperienceCalculatorException
+{
+    public IncorrectExperienceTypeExperienceCalculatorException() { }
+    public IncorrectExperienceTypeExperienceCalculatorException(string message) : base(message) { }
+    public IncorrectExperienceTypeExperienceCalculatorException(string message, Exception innerException) : base(message, innerException) { }
+    public IncorrectExperienceTypeExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+}
+[Serializable]
+public sealed class LevelTooHighExperienceCalculatorException : ExperienceCalculatorException
+{
+    public LevelTooHighExperienceCalculatorException() { }
+    public LevelTooHighExperienceCalculatorException(string message) : base(message) { }
+    public LevelTooHighExperienceCalculatorException(string message, Exception innerException) : base(message, innerException) { }
+    public LevelTooHighExperienceCalculatorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+}
+
+public static class ExperienceCalculator
+{
+    public static byte LevelForExperienceValue(ExperienceType experienceType, long experience)
     {
-        public static byte LevelForExperienceValue(ExperienceType experienceType, long experience)
-        {
             // returns level 1 if no experience (or negative value):
             if (experience <= 0)
                 return 1;
@@ -44,19 +44,19 @@ namespace P3D.Legacy.Common.Monsters
             return level;
         }
 
-        public static int ExperienceNeededForLevel(ExperienceType experienceType, int level) => experienceType switch
-        {
-            ExperienceType.Erratic => (int) Math.Round(ExperienceNeededForLevelErratic(level)),
-            ExperienceType.Fast => (int) Math.Round(ExperienceNeededForLevelFast(level)),
-            ExperienceType.MediumFast => (int) Math.Round(ExperienceNeededForLevelMediumFast(level)),
-            ExperienceType.MediumSlow => (int) Math.Round(ExperienceNeededForLevelMediumSlow(level)),
-            ExperienceType.Slow => (int) Math.Round(ExperienceNeededForLevelSlow(level)),
-            ExperienceType.Fluctuating => (int) Math.Round(ExperienceNeededForLevelFluctuating(level)),
-            _ => throw new IncorrectExperienceTypeExperienceCalculatorException($"ExperienceType {(int) experienceType} is incorrect!")
-        };
+    public static int ExperienceNeededForLevel(ExperienceType experienceType, int level) => experienceType switch
+    {
+        ExperienceType.Erratic => (int) Math.Round(ExperienceNeededForLevelErratic(level)),
+        ExperienceType.Fast => (int) Math.Round(ExperienceNeededForLevelFast(level)),
+        ExperienceType.MediumFast => (int) Math.Round(ExperienceNeededForLevelMediumFast(level)),
+        ExperienceType.MediumSlow => (int) Math.Round(ExperienceNeededForLevelMediumSlow(level)),
+        ExperienceType.Slow => (int) Math.Round(ExperienceNeededForLevelSlow(level)),
+        ExperienceType.Fluctuating => (int) Math.Round(ExperienceNeededForLevelFluctuating(level)),
+        _ => throw new IncorrectExperienceTypeExperienceCalculatorException($"ExperienceType {(int) experienceType} is incorrect!")
+    };
 
-        private static double ExperienceNeededForLevelErratic(int level)
-        {
+    private static double ExperienceNeededForLevelErratic(int level)
+    {
             // EXP =
             // level <= 50:         ((pow(level, 3) * (100 - level)) / 50)
             // 50 <= level <= 68:   ((pow(level, 3) * (150 - level)) / 100)
@@ -73,40 +73,40 @@ namespace P3D.Legacy.Common.Monsters
             };
         }
 
-        private static double ExperienceNeededForLevelFast(int level)
-        {
+    private static double ExperienceNeededForLevelFast(int level)
+    {
             // EXP =
             // ((4 * pow(level, 3)) / 5)
 
             return (4D * Math.Pow(level, 3D)) / 5D;
         }
 
-        private static double ExperienceNeededForLevelMediumFast(int level)
-        {
+    private static double ExperienceNeededForLevelMediumFast(int level)
+    {
             // EXP =
             // (pow(level, 3))
 
             return Math.Pow(level, 3D);
         }
 
-        private static double ExperienceNeededForLevelMediumSlow(int level)
-        {
+    private static double ExperienceNeededForLevelMediumSlow(int level)
+    {
             // EXP =
             // (((6 / 5) * pow(level, 3)) - (15 * pow(level, 2)) + (100 * level) - 140)
 
             return ((6D / 5D) * Math.Pow(level, 3D)) - (15D * Math.Pow(level, 2D)) + (100D * level) - 140D;
         }
 
-        private static double ExperienceNeededForLevelSlow(int level)
-        {
+    private static double ExperienceNeededForLevelSlow(int level)
+    {
             // EXP =
             // ((5 * pow(level, 3)) / 4)
 
             return (5D * Math.Pow(level, 3D)) / 4D;
         }
 
-        private static double ExperienceNeededForLevelFluctuating(int level)
-        {
+    private static double ExperienceNeededForLevelFluctuating(int level)
+    {
             // EXP =
             // level <= 15: (pow(level, 3) * ((floor((level + 1) / 3) + 24) / 50))
             // 15 <= level <= 36: (pow(level, 3) * ((level + 14) / 50))
@@ -120,5 +120,4 @@ namespace P3D.Legacy.Common.Monsters
                 _ => throw new LevelTooHighExperienceCalculatorException($"Level {level} is too high for Fluctuating!")
             };
         }
-    }
 }

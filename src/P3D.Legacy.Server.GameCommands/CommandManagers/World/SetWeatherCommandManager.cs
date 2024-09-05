@@ -8,19 +8,19 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
+namespace P3D.Legacy.Server.GameCommands.CommandManagers.World;
+
+internal class SetWeatherCommandManager : CommandManager
 {
-    internal class SetWeatherCommandManager : CommandManager
+    public override string Name => "setweather";
+    public override string Description => "Set World Weather.";
+    public override IEnumerable<string> Aliases => new[] { "sw" };
+    public override PermissionTypes Permissions => PermissionTypes.ModeratorOrHigher;
+
+    public SetWeatherCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
+    public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
     {
-        public override string Name => "setweather";
-        public override string Description => "Set World Weather.";
-        public override IEnumerable<string> Aliases => new[] { "sw" };
-        public override PermissionTypes Permissions => PermissionTypes.ModeratorOrHigher;
-
-        public SetWeatherCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
-
-        public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
-        {
             if (arguments.Length == 1)
             {
                 if (Enum.TryParse(arguments[0], true, out WorldWeather weather))
@@ -39,9 +39,8 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.World
             }
         }
 
-        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
-        {
+    public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
+    {
             await SendMessageAsync(player, $"Correct usage is /{alias} <weather>", ct);
         }
-    }
 }

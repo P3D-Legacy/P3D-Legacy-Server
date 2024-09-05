@@ -12,12 +12,12 @@ using System;
 using System.Net.Http.Headers;
 using System.Threading;
 
-namespace P3D.Legacy.Server.Extensions
+namespace P3D.Legacy.Server.Extensions;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddHost(this IServiceCollection services)
     {
-        public static IServiceCollection AddHost(this IServiceCollection services)
-        {
             services.AddTransient(typeof(ICommandBehavior<>), typeof(CommandValidationBehaviour<>));
             services.AddTransient(typeof(ICommandBehavior<>), typeof(CommandTracingBehaviour<>));
 
@@ -40,5 +40,4 @@ namespace P3D.Legacy.Server.Extensions
 
             return services;
         }
-    }
 }

@@ -3,10 +3,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Infrastructure
+namespace P3D.Legacy.Server.Infrastructure;
+
+public interface IMonsterDataProvider
 {
-    public interface IMonsterDataProvider
-    {
-        Task<(IMonsterStaticData, IItemInstance?)> GetStaticDataAsync(int id, int itemId, CancellationToken ct);
-    }
+    Task<(IMonsterStaticData, IItemInstance?)> GetStaticDataAsync(int id, int itemId, CancellationToken ct);
 }

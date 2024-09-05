@@ -1,12 +1,11 @@
-﻿namespace P3D.Legacy.Server.Abstractions
+﻿namespace P3D.Legacy.Server.Abstractions;
+
+public enum PlayerState
 {
-    public enum PlayerState
-    {
-        None,
-        Initializing,
-        Authentication,
-        Initialized,
-        Finalizing,
-        Finalized,
-    }
+    None,
+    Initializing,
+    Authentication,
+    Initialized,
+    Finalizing,
+    Finalized,
 }

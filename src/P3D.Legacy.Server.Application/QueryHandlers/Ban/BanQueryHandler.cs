@@ -10,22 +10,21 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Application.QueryHandlers.Ban
-{
-    internal sealed class BanQueryHandler : IQueryHandler<GetPlayerBanQuery, BanViewModel?>
-    {
-        private readonly IBanRepository _banRepository;
+namespace P3D.Legacy.Server.Application.QueryHandlers.Ban;
 
-        public BanQueryHandler(IBanRepository banRepository)
-        {
+internal sealed class BanQueryHandler : IQueryHandler<GetPlayerBanQuery, BanViewModel?>
+{
+    private readonly IBanRepository _banRepository;
+
+    public BanQueryHandler(IBanRepository banRepository)
+    {
             _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
         }
 
-        public async Task<BanViewModel?> HandleAsync(GetPlayerBanQuery query, CancellationToken ct)
-        {
+    public async Task<BanViewModel?> HandleAsync(GetPlayerBanQuery query, CancellationToken ct)
+    {
             var id = query.Id;
 
             return await _banRepository.GetAsync(id, ct) is { } ban ? new BanViewModel(ban.BannerId, ban.Id, ban.Ip, ban.Reason, ban.Expiration) : null;
         }
-    }
 }

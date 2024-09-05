@@ -6,27 +6,26 @@ using LiteDB;
 using System;
 using System.IO;
 
-namespace P3D.Legacy.Server.Infrastructure.FluentValidation
+namespace P3D.Legacy.Server.Infrastructure.FluentValidation;
+
+public interface IIsLiteDBConnectionStringValidator : IPropertyValidator { }
+
+public class IsLiteDBConnectionStringValidator<T> : PropertyValidator<T, string>, IIsLiteDBConnectionStringValidator
 {
-    public interface IIsLiteDBConnectionStringValidator : IPropertyValidator { }
+    public override string Name => "IsLiteDBConnectionStringValidator";
 
-    public class IsLiteDBConnectionStringValidator<T> : PropertyValidator<T, string>, IIsLiteDBConnectionStringValidator
+    public override bool IsValid(ValidationContext<T> context, string value)
     {
-        public override string Name => "IsLiteDBConnectionStringValidator";
-
-        public override bool IsValid(ValidationContext<T> context, string value)
+        try
         {
-            try
-            {
-                var cs = new ConnectionString(value);
-                return cs.Filename.IndexOfAny(Path.GetInvalidFileNameChars()) == -1;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            var cs = new ConnectionString(value);
+            return cs.Filename.IndexOfAny(Path.GetInvalidFileNameChars()) == -1;
         }
-
-        protected override string GetDefaultMessageTemplate(string errorCode) => "{PropertyName} is not a valid LiteDB Connection String!";
+        catch (Exception)
+        {
+            return false;
+        }
     }
+
+    protected override string GetDefaultMessageTemplate(string errorCode) => "{PropertyName} is not a valid LiteDB Connection String!";
 }

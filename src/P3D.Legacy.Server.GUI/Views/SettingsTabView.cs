@@ -8,20 +8,20 @@ using System.Reflection;
 
 using Terminal.Gui;
 
-namespace P3D.Legacy.Server.GUI.Views
-{
-    public sealed class SettingsTabView : View
-    {
-        private static string ToString(object? val) => val switch
-        {
-            bool b => b.ToString().ToLowerInvariant(),
-            not null => val.ToString() ?? string.Empty,
-            _ => string.Empty
-        };
+namespace P3D.Legacy.Server.GUI.Views;
 
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
-        public SettingsTabView(DynamicConfigurationProviderManager dynamicConfigurationProvider)
-        {
+public sealed class SettingsTabView : View
+{
+    private static string ToString(object? val) => val switch
+    {
+        bool b => b.ToString().ToLowerInvariant(),
+        not null => val.ToString() ?? string.Empty,
+        _ => string.Empty
+    };
+
+    [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
+    public SettingsTabView(DynamicConfigurationProviderManager dynamicConfigurationProvider)
+    {
             Width = Dim.Fill();
             Height = Dim.Fill();
 
@@ -87,5 +87,4 @@ namespace P3D.Legacy.Server.GUI.Views
 
             Add(views.ToArray());
         }
-    }
 }

@@ -3,12 +3,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace P3D.Legacy.Server.Application.Utils
+namespace P3D.Legacy.Server.Application.Utils;
+
+public sealed class ConnectionContextHandlerEqualityComparer : IEqualityComparer<ConnectionContextHandler>
 {
-    public sealed class ConnectionContextHandlerEqualityComparer : IEqualityComparer<ConnectionContextHandler>
+    public bool Equals(ConnectionContextHandler? x, ConnectionContextHandler? y)
     {
-        public bool Equals(ConnectionContextHandler? x, ConnectionContextHandler? y)
-        {
             if (ReferenceEquals(x, y)) return true;
             if (ReferenceEquals(x, null)) return false;
             if (ReferenceEquals(y, null)) return false;
@@ -16,6 +16,5 @@ namespace P3D.Legacy.Server.Application.Utils
             return string.Equals(x.ConnectionId, y.ConnectionId, StringComparison.Ordinal);
         }
 
-        public int GetHashCode(ConnectionContextHandler obj) => HashCode.Combine(obj.ConnectionId);
-    }
+    public int GetHashCode(ConnectionContextHandler obj) => HashCode.Combine(obj.ConnectionId);
 }

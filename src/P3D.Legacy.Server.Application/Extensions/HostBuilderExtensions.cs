@@ -7,12 +7,12 @@ using P3D.Legacy.Server.Application.Utils;
 
 using System;
 
-namespace P3D.Legacy.Server.Application.Extensions
+namespace P3D.Legacy.Server.Application.Extensions;
+
+public static class HostBuilderExtensions
 {
-    public static class HostBuilderExtensions
+    public static IHostBuilder ConfigureServer(this IHostBuilder builder, Action<ServerBuilderContext, ServerBuilder> configure)
     {
-        public static IHostBuilder ConfigureServer(this IHostBuilder builder, Action<ServerBuilderContext, ServerBuilder> configure)
-        {
             return builder.ConfigureServices((ctx, services) =>
             {
                 services.AddHostedService<ServerHostedService>();
@@ -23,5 +23,4 @@ namespace P3D.Legacy.Server.Application.Extensions
                 });
             });
         }
-    }
 }

@@ -3,10 +3,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.CQERS.Behaviours.Command
+namespace P3D.Legacy.Server.CQERS.Behaviours.Command;
+
+public interface ICommandPostProcessor<in TCommand> where TCommand : ICommand
 {
-    public interface ICommandPostProcessor<in TCommand> where TCommand : ICommand
-    {
-        Task ProcessAsync(TCommand command, CommandResult result, CancellationToken ct);
-    }
+    Task ProcessAsync(TCommand command, CommandResult result, CancellationToken ct);
 }

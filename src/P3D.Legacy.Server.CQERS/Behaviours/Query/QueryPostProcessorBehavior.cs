@@ -4,28 +4,27 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.CQERS.Behaviours.Query
+namespace P3D.Legacy.Server.CQERS.Behaviours.Query;
+
+public class QueryPostProcessorBehavior<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult>
+    where TQuery : IQuery<TQueryResult>
 {
-    public class QueryPostProcessorBehavior<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult>
-        where TQuery : IQuery<TQueryResult>
+    private readonly IEnumerable<IQueryPostProcessor<TQuery, TQueryResult>> _postProcessors;
+
+    public QueryPostProcessorBehavior(IEnumerable<IQueryPostProcessor<TQuery, TQueryResult>> postProcessors)
     {
-        private readonly IEnumerable<IQueryPostProcessor<TQuery, TQueryResult>> _postProcessors;
+        _postProcessors = postProcessors;
+    }
 
-        public QueryPostProcessorBehavior(IEnumerable<IQueryPostProcessor<TQuery, TQueryResult>> postProcessors)
+    public async Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct)
+    {
+        var result = await next();
+
+        foreach (var processor in _postProcessors)
         {
-            _postProcessors = postProcessors;
+            await processor.ProcessAsync(query, result, ct);
         }
 
-        public async Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct)
-        {
-            var result = await next();
-
-            foreach (var processor in _postProcessors)
-            {
-                await processor.ProcessAsync(query, result, ct);
-            }
-
-            return result;
-        }
+        return result;
     }
 }

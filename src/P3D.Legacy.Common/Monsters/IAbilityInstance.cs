@@ -1,11 +1,10 @@
-﻿namespace P3D.Legacy.Common.Monsters
+﻿namespace P3D.Legacy.Common.Monsters;
+
+public interface IAbilityInstance
 {
-    public interface IAbilityInstance
-    {
-        IAbilityStaticData StaticData { get; }
+    IAbilityStaticData StaticData { get; }
 
-        bool IsHidden { get; }
+    bool IsHidden { get; }
 
-        string? ToString() => $"{StaticData}{(IsHidden ? " (H)" : string.Empty)}";
-    }
+    string? ToString() => $"{StaticData}{(IsHidden ? " (H)" : string.Empty)}";
 }

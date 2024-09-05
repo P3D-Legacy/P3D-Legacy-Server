@@ -9,24 +9,23 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Application.QueryHandlers.Player
+namespace P3D.Legacy.Server.Application.QueryHandlers.Player;
+
+internal sealed class GetPlayerMuteStateQueryHandler : IQueryHandler<GetPlayerMuteStateQuery, bool>
 {
-    internal sealed class GetPlayerMuteStateQueryHandler : IQueryHandler<GetPlayerMuteStateQuery, bool>
+    private readonly ILogger _logger;
+    private readonly IMuteRepository _muteRepository;
+
+    public GetPlayerMuteStateQueryHandler(ILogger<GetPlayerMuteStateQueryHandler> logger, IMuteRepository muteRepository)
     {
-        private readonly ILogger _logger;
-        private readonly IMuteRepository _muteRepository;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _muteRepository = muteRepository ?? throw new ArgumentNullException(nameof(muteRepository));
+    }
 
-        public GetPlayerMuteStateQueryHandler(ILogger<GetPlayerMuteStateQueryHandler> logger, IMuteRepository muteRepository)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _muteRepository = muteRepository ?? throw new ArgumentNullException(nameof(muteRepository));
-        }
+    public async Task<bool> HandleAsync(GetPlayerMuteStateQuery query, CancellationToken ct)
+    {
+        var (playerId, targetPlayerId) = query;
 
-        public async Task<bool> HandleAsync(GetPlayerMuteStateQuery query, CancellationToken ct)
-        {
-            var (playerId, targetPlayerId) = query;
-
-            return await _muteRepository.IsMutedAsync(playerId, targetPlayerId, ct);
-        }
+        return await _muteRepository.IsMutedAsync(playerId, targetPlayerId, ct);
     }
 }

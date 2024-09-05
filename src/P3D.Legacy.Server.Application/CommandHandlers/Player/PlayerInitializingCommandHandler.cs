@@ -11,23 +11,23 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Application.CommandHandlers.Player
-{
-    internal sealed class PlayerInitializingCommandHandler : ICommandHandler<PlayerInitializingCommand>
-    {
-        private readonly IPlayerOriginGenerator _playerIdGenerator;
-        private readonly IPlayerContainerWriterAsync _playerContainer;
-        private readonly IBanRepository _banRepository;
+namespace P3D.Legacy.Server.Application.CommandHandlers.Player;
 
-        public PlayerInitializingCommandHandler(IPlayerContainerWriterAsync playerContainer, IPlayerOriginGenerator playerIdGenerator, IBanRepository banRepository)
-        {
+internal sealed class PlayerInitializingCommandHandler : ICommandHandler<PlayerInitializingCommand>
+{
+    private readonly IPlayerOriginGenerator _playerIdGenerator;
+    private readonly IPlayerContainerWriterAsync _playerContainer;
+    private readonly IBanRepository _banRepository;
+
+    public PlayerInitializingCommandHandler(IPlayerContainerWriterAsync playerContainer, IPlayerOriginGenerator playerIdGenerator, IBanRepository banRepository)
+    {
             _playerIdGenerator = playerIdGenerator ?? throw new ArgumentNullException(nameof(playerIdGenerator));
             _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
             _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
         }
 
-        public async Task<CommandResult> HandleAsync(PlayerInitializingCommand command, CancellationToken ct)
-        {
+    public async Task<CommandResult> HandleAsync(PlayerInitializingCommand command, CancellationToken ct)
+    {
             var player = command.Player;
 
             Debug.Assert(player.State == PlayerState.Initializing);
@@ -50,5 +50,4 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 
             return CommandResult.Success;
         }
-    }
 }

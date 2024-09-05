@@ -1,7 +1,6 @@
-﻿namespace P3D.Legacy.Server.CQERS.Events
+﻿namespace P3D.Legacy.Server.CQERS.Events;
+
+public interface IReceiveContext<out TEvent> where TEvent : IEvent
 {
-    public interface IReceiveContext<out TEvent> where TEvent : IEvent
-    {
-        TEvent Message { get; }
-    }
+    TEvent Message { get; }
 }

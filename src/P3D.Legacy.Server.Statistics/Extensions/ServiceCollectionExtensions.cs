@@ -3,12 +3,12 @@
 using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.Statistics.EventHandlers;
 
-namespace P3D.Legacy.Server.Statistics.Extensions
+namespace P3D.Legacy.Server.Statistics.Extensions;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddStatistics(this IServiceCollection services)
     {
-        public static IServiceCollection AddStatistics(this IServiceCollection services)
-        {
             services.AddTransient<MetricsHandler>();
             services.AddEventHandler(static sp => sp.GetRequiredService<MetricsHandler>());
 
@@ -17,5 +17,4 @@ namespace P3D.Legacy.Server.Statistics.Extensions
 
             return services;
         }
-    }
 }

@@ -13,23 +13,23 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Application.Services
+namespace P3D.Legacy.Server.Application.Services;
+
+public class WorldService : LongRunningBackgroundService
 {
-    public class WorldService : LongRunningBackgroundService
+    public WorldState State { get; private set; } = new(TimeSpan.Zero, WorldSeason.Spring, WorldWeather.Sunny);
+
+    public WorldSeason Season { get => State.Season; set => State = State with { Season = value }; }
+    public WorldWeather Weather { get => State.Weather; set => State = State with { Weather = value }; }
+    public TimeSpan CurrentTime { get => State.Time; set => State = State with { Time = value }; }
+
+    private readonly ILogger _logger;
+    private readonly Tracer _tracer;
+    private readonly IEventDispatcher _eventDispatcher;
+    private readonly TimeLimiter _checkTimeLimiter;
+
+    public WorldService(ILogger<WorldService> logger, TracerProvider traceProvider, IEventDispatcher eventDispatcher)
     {
-        public WorldState State { get; private set; } = new(TimeSpan.Zero, WorldSeason.Spring, WorldWeather.Sunny);
-
-        public WorldSeason Season { get => State.Season; set => State = State with { Season = value }; }
-        public WorldWeather Weather { get => State.Weather; set => State = State with { Weather = value }; }
-        public TimeSpan CurrentTime { get => State.Time; set => State = State with { Time = value }; }
-
-        private readonly ILogger _logger;
-        private readonly Tracer _tracer;
-        private readonly IEventDispatcher _eventDispatcher;
-        private readonly TimeLimiter _checkTimeLimiter;
-
-        public WorldService(ILogger<WorldService> logger, TracerProvider traceProvider, IEventDispatcher eventDispatcher)
-        {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tracer = traceProvider.GetTracer("P3D.Legacy.Server.Application");
             _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
@@ -39,8 +39,8 @@ namespace P3D.Legacy.Server.Application.Services
             _checkTimeLimiter = TimeLimiter.GetPersistentTimeLimiter(1, TimeSpan.FromHours(1), static _ => { }, new[] { currentHour });
         }
 
-        protected override async Task ExecuteAsync(CancellationToken ct)
-        {
+    protected override async Task ExecuteAsync(CancellationToken ct)
+    {
             using var span = _tracer.StartActiveSpan("P3D Player Movement Compensation Service");
 
             try
@@ -103,5 +103,4 @@ namespace P3D.Legacy.Server.Application.Services
                 _logger.LogError(e, "Exception!");
             }
         }
-    }
 }

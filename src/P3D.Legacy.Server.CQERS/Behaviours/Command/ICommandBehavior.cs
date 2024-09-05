@@ -3,10 +3,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.CQERS.Behaviours.Command
+namespace P3D.Legacy.Server.CQERS.Behaviours.Command;
+
+public interface ICommandBehavior<in TCommand> where TCommand : ICommand
 {
-    public interface ICommandBehavior<in TCommand> where TCommand : ICommand
-    {
-        Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct);
-    }
+    Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct);
 }

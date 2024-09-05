@@ -15,84 +15,83 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
+namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests;
+
+internal abstract class BaseTests
 {
-    internal abstract class BaseTests
+    private class TestConnectionFactory : IConnectionFactory
     {
-        private class TestConnectionFactory : IConnectionFactory
+        private class DuplexPipe : IDuplexPipe
         {
-            private class DuplexPipe : IDuplexPipe
+            // This class exists to work around issues with value tuple on .NET Framework
+            public readonly struct DuplexPipePair
             {
-                // This class exists to work around issues with value tuple on .NET Framework
-                public readonly struct DuplexPipePair
+                public IDuplexPipe Transport { get; }
+                public IDuplexPipe Application { get; }
+
+                public DuplexPipePair(IDuplexPipe transport, IDuplexPipe application)
                 {
-                    public IDuplexPipe Transport { get; }
-                    public IDuplexPipe Application { get; }
-
-                    public DuplexPipePair(IDuplexPipe transport, IDuplexPipe application)
-                    {
-                        Transport = transport;
-                        Application = application;
-                    }
-                }
-
-                public static DuplexPipePair CreateConnectionPair(PipeOptions inputOptions, PipeOptions outputOptions)
-                {
-                    var input = new Pipe(inputOptions);
-                    var output = new Pipe(outputOptions);
-
-                    var transportToApplication = new DuplexPipe(output.Reader, input.Writer);
-                    var applicationToTransport = new DuplexPipe(input.Reader, output.Writer);
-
-                    return new DuplexPipePair(applicationToTransport, transportToApplication);
-                }
-
-                public PipeReader Input { get; }
-                public PipeWriter Output { get; }
-
-                private DuplexPipe(PipeReader reader, PipeWriter writer)
-                {
-                    Input = reader;
-                    Output = writer;
+                    Transport = transport;
+                    Application = application;
                 }
             }
-            private class TestConnectionLifetimeNotificationFeature : IConnectionLifetimeNotificationFeature
+
+            public static DuplexPipePair CreateConnectionPair(PipeOptions inputOptions, PipeOptions outputOptions)
             {
-                public CancellationToken ConnectionClosedRequested { get; set; }
+                var input = new Pipe(inputOptions);
+                var output = new Pipe(outputOptions);
 
-                private readonly ConnectionContext _connectionContext;
+                var transportToApplication = new DuplexPipe(output.Reader, input.Writer);
+                var applicationToTransport = new DuplexPipe(input.Reader, output.Writer);
 
-                public TestConnectionLifetimeNotificationFeature(ConnectionContext connectionContext)
-                {
-                    _connectionContext = connectionContext;
-                    ConnectionClosedRequested = connectionContext.ConnectionClosed;
-                }
-                public void RequestClose() => _connectionContext.Abort();
+                return new DuplexPipePair(applicationToTransport, transportToApplication);
             }
 
-            public ValueTask<ConnectionContext> ConnectAsync(EndPoint endpoint, CancellationToken ct = default)
+            public PipeReader Input { get; }
+            public PipeWriter Output { get; }
+
+            private DuplexPipe(PipeReader reader, PipeWriter writer)
             {
-                var options = new PipeOptions(useSynchronizationContext: false);
-                var pair = DuplexPipe.CreateConnectionPair(options, options);
-                var connectionContext = new DefaultConnectionContext(Guid.NewGuid().ToString(), pair.Transport, pair.Application);
-                connectionContext.Features.Set<IConnectionLifetimeNotificationFeature>(new TestConnectionLifetimeNotificationFeature(connectionContext));
-                return ValueTask.FromResult<ConnectionContext>(connectionContext);
+                Input = reader;
+                Output = writer;
             }
         }
-
-        protected static TestService Common() => TestService.CreateNew().Configure(static services =>
+        private class TestConnectionLifetimeNotificationFeature : IConnectionLifetimeNotificationFeature
         {
-            services.AddSingleton<TracerProvider>(static _ => TracerProvider.Default);
+            public CancellationToken ConnectionClosedRequested { get; set; }
 
-            services.AddSingleton<IConnectionFactory, TestConnectionFactory>();
+            private readonly ConnectionContext _connectionContext;
 
-            services.AddScoped<ConnectionContextHandlerFactory>();
+            public TestConnectionLifetimeNotificationFeature(ConnectionContext connectionContext)
+            {
+                _connectionContext = connectionContext;
+                ConnectionClosedRequested = connectionContext.ConnectionClosed;
+            }
+            public void RequestClose() => _connectionContext.Abort();
+        }
 
-            services.AddTransient<P3DConnectionHandler>();
-            services.AddScoped<P3DConnectionContextHandler>();
-
-            services.AddScoped<P3DProtocol>();
-            services.AddSingleton<IP3DPacketFactory, P3DPacketServerFactory>();
-        });
+        public ValueTask<ConnectionContext> ConnectAsync(EndPoint endpoint, CancellationToken ct = default)
+        {
+            var options = new PipeOptions(useSynchronizationContext: false);
+            var pair = DuplexPipe.CreateConnectionPair(options, options);
+            var connectionContext = new DefaultConnectionContext(Guid.NewGuid().ToString(), pair.Transport, pair.Application);
+            connectionContext.Features.Set<IConnectionLifetimeNotificationFeature>(new TestConnectionLifetimeNotificationFeature(connectionContext));
+            return ValueTask.FromResult<ConnectionContext>(connectionContext);
+        }
     }
+
+    protected static TestService Common() => TestService.CreateNew().Configure(static services =>
+    {
+        services.AddSingleton<TracerProvider>(static _ => TracerProvider.Default);
+
+        services.AddSingleton<IConnectionFactory, TestConnectionFactory>();
+
+        services.AddScoped<ConnectionContextHandlerFactory>();
+
+        services.AddTransient<P3DConnectionHandler>();
+        services.AddScoped<P3DConnectionContextHandler>();
+
+        services.AddScoped<P3DProtocol>();
+        services.AddSingleton<IP3DPacketFactory, P3DPacketServerFactory>();
+    });
 }

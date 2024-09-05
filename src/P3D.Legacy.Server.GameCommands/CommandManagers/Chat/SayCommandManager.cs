@@ -5,18 +5,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.GameCommands.CommandManagers.Chat
+namespace P3D.Legacy.Server.GameCommands.CommandManagers.Chat;
+
+internal class SayCommandManager : CommandManager
 {
-    internal class SayCommandManager : CommandManager
+    public override string Name => "say";
+    public override string Description => "Speak as the Server.";
+    public override PermissionTypes Permissions => PermissionTypes.AdministratorOrHigher;
+
+    public SayCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
+    public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
     {
-        public override string Name => "say";
-        public override string Description => "Speak as the Server.";
-        public override PermissionTypes Permissions => PermissionTypes.AdministratorOrHigher;
-
-        public SayCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
-
-        public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
-        {
             if (arguments.Length == 1)
             {
                 var message = arguments[0].TrimStart('"').TrimEnd('"');
@@ -31,9 +31,8 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Chat
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
         }
 
-        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
-        {
+    public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
+    {
             await SendMessageAsync(player, $"Correct usage is /{alias} <message>", ct);
         }
-    }
 }

@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace P3D.Legacy.Common.PlayerEvents
-{
-    public static class PlayerEventParser
-    {
-        private static readonly char[] AchievedEmblemMarker = "achieved the emblem \"".ToCharArray();
-        private static readonly char[] HostedABattleMarker = "hosted a battle: \"Player ".ToCharArray();
-        private static readonly char[] HostedABattleMarker2 = " got defeated by Player ".ToCharArray();
-        private static readonly char[] EvolvedPokemonMarker = "evolved their ".ToCharArray();
-        private static readonly char[] EvolvedPokemonMarker2 = " into a ".ToCharArray();
-        private static readonly char[] DefeatedByWildPokemonMarker = "got defeated by a wild ".ToCharArray();
-        private static readonly char[] DefeatedByTrainerMarker = "got defeated by ".ToCharArray();
+namespace P3D.Legacy.Common.PlayerEvents;
 
-        public static bool TryParse(in ReadOnlySpan<char> message, [NotNullWhen(true)] out PlayerEvent? eventType)
-        {
+public static class PlayerEventParser
+{
+    private static readonly char[] AchievedEmblemMarker = "achieved the emblem \"".ToCharArray();
+    private static readonly char[] HostedABattleMarker = "hosted a battle: \"Player ".ToCharArray();
+    private static readonly char[] HostedABattleMarker2 = " got defeated by Player ".ToCharArray();
+    private static readonly char[] EvolvedPokemonMarker = "evolved their ".ToCharArray();
+    private static readonly char[] EvolvedPokemonMarker2 = " into a ".ToCharArray();
+    private static readonly char[] DefeatedByWildPokemonMarker = "got defeated by a wild ".ToCharArray();
+    private static readonly char[] DefeatedByTrainerMarker = "got defeated by ".ToCharArray();
+
+    public static bool TryParse(in ReadOnlySpan<char> message, [NotNullWhen(true)] out PlayerEvent? eventType)
+    {
             var eventMessage = message;
 
             if (eventMessage.StartsWith(AchievedEmblemMarker, StringComparison.Ordinal))
@@ -63,15 +63,14 @@ namespace P3D.Legacy.Common.PlayerEvents
             return true;
         }
 
-        public static string AsText(PlayerEvent @event) => @event switch
-        {
-            AchievedEmblemEvent achievedEmblemEvent => $"achieved the emblem {achievedEmblemEvent.EmblemName}!",
-            DefeatedByTrainerEvent defeatedByTrainerEvent => $"got defeated by {defeatedByTrainerEvent.TrainerTypeAndName}!",
-            DefeatedByWildPokemonEvent defeatedByWildPokemonEvent => $"got defeated by a wild {defeatedByWildPokemonEvent.PokemonName}!",
-            EvolvedPokemonEvent evolvedPokemonEvent => $"evolved their {evolvedPokemonEvent.PokemonName} into a {evolvedPokemonEvent.EvolvedPokemonName}!",
-            HostedABattleEvent hostedABattleEvent => $"hosted a battle: \"Player {hostedABattleEvent.DefeatedTrainerName} got defeated by Player {hostedABattleEvent.TrainerName}\"!",
-            UnknownEvent unknownEvent => unknownEvent.RawEvent,
-            _ => throw new ArgumentOutOfRangeException(nameof(@event))
-        };
-    }
+    public static string AsText(PlayerEvent @event) => @event switch
+    {
+        AchievedEmblemEvent achievedEmblemEvent => $"achieved the emblem {achievedEmblemEvent.EmblemName}!",
+        DefeatedByTrainerEvent defeatedByTrainerEvent => $"got defeated by {defeatedByTrainerEvent.TrainerTypeAndName}!",
+        DefeatedByWildPokemonEvent defeatedByWildPokemonEvent => $"got defeated by a wild {defeatedByWildPokemonEvent.PokemonName}!",
+        EvolvedPokemonEvent evolvedPokemonEvent => $"evolved their {evolvedPokemonEvent.PokemonName} into a {evolvedPokemonEvent.EvolvedPokemonName}!",
+        HostedABattleEvent hostedABattleEvent => $"hosted a battle: \"Player {hostedABattleEvent.DefeatedTrainerName} got defeated by Player {hostedABattleEvent.TrainerName}\"!",
+        UnknownEvent unknownEvent => unknownEvent.RawEvent,
+        _ => throw new ArgumentOutOfRangeException(nameof(@event))
+    };
 }

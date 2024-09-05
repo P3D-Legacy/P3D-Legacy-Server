@@ -8,33 +8,33 @@ using System.Collections.Generic;
 
 using Terminal.Gui;
 
-namespace P3D.Legacy.Server.GUI.Utils
+namespace P3D.Legacy.Server.GUI.Utils;
+
+internal sealed class PlayerListDataSource : IListDataSource
 {
-    internal sealed class PlayerListDataSource : IListDataSource
+    public List<IPlayer> Players { get; }
+
+    public int Count => Players.Count;
+
+    public int Length { get; }
+
+    public PlayerListDataSource(List<IPlayer> itemList)
     {
-        public List<IPlayer> Players { get; }
-
-        public int Count => Players.Count;
-
-        public int Length { get; }
-
-        public PlayerListDataSource(List<IPlayer> itemList)
-        {
             Players = itemList;
             Length = GetMaxLengthItem();
         }
 
-        public void Render(ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start = 0)
-        {
+    public void Render(ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start = 0)
+    {
             container.Move(col, line);
             RenderUstr(driver, Players[item].Name, col, line, width, start);
         }
 
-        public bool IsMarked(int item) => false;
-        public void SetMark(int item, bool value) { }
+    public bool IsMarked(int item) => false;
+    public void SetMark(int item, bool value) { }
 
-        private int GetMaxLengthItem()
-        {
+    private int GetMaxLengthItem()
+    {
             if (Players.Count == 0)
             {
                 return 0;
@@ -53,9 +53,9 @@ namespace P3D.Legacy.Server.GUI.Utils
             return maxLength;
         }
 
-        // A slightly adapted method from: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-        private static void RenderUstr(ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
-        {
+    // A slightly adapted method from: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+    private static void RenderUstr(ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
+    {
             var used = 0;
             var index = start;
             while (index < ustr.Length)
@@ -75,6 +75,5 @@ namespace P3D.Legacy.Server.GUI.Utils
             }
         }
 
-        public IList ToList() => Players;
-    }
+    public IList ToList() => Players;
 }

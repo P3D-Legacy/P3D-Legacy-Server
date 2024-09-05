@@ -1,17 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace P3D.Legacy.Server.UI.Shared.Models
-{
-    public class RegisterModel
-    {
-        [Required]
-        [Display(Name = "Username")]
-        public string Username { get; set; } = default!;
+namespace P3D.Legacy.Server.UI.Shared.Models;
 
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = "Password")]
-        public string Password { get; set; } = default!;
-    }
+public class RegisterModel
+{
+    [Required]
+    [Display(Name = "Username")]
+    public string Username { get; set; } = default!;
+
+    [Required]
+    [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+    [DataType(DataType.Password)]
+    [Display(Name = "Password")]
+    public string Password { get; set; } = default!;
 }

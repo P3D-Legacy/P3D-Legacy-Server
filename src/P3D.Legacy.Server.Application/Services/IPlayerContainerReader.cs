@@ -5,11 +5,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Application.Services
+namespace P3D.Legacy.Server.Application.Services;
+
+public interface IPlayerContainerReader
 {
-    public interface IPlayerContainerReader
-    {
-        IPlayer? Get(Origin origin);
-        IEnumerable<IPlayer> GetAll();
-    }
+    IPlayer? Get(Origin origin);
+    IEnumerable<IPlayer> GetAll();
 }

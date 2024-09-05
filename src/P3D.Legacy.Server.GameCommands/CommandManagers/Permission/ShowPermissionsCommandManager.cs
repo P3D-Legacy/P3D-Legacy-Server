@@ -5,18 +5,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
+namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission;
+
+internal class ShowPermissionsCommandManager : CommandManager
 {
-    internal class ShowPermissionsCommandManager : CommandManager
+    public override string Name => "showperm";
+    public override string Description => "Show available Client permissions.";
+    public override PermissionTypes Permissions => PermissionTypes.AdministratorOrHigher;
+
+    public ShowPermissionsCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
+    public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
     {
-        public override string Name => "showperm";
-        public override string Description => "Show available Client permissions.";
-        public override PermissionTypes Permissions => PermissionTypes.AdministratorOrHigher;
-
-        public ShowPermissionsCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
-
-        public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
-        {
             if (arguments.Length == 1)
                 await SendMessageAsync(player, string.Join(",", Enum.GetNames(typeof(PermissionTypes))), ct);
             else if (arguments.Length == 2)
@@ -34,9 +34,8 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
                 await SendMessageAsync(player, "Invalid arguments given.", ct);
         }
 
-        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
-        {
+    public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
+    {
             await SendMessageAsync(player, $"Correct usage is /{alias} [<playername>]", ct);
         }
-    }
 }

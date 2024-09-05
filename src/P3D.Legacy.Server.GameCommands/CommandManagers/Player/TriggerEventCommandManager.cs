@@ -9,28 +9,28 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
+namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player;
+
+internal class TriggerPlayerEventCommandManager : CommandManager
 {
-    internal class TriggerPlayerEventCommandManager : CommandManager
+    private enum EventType
     {
-        private enum EventType
-        {
-            AchievedEmblem,
-            DefeatedByTrainer,
-            DefeatedByWildPokemon,
-            HostedABattle,
-            EvolvedPokemon,
-        }
+        AchievedEmblem,
+        DefeatedByTrainer,
+        DefeatedByWildPokemon,
+        HostedABattle,
+        EvolvedPokemon,
+    }
 
-        public override string Name => "triggerevent";
-        public override string Description => "Trigger Player Event.";
-        public override IEnumerable<string> Aliases => new[] { "te" };
-        public override PermissionTypes Permissions => PermissionTypes.Debug;
+    public override string Name => "triggerevent";
+    public override string Description => "Trigger Player Event.";
+    public override IEnumerable<string> Aliases => new[] { "te" };
+    public override PermissionTypes Permissions => PermissionTypes.Debug;
 
-        public TriggerPlayerEventCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
+    public TriggerPlayerEventCommandManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
-        {
+    public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
+    {
             if (Enum.TryParse(arguments[0], true, out EventType eventType))
             {
                 var @event = eventType switch
@@ -53,9 +53,8 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Player
             }
         }
 
-        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
-        {
+    public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
+    {
             await SendMessageAsync(player, $"Correct usage is /{alias} <eventType> [args]", ct);
         }
-    }
 }

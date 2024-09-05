@@ -1,12 +1,11 @@
-﻿namespace P3D.Legacy.Server.CQERS.Events
-{
-    public class NullReceiveContext<TEvent> : IReceiveContext<TEvent> where TEvent : IEvent
-    {
-        public TEvent Message { get; }
+﻿namespace P3D.Legacy.Server.CQERS.Events;
 
-        public NullReceiveContext(TEvent @event)
-        {
+public class NullReceiveContext<TEvent> : IReceiveContext<TEvent> where TEvent : IEvent
+{
+    public TEvent Message { get; }
+
+    public NullReceiveContext(TEvent @event)
+    {
             Message = @event;
         }
-    }
 }

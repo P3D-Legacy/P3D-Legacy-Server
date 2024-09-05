@@ -1,12 +1,11 @@
-﻿namespace P3D.Legacy.Server.Client.P3D.Packets.Chat
-{
-    public sealed record ChatMessageGlobalPacket() : P3DPacket(P3DPacketType.ChatMessageGlobal)
-    {
-        public string Message { get => DataItemStorage.Get(0); init => DataItemStorage.Set(0, value); }
+﻿namespace P3D.Legacy.Server.Client.P3D.Packets.Chat;
 
-        public void Deconstruct(out string message)
-        {
-            message = Message;
-        }
+public sealed record ChatMessageGlobalPacket() : P3DPacket(P3DPacketType.ChatMessageGlobal)
+{
+    public string Message { get => DataItemStorage.Get(0); init => DataItemStorage.Set(0, value); }
+
+    public void Deconstruct(out string message)
+    {
+        message = Message;
     }
 }

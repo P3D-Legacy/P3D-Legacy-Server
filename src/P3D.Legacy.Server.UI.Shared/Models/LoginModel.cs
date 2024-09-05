@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace P3D.Legacy.Server.UI.Shared.Models
+namespace P3D.Legacy.Server.UI.Shared.Models;
+
+public class LoginModel
 {
-    public class LoginModel
-    {
-        [Required]
-        public string Username { get; set; } = default!;
+    [Required]
+    public string Username { get; set; } = default!;
 
-        [Required]
-        public string Password { get; set; } = default!;
+    [Required]
+    public string Password { get; set; } = default!;
 
-        public bool RememberMe { get; set; } = default!;
-    }
+    public bool RememberMe { get; set; } = default!;
 }

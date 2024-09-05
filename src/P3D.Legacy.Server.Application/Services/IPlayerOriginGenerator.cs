@@ -3,10 +3,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Application.Services
+namespace P3D.Legacy.Server.Application.Services;
+
+public interface IPlayerOriginGenerator
 {
-    public interface IPlayerOriginGenerator
-    {
-        Task<Origin> GenerateAsync(CancellationToken ct);
-    }
+    Task<Origin> GenerateAsync(CancellationToken ct);
 }

@@ -12,19 +12,19 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Behaviours
-{
-    internal class CommandValidationBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
-    {
-        private readonly IEnumerable<IValidator<TCommand>> _validators;
+namespace P3D.Legacy.Server.Behaviours;
 
-        public CommandValidationBehaviour(IEnumerable<IValidator<TCommand>> validators)
-        {
+internal class CommandValidationBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
+{
+    private readonly IEnumerable<IValidator<TCommand>> _validators;
+
+    public CommandValidationBehaviour(IEnumerable<IValidator<TCommand>> validators)
+    {
             _validators = validators;
         }
 
-        public async Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct)
-        {
+    public async Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct)
+    {
             if (_validators.Any())
             {
                 var context = new ValidationContext<TCommand>(command);
@@ -37,19 +37,19 @@ namespace P3D.Legacy.Server.Behaviours
             }
             return await next();
         }
-    }
+}
 
-    internal class QueryValidationBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
+internal class QueryValidationBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
+{
+    private readonly IEnumerable<IValidator<TQuery>> _validators;
+
+    public QueryValidationBehaviour(IEnumerable<IValidator<TQuery>> validators)
     {
-        private readonly IEnumerable<IValidator<TQuery>> _validators;
-
-        public QueryValidationBehaviour(IEnumerable<IValidator<TQuery>> validators)
-        {
             _validators = validators;
         }
 
-        public async Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct)
-        {
+    public async Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct)
+    {
             if (_validators.Any())
             {
                 var context = new ValidationContext<TQuery>(query);
@@ -62,5 +62,4 @@ namespace P3D.Legacy.Server.Behaviours
             }
             return await next();
         }
-    }
 }

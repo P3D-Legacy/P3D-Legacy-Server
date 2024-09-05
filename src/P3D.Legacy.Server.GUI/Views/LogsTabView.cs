@@ -5,17 +5,17 @@ using System.Diagnostics.CodeAnalysis;
 
 using Terminal.Gui;
 
-namespace P3D.Legacy.Server.GUI.Views
+namespace P3D.Legacy.Server.GUI.Views;
+
+public sealed class LogsTabView : View
 {
-    public sealed class LogsTabView : View
-    {
 #pragma warning disable IDISP006
-        private readonly TextView _logsTextView;
+    private readonly TextView _logsTextView;
 #pragma warning restore IDISP006
 
-        [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
-        public LogsTabView()
-        {
+    [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
+    public LogsTabView()
+    {
             Width = Dim.Fill();
             Height = Dim.Fill();
 
@@ -26,8 +26,8 @@ namespace P3D.Legacy.Server.GUI.Views
             Add(messageView);
         }
 
-        public void Log<TState>(string category, LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-        {
+    public void Log<TState>(string category, LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    {
             var message = formatter(state, exception);
             var content = message + Environment.NewLine + _logsTextView.Text;
 
@@ -41,5 +41,4 @@ namespace P3D.Legacy.Server.GUI.Views
 
             _logsTextView.Text = content;
         }
-    }
 }

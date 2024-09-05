@@ -11,111 +11,110 @@ using System.Threading.Tasks;
 
 using KVP = System.Collections.Generic.KeyValuePair<string, object?>;
 
-namespace P3D.Legacy.Server.Statistics.EventHandlers
+namespace P3D.Legacy.Server.Statistics.EventHandlers;
+
+internal sealed class MetricsHandler :
+    IEventHandler<PlayerTriggeredEventEvent>,
+    IEventHandler<PlayerSentGlobalMessageEvent>,
+    IEventHandler<PlayerSentLocalMessageEvent>,
+    IEventHandler<PlayerSentPrivateMessageEvent>,
+    IEventHandler<PlayerSentCommandEvent>,
+    IEventHandler<PlayerJoinedEvent>,
+    IEventHandler<PlayerLeftEvent>,
+    IEventHandler<WorldUpdatedEvent>,
+    IDisposable
 {
-    internal sealed class MetricsHandler :
-        IEventHandler<PlayerTriggeredEventEvent>,
-        IEventHandler<PlayerSentGlobalMessageEvent>,
-        IEventHandler<PlayerSentLocalMessageEvent>,
-        IEventHandler<PlayerSentPrivateMessageEvent>,
-        IEventHandler<PlayerSentCommandEvent>,
-        IEventHandler<PlayerJoinedEvent>,
-        IEventHandler<PlayerLeftEvent>,
-        IEventHandler<WorldUpdatedEvent>,
-        IDisposable
+    private readonly ILogger _logger;
+    private readonly Meter _meter;
+    private readonly Counter<long> _eventCounter;
+    private readonly Counter<long> _messageCounter;
+    private readonly Counter<long> _queueCounter;
+    private readonly Counter<long> _worldCounter;
+
+    public MetricsHandler(ILogger<MetricsHandler> logger)
     {
-        private readonly ILogger _logger;
-        private readonly Meter _meter;
-        private readonly Counter<long> _eventCounter;
-        private readonly Counter<long> _messageCounter;
-        private readonly Counter<long> _queueCounter;
-        private readonly Counter<long> _worldCounter;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _meter = new Meter("P3D.Legacy.Server.Statistics");
+        _eventCounter = _meter.CreateCounter<long>("player_event", "count", "occurrence of event triggered by player");
+        _messageCounter = _meter.CreateCounter<long>("player_message", "count", "occurrence of messages sent by player");
+        _queueCounter = _meter.CreateCounter<long>("player_queue", "count", "occurrence of queue actions by player");
+        _worldCounter = _meter.CreateCounter<long>("world_state", "count", "occurrence of world state updates");
+    }
 
-        public MetricsHandler(ILogger<MetricsHandler> logger)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _meter = new Meter("P3D.Legacy.Server.Statistics");
-            _eventCounter = _meter.CreateCounter<long>("player_event", "count", "occurrence of event triggered by player");
-            _messageCounter = _meter.CreateCounter<long>("player_message", "count", "occurrence of messages sent by player");
-            _queueCounter = _meter.CreateCounter<long>("player_queue", "count", "occurrence of queue actions by player");
-            _worldCounter = _meter.CreateCounter<long>("world_state", "count", "occurrence of world state updates");
-        }
+    public Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)
+    {
+        _eventCounter.Add(1,
+            new KVP("id", context.Message.Player.Id),
+            new KVP("event", context.Message.Event.EventType));
 
-        public Task HandleAsync(IReceiveContext<PlayerTriggeredEventEvent> context, CancellationToken ct)
-        {
-            _eventCounter.Add(1,
-                new KVP("id", context.Message.Player.Id),
-                new KVP("event", context.Message.Event.EventType));
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
+    public Task HandleAsync(IReceiveContext<PlayerSentGlobalMessageEvent> context, CancellationToken ct)
+    {
+        _messageCounter.Add(1,
+            new KVP("id", context.Message.Player.Id),
+            new KVP("type", "global"));
 
-        public Task HandleAsync(IReceiveContext<PlayerSentGlobalMessageEvent> context, CancellationToken ct)
-        {
-            _messageCounter.Add(1,
-                new KVP("id", context.Message.Player.Id),
-                new KVP("type", "global"));
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
+    public Task HandleAsync(IReceiveContext<PlayerSentLocalMessageEvent> context, CancellationToken ct)
+    {
+        _messageCounter.Add(1,
+            new KVP("id", context.Message.Player.Id),
+            new KVP("type", "local"));
 
-        public Task HandleAsync(IReceiveContext<PlayerSentLocalMessageEvent> context, CancellationToken ct)
-        {
-            _messageCounter.Add(1,
-                new KVP("id", context.Message.Player.Id),
-                new KVP("type", "local"));
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
+    public Task HandleAsync(IReceiveContext<PlayerSentPrivateMessageEvent> context, CancellationToken ct)
+    {
+        _messageCounter.Add(1,
+            new KVP("id", context.Message.Player.Id),
+            new KVP("type", "private"));
 
-        public Task HandleAsync(IReceiveContext<PlayerSentPrivateMessageEvent> context, CancellationToken ct)
-        {
-            _messageCounter.Add(1,
-                new KVP("id", context.Message.Player.Id),
-                new KVP("type", "private"));
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
+    public Task HandleAsync(IReceiveContext<PlayerSentCommandEvent> context, CancellationToken ct)
+    {
+        _messageCounter.Add(1,
+            new KVP("id", context.Message.Player.Id),
+            new KVP("type", "command"));
 
-        public Task HandleAsync(IReceiveContext<PlayerSentCommandEvent> context, CancellationToken ct)
-        {
-            _messageCounter.Add(1,
-                new KVP("id", context.Message.Player.Id),
-                new KVP("type", "command"));
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
+    public Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
+    {
+        _queueCounter.Add(1,
+            new KVP("id", context.Message.Player.Id),
+            new KVP("type", "joined"));
 
-        public Task HandleAsync(IReceiveContext<PlayerJoinedEvent> context, CancellationToken ct)
-        {
-            _queueCounter.Add(1,
-                new KVP("id", context.Message.Player.Id),
-                new KVP("type", "joined"));
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
+    public Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
+    {
+        _queueCounter.Add(1,
+            new KVP("id", context.Message.Id),
+            new KVP("type", "left"));
 
-        public Task HandleAsync(IReceiveContext<PlayerLeftEvent> context, CancellationToken ct)
-        {
-            _queueCounter.Add(1,
-                new KVP("id", context.Message.Id),
-                new KVP("type", "left"));
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
+    public Task HandleAsync(IReceiveContext<WorldUpdatedEvent> context, CancellationToken ct)
+    {
+        _worldCounter.Add(1,
+            new KVP("season", context.Message.State.Season),
+            new KVP("weather", context.Message.State.Weather));
 
-        public Task HandleAsync(IReceiveContext<WorldUpdatedEvent> context, CancellationToken ct)
-        {
-            _worldCounter.Add(1,
-                new KVP("season", context.Message.State.Season),
-                new KVP("weather", context.Message.State.Weather));
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            _meter.Dispose();
-        }
+    public void Dispose()
+    {
+        _meter.Dispose();
     }
 }

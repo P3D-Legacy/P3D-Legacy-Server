@@ -1,10 +1,9 @@
-﻿namespace P3D.Legacy.Common.Data
+﻿namespace P3D.Legacy.Common.Data;
+
+public enum WorldSeason
 {
-    public enum WorldSeason
-    {
-        Winter,
-        Spring,
-        Summer,
-        Fall,
-    }
+    Winter,
+    Spring,
+    Summer,
+    Fall,
 }

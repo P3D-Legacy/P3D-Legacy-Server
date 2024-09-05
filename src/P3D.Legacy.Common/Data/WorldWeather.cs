@@ -1,16 +1,15 @@
-﻿namespace P3D.Legacy.Common.Data
+﻿namespace P3D.Legacy.Common.Data;
+
+public enum WorldWeather
 {
-    public enum WorldWeather
-    {
-        Clear,
-        Rain,
-        Snow,
-        Underwater,
-        Sunny,
-        Fog,
-        Thunderstorm,
-        Sandstorm,
-        Ash,
-        Blizzard,
-    }
+    Clear,
+    Rain,
+    Snow,
+    Underwater,
+    Sunny,
+    Fog,
+    Thunderstorm,
+    Sandstorm,
+    Ash,
+    Blizzard,
 }

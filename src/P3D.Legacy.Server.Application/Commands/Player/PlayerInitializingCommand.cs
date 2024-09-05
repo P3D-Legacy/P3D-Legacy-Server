@@ -1,7 +1,6 @@
 ﻿using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.CQERS.Commands;
 
-namespace P3D.Legacy.Server.Application.Commands.Player
-{
-    public sealed record PlayerInitializingCommand(IPlayer Player) : ICommand;
-}
+namespace P3D.Legacy.Server.Application.Commands.Player;
+
+public sealed record PlayerInitializingCommand(IPlayer Player) : ICommand;

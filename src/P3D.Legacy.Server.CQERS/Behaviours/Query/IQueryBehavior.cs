@@ -3,10 +3,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.CQERS.Behaviours.Query
+namespace P3D.Legacy.Server.CQERS.Behaviours.Query;
+
+public interface IQueryBehavior<in TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
 {
-    public interface IQueryBehavior<in TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
-    {
-        Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct);
-    }
+    Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct);
 }

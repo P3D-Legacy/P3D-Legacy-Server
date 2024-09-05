@@ -11,57 +11,56 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.CommunicationAPI.Controllers
+namespace P3D.Legacy.Server.CommunicationAPI.Controllers;
+
+[ApiController]
+[Route("api/v1/[controller]")]
+public sealed partial class CommunicationController : ControllerBase
 {
-    [ApiController]
-    [Route("api/v1/[controller]")]
-    public sealed partial class CommunicationController : ControllerBase
+    [LoggerMessage(Level = LogLevel.Trace, Message = "WebSocket connection received at 'listener/ws'")]
+    private partial void ConnectionReceived();
+
+    private readonly ILogger _logger;
+    private readonly Tracer _tracer;
+    private readonly WebSocketHandlerFactory _handlerFactory;
+    private readonly WebSocketSubscribtionManager _subscribtionManager;
+
+    public CommunicationController(ILogger<CommunicationController> logger, TracerProvider traceProvider, WebSocketHandlerFactory handlerFactory, WebSocketSubscribtionManager subscribtionManager)
     {
-        [LoggerMessage(Level = LogLevel.Trace, Message = "WebSocket connection received at 'listener/ws'")]
-        private partial void ConnectionReceived();
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _tracer = traceProvider.GetTracer("P3D.Legacy.Server.CommunicationAPI");
+        _handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
+        _subscribtionManager = subscribtionManager ?? throw new ArgumentNullException(nameof(subscribtionManager));
+    }
 
-        private readonly ILogger _logger;
-        private readonly Tracer _tracer;
-        private readonly WebSocketHandlerFactory _handlerFactory;
-        private readonly WebSocketSubscribtionManager _subscribtionManager;
-
-        public CommunicationController(ILogger<CommunicationController> logger, TracerProvider traceProvider, WebSocketHandlerFactory handlerFactory, WebSocketSubscribtionManager subscribtionManager)
+    [HttpGet("listener/ws")]
+    public async Task ListenerAsync(CancellationToken ct)
+    {
+        if (HttpContext.WebSockets.IsWebSocketRequest)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _tracer = traceProvider.GetTracer("P3D.Legacy.Server.CommunicationAPI");
-            _handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
-            _subscribtionManager = subscribtionManager ?? throw new ArgumentNullException(nameof(subscribtionManager));
+            ConnectionReceived();
+
+            using var connectionSpan = _tracer.StartActiveSpan("Communication WebSocket Connection", SpanKind.Server);
+
+            await using var handler = _handlerFactory.Create(await HttpContext.WebSockets.AcceptWebSocketAsync("json"));
+            _subscribtionManager.AddOrUpdate(HttpContext.Connection.Id, static (_, x) => x, static (_, _, x) => x, handler);
+
+            try
+            {
+                await handler.ListenAsync(ct);
+            }
+            catch (Exception e)
+            {
+                connectionSpan.RecordException(e);
+            }
+            finally
+            {
+                _subscribtionManager.Remove(HttpContext.Connection.Id, out _);
+            }
         }
-
-        [HttpGet("listener/ws")]
-        public async Task ListenerAsync(CancellationToken ct)
+        else
         {
-            if (HttpContext.WebSockets.IsWebSocketRequest)
-            {
-                ConnectionReceived();
-
-                using var connectionSpan = _tracer.StartActiveSpan("Communication WebSocket Connection", SpanKind.Server);
-
-                await using var handler = _handlerFactory.Create(await HttpContext.WebSockets.AcceptWebSocketAsync("json"));
-                _subscribtionManager.AddOrUpdate(HttpContext.Connection.Id, static (_, x) => x, static (_, _, x) => x, handler);
-
-                try
-                {
-                    await handler.ListenAsync(ct);
-                }
-                catch (Exception e)
-                {
-                    connectionSpan.RecordException(e);
-                }
-                finally
-                {
-                    _subscribtionManager.Remove(HttpContext.Connection.Id, out _);
-                }
-            }
-            else
-            {
-                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-            }
+            HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         }
     }
 }

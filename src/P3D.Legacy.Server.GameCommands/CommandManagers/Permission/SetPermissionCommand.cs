@@ -9,19 +9,19 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
+namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission;
+
+internal class SetPermissionCommand : CommandManager
 {
-    internal class SetPermissionCommand : CommandManager
+    public override string Name => "setperm";
+    public override string Description => "Change Client permission.";
+    public override IEnumerable<string> Aliases => new[] { "sperm", "sp" };
+    public override PermissionTypes Permissions => PermissionTypes.AdministratorOrHigher;
+
+    public SetPermissionCommand(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
+    public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
     {
-        public override string Name => "setperm";
-        public override string Description => "Change Client permission.";
-        public override IEnumerable<string> Aliases => new[] { "sperm", "sp" };
-        public override PermissionTypes Permissions => PermissionTypes.AdministratorOrHigher;
-
-        public SetPermissionCommand(IServiceProvider serviceProvider) : base(serviceProvider) { }
-
-        public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
-        {
             if (arguments.Length >= 2)
             {
                 var permissions = arguments.Skip(1).Where(static arg => arg is not "," and not "|").ToArray();
@@ -47,13 +47,13 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
             }
         }
 
-        public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
-        {
+    public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
+    {
             await SendMessageAsync(player, $"Correct usage is /{alias} <PlayerName> <Permission>", ct);
         }
 
-        private async IAsyncEnumerable<PermissionTypes> GetPermissionsAsync(IPlayer player, IEnumerable<string> permissions, [EnumeratorCancellation] CancellationToken ct)
-        {
+    private async IAsyncEnumerable<PermissionTypes> GetPermissionsAsync(IPlayer player, IEnumerable<string> permissions, [EnumeratorCancellation] CancellationToken ct)
+    {
             foreach (var permission in permissions)
             {
                 if (Enum.TryParse(permission, true, out PermissionTypes flag))
@@ -62,5 +62,4 @@ namespace P3D.Legacy.Server.GameCommands.CommandManagers.Permission
                     await SendMessageAsync(player, $"Permission {permission} not found.", ct);
             }
         }
-    }
 }

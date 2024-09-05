@@ -3,28 +3,28 @@
 using System;
 using System.Security.Cryptography;
 
-namespace P3D.Legacy.Server.InternalAPI.Options
+namespace P3D.Legacy.Server.InternalAPI.Options;
+
+public sealed class JwtOptionsValidator : AbstractValidator<JwtOptions>
 {
-    public sealed class JwtOptionsValidator : AbstractValidator<JwtOptions>
+    public JwtOptionsValidator()
     {
-        public JwtOptionsValidator()
-        {
             RuleFor(static x => x.KeyType).NotEqual(KeyType.None);
             RuleFor(static x => x.PrivateKey).MinimumLength(16).When(static x => x.KeyType == KeyType.Rsa);
             RuleFor(static x => x.PrivateKey).MinimumLength(16).When(static x => x.KeyType == KeyType.ECDsa);
         }
-    }
+}
 
-    public enum KeyType { None, Rsa, ECDsa }
+public enum KeyType { None, Rsa, ECDsa }
 
-    public sealed record JwtOptions : IDisposable
+public sealed record JwtOptions : IDisposable
+{
+    public required string PrivateKey { get; init; } = default!;
+    public required KeyType KeyType { get; init; } = default!;
+
+    private RSA? _rsa;
+    public RSA GetRSAKey()
     {
-        public required string PrivateKey { get; init; } = default!;
-        public required KeyType KeyType { get; init; } = default!;
-
-        private RSA? _rsa;
-        public RSA GetRSAKey()
-        {
             if (KeyType != KeyType.Rsa) throw new NotSupportedException();
 
             if (_rsa is null)
@@ -36,9 +36,9 @@ namespace P3D.Legacy.Server.InternalAPI.Options
             return _rsa;
         }
 
-        private ECDsa? _ecdsa;
-        public ECDsa GetECDsaKey()
-        {
+    private ECDsa? _ecdsa;
+    public ECDsa GetECDsaKey()
+    {
             if (KeyType != KeyType.ECDsa) throw new NotSupportedException();
 
             if (_ecdsa is null)
@@ -50,10 +50,9 @@ namespace P3D.Legacy.Server.InternalAPI.Options
             return _ecdsa;
         }
 
-        public void Dispose()
-        {
+    public void Dispose()
+    {
             _rsa?.Dispose();
             _ecdsa?.Dispose();
         }
-    }
 }

@@ -9,21 +9,21 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Application.CommandHandlers.Player
-{
-    internal sealed class ChangePlayerPermissionsCommandHandler : ICommandHandler<ChangePlayerPermissionsCommand>
-    {
-        private readonly ILogger _logger;
-        private readonly IPermissionRepository _permissionManager;
+namespace P3D.Legacy.Server.Application.CommandHandlers.Player;
 
-        public ChangePlayerPermissionsCommandHandler(ILogger<ChangePlayerPermissionsCommandHandler> logger, IPermissionRepository permissionManager)
-        {
+internal sealed class ChangePlayerPermissionsCommandHandler : ICommandHandler<ChangePlayerPermissionsCommand>
+{
+    private readonly ILogger _logger;
+    private readonly IPermissionRepository _permissionManager;
+
+    public ChangePlayerPermissionsCommandHandler(ILogger<ChangePlayerPermissionsCommandHandler> logger, IPermissionRepository permissionManager)
+    {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _permissionManager = permissionManager ?? throw new ArgumentNullException(nameof(permissionManager));
         }
 
-        public async Task<CommandResult> HandleAsync(ChangePlayerPermissionsCommand command, CancellationToken ct)
-        {
+    public async Task<CommandResult> HandleAsync(ChangePlayerPermissionsCommand command, CancellationToken ct)
+    {
             var (player, permissions) = command;
 
             var result = await _permissionManager.SetPermissionsAsync(player.Id, permissions, ct);
@@ -34,5 +34,4 @@ namespace P3D.Legacy.Server.Application.CommandHandlers.Player
 
             return new CommandResult(result);
         }
-    }
 }

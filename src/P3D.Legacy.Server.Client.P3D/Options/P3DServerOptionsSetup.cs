@@ -5,23 +5,22 @@ using Microsoft.Extensions.Options;
 
 using System.Net;
 
-namespace P3D.Legacy.Server.Client.P3D.Options
+namespace P3D.Legacy.Server.Client.P3D.Options;
+
+public class P3DServerOptionsSetup : IPostConfigureOptions<KestrelServerOptions>
 {
-    public class P3DServerOptionsSetup : IPostConfigureOptions<KestrelServerOptions>
+    private readonly P3DServerOptions _options;
+
+    public P3DServerOptionsSetup(IOptions<P3DServerOptions> options)
     {
-        private readonly P3DServerOptions _options;
+        _options = options.Value;
+    }
 
-        public P3DServerOptionsSetup(IOptions<P3DServerOptions> options)
+    public void PostConfigure(string? name, KestrelServerOptions options)
+    {
+        options.Listen(new IPEndPoint(IPAddress.Parse(_options.IP), _options.Port), static builder =>
         {
-            _options = options.Value;
-        }
-
-        public void PostConfigure(string? name, KestrelServerOptions options)
-        {
-            options.Listen(new IPEndPoint(IPAddress.Parse(_options.IP), _options.Port), static builder =>
-            {
-                builder.UseConnectionLogging().UseConnectionHandler<P3DConnectionHandler>();
-            });
-        }
+            builder.UseConnectionLogging().UseConnectionHandler<P3DConnectionHandler>();
+        });
     }
 }

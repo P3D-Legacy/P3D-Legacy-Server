@@ -3,10 +3,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.Application.Services
+namespace P3D.Legacy.Server.Application.Services;
+
+public interface IMonsterValidator
 {
-    public interface IMonsterValidator
-    {
-        Task<bool> ValidateAsync(IMonsterInstance monsterInstance, CancellationToken ct);
-    }
+    Task<bool> ValidateAsync(IMonsterInstance monsterInstance, CancellationToken ct);
 }

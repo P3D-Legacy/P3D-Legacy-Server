@@ -6,24 +6,24 @@ using Microsoft.Extensions.Options;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace P3D.Legacy.Server.InternalAPI.Controllers
+namespace P3D.Legacy.Server.InternalAPI.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class ValidationController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ValidationController : ControllerBase
+    private const string Bearer = "Bearer ";
+
+    private readonly JwtBearerOptions _jwtBearerOptions;
+
+    public ValidationController(IOptionsSnapshot<JwtBearerOptions> jwtBearerOptions)
     {
-        private const string Bearer = "Bearer ";
-
-        private readonly JwtBearerOptions _jwtBearerOptions;
-
-        public ValidationController(IOptionsSnapshot<JwtBearerOptions> jwtBearerOptions)
-        {
             _jwtBearerOptions = jwtBearerOptions.Get(JwtBearerDefaults.AuthenticationScheme) ?? throw new ArgumentNullException(nameof(jwtBearerOptions));
         }
 
-        [HttpGet]
-        public IActionResult ValidateToken()
-        {
+    [HttpGet]
+    public IActionResult ValidateToken()
+    {
             string? authorization = Request.Headers.Authorization;
 
             // If no authorization header found, nothing to process further
@@ -48,5 +48,4 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
 
             return BadRequest();
         }
-    }
 }

@@ -17,64 +17,63 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Tests
+namespace P3D.Legacy.Tests;
+
+internal sealed class MonsterTests
 {
-    internal sealed class MonsterTests
+    private static string[] TestCaseSources() => File.ReadAllLines("./Data/Monsters.txt");
+
+    [Test]
+    [TestCaseSource(nameof(TestCaseSources))]
+    public async Task TestMonsterCreationViaPokeAPIAsync(string line) => await TestService.CreateNew()
+        .Configure(static services =>
+        {
+            services.AddTransient<IOptions<PokeAPIOptions>>(static _ => new OptionsWrapper<PokeAPIOptions>(new PokeAPIOptions
+            {
+                GraphQLEndpoint = "https://beta.pokeapi.co/graphql/v1beta"
+            }));
+            services.AddTransient<IMonsterDataProvider, PokeAPIMonsterDataProvider>();
+            services.AddTransient<IMonsterValidator, DefaultMonsterValidator>();
+            services.AddTransient<P3DMonsterConverter>();
+        }).DoTestAsync(async sp =>
+        {
+            var converter = sp.GetRequiredService<P3DMonsterConverter>();
+            var validator = sp.GetRequiredService<IMonsterValidator>();
+            var monster = await converter.FromP3DStringAsync(line, CancellationToken.None);
+            if (await validator.ValidateAsync(monster, CancellationToken.None))
+            {
+                var convertedBack = await converter.ToP3DStringAsync(monster);
+                ClassicAssert.AreEqual(line, convertedBack);
+            }
+        });
+
+    [Test]
+    [TestCaseSource(nameof(TestCaseSources))]
+    public void TestMonsterDictionaryTransformation(string line)
     {
-        private static string[] TestCaseSources() => File.ReadAllLines("./Data/Monsters.txt");
+        var dict = line.AsSpan().MonsterDataToDictionary();
+        var convertedBack = dict.DictionaryToMonsterData();
 
-        [Test]
-        [TestCaseSource(nameof(TestCaseSources))]
-        public async Task TestMonsterCreationViaPokeAPIAsync(string line) => await TestService.CreateNew()
-            .Configure(static services =>
-            {
-                services.AddTransient<IOptions<PokeAPIOptions>>(static _ => new OptionsWrapper<PokeAPIOptions>(new PokeAPIOptions
-                {
-                    GraphQLEndpoint = "https://beta.pokeapi.co/graphql/v1beta"
-                }));
-                services.AddTransient<IMonsterDataProvider, PokeAPIMonsterDataProvider>();
-                services.AddTransient<IMonsterValidator, DefaultMonsterValidator>();
-                services.AddTransient<P3DMonsterConverter>();
-            }).DoTestAsync(async sp =>
-            {
-                var converter = sp.GetRequiredService<P3DMonsterConverter>();
-                var validator = sp.GetRequiredService<IMonsterValidator>();
-                var monster = await converter.FromP3DStringAsync(line, CancellationToken.None);
-                if (await validator.ValidateAsync(monster, CancellationToken.None))
-                {
-                    var convertedBack = await converter.ToP3DStringAsync(monster);
-                    ClassicAssert.AreEqual(line, convertedBack);
-                }
-            });
+        ClassicAssert.AreEqual(line, convertedBack);
+    }
 
-        [Test]
-        [TestCaseSource(nameof(TestCaseSources))]
-        public void TestMonsterDictionaryTransformation(string line)
-        {
-            var dict = line.AsSpan().MonsterDataToDictionary();
-            var convertedBack = dict.DictionaryToMonsterData();
+    [Test]
+    public void TestBattleOfferData()
+    {
+        var monsters = string.Join('|', TestCaseSources());
+        var data = new BattleOfferData(monsters);
+        var convertedBack = data.ToP3DString();
 
-            ClassicAssert.AreEqual(line, convertedBack);
-        }
+        ClassicAssert.AreEqual(monsters, convertedBack);
+    }
 
-        [Test]
-        public void TestBattleOfferData()
-        {
-            var monsters = string.Join('|', TestCaseSources());
-            var data = new BattleOfferData(monsters);
-            var convertedBack = data.ToP3DString();
+    [Test]
+    [TestCaseSource(nameof(TestCaseSources))]
+    public void TestTradeData(string line)
+    {
+        var data = new TradeData(line);
+        var convertedBack = data.ToP3DString();
 
-            ClassicAssert.AreEqual(monsters, convertedBack);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(TestCaseSources))]
-        public void TestTradeData(string line)
-        {
-            var data = new TradeData(line);
-            var convertedBack = data.ToP3DString();
-
-            ClassicAssert.AreEqual(line, convertedBack);
-        }
+        ClassicAssert.AreEqual(line, convertedBack);
     }
 }

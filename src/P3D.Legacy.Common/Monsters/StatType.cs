@@ -1,12 +1,11 @@
-﻿namespace P3D.Legacy.Common.Monsters
+﻿namespace P3D.Legacy.Common.Monsters;
+
+public enum StatType
 {
-    public enum StatType
-    {
-        HP = 1,
-        Attack = 2,
-        Defense = 3,
-        SpecialAttack = 4,
-        SpecialDefense = 5,
-        Speed = 6
-    }
+    HP = 1,
+    Attack = 2,
+    Defense = 3,
+    SpecialAttack = 4,
+    SpecialDefense = 5,
+    Speed = 6
 }

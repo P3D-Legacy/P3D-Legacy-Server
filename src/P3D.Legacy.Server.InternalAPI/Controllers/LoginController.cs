@@ -15,24 +15,24 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace P3D.Legacy.Server.InternalAPI.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class LoginController : ControllerBase
-    {
-        private readonly JwtOptions _jwtOptions;
-        private readonly IUserRepository _userRepository;
+namespace P3D.Legacy.Server.InternalAPI.Controllers;
 
-        public LoginController(IOptions<JwtOptions> jwtOptions, IUserRepository userRepository)
-        {
+[Route("api/[controller]")]
+[ApiController]
+public class LoginController : ControllerBase
+{
+    private readonly JwtOptions _jwtOptions;
+    private readonly IUserRepository _userRepository;
+
+    public LoginController(IOptions<JwtOptions> jwtOptions, IUserRepository userRepository)
+    {
             _jwtOptions = jwtOptions.Value ?? throw new ArgumentNullException(nameof(jwtOptions));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> LoginAsync([FromBody] LoginModel login, CancellationToken ct)
-        {
+    [HttpPost]
+    public async Task<IActionResult> LoginAsync([FromBody] LoginModel login, CancellationToken ct)
+    {
             var user = await _userRepository.FindByIdAsync(PlayerId.FromName(login.Username), ct);
 
             if (user is null) return BadRequest(new LoginResult { Successful = false, Error = "User does not exists." });
@@ -46,14 +46,14 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
             return Ok(new LoginResult { Successful = true, Token = GenerateJsonWebToken(user) });
         }
 
-        private string GenerateJsonWebToken(UserEntity user)
-        {
+    private string GenerateJsonWebToken(UserEntity user)
+    {
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = GetSecurityToken(user);
             return tokenHandler.WriteToken(securityToken);
         }
-        private JwtSecurityToken GetSecurityToken(UserEntity user)
-        {
+    private JwtSecurityToken GetSecurityToken(UserEntity user)
+    {
             var signingCredentials = _jwtOptions.KeyType switch
             {
                 KeyType.Rsa => new SigningCredentials(new RsaSecurityKey(_jwtOptions.GetRSAKey()), SecurityAlgorithms.RsaSha512Signature),
@@ -80,5 +80,4 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers
                 signingCredentials: signingCredentials
             );
         }
-    }
 }
