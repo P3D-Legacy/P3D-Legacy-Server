@@ -22,10 +22,10 @@ namespace P3D.Legacy.Server.CQERS.Services
 
         public Task<CommandResult> DispatchAsync(TCommand command, CancellationToken ct)
         {
-            Task<CommandResult> GetHandler() => _handler.HandleAsync(command, ct);
+            Task<CommandResult> GetHandlerAsync() => _handler.HandleAsync(command, ct);
             return _behaviors
                 .Reverse()
-                .Aggregate((CommandHandlerDelegate) GetHandler, (next, pipeline) => () => pipeline.HandleAsync(command, next, ct))();
+                .Aggregate((CommandHandlerDelegate) GetHandlerAsync, (next, pipeline) => () => pipeline.HandleAsync(command, next, ct))();
         }
     }
 }

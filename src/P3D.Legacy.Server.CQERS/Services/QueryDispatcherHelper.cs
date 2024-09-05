@@ -34,10 +34,10 @@ namespace P3D.Legacy.Server.CQERS.Services
 
         private Task<TQueryResult> DispatchAsync(TQuery query, CancellationToken ct)
         {
-            Task<TQueryResult> GetHandler() => _handler.HandleAsync(query, ct);
+            Task<TQueryResult> GetHandlerAsync() => _handler.HandleAsync(query, ct);
             return _behaviors
                 .Reverse()
-                .Aggregate((QueryHandlerDelegate<TQueryResult>) GetHandler, (next, pipeline) => () => pipeline.HandleAsync(query, next, ct))();
+                .Aggregate((QueryHandlerDelegate<TQueryResult>) GetHandlerAsync, (next, pipeline) => () => pipeline.HandleAsync(query, next, ct))();
         }
     }
 }

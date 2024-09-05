@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Client.P3D.Data.P3DDatas;
@@ -15,7 +16,6 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests
 {

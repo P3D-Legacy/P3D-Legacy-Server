@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Abstractions.Options;
@@ -24,7 +25,6 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 {

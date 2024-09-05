@@ -1,11 +1,11 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Server.Client.P3D;
 using P3D.Legacy.Server.Client.P3D.Extensions;
 
 using System.Numerics;
-using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests
 {

@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using P3D.Legacy.Server.Abstractions.Utils;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -34,6 +35,7 @@ namespace P3D.Legacy.Server
             return opt;
         }
 
+        [RequiresUnreferencedCode()]
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<JsonSerializerOptions>(static opt => Configure(opt));

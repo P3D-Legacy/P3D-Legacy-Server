@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+
 using Vogen;
 
 namespace P3D.Legacy.Common

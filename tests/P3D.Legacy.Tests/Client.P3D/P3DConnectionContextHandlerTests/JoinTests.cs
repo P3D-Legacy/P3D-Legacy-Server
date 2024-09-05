@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.Data;
@@ -29,7 +30,6 @@ using System.Net;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 {

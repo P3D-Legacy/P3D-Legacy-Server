@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 using P3D.Legacy.Common.PlayerEvents;
 
 using System.Globalization;
-using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests
 {

@@ -109,7 +109,7 @@ namespace P3D.Legacy.Server.DiscordBot.BackgroundServices
             try
             {
                 // Signal cancellation to the executing method
-                _stoppingCts.Cancel();
+                await _stoppingCts.CancelAsync();
             }
             finally
             {

@@ -4,8 +4,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.ResourceDetectors.Container;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -28,16 +32,13 @@ using P3D.Legacy.Server.InternalAPI.Options;
 using P3D.Legacy.Server.Options;
 using P3D.Legacy.Server.Statistics.Extensions;
 
+using Serilog;
+using Serilog.Events;
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Logs;
-using OpenTelemetry.ResourceDetectors.Container;
-using Serilog;
-using Serilog.Events;
 
 namespace P3D.Legacy.Server
 {

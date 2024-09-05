@@ -7,7 +7,7 @@ using System.Numerics;
 namespace P3D.Legacy.Server.Client.P3D
 {
     // ReSharper disable once ArrangeTypeModifiers
-    partial class P3DConnectionContextHandler : IP3DPlayerState
+    internal partial class P3DConnectionContextHandler : IP3DPlayerState
     {
         public PlayerId Id { get; private set; } = PlayerId.None;
         public Origin Origin { get; private set; } = Origin.None;

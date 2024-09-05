@@ -100,12 +100,11 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
             _jsonContext = new JsonContext(new JsonSerializerOptions(jsonSerializerOptions.Value));
         }
 
-        private ValueTask CheckWebSocketStateAsync(CancellationToken ct)
+        private async ValueTask CheckWebSocketStateAsync(CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
             if (_webSocket.CloseStatus is not null)
-                _cts.Cancel();
-            return ValueTask.CompletedTask;
+                await _cts.CancelAsync();
         }
 
         private async Task SendAsync(ArraySegment<byte> buffer, CancellationToken cancellationToken)
@@ -228,7 +227,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Services
 
         public async ValueTask DisposeAsync()
         {
-            _cts.Cancel();
+            await _cts.CancelAsync();
             _cts.Dispose();
             _sequenceTextReader.Dispose();
 

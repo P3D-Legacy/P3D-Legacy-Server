@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 using P3D.Legacy.Server.Client.P3D;
 using P3D.Legacy.Server.Client.P3D.Packets;
@@ -9,7 +10,6 @@ using System;
 using System.Buffers;
 using System.Numerics;
 using System.Text;
-using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests.Client.P3D
 {

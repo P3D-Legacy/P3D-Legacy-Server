@@ -37,7 +37,7 @@ namespace P3D.Legacy.Server.Application.Services
             try
             {
                 // Signal cancellation to the executing method
-                _stoppingCts.Cancel();
+                await _stoppingCts.CancelAsync();
             }
             finally
             {

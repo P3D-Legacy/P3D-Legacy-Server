@@ -1,6 +1,7 @@
 ﻿using Aragas.Extensions.Options.FluentValidation.Extensions;
 
 using FluentValidation;
+
 using OpenTelemetry.Exporter;
 
 namespace P3D.Legacy.Server.Options
