@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET 
         uses: actions/setup-dotnet@master
         with:
-          dotnet-version: 7.x.x
+          dotnet-version: 8.x.x
 
       - name: Build
         run: dotnet build src/P3D.Legacy.Server/P3D.Legacy.Server.csproj -c Release
@@ -32,7 +32,7 @@ jobs:
         shell: pwsh
 
       - name: Generate OpenAPI spec
-        run: dotnet swagger tofile --output ./openapi.json ./src/P3D.Legacy.Server/bin/Release/net7.0/P3D.Legacy.Server.dll v1
+        run: dotnet swagger tofile --output ./openapi.json ./src/P3D.Legacy.Server/bin/Release/net8.0/P3D.Legacy.Server.dll v1
         shell: pwsh
 
       - name: Generate Swagger UI
