@@ -5,6 +5,7 @@ using P3D.Legacy.Server.Client.P3D;
 using P3D.Legacy.Server.Client.P3D.Extensions;
 
 using System.Numerics;
+using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests
 {
@@ -29,14 +30,14 @@ namespace P3D.Legacy.Tests
             dataItemStorage.Set(4, idInt);
             dataItemStorage.Set(5, position.ToP3DString(separator));
 
-            Assert.AreEqual(name, dataItemStorage.Get(0));
-            Assert.AreEqual(isCorrect, dataItemStorage.GetBool(1));
-            Assert.AreEqual(idULong, dataItemStorage.GetUInt64(2));
-            Assert.AreEqual(@char, dataItemStorage.GetChar(3));
-            Assert.AreEqual(idInt, dataItemStorage.GetInt64(4));
-            Assert.AreEqual(position, Vector3Extensions.FromP3DString(dataItemStorage.Get(5), separator));
+            ClassicAssert.AreEqual(name, dataItemStorage.Get(0));
+            ClassicAssert.AreEqual(isCorrect, dataItemStorage.GetBool(1));
+            ClassicAssert.AreEqual(idULong, dataItemStorage.GetUInt64(2));
+            ClassicAssert.AreEqual(@char, dataItemStorage.GetChar(3));
+            ClassicAssert.AreEqual(idInt, dataItemStorage.GetInt64(4));
+            ClassicAssert.AreEqual(position, Vector3Extensions.FromP3DString(dataItemStorage.Get(5), separator));
 
-            Assert.AreEqual("Aragas*1*15124000000000*j*15124*1|1|1", dataItemStorage.ToString());
+            ClassicAssert.AreEqual("Aragas*1*15124000000000*j*15124*1|1|1", dataItemStorage.ToString());
         }
     }
 }

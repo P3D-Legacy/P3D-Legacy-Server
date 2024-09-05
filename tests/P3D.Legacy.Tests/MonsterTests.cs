@@ -15,6 +15,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests
 {
@@ -42,7 +43,7 @@ namespace P3D.Legacy.Tests
                 if (await validator.ValidateAsync(monster, CancellationToken.None))
                 {
                     var convertedBack = await converter.ToP3DStringAsync(monster);
-                    Assert.AreEqual(line, convertedBack);
+                    ClassicAssert.AreEqual(line, convertedBack);
                 }
             });
 
@@ -53,7 +54,7 @@ namespace P3D.Legacy.Tests
             var dict = line.AsSpan().MonsterDataToDictionary();
             var convertedBack = dict.DictionaryToMonsterData();
 
-            Assert.AreEqual(line, convertedBack);
+            ClassicAssert.AreEqual(line, convertedBack);
         }
 
         [Test]
@@ -63,7 +64,7 @@ namespace P3D.Legacy.Tests
             var data = new BattleOfferData(monsters);
             var convertedBack = data.ToP3DString();
 
-            Assert.AreEqual(monsters, convertedBack);
+            ClassicAssert.AreEqual(monsters, convertedBack);
         }
 
         [Test]
@@ -73,7 +74,7 @@ namespace P3D.Legacy.Tests
             var data = new TradeData(line);
             var convertedBack = data.ToP3DString();
 
-            Assert.AreEqual(line, convertedBack);
+            ClassicAssert.AreEqual(line, convertedBack);
         }
     }
 }

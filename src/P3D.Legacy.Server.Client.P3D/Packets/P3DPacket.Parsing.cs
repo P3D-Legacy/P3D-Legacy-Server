@@ -59,7 +59,7 @@ namespace P3D.Legacy.Server.Client.P3D.Packets
             if (!Utf8Parser.TryParse(ParseSection(ref sequence), out int origin, out _))
                 return false;
 
-            Origin = Origin.FromNumber(origin);
+            Origin = Origin.From(origin);
 
 
             if (!Utf8Parser.TryParse(ParseSection(ref sequence), out int dataItemsCount, out _))

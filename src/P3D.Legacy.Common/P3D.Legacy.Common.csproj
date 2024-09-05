@@ -6,4 +6,8 @@
     </AssemblyAttribute>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Vogen" />
+  </ItemGroup>
+
 </Project>

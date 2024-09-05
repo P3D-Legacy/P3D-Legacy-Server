@@ -14,7 +14,7 @@ jobs:
         runtime: ['win-x64', 'win-x86', 'win-arm64', 'win-arm', 'linux-x64', 'linux-arm', 'linux-arm64', 'osx-x64', 'osx-arm64' ]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup .NET 6
         uses: actions/setup-dotnet@master
@@ -49,7 +49,7 @@ jobs:
           7z a P3D-Legacy-Server-${{ matrix.runtime }}.zip ./P3D-Legacy-Server-${{ matrix.runtime }}/*
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: all-artifacts
           path: |
@@ -61,16 +61,16 @@ jobs:
 
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: all-artifacts
 
       - name: Get tag info
         id: tag_info
-        run: echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+        run: echo "SOURCE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Create release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

@@ -1,11 +1,11 @@
 ﻿<Project>
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <MSBuildWarningsAsMessages>SYSLIB1006;SYSLIB1037</MSBuildWarningsAsMessages>
 
-    <PublishTrimmed>true</PublishTrimmed>
+    <PublishTrimmed>false</PublishTrimmed>
     <IsTrimmable>true</IsTrimmable>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <!-- full breaks OpenTelemetry. Additional 20MB at least -->

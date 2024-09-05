@@ -14,8 +14,8 @@ namespace P3D.Legacy.Server.Infrastructure.Options
         }
     }
 
-    public record PokeAPIOptions
+    public sealed record PokeAPIOptions
     {
-        public string GraphQLEndpoint { get; init; } = default!;
+        public required string GraphQLEndpoint { get; init; } = default!;
     }
 }

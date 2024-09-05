@@ -235,7 +235,7 @@ namespace P3D.Legacy.Server.Client.P3D
             if (Id.GameJoltIdOrNone.IsNone != initiator.Id.GameJoltIdOrNone.IsNone)
             {
                 await _eventDispatcher.DispatchAsync(new MessageToPlayerEvent(IPlayer.Server, initiator, "GameJolt and Non-GameJolt interaction is not supported!"), ct);
-                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
+                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), CancellationToken.None);
                 return;
             }
 
@@ -245,8 +245,8 @@ namespace P3D.Legacy.Server.Client.P3D
             }
             else
             {
-                await _commandDispatcher.DispatchAsync(new TradeAbortCommand(initiator, this), ct);
-                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), ct);
+                await _commandDispatcher.DispatchAsync(new TradeAbortCommand(initiator, this), CancellationToken.None);
+                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(initiator, new TradeQuitPacket { Origin = target, DestinationPlayerOrigin = target }), CancellationToken.None);
             }
         }
 
@@ -262,8 +262,8 @@ namespace P3D.Legacy.Server.Client.P3D
             }
             else
             {
-                await _commandDispatcher.DispatchAsync(new TradeAbortCommand(target, this), ct);
-                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(target, new TradeQuitPacket { Origin = initiator, DestinationPlayerOrigin = target.Origin }), ct);
+                await _commandDispatcher.DispatchAsync(new TradeAbortCommand(target, this), CancellationToken.None);
+                await _eventDispatcher.DispatchAsync(new PlayerSentRawP3DPacketEvent(target, new TradeQuitPacket { Origin = initiator, DestinationPlayerOrigin = target.Origin }), CancellationToken.None);
             }
         }
 

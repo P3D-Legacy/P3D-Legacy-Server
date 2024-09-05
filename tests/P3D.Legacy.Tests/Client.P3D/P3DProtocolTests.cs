@@ -9,6 +9,7 @@ using System;
 using System.Buffers;
 using System.Numerics;
 using System.Text;
+using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests.Client.P3D
 {
@@ -39,21 +40,21 @@ namespace P3D.Legacy.Tests.Client.P3D
             };
             packet.SetPosition(position);
 
-            Assert.AreEqual(name, packet.Name);
-            Assert.AreEqual(isCorrect, packet.IsCorrect);
-            Assert.AreEqual(idULong, packet.IdLong);
-            Assert.AreEqual(@char, packet.Char);
-            Assert.AreEqual(idInt, packet.IdInt);
-            Assert.AreEqual(position, packet.GetPosition());
+            ClassicAssert.AreEqual(name, packet.Name);
+            ClassicAssert.AreEqual(isCorrect, packet.IsCorrect);
+            ClassicAssert.AreEqual(idULong, packet.IdLong);
+            ClassicAssert.AreEqual(@char, packet.Char);
+            ClassicAssert.AreEqual(idInt, packet.IdInt);
+            ClassicAssert.AreEqual(position, packet.GetPosition());
 
             var protocol = new P3DProtocol(NullLogger<P3DProtocol>.Instance, new TestPacketFactory());
             var writer = new ArrayBufferWriter<byte>();
             protocol.WriteMessage(packet, writer);
-            Assert.AreEqual("0.5|1|0|6|0|6|7|21|22|27|Aragas115124000000000j151241|1|1\r\n", Encoding.ASCII.GetString(writer.WrittenSpan));
+            ClassicAssert.AreEqual("0.5|1|0|6|0|6|7|21|22|27|Aragas115124000000000j151241|1|1\r\n", Encoding.ASCII.GetString(writer.WrittenSpan));
 
             var pos = default(SequencePosition);
-            Assert.IsTrue(protocol.TryParseMessage(new ReadOnlySequence<byte>(writer.WrittenMemory), ref pos, ref pos, out var packet2));
-            Assert.AreEqual(packet, packet2);
+            ClassicAssert.IsTrue(protocol.TryParseMessage(new ReadOnlySequence<byte>(writer.WrittenMemory), ref pos, ref pos, out var packet2));
+            ClassicAssert.AreEqual(packet, packet2);
         }
     }
 }

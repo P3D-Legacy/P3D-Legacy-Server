@@ -33,7 +33,7 @@ namespace P3D.Legacy.Server.Client.P3D
             Origin = player.Origin,
             GameMode = state.GameMode,
             IsGameJoltPlayer = state.IsGameJoltPlayer,
-            GameJoltId = player.Id.GameJoltIdOrNone,
+            GameJoltId = player.Id.GameJoltIdOrNone.Value,
             DecimalSeparator = state.DecimalSeparator,
             Name = player.Name,
             LevelFile = state.LevelFile,

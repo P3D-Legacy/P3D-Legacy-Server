@@ -13,10 +13,10 @@ namespace P3D.Legacy.Server.Infrastructure.Options
         }
     }
 
-    public record LockoutOptions
+    public sealed record LockoutOptions
     {
-        public int MaxFailedAccessAttempts { get; init; } = 5;
+        public required int MaxFailedAccessAttempts { get; init; } = 5;
 
-        public TimeSpan DefaultLockoutTimeSpan { get; init; } = TimeSpan.FromMinutes(5);
+        public required TimeSpan DefaultLockoutTimeSpan { get; init; } = TimeSpan.FromMinutes(5);
     }
 }

@@ -26,10 +26,8 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
         [LoggerMessage(Level = LogLevel.Critical, Message = "Client's RemoteEndPoint is not IPEndPoint! {EndPoint}")]
         private partial void InvalidEndPoint(EndPoint? endPoint);
 
-        private static readonly IPAddress Netmask = IPAddress.Parse("255.255.0.0");
-
         private readonly TimeLimiter _connectionLimiter = TimeLimiter.GetFromMaxCountByInterval(1, TimeSpan.FromMilliseconds(300));
-        private readonly ConcurrentDictionary<IPNetwork, TimeLimiter> _subnetLimiter = new(); // TODO: Free after a while
+        private readonly ConcurrentDictionary<IPNetwork2, TimeLimiter> _subnetLimiter = new(); // TODO: Free after a while
 
         private readonly ConnectionDelegate _next;
         private readonly ILogger _logger;
@@ -49,7 +47,7 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
             }
 
             // Rate limiting subnet
-            var subnet = IPNetwork.Parse(ipEndPoint.Address, Netmask);
+            var subnet = new IPNetwork2(ipEndPoint.Address, 16);
             await _subnetLimiter.AddOrUpdate(subnet, static _ => TimeLimiter.GetFromMaxCountByInterval(1, TimeSpan.FromMilliseconds(2000)), static (_, x) => x);
 
             // Rate limiting general

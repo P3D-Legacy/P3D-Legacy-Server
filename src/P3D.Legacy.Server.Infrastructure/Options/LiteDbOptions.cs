@@ -12,8 +12,8 @@ namespace P3D.Legacy.Server.Infrastructure.Options
         }
     }
 
-    public record LiteDbOptions
+    public sealed record LiteDbOptions
     {
-        public string ConnectionString { get; init; } = default!;
+        public required string ConnectionString { get; init; } = default!;
     }
 }

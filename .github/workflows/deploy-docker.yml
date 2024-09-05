@@ -15,7 +15,7 @@ jobs:
       url: 'https://karp.pokemon3d.net'
     steps:
 
-      - uses: appleboy/ssh-action@master
+      - uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
@@ -23,12 +23,12 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             docker login -u=P3D-Legacy -p=${{ secrets.TOKEN_GPR }} ghcr.io
-            docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest-alpine;
+            docker image pull ghcr.io/p3d-legacy/p3d-legacy-server:latest;
             docker stack deploy --prune --resolve-image always -c /deploy/p3d-legacy-server/docker-compose.yml p3dlegacyserver;
 
       - name: Checkout Repository
         if: always()
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Notify
         if: always()

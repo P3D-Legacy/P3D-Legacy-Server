@@ -36,7 +36,7 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Bans
             if (actualEntry is null || actualEntry.BannedBy is null || actualEntry.Reason is null) return null;
 
             return new BanEntity(
-                    PlayerId.FromGameJolt(GameJoltId.FromNumber(actualEntry.BannedBy.Id)),
+                    PlayerId.FromGameJolt(GameJoltId.From(actualEntry.BannedBy.Id)),
                     id,
                     IPAddress.None,
                     0,

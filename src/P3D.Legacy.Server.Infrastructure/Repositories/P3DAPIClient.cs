@@ -148,10 +148,10 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories
                 response = string.IsNullOrEmpty(reason)
                     ? await client.PostAsJsonAsync(
                         new Uri("ban/gamejoltaccount", UriKind.Relative),
-                        new BanRequest(id.GameJoltIdOrNone, reasonId, expiration, bannerId.GameJoltIdOrNone), _jsonContext.BanRequest, ct)
+                        new BanRequest(id.GameJoltIdOrNone.Value, reasonId, expiration, bannerId.GameJoltIdOrNone.Value), _jsonContext.BanRequest, ct)
                     : await client.PostAsJsonAsync(
                         new Uri("ban/gamejoltaccount", UriKind.Relative),
-                        new TextReasonBanRequest(id.GameJoltIdOrNone, reason, expiration, bannerId.GameJoltIdOrNone), _jsonContext.TextReasonBanRequest, ct);
+                        new TextReasonBanRequest(id.GameJoltIdOrNone.Value, reason, expiration, bannerId.GameJoltIdOrNone.Value), _jsonContext.TextReasonBanRequest, ct);
             }
             catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
             {

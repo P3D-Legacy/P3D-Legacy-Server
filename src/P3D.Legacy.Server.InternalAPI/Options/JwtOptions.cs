@@ -19,8 +19,8 @@ namespace P3D.Legacy.Server.InternalAPI.Options
 
     public sealed record JwtOptions : IDisposable
     {
-        public string PrivateKey { get; init; } = default!;
-        public KeyType KeyType { get; init; } = default!;
+        public required string PrivateKey { get; init; } = default!;
+        public required KeyType KeyType { get; init; } = default!;
 
         private RSA? _rsa;
         public RSA GetRSAKey()

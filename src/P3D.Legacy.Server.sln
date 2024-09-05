@@ -67,6 +67,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P3D.Legacy.Server.CQERS", "P3D.Legacy.Server.CQERS\P3D.Legacy.Server.CQERS.csproj", "{D88D41B4-6AD5-4E66-8DE0-D7C01DFA61A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P3D.Legacy.Site.API", "P3D.Legacy.Site.API\P3D.Legacy.Site.API.csproj", "{D29D51F6-4082-4636-81E3-688E12254F40}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +139,10 @@ Global
 		{D88D41B4-6AD5-4E66-8DE0-D7C01DFA61A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D88D41B4-6AD5-4E66-8DE0-D7C01DFA61A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D88D41B4-6AD5-4E66-8DE0-D7C01DFA61A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D29D51F6-4082-4636-81E3-688E12254F40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D29D51F6-4082-4636-81E3-688E12254F40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D29D51F6-4082-4636-81E3-688E12254F40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D29D51F6-4082-4636-81E3-688E12254F40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -164,6 +170,7 @@ Global
 		{7A5533AD-A0F0-4141-96AB-3A5756945FFC} = {679B78EF-C627-49A7-B49E-D54B4FAF1F08}
 		{0DDFBF00-5A0D-42B8-8851-A6EF0A3BE1ED} = {B8171225-FEA8-47E8-AE9E-96DD1AFE76D2}
 		{D88D41B4-6AD5-4E66-8DE0-D7C01DFA61A7} = {679B78EF-C627-49A7-B49E-D54B4FAF1F08}
+		{D29D51F6-4082-4636-81E3-688E12254F40} = {5DC5782B-B1E0-45F0-A286-F27928702DAA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE1E891D-648F-4AD9-981D-5743A83ACDD2}

@@ -7,8 +7,8 @@ namespace P3D.Legacy.Server.Infrastructure.Options
         public P3DIntegrationOptionsValidator() { }
     }
 
-    public record P3DIntegrationOptions
+    public sealed record P3DIntegrationOptions
     {
-        public bool IsOfficial { get; init; } = default!;
+        public required bool IsOfficial { get; init; } = default!;
     }
 }

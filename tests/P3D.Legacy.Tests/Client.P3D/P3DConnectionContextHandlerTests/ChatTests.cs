@@ -31,6 +31,7 @@ using System.Net;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 {
@@ -50,7 +51,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                 switch (rawCommand)
                 {
                     case PlayerInitializingCommand command:
-                        await command.Player.AssignIdAsync(PlayerId.FromGameJolt(GameJoltId.FromNumber(0)), ct);
+                        await command.Player.AssignIdAsync(PlayerId.FromGameJolt(GameJoltId.From(0)), ct);
                         return CommandResult.Success;
                     case PlayerAuthenticateGameJoltCommand:
                         return CommandResult.Success;
@@ -60,7 +61,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                     case PlayerFinalizingCommand:
                         return CommandResult.Success;
                     default:
-                        Assert.Fail($"Missing handling of Command {typeof(TCommand)}");
+                        ClassicAssert.Fail($"Missing handling of Command {typeof(TCommand)}");
                         throw new AssertionException($"Missing handling of Command {typeof(TCommand)}");
                 }
             }
@@ -78,7 +79,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                     case GetWorldStateQuery when new WorldState(TimeSpan.Zero, default, default) is TQueryResult result:
                         return Task.FromResult(result);
                     default:
-                        Assert.Fail($"Missing handling of Query {query.GetType()}");
+                        ClassicAssert.Fail($"Missing handling of Query {query.GetType()}");
                         throw new AssertionException($"Missing handling of Query {query.GetType()}");
                 }
             }
@@ -111,7 +112,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                             await eventHandler.HandleAsync(new NullReceiveContext<PlayerSentGlobalMessageEvent>(notification), ct);
                         return;
                     default:
-                        Assert.Fail($"Missing handling of Event {typeof(TEvent)}");
+                        ClassicAssert.Fail($"Missing handling of Event {typeof(TEvent)}");
                         throw new AssertionException($"Missing handling of Event {typeof(TEvent)}");
                 }
             }
@@ -164,26 +165,26 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 
             var idPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.IsFalse(idPacket.IsCanceled);
-            Assert.IsFalse(idPacket.IsCompleted);
-            Assert.NotNull(idPacket.Message);
-            Assert.IsInstanceOf<IdPacket>(idPacket.Message);
+            ClassicAssert.IsFalse(idPacket.IsCanceled);
+            ClassicAssert.IsFalse(idPacket.IsCompleted);
+            ClassicAssert.NotNull(idPacket.Message);
+            ClassicAssert.IsInstanceOf<IdPacket>(idPacket.Message);
 
             var origin = idPacket.Message!.Origin;
 
             var worldDataPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.IsFalse(worldDataPacket.IsCanceled);
-            Assert.IsFalse(worldDataPacket.IsCompleted);
-            Assert.NotNull(worldDataPacket.Message);
-            Assert.IsInstanceOf<WorldDataPacket>(worldDataPacket.Message);
+            ClassicAssert.IsFalse(worldDataPacket.IsCanceled);
+            ClassicAssert.IsFalse(worldDataPacket.IsCompleted);
+            ClassicAssert.NotNull(worldDataPacket.Message);
+            ClassicAssert.IsInstanceOf<WorldDataPacket>(worldDataPacket.Message);
 
             var gameDataPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.IsFalse(gameDataPacket.IsCanceled);
-            Assert.IsFalse(gameDataPacket.IsCompleted);
-            Assert.NotNull(gameDataPacket.Message);
-            Assert.IsInstanceOf<GameDataPacket>(gameDataPacket.Message);
+            ClassicAssert.IsFalse(gameDataPacket.IsCanceled);
+            ClassicAssert.IsFalse(gameDataPacket.IsCompleted);
+            ClassicAssert.NotNull(gameDataPacket.Message);
+            ClassicAssert.IsInstanceOf<GameDataPacket>(gameDataPacket.Message);
 
             const string message = "Test123";
 
@@ -193,10 +194,10 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 
             var chatMessage = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.IsFalse(chatMessage.IsCanceled);
-            Assert.IsFalse(chatMessage.IsCompleted);
-            Assert.NotNull(chatMessage.Message);
-            Assert.IsInstanceOf<ChatMessageGlobalPacket>(chatMessage.Message);
+            ClassicAssert.IsFalse(chatMessage.IsCanceled);
+            ClassicAssert.IsFalse(chatMessage.IsCompleted);
+            ClassicAssert.NotNull(chatMessage.Message);
+            ClassicAssert.IsInstanceOf<ChatMessageGlobalPacket>(chatMessage.Message);
 
             foreach (var player in list)
                 await player.KickAsync("", CancellationToken.None);

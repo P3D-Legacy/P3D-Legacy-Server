@@ -16,9 +16,9 @@ namespace P3D.Legacy.Server.Client.P3D.Options
 
     public sealed record P3DServerOptions
     {
-        public string IP { get; init; } = default!;
-        public ushort Port { get; init; } = default!;
-        public bool PortForward { get; init; } = true;
-        public int PortForwardTimeoutMilliseconds { get; init; } = 10000;
+        public required string IP { get; init; } = default!;
+        public required ushort Port { get; init; } = default!;
+        public required bool PortForward { get; init; } = true;
+        public required int PortForwardTimeoutMilliseconds { get; init; } = 10000;
     }
 }

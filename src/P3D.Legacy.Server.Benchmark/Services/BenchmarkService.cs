@@ -28,7 +28,7 @@ namespace P3D.Legacy.Server.Benchmark.Services
         private sealed class PlayerState
         {
             public string Name { get; set; } = "";
-            public Origin Origin { get; set; } = Origin.FromNumber(-1);
+            public Origin Origin { get; set; } = Origin.From(-1);
 
             public Func<P3DPacket, ValueTask> SendMessage { get; set; } = static _ => ValueTask.CompletedTask;
         }

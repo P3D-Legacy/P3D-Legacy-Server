@@ -38,22 +38,22 @@ namespace P3D.Legacy.Server.Application.QueryHandlers.Player
 
             return Task.FromResult((
                 _playerContainer.GetAll().AreInitialized().LongCount(),
-                _playerContainer.GetAll().AreInitialized().Skip(skip).Take(take).Select(static x => new PlayerViewModel(x.Origin, x.Name, x.Id.GameJoltIdOrNone)).ToImmutableArray()
+                _playerContainer.GetAll().AreInitialized().Skip(skip).Take(take).Select(static x => new PlayerViewModel(x.Origin.Value, x.Name, x.Id.GameJoltIdOrNone)).ToImmutableArray()
             ));
         }
 
 
         public Task<ImmutableArray<PlayerViewModel>> HandleAsync(GetPlayerViewModelsQuery query, CancellationToken ct)
         {
-            return Task.FromResult(_playerContainer.GetAll().AreInitialized().Select(static x => new PlayerViewModel(x.Origin, x.Name, x.Id.GameJoltIdOrNone)).ToImmutableArray());
+            return Task.FromResult(_playerContainer.GetAll().AreInitialized().Select(static x => new PlayerViewModel(x.Origin.Value, x.Name, x.Id.GameJoltIdOrNone)).ToImmutableArray());
         }
 
         public Task<PlayerViewModel?> HandleAsync(GetPlayerViewModelQuery query, CancellationToken ct)
         {
             var origin = query.Origin;
 
-            return Task.FromResult(_playerContainer.Get(Origin.FromNumber(origin)) is { Permissions: > PermissionTypes.UnVerified } x
-                ? new PlayerViewModel(x.Origin, x.Name, x.Id.GameJoltIdOrNone)
+            return Task.FromResult(_playerContainer.Get(Origin.From(origin)) is { Permissions: > PermissionTypes.UnVerified } x
+                ? new PlayerViewModel(x.Origin.Value, x.Name, x.Id.GameJoltIdOrNone)
                 : null);
         }
     }

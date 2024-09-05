@@ -11,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Cache Docker layers
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-universal-${{ github.sha }}
@@ -26,7 +26,7 @@ jobs:
             ${{ runner.os }}-buildx-universal-
 
       - name: Login to Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: P3D-Legacy
@@ -34,7 +34,7 @@ jobs:
 
       - name: Build and Push
         id: docker_build
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
@@ -51,52 +51,8 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
-  build-and-publish-docker-alpine:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-alpine-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-alpine-
-
-      - name: Login to Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: P3D-Legacy
-          password: ${{ secrets.TOKEN_GPR }}
-
-      - name: Build and Push
-        id: docker_build
-        uses: docker/build-push-action@v4
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: .
-          file: ./src/P3D.Legacy.Server/Dockerfile.Alpine
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-          build-args: |
-            DATE=$(date --iso-8601=s)
-            REVISION=$(git rev-parse --short HEAD)
-          push: true
-          tags: ghcr.io/p3d-legacy/p3d-legacy-server:latest-alpine
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
-
       - name: Trigger Deploy
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.TOKEN_GPR }}
           repository: P3D-Legacy/P3D-Legacy-Server

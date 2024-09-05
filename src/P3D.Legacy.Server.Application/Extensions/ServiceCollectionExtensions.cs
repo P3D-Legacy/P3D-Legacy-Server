@@ -11,7 +11,6 @@ using P3D.Legacy.Server.Application.QueryHandlers.Player;
 using P3D.Legacy.Server.Application.QueryHandlers.World;
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.CQERS.Extensions;
-using P3D.Legacy.Server.Infrastructure;
 
 namespace P3D.Legacy.Server.Application.Extensions
 {

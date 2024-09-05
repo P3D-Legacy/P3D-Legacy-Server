@@ -1,7 +1,7 @@
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 AS restore
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS restore
 WORKDIR /build
 ARG TARGETPLATFORM
 
@@ -32,7 +32,8 @@ RUN \
     elif [ $TARGETPLATFORM = "windows/amd64" ]; then \
         RID="win-x64"; \
     fi \
-    && dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r $RID -p:PublishReadyToRun=true;
+    # && dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r $RID -p:PublishReadyToRun=true;
+    && dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r $RID;
 
 COPY ["src/P3D.Legacy.Common/", "src/P3D.Legacy.Common/"]
 COPY ["src/P3D.Legacy.Server.CQERS/", "src/P3D.Legacy.Server.CQERS/"]
@@ -64,7 +65,8 @@ RUN \
     elif [ $TARGETPLATFORM = "windows/amd64" ]; then \
         RID="win-x64"; \
     fi \
-    && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained false -o /app/publish -p:PublishReadyToRun=true;
+    # && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained false -o /app/publish -p:PublishReadyToRun=true;
+    && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained false -o /app/publish;
 
 FROM base AS final
 WORKDIR /app

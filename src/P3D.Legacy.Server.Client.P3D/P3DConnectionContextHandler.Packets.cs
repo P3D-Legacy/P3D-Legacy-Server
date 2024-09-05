@@ -154,7 +154,7 @@ namespace P3D.Legacy.Server.Client.P3D
                     case 2:
                         if (!GameJoltId.Equals(packet.GameJoltId))
                         {
-                            GameJoltId = GameJoltId.FromNumber(packet.GameJoltId);
+                            GameJoltId = GameJoltId.From(packet.GameJoltId);
                             stateUpdated = true;
                         }
                         break;

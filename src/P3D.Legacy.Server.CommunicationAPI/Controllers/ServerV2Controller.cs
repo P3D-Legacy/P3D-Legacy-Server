@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Abstractions.Utils;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -63,7 +65,7 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers
 
             return StatusCode(StatusCodes.Status200OK, new PagingResponse<StatusResponseV2Player>
             {
-                Items = models.Select(static x => new StatusResponseV2Player(x.Name, x.GameJoltId)),
+                Items = models.Select(static x => new StatusResponseV2Player(x.Name, x.GameJoltId.Value)),
                 Metadata = metadata,
             });
         }

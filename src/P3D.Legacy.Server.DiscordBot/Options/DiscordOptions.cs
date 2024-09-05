@@ -13,7 +13,7 @@ namespace P3D.Legacy.Server.DiscordBot.Options
 
     public sealed record DiscordOptions
     {
-        public string BotToken { get; init; } = default!;
-        public ulong PasstroughChannelId { get; init; } = default!;
+        public required string BotToken { get; init; } = default!;
+        public required ulong PasstroughChannelId { get; init; } = default!;
     }
 }

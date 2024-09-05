@@ -29,6 +29,7 @@ using System.Net;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 {
@@ -48,7 +49,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                 switch (rawCommand)
                 {
                     case PlayerInitializingCommand command:
-                        await command.Player.AssignIdAsync(PlayerId.FromGameJolt(GameJoltId.FromNumber(0)), ct);
+                        await command.Player.AssignIdAsync(PlayerId.FromGameJolt(GameJoltId.From(0)), ct);
                         return CommandResult.Success;
 
                     case PlayerAuthenticateGameJoltCommand:
@@ -62,7 +63,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                         return CommandResult.Success;
 
                     default:
-                        Assert.Fail($"Missing handling of Command {typeof(TCommand)}");
+                        ClassicAssert.Fail($"Missing handling of Command {typeof(TCommand)}");
                         throw new AssertionException($"Missing handling of Command {typeof(TCommand)}");
                 }
             }
@@ -83,7 +84,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                         return Task.FromResult(result);
 
                     default:
-                        Assert.Fail($"Missing handling of Query {query.GetType()}");
+                        ClassicAssert.Fail($"Missing handling of Query {query.GetType()}");
                         throw new AssertionException($"Missing handling of Query {query.GetType()}");
                 }
             }
@@ -104,7 +105,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                         return;
 
                     default:
-                        Assert.Fail($"Missing handling of Event {typeof(TEvent)}");
+                        ClassicAssert.Fail($"Missing handling of Event {typeof(TEvent)}");
                         throw new AssertionException($"Missing handling of Event {typeof(TEvent)}");
                 }
             }
@@ -150,29 +151,29 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 
             var idPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.IsFalse(idPacket.IsCanceled);
-            Assert.IsFalse(idPacket.IsCompleted);
-            Assert.NotNull(idPacket.Message);
-            Assert.IsInstanceOf<IdPacket>(idPacket.Message);
+            ClassicAssert.IsFalse(idPacket.IsCanceled);
+            ClassicAssert.IsFalse(idPacket.IsCompleted);
+            ClassicAssert.NotNull(idPacket.Message);
+            ClassicAssert.IsInstanceOf<IdPacket>(idPacket.Message);
 
             var worldDataPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.IsFalse(worldDataPacket.IsCanceled);
-            Assert.IsFalse(worldDataPacket.IsCompleted);
-            Assert.NotNull(worldDataPacket.Message);
-            Assert.IsInstanceOf<WorldDataPacket>(worldDataPacket.Message);
+            ClassicAssert.IsFalse(worldDataPacket.IsCanceled);
+            ClassicAssert.IsFalse(worldDataPacket.IsCompleted);
+            ClassicAssert.NotNull(worldDataPacket.Message);
+            ClassicAssert.IsInstanceOf<WorldDataPacket>(worldDataPacket.Message);
 
             var kickPacket = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.IsFalse(kickPacket.IsCanceled);
-            Assert.IsFalse(kickPacket.IsCompleted);
-            Assert.NotNull(kickPacket.Message);
-            Assert.IsInstanceOf<KickedPacket>(kickPacket.Message);
+            ClassicAssert.IsFalse(kickPacket.IsCanceled);
+            ClassicAssert.IsFalse(kickPacket.IsCompleted);
+            ClassicAssert.NotNull(kickPacket.Message);
+            ClassicAssert.IsInstanceOf<KickedPacket>(kickPacket.Message);
 
             var emptyPacket = await await Task.WhenAny(reader.ReadAsync(protocol).AsTask(), WaitNullPacketAsync(100));
-            Assert.IsFalse(emptyPacket.IsCanceled);
-            Assert.IsFalse(emptyPacket.IsCompleted);
-            Assert.Null(emptyPacket.Message);
+            ClassicAssert.IsFalse(emptyPacket.IsCanceled);
+            ClassicAssert.IsFalse(emptyPacket.IsCompleted);
+            ClassicAssert.Null(emptyPacket.Message);
 
             await connectionTask.WaitAsync(TimeSpan.FromMilliseconds(1000));
         });

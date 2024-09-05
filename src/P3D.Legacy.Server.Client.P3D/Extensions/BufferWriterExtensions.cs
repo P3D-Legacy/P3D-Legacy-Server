@@ -40,7 +40,7 @@ namespace P3D.Legacy.Server.Client.P3D.Extensions
         {
             const int maxDigitCount = 20;
             var span = output.GetSpan(maxDigitCount);
-            Utf8Formatter.TryFormat(origin, span, out var bytesWritten);
+            Utf8Formatter.TryFormat(origin.Value, span, out var bytesWritten);
             output.Advance(bytesWritten);
         }
 

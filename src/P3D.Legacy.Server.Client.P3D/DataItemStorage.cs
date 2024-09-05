@@ -55,7 +55,7 @@ namespace P3D.Legacy.Server.Client.P3D
         public int GetInt32(int index) => int.TryParse(Get(index), NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : 0;
         public ulong GetUInt64(int index) => ulong.TryParse(Get(index), NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : 0UL;
         public long GetInt64(int index) => long.TryParse(Get(index), NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : 0L;
-        public Origin GetOrigin(int index) => Origin.FromNumber(GetInt64(index));
+        public Origin GetOrigin(int index) => Origin.From(GetInt64(index));
 
         public void Set(int index, ImmutableArray<string> value)
         {

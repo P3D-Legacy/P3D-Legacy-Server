@@ -3,6 +3,7 @@
 using P3D.Legacy.Common.PlayerEvents;
 
 using System.Globalization;
+using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests
 {
@@ -20,10 +21,10 @@ namespace P3D.Legacy.Tests
             const string arg0 = "Test";
             const string msgTemplate = "achieved the emblem \"{0}\"!";
             var msg = string.Format(CultureInfo.InvariantCulture, msgTemplate, arg0);
-            Assert.True(PlayerEventParser.TryParse(msg, out var @event));
-            Assert.IsInstanceOf<AchievedEmblemEvent>(@event);
-            Assert.AreEqual(PlayerEventType.AchievedEmblem, @event!.EventType);
-            Assert.AreEqual(arg0, ((AchievedEmblemEvent) @event).EmblemName);
+            ClassicAssert.True(PlayerEventParser.TryParse(msg, out var @event));
+            ClassicAssert.IsInstanceOf<AchievedEmblemEvent>(@event);
+            ClassicAssert.AreEqual(PlayerEventType.AchievedEmblem, @event!.EventType);
+            ClassicAssert.AreEqual(arg0, ((AchievedEmblemEvent) @event).EmblemName);
         }
 
         [Test]
@@ -33,11 +34,11 @@ namespace P3D.Legacy.Tests
             const string arg1 = "Test2";
             const string msgTemplate = "hosted a battle: \"Player {0} got defeated by Player {1}\".";
             var msg = string.Format(CultureInfo.InvariantCulture, msgTemplate, arg0, arg1);
-            Assert.True(PlayerEventParser.TryParse(msg, out var @event));
-            Assert.IsInstanceOf<HostedABattleEvent>(@event);
-            Assert.AreEqual(PlayerEventType.HostedABattle, @event!.EventType);
-            Assert.AreEqual(arg0, ((HostedABattleEvent) @event).DefeatedTrainerName);
-            Assert.AreEqual(arg1, ((HostedABattleEvent) @event).TrainerName);
+            ClassicAssert.True(PlayerEventParser.TryParse(msg, out var @event));
+            ClassicAssert.IsInstanceOf<HostedABattleEvent>(@event);
+            ClassicAssert.AreEqual(PlayerEventType.HostedABattle, @event!.EventType);
+            ClassicAssert.AreEqual(arg0, ((HostedABattleEvent) @event).DefeatedTrainerName);
+            ClassicAssert.AreEqual(arg1, ((HostedABattleEvent) @event).TrainerName);
         }
 
         [Test]
@@ -47,11 +48,11 @@ namespace P3D.Legacy.Tests
             const string arg1 = "Test2";
             const string msgTemplate = "evolved their {0} into a {1}!";
             var msg = string.Format(CultureInfo.InvariantCulture, msgTemplate, arg0, arg1);
-            Assert.True(PlayerEventParser.TryParse(msg, out var @event));
-            Assert.IsInstanceOf<EvolvedPokemonEvent>(@event);
-            Assert.AreEqual(PlayerEventType.EvolvedPokemon, @event!.EventType);
-            Assert.AreEqual(arg0, ((EvolvedPokemonEvent) @event).PokemonName);
-            Assert.AreEqual(arg1, ((EvolvedPokemonEvent) @event).EvolvedPokemonName);
+            ClassicAssert.True(PlayerEventParser.TryParse(msg, out var @event));
+            ClassicAssert.IsInstanceOf<EvolvedPokemonEvent>(@event);
+            ClassicAssert.AreEqual(PlayerEventType.EvolvedPokemon, @event!.EventType);
+            ClassicAssert.AreEqual(arg0, ((EvolvedPokemonEvent) @event).PokemonName);
+            ClassicAssert.AreEqual(arg1, ((EvolvedPokemonEvent) @event).EvolvedPokemonName);
         }
 
         [Test]
@@ -60,10 +61,10 @@ namespace P3D.Legacy.Tests
             const string arg0 = "Test";
             const string msgTemplate = "got defeated by a wild {0}.";
             var msg = string.Format(CultureInfo.InvariantCulture, msgTemplate, arg0);
-            Assert.True(PlayerEventParser.TryParse(msg, out var @event));
-            Assert.IsInstanceOf<DefeatedByWildPokemonEvent>(@event);
-            Assert.AreEqual(PlayerEventType.DefeatedByWildPokemon, @event!.EventType);
-            Assert.AreEqual(arg0, ((DefeatedByWildPokemonEvent) @event).PokemonName);
+            ClassicAssert.True(PlayerEventParser.TryParse(msg, out var @event));
+            ClassicAssert.IsInstanceOf<DefeatedByWildPokemonEvent>(@event);
+            ClassicAssert.AreEqual(PlayerEventType.DefeatedByWildPokemon, @event!.EventType);
+            ClassicAssert.AreEqual(arg0, ((DefeatedByWildPokemonEvent) @event).PokemonName);
         }
 
         [Test]
@@ -72,10 +73,10 @@ namespace P3D.Legacy.Tests
             const string arg0 = "Test Test2";
             const string msgTemplate = "got defeated by {0}.";
             var msg = string.Format(CultureInfo.InvariantCulture, msgTemplate, arg0);
-            Assert.True(PlayerEventParser.TryParse(msg, out var @event));
-            Assert.IsInstanceOf<DefeatedByTrainerEvent>(@event);
-            Assert.AreEqual(PlayerEventType.DefeatedByTrainer, @event!.EventType);
-            Assert.AreEqual(arg0, ((DefeatedByTrainerEvent) @event).TrainerTypeAndName);
+            ClassicAssert.True(PlayerEventParser.TryParse(msg, out var @event));
+            ClassicAssert.IsInstanceOf<DefeatedByTrainerEvent>(@event);
+            ClassicAssert.AreEqual(PlayerEventType.DefeatedByTrainer, @event!.EventType);
+            ClassicAssert.AreEqual(arg0, ((DefeatedByTrainerEvent) @event).TrainerTypeAndName);
         }
     }
 }

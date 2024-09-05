@@ -24,6 +24,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using NUnit.Framework.Legacy;
 
 namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
 {
@@ -42,7 +43,7 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
                         return Task.FromResult(result);
 
                     default:
-                        Assert.Fail($"Missing handling of Query {query.GetType()}");
+                        ClassicAssert.Fail($"Missing handling of Query {query.GetType()}");
                         throw new AssertionException($"Missing handling of Query {query.GetType()}");
                 }
             }
@@ -69,15 +70,15 @@ namespace P3D.Legacy.Tests.Client.P3D.P3DConnectionContextHandlerTests
             await writer.WriteAsync(protocol, new ServerDataRequestPacket());
             var response = await reader.ReadAsync(protocol);
             reader.Advance();
-            Assert.IsFalse(response.IsCanceled);
-            Assert.IsFalse(response.IsCompleted);
-            Assert.NotNull(response.Message);
-            Assert.IsInstanceOf<ServerInfoDataPacket>(response.Message);
+            ClassicAssert.IsFalse(response.IsCanceled);
+            ClassicAssert.IsFalse(response.IsCompleted);
+            ClassicAssert.NotNull(response.Message);
+            ClassicAssert.IsInstanceOf<ServerInfoDataPacket>(response.Message);
 
             var serverInfoDataPacket = (ServerInfoDataPacket) response.Message!;
-            Assert.NotNull(serverInfoDataPacket.PlayerNames.Single(static x => string.Equals(x, IPlayer.Server.Name, StringComparison.Ordinal)));
-            Assert.AreEqual(1, serverInfoDataPacket.CurrentPlayers);
-            Assert.AreEqual(0, serverInfoDataPacket.MaxPlayers);
+            ClassicAssert.NotNull(serverInfoDataPacket.PlayerNames.Single(static x => string.Equals(x, IPlayer.Server.Name, StringComparison.Ordinal)));
+            ClassicAssert.AreEqual(1, serverInfoDataPacket.CurrentPlayers);
+            ClassicAssert.AreEqual(0, serverInfoDataPacket.MaxPlayers);
 
             await connectionTask.WaitAsync(TimeSpan.FromMilliseconds(1000));
         });
