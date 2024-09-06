@@ -35,7 +35,7 @@ public class Startup
         return opt;
     }
 
-    [RequiresUnreferencedCode()]
+    [RequiresUnreferencedCode("AddControllers")]
     public void ConfigureServices(IServiceCollection services)
     {
         services.Configure<JsonSerializerOptions>(static opt => Configure(opt));
