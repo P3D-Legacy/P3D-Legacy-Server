@@ -7,6 +7,7 @@ namespace P3D.Legacy.Server.CQERS.Extensions;
 
 public static class EventDispatcherExtensions
 {
+    // TODO: We dropped cancellation token support for now, but we should add it back in.
     public static Task DispatchAsync<TEvent>(this IEventDispatcher eventDispatcher, TEvent @event, CancellationToken ct) where TEvent : IEvent =>
-        eventDispatcher.DispatchAsync(@event, eventDispatcher.DefaultStrategy, trace: true, ct);
+        eventDispatcher.DispatchAsync(@event, eventDispatcher.DefaultStrategy, trace: true, CancellationToken.None);
 }
