@@ -49,7 +49,7 @@ public static class Program
     private const string LiteDbSectionName = "LiteDb";
     private const string OfficialSiteSectionName = "OfficialSite";
     private const string P3DServerSectionName = "P3DServer";
-    private const string DiscordBotSectionName = "DiscordBot";
+    private const string DiscordSectionName = "Discord";
     private const string JwtSectionName = "Jwt";
     private const string OtlpSectionName = "Otlp";
 
@@ -96,7 +96,7 @@ public static class Program
             services.AddValidatedOptions<P3DIntegrationOptions, P3DIntegrationOptionsValidator>().Bind(ctx.Configuration.GetSection(ServerSectionName));
             services.AddValidatedOptionsWithHttp<P3DSiteOptions, P3DSiteOptionsValidator>().Bind(ctx.Configuration.GetSection(OfficialSiteSectionName));
             services.AddValidatedOptions<P3DServerOptions, P3DServerOptionsValidator>().Bind(ctx.Configuration.GetSection(P3DServerSectionName));
-            services.AddValidatedOptions<DiscordOptions, DiscordOptionsValidator>().Bind(ctx.Configuration.GetSection(DiscordBotSectionName));
+            services.AddValidatedOptions<DiscordOptions, DiscordOptionsValidator>().Bind(ctx.Configuration.GetSection(DiscordSectionName));
             services.AddValidatedOptions<LiteDbOptions, LiteDbOptionsValidator>().Bind(ctx.Configuration.GetSection(LiteDbSectionName));
             services.AddValidatedOptions<JwtOptions, JwtOptionsValidator>().Bind(ctx.Configuration.GetSection(JwtSectionName));
             services.AddValidatedOptions<OtlpOptions, OtlpOptionsValidator>().Bind(ctx.Configuration.GetSection(OtlpSectionName));

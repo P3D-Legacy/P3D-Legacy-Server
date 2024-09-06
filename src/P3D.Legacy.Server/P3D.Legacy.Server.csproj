@@ -2,7 +2,9 @@
 
   <PropertyGroup>
     <Version>0.10</Version>
+    <!--
     <InvariantGlobalization>true</InvariantGlobalization>
+    -->
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>CS1591;</NoWarn>
