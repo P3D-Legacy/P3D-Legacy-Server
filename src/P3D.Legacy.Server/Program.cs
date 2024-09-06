@@ -113,7 +113,6 @@ public static class Program
             services.AddStatistics();
             services.AddGUI();
 
-            /*
             // Sorry (not sorry) for this hack
             // Will show the application name in OpenObserve UI as show in the P3D Client
             if (services.FirstOrDefault(sp => typeof(IHostEnvironment).IsAssignableFrom(sp.ServiceType))?.ImplementationInstance is IHostEnvironment he)
@@ -123,7 +122,6 @@ public static class Program
                                  ?? "P3D.Legacy.Server";
                 he.ApplicationName = serverName;
             }
-            */
         })
         .ConfigureServices((ctx, services) =>
         {
