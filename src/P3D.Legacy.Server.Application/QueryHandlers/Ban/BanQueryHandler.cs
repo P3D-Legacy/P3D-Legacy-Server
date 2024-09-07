@@ -18,13 +18,13 @@ internal sealed class BanQueryHandler : IQueryHandler<GetPlayerBanQuery, BanView
 
     public BanQueryHandler(IBanRepository banRepository)
     {
-            _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
-        }
+        _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
+    }
 
     public async Task<BanViewModel?> HandleAsync(GetPlayerBanQuery query, CancellationToken ct)
     {
-            var id = query.Id;
+        var id = query.Id;
 
-            return await _banRepository.GetAsync(id, ct) is { } ban ? new BanViewModel(ban.BannerId, ban.Id, ban.Ip, ban.Reason, ban.Expiration) : null;
-        }
+        return await _banRepository.GetAsync(id, ct) is { } ban ? new BanViewModel(ban.BannerId, ban.Id, ban.Ip, ban.Reason, ban.Expiration) : null;
+    }
 }

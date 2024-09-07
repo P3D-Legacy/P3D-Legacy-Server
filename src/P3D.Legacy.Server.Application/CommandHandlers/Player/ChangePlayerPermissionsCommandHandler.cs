@@ -18,20 +18,20 @@ internal sealed class ChangePlayerPermissionsCommandHandler : ICommandHandler<Ch
 
     public ChangePlayerPermissionsCommandHandler(ILogger<ChangePlayerPermissionsCommandHandler> logger, IPermissionRepository permissionManager)
     {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _permissionManager = permissionManager ?? throw new ArgumentNullException(nameof(permissionManager));
-        }
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _permissionManager = permissionManager ?? throw new ArgumentNullException(nameof(permissionManager));
+    }
 
     public async Task<CommandResult> HandleAsync(ChangePlayerPermissionsCommand command, CancellationToken ct)
     {
-            var (player, permissions) = command;
+        var (player, permissions) = command;
 
-            var result = await _permissionManager.SetPermissionsAsync(player.Id, permissions, ct);
-            if (result)
-            {
-                await player.AssignPermissionsAsync(permissions, ct);
-            }
-
-            return new CommandResult(result);
+        var result = await _permissionManager.SetPermissionsAsync(player.Id, permissions, ct);
+        if (result)
+        {
+            await player.AssignPermissionsAsync(permissions, ct);
         }
+
+        return new CommandResult(result);
+    }
 }

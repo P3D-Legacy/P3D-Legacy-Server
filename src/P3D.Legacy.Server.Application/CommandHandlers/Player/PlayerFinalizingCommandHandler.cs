@@ -21,19 +21,19 @@ internal sealed class PlayerFinalizingCommandHandler : ICommandHandler<PlayerFin
 
     public PlayerFinalizingCommandHandler(IEventDispatcher eventDispatcher, IPlayerContainerWriterAsync playerContainer)
     {
-            _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
-            _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
-        }
+        _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
+        _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
+    }
 
     public async Task<CommandResult> HandleAsync(PlayerFinalizingCommand command, CancellationToken ct)
     {
-            var player = command.Player;
+        var player = command.Player;
 
-            Debug.Assert(player.State == PlayerState.Finalizing);
+        Debug.Assert(player.State == PlayerState.Finalizing);
 
-            await _playerContainer.RemoveAsync(player, ct);
-            await _eventDispatcher.DispatchAsync(new PlayerLeftEvent(player.Id, player.Origin, player.Name), ct);
+        await _playerContainer.RemoveAsync(player, ct);
+        await _eventDispatcher.DispatchAsync(new PlayerLeftEvent(player.Id, player.Origin, player.Name), ct);
 
-            return new CommandResult(true);
-        }
+        return new CommandResult(true);
+    }
 }

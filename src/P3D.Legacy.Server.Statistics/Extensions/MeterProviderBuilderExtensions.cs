@@ -6,8 +6,8 @@ public static class MeterProviderBuilderExtensions
 {
     public static MeterProviderBuilder AddStatisticsInstrumentation(this MeterProviderBuilder builder)
     {
-            builder.AddMeter("P3D.Legacy.Server.Statistics");
+        builder.AddMeter("P3D.Legacy.Server.Statistics");
 
-            return builder;
-        }
+        return builder;
+    }
 }

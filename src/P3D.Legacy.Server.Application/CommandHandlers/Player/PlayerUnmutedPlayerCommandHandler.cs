@@ -18,15 +18,15 @@ internal sealed class PlayerUnmutedPlayerCommandHandler : ICommandHandler<Player
 
     public PlayerUnmutedPlayerCommandHandler(ILogger<PlayerUnmutedPlayerCommandHandler> logger, IMuteRepository muteRepository)
     {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _muteRepository = muteRepository ?? throw new ArgumentNullException(nameof(muteRepository));
-        }
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _muteRepository = muteRepository ?? throw new ArgumentNullException(nameof(muteRepository));
+    }
 
     public async Task<CommandResult> HandleAsync(PlayerUnmutedPlayerCommand command, CancellationToken ct)
     {
-            var (id, idToUnmute) = command;
+        var (id, idToUnmute) = command;
 
-            await _muteRepository.UnmuteAsync(id, idToUnmute, ct);
-            return new CommandResult(true);
-        }
+        await _muteRepository.UnmuteAsync(id, idToUnmute, ct);
+        return new CommandResult(true);
+    }
 }

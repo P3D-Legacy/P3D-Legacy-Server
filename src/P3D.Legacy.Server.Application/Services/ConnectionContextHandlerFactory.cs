@@ -12,13 +12,13 @@ public class ConnectionContextHandlerFactory
 
     public ConnectionContextHandlerFactory(IServiceProvider serviceProvider)
     {
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        }
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+    }
 
     public async Task<TConnectionContextHandler> CreateAsync<TConnectionContextHandler>(ConnectionContext connectionContext) where TConnectionContextHandler : ConnectionContextHandler
     {
-            var connectionContextHandler = _serviceProvider.GetRequiredService<TConnectionContextHandler>();
-            await connectionContextHandler.SetConnectionContextAsync(connectionContext);
-            return connectionContextHandler;
-        }
+        var connectionContextHandler = _serviceProvider.GetRequiredService<TConnectionContextHandler>();
+        await connectionContextHandler.SetConnectionContextAsync(connectionContext);
+        return connectionContextHandler;
+    }
 }

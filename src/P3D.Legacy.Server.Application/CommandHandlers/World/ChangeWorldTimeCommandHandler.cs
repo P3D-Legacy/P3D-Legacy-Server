@@ -22,18 +22,18 @@ internal sealed class ChangeWorldTimeCommandHandler : ICommandHandler<ChangeWorl
 
     public ChangeWorldTimeCommandHandler(ILogger<ChangeWorldTimeCommandHandler> logger, IEventDispatcher eventDispatcher, WorldService world)
     {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
-            _world = world ?? throw new ArgumentNullException(nameof(world));
-        }
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _eventDispatcher = eventDispatcher ?? throw new ArgumentNullException(nameof(eventDispatcher));
+        _world = world ?? throw new ArgumentNullException(nameof(world));
+    }
 
     public async Task<CommandResult> HandleAsync(ChangeWorldTimeCommand command, CancellationToken ct)
     {
-            var time = command.Time;
+        var time = command.Time;
 
-            var oldState = _world.State;
-            _world.CurrentTime = time;
-            await _eventDispatcher.DispatchAsync(new WorldUpdatedEvent(_world.State, oldState), ct);
-            return new CommandResult(true);
-        }
+        var oldState = _world.State;
+        _world.CurrentTime = time;
+        await _eventDispatcher.DispatchAsync(new WorldUpdatedEvent(_world.State, oldState), ct);
+        return new CommandResult(true);
+    }
 }

@@ -11,8 +11,8 @@ public sealed class WebSocketHandlerFactory
 
     public WebSocketHandlerFactory(IServiceProvider serviceProvider)
     {
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        }
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+    }
 
     public WebSocketHandler Create(WebSocket webSocket) => ActivatorUtilities.CreateInstance<WebSocketHandler>(_serviceProvider, webSocket);
 }

@@ -16,15 +16,15 @@ internal sealed class KickPlayerCommandHandler : ICommandHandler<KickPlayerComma
 
     public KickPlayerCommandHandler(ILogger<KickPlayerCommandHandler> logger)
     {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
     public async Task<CommandResult> HandleAsync(KickPlayerCommand command, CancellationToken ct)
     {
-            var (player, reason) = command;
+        var (player, reason) = command;
 
-            await player.KickAsync(reason, ct);
+        await player.KickAsync(reason, ct);
 
-            return new CommandResult(true);
-        }
+        return new CommandResult(true);
+    }
 }

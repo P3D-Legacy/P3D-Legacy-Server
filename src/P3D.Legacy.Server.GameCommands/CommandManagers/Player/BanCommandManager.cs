@@ -22,78 +22,78 @@ internal class BanCommandManager : CommandManager
 
     public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
     {
-            if (arguments.Length == 3)
+        if (arguments.Length == 3)
+        {
+            var targetName = arguments[0];
+            if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
             {
-                var targetName = arguments[0];
-                if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
-                {
-                    await SendMessageAsync(player, $"Player {targetName} not found!", ct);
-                    return;
-                }
-
-                if (targetPlayer.Id == player.Id)
-                {
-                    await SendMessageAsync(player, "You can't ban yourself!", ct);
-                    return;
-                }
-
-                if (!int.TryParse(arguments[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var minutes))
-                {
-                    await SendMessageAsync(player, "Invalid minutes given.", ct);
-                    return;
-                }
-
-                var reason = arguments[2].TrimStart('"').TrimEnd('"');
-
-                if (ulong.TryParse(reason, NumberStyles.Integer, CultureInfo.InvariantCulture, out var reasonId))
-                    reason = string.Empty;
-
-                var result = await CommandDispatcher.DispatchAsync(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
-                if (result.IsSuccess)
-                    await CommandDispatcher.DispatchAsync(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
-                else
-                    await SendMessageAsync(player, $"Failed to ban player {targetName}!", ct);
+                await SendMessageAsync(player, $"Player {targetName} not found!", ct);
+                return;
             }
-            else if (arguments.Length > 3)
+
+            if (targetPlayer.Id == player.Id)
             {
-                var targetName = arguments[0];
-                if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
-                {
-                    await SendMessageAsync(player, $"Player {targetName} not found!", ct);
-                    return;
-                }
-
-                if (targetPlayer.Id == player.Id)
-                {
-                    await SendMessageAsync(player, "You can't ban yourself!", ct);
-                    return;
-                }
-
-                if (!int.TryParse(arguments[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var minutes))
-                {
-                    await SendMessageAsync(player, "Invalid minutes given.", ct);
-                    return;
-                }
-
-                var reason = string.Join(" ", arguments.Skip(2).ToArray());
-
-                if (ulong.TryParse(reason, NumberStyles.Integer, CultureInfo.InvariantCulture, out var reasonId))
-                    reason = string.Empty;
-
-                var result = await CommandDispatcher.DispatchAsync(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
-                if (result.IsSuccess)
-                    await CommandDispatcher.DispatchAsync(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
-                else
-                    await SendMessageAsync(player, $"Failed to ban player {targetName}!", ct);
+                await SendMessageAsync(player, "You can't ban yourself!", ct);
+                return;
             }
+
+            if (!int.TryParse(arguments[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var minutes))
+            {
+                await SendMessageAsync(player, "Invalid minutes given.", ct);
+                return;
+            }
+
+            var reason = arguments[2].TrimStart('"').TrimEnd('"');
+
+            if (ulong.TryParse(reason, NumberStyles.Integer, CultureInfo.InvariantCulture, out var reasonId))
+                reason = string.Empty;
+
+            var result = await CommandDispatcher.DispatchAsync(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
+            if (result.IsSuccess)
+                await CommandDispatcher.DispatchAsync(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
             else
-            {
-                await SendMessageAsync(player, "Invalid arguments given.", ct);
-            }
+                await SendMessageAsync(player, $"Failed to ban player {targetName}!", ct);
         }
+        else if (arguments.Length > 3)
+        {
+            var targetName = arguments[0];
+            if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
+            {
+                await SendMessageAsync(player, $"Player {targetName} not found!", ct);
+                return;
+            }
+
+            if (targetPlayer.Id == player.Id)
+            {
+                await SendMessageAsync(player, "You can't ban yourself!", ct);
+                return;
+            }
+
+            if (!int.TryParse(arguments[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var minutes))
+            {
+                await SendMessageAsync(player, "Invalid minutes given.", ct);
+                return;
+            }
+
+            var reason = string.Join(" ", arguments.Skip(2).ToArray());
+
+            if (ulong.TryParse(reason, NumberStyles.Integer, CultureInfo.InvariantCulture, out var reasonId))
+                reason = string.Empty;
+
+            var result = await CommandDispatcher.DispatchAsync(new BanPlayerCommand(player.Id, targetPlayer.Id, targetPlayer.IPEndPoint.Address, reasonId, reason, DateTimeOffset.UtcNow.AddMinutes(minutes)), CancellationToken.None);
+            if (result.IsSuccess)
+                await CommandDispatcher.DispatchAsync(new KickPlayerCommand(targetPlayer, $"You are banned: {reason}"), ct);
+            else
+                await SendMessageAsync(player, $"Failed to ban player {targetName}!", ct);
+        }
+        else
+        {
+            await SendMessageAsync(player, "Invalid arguments given.", ct);
+        }
+    }
 
     public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
     {
-            await SendMessageAsync(player, $"Correct usage is /{alias} <playername> [<reason>]", ct);
-        }
+        await SendMessageAsync(player, $"Correct usage is /{alias} <playername> [<reason>]", ct);
+    }
 }

@@ -18,34 +18,34 @@ public class ValidationController : ControllerBase
 
     public ValidationController(IOptionsSnapshot<JwtBearerOptions> jwtBearerOptions)
     {
-            _jwtBearerOptions = jwtBearerOptions.Get(JwtBearerDefaults.AuthenticationScheme) ?? throw new ArgumentNullException(nameof(jwtBearerOptions));
-        }
+        _jwtBearerOptions = jwtBearerOptions.Get(JwtBearerDefaults.AuthenticationScheme) ?? throw new ArgumentNullException(nameof(jwtBearerOptions));
+    }
 
     [HttpGet]
     public IActionResult ValidateToken()
     {
-            string? authorization = Request.Headers.Authorization;
+        string? authorization = Request.Headers.Authorization;
 
-            // If no authorization header found, nothing to process further
-            if (string.IsNullOrEmpty(authorization))
-                return BadRequest(AuthenticateResult.NoResult());
+        // If no authorization header found, nothing to process further
+        if (string.IsNullOrEmpty(authorization))
+            return BadRequest(AuthenticateResult.NoResult());
 
-            if (authorization.StartsWith(Bearer, StringComparison.OrdinalIgnoreCase))
+        if (authorization.StartsWith(Bearer, StringComparison.OrdinalIgnoreCase))
+        {
+            var token = authorization.Substring(Bearer.Length).Trim();
+            var tokenHandler = new JwtSecurityTokenHandler();
+            try
             {
-                var token = authorization.Substring(Bearer.Length).Trim();
-                var tokenHandler = new JwtSecurityTokenHandler();
-                try
-                {
-                    tokenHandler.ValidateToken(token, _jwtBearerOptions.TokenValidationParameters, out _);
+                tokenHandler.ValidateToken(token, _jwtBearerOptions.TokenValidationParameters, out _);
 
-                    return Ok();
-                }
-                catch (Exception)
-                {
-                    return BadRequest();
-                }
+                return Ok();
             }
-
-            return BadRequest();
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
+
+        return BadRequest();
+    }
 }

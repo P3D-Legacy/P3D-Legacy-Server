@@ -17,9 +17,9 @@ public class DefaultMonsterValidator : IMonsterValidator
 
     public DefaultMonsterValidator(ILogger<DefaultMonsterValidator> logger, IOptions<PokeAPIOptions> options)
     {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
-        }
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+    }
 
     /// <inheritdoc />
     public Task<bool> ValidateAsync(IMonsterInstance monster, CancellationToken ct) => Task.FromResult(

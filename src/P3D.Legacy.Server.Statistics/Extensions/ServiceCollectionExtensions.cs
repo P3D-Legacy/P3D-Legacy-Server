@@ -9,12 +9,12 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddStatistics(this IServiceCollection services)
     {
-            services.AddTransient<MetricsHandler>();
-            services.AddEventHandler(static sp => sp.GetRequiredService<MetricsHandler>());
+        services.AddTransient<MetricsHandler>();
+        services.AddEventHandler(static sp => sp.GetRequiredService<MetricsHandler>());
 
-            //services.AddTransient<StatisticsHandler>();
-            //services.AddEvents(sp => sp.GetRequiredService<StatisticsHandler>());
+        //services.AddTransient<StatisticsHandler>();
+        //services.AddEvents(sp => sp.GetRequiredService<StatisticsHandler>());
 
-            return services;
-        }
+        return services;
+    }
 }

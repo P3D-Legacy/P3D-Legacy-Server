@@ -20,8 +20,8 @@ public class P3DClientConnectionService
 
     public P3DClientConnectionService(IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
     {
-            _client = new ClientBuilder(serviceProvider).UseSockets().UseConnectionLogging(loggerFactory: loggerFactory).Build();
-        }
+        _client = new ClientBuilder(serviceProvider).UseSockets().UseConnectionLogging(loggerFactory: loggerFactory).Build();
+    }
 
     public ValueTask<ConnectionContext?> GetConnectionAsync(string host, ushort port, CancellationToken ct) => _client.ConnectAsync(GetEndPoint(host, port), ct);
 }

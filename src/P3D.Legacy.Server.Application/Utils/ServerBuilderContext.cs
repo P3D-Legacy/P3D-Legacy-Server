@@ -11,7 +11,7 @@ public class ServerBuilderContext
 
     public ServerBuilderContext(IHostEnvironment hostingEnvironment, IConfiguration configuration)
     {
-            HostingEnvironment = hostingEnvironment;
-            Configuration = configuration;
-        }
+        HostingEnvironment = hostingEnvironment;
+        Configuration = configuration;
+    }
 }

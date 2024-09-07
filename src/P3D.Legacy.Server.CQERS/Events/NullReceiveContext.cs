@@ -6,6 +6,6 @@ public class NullReceiveContext<TEvent> : IReceiveContext<TEvent> where TEvent :
 
     public NullReceiveContext(TEvent @event)
     {
-            Message = @event;
-        }
+        Message = @event;
+    }
 }

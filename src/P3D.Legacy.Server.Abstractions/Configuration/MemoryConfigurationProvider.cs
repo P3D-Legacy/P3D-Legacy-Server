@@ -17,16 +17,16 @@ public class MemoryConfigurationProvider<[DynamicallyAccessedMembers(Dynamically
     private readonly PropertyInfo[] _keys;
     public MemoryConfigurationProvider(IConfigurationSection section)
     {
-            _basePath = section.Path;
-            _keys = typeof(TOptions).GetProperties().Where(static p => p is { CanRead: true, CanWrite: true }).ToArray();
-        }
+        _basePath = section.Path;
+        _keys = typeof(TOptions).GetProperties().Where(static p => p is { CanRead: true, CanWrite: true }).ToArray();
+    }
 
     public bool SetProperty(PropertyInfo propertyInfo, string value)
     {
-            Set($"{_basePath}:{propertyInfo.Name}", value);
-            OnReload();
-            return true;
-        }
+        Set($"{_basePath}:{propertyInfo.Name}", value);
+        OnReload();
+        return true;
+    }
 
     public override void Load() { }
 

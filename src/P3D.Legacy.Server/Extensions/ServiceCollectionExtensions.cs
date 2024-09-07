@@ -18,26 +18,26 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddHost(this IServiceCollection services)
     {
-            services.AddTransient(typeof(ICommandBehavior<>), typeof(CommandValidationBehaviour<>));
-            services.AddTransient(typeof(ICommandBehavior<>), typeof(CommandTracingBehaviour<>));
+        services.AddTransient(typeof(ICommandBehavior<>), typeof(CommandValidationBehaviour<>));
+        services.AddTransient(typeof(ICommandBehavior<>), typeof(CommandTracingBehaviour<>));
 
-            services.AddTransient(typeof(IQueryBehavior<,>), typeof(QueryValidationBehaviour<,>));
-            services.AddTransient(typeof(IQueryBehavior<,>), typeof(QueryTracingBehaviour<,>));
+        services.AddTransient(typeof(IQueryBehavior<,>), typeof(QueryValidationBehaviour<,>));
+        services.AddTransient(typeof(IQueryBehavior<,>), typeof(QueryTracingBehaviour<,>));
 
-            services.AddBetterHostedServices();
+        services.AddBetterHostedServices();
 
-            services.AddHttpClient("P3D.API")
-                .ConfigureHttpClient(static (sp, client) =>
-                {
-                    var backendOptionsSnapshot = sp.GetRequiredService<IOptions<P3DSiteOptions>>();
-                    var backendOptions = backendOptionsSnapshot.Value;
+        services.AddHttpClient("P3D.API")
+            .ConfigureHttpClient(static (sp, client) =>
+            {
+                var backendOptionsSnapshot = sp.GetRequiredService<IOptions<P3DSiteOptions>>();
+                var backendOptions = backendOptionsSnapshot.Value;
 
-                    client.BaseAddress = new Uri(backendOptions.APIEndpointV1);
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", backendOptions.APIToken);
-                    client.Timeout = Timeout.InfiniteTimeSpan;
-                })
-                .AddPolly();
+                client.BaseAddress = new Uri(backendOptions.APIEndpointV1);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", backendOptions.APIToken);
+                client.Timeout = Timeout.InfiniteTimeSpan;
+            })
+            .AddPolly();
 
-            return services;
-        }
+        return services;
+    }
 }

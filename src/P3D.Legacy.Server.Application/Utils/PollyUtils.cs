@@ -22,33 +22,33 @@ public sealed partial class PollyUtils
 
     private static TimeSpan GetServerWaitDuration(DelegateResult<HttpResponseMessage> response)
     {
-            if (response.Result?.Headers.RetryAfter is not { } retryAfter)
-                return TimeSpan.Zero;
+        if (response.Result?.Headers.RetryAfter is not { } retryAfter)
+            return TimeSpan.Zero;
 
-            return retryAfter.Date is not null ? retryAfter.Date.Value - DateTime.UtcNow : retryAfter.Delta.GetValueOrDefault(TimeSpan.Zero);
-        }
+        return retryAfter.Date is not null ? retryAfter.Date.Value - DateTime.UtcNow : retryAfter.Delta.GetValueOrDefault(TimeSpan.Zero);
+    }
 
     public static IAsyncPolicy<HttpResponseMessage> PolicySelector(IServiceProvider sp, HttpRequestMessage _)
     {
-            var logger = sp.GetRequiredService<ILogger<PollyUtils>>();
+        var logger = sp.GetRequiredService<ILogger<PollyUtils>>();
 
-            return Policy
-                .Handle<Exception>()
-                .Or<HttpRequestException>(static e => e.StatusCode != HttpStatusCode.Unauthorized)
-                .OrTransientHttpStatusCode()
-                .WaitAndRetryAsync(
-                    retryCount: 5,
-                    sleepDurationProvider: static (_, result, _) =>
-                    {
-                        var clientWaitDuration = TimeSpan.FromSeconds(2);
-                        var serverWaitDuration = GetServerWaitDuration(result);
-                        var waitDuration = Math.Max(clientWaitDuration.TotalMilliseconds, serverWaitDuration.TotalMilliseconds);
-                        return TimeSpan.FromMilliseconds(waitDuration);
-                    },
-                    onRetryAsync: (result, timeSpan, retryCount, _) =>
-                    {
-                        Exception(logger, result.Result, retryCount, timeSpan, result.Exception);
-                        return Task.CompletedTask;
-                    });
-        }
+        return Policy
+            .Handle<Exception>()
+            .Or<HttpRequestException>(static e => e.StatusCode != HttpStatusCode.Unauthorized)
+            .OrTransientHttpStatusCode()
+            .WaitAndRetryAsync(
+                retryCount: 5,
+                sleepDurationProvider: static (_, result, _) =>
+                {
+                    var clientWaitDuration = TimeSpan.FromSeconds(2);
+                    var serverWaitDuration = GetServerWaitDuration(result);
+                    var waitDuration = Math.Max(clientWaitDuration.TotalMilliseconds, serverWaitDuration.TotalMilliseconds);
+                    return TimeSpan.FromMilliseconds(waitDuration);
+                },
+                onRetryAsync: (result, timeSpan, retryCount, _) =>
+                {
+                    Exception(logger, result.Result, retryCount, timeSpan, result.Exception);
+                    return Task.CompletedTask;
+                });
+    }
 }

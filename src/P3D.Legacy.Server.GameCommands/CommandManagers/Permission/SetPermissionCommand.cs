@@ -22,44 +22,44 @@ internal class SetPermissionCommand : CommandManager
 
     public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
     {
-            if (arguments.Length >= 2)
+        if (arguments.Length >= 2)
+        {
+            var permissions = arguments.Skip(1).Where(static arg => arg is not "," and not "|").ToArray();
+
+            var targetName = arguments[0];
+            if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
             {
-                var permissions = arguments.Skip(1).Where(static arg => arg is not "," and not "|").ToArray();
-
-                var targetName = arguments[0];
-                if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
-                {
-                    await SendMessageAsync(player, $"Player {targetName} not found.", ct);
-                    return;
-                }
-
-                var permissionFlags = await GetPermissionsAsync(player, permissions, ct).AggregateAsync(PermissionTypes.None, static (current, flag) => current | flag, ct);
-
-                var result = await CommandDispatcher.DispatchAsync(new ChangePlayerPermissionsCommand(targetPlayer, permissionFlags), ct);
-                if (result.IsSuccess)
-                    await SendMessageAsync(player, $"Changed {targetName} permissions!", ct);
-                else
-                    await SendMessageAsync(player, $"Failed to change {targetName} permissions!", ct);
+                await SendMessageAsync(player, $"Player {targetName} not found.", ct);
+                return;
             }
+
+            var permissionFlags = await GetPermissionsAsync(player, permissions, ct).AggregateAsync(PermissionTypes.None, static (current, flag) => current | flag, ct);
+
+            var result = await CommandDispatcher.DispatchAsync(new ChangePlayerPermissionsCommand(targetPlayer, permissionFlags), ct);
+            if (result.IsSuccess)
+                await SendMessageAsync(player, $"Changed {targetName} permissions!", ct);
             else
-            {
-                await SendMessageAsync(player, "Invalid arguments given.", ct);
-            }
+                await SendMessageAsync(player, $"Failed to change {targetName} permissions!", ct);
         }
+        else
+        {
+            await SendMessageAsync(player, "Invalid arguments given.", ct);
+        }
+    }
 
     public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
     {
-            await SendMessageAsync(player, $"Correct usage is /{alias} <PlayerName> <Permission>", ct);
-        }
+        await SendMessageAsync(player, $"Correct usage is /{alias} <PlayerName> <Permission>", ct);
+    }
 
     private async IAsyncEnumerable<PermissionTypes> GetPermissionsAsync(IPlayer player, IEnumerable<string> permissions, [EnumeratorCancellation] CancellationToken ct)
     {
-            foreach (var permission in permissions)
-            {
-                if (Enum.TryParse(permission, true, out PermissionTypes flag))
-                    yield return flag;
-                else
-                    await SendMessageAsync(player, $"Permission {permission} not found.", ct);
-            }
+        foreach (var permission in permissions)
+        {
+            if (Enum.TryParse(permission, true, out PermissionTypes flag))
+                yield return flag;
+            else
+                await SendMessageAsync(player, $"Permission {permission} not found.", ct);
         }
+    }
 }

@@ -19,15 +19,15 @@ internal sealed class BanPlayerCommandHandler : ICommandHandler<BanPlayerCommand
 
     public BanPlayerCommandHandler(ILogger<BanPlayerCommandHandler> logger, IBanRepository banRepository)
     {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
-        }
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
+    }
 
     public async Task<CommandResult> HandleAsync(BanPlayerCommand command, CancellationToken ct)
     {
-            var (bannerId, id, ip, reasonId, reason, expiration) = command;
+        var (bannerId, id, ip, reasonId, reason, expiration) = command;
 
-            var result = await _banRepository.BanAsync(new BanEntity(bannerId, id, ip, reasonId, reason, expiration), ct);
-            return new CommandResult(result);
-        }
+        var result = await _banRepository.BanAsync(new BanEntity(bannerId, id, ip, reasonId, reason, expiration), ct);
+        return new CommandResult(result);
+    }
 }

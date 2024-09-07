@@ -21,51 +21,51 @@ internal class KickCommandManager : CommandManager
 
     public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
     {
-            if (arguments.Length == 1)
+        if (arguments.Length == 1)
+        {
+            var targetName = arguments[0];
+            if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
             {
-                var targetName = arguments[0];
-                if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
-                {
-                    await SendMessageAsync(player, $"Player {targetName} not found!", ct);
-                    return;
-                }
-
-                if (targetPlayer.Id == player.Id)
-                {
-                    await SendMessageAsync(player, "You can't kick yourself!", ct);
-                    return;
-                }
-
-                await CommandDispatcher.DispatchAsync(new KickPlayerCommand(targetPlayer, "Kicked by a Moderator or Admin."), ct);
+                await SendMessageAsync(player, $"Player {targetName} not found!", ct);
+                return;
             }
-            else if (arguments.Length > 1)
+
+            if (targetPlayer.Id == player.Id)
             {
-                var targetName = arguments[0];
-                if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
-                {
-                    await SendMessageAsync(player, $"Player {targetName} not found!", ct);
-                    return;
-                }
-
-                if (targetPlayer.Id == player.Id)
-                {
-                    await SendMessageAsync(player, "You can't kick yourself!", ct);
-                    return;
-                }
-
-                var reason = string.Join(" ", arguments.Skip(1).ToArray());
-                var result = await CommandDispatcher.DispatchAsync(new KickPlayerCommand(targetPlayer, reason), ct);
-                if (!result.IsSuccess)
-                    await SendMessageAsync(player, $"Failed to kick player {targetName}!", ct);
+                await SendMessageAsync(player, "You can't kick yourself!", ct);
+                return;
             }
-            else
-            {
-                await SendMessageAsync(player, "Invalid arguments given.", ct);
-            }
+
+            await CommandDispatcher.DispatchAsync(new KickPlayerCommand(targetPlayer, "Kicked by a Moderator or Admin."), ct);
         }
+        else if (arguments.Length > 1)
+        {
+            var targetName = arguments[0];
+            if (await GetPlayerAsync(targetName, ct) is not { } targetPlayer)
+            {
+                await SendMessageAsync(player, $"Player {targetName} not found!", ct);
+                return;
+            }
+
+            if (targetPlayer.Id == player.Id)
+            {
+                await SendMessageAsync(player, "You can't kick yourself!", ct);
+                return;
+            }
+
+            var reason = string.Join(" ", arguments.Skip(1).ToArray());
+            var result = await CommandDispatcher.DispatchAsync(new KickPlayerCommand(targetPlayer, reason), ct);
+            if (!result.IsSuccess)
+                await SendMessageAsync(player, $"Failed to kick player {targetName}!", ct);
+        }
+        else
+        {
+            await SendMessageAsync(player, "Invalid arguments given.", ct);
+        }
+    }
 
     public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
     {
-            await SendMessageAsync(player, $"Correct usage is /{alias} <playername> [<reason>]", ct);
-        }
+        await SendMessageAsync(player, $"Correct usage is /{alias} <playername> [<reason>]", ct);
+    }
 }

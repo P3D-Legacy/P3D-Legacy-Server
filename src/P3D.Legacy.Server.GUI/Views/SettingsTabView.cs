@@ -22,69 +22,69 @@ public sealed class SettingsTabView : View
     [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
     public SettingsTabView(DynamicConfigurationProviderManager dynamicConfigurationProvider)
     {
-            Width = Dim.Fill();
-            Height = Dim.Fill();
+        Width = Dim.Fill();
+        Height = Dim.Fill();
 
-            var views = new List<View>();
-            foreach (var optionsType in dynamicConfigurationProvider.GetRegisteredOptionTypes())
+        var views = new List<View>();
+        foreach (var optionsType in dynamicConfigurationProvider.GetRegisteredOptionTypes())
+        {
+            if (dynamicConfigurationProvider.GetProvider(optionsType) is not { } manager) continue;
+            var propertyCount = manager.AvailableProperties.Count();
+
+            if (dynamicConfigurationProvider.GetOptions(optionsType) is not { } currentOptions) continue;
+
+            var view = new FrameView(optionsType.Name.Replace("Options", "", StringComparison.Ordinal))
             {
-                if (dynamicConfigurationProvider.GetProvider(optionsType) is not { } manager) continue;
-                var propertyCount = manager.AvailableProperties.Count();
-
-                if (dynamicConfigurationProvider.GetOptions(optionsType) is not { } currentOptions) continue;
-
-                var view = new FrameView(optionsType.Name.Replace("Options", "", StringComparison.Ordinal))
+                X = 0,
+                Y = views.Count == 0 ? 0 : Pos.Bottom(views.Last()),
+                Width = Dim.Fill(),
+                Height = 3 + propertyCount,
+            };
+            var maxLength = manager.AvailableProperties.Max(static x => x.Name.Length);
+            var i = 0;
+            var propertyViews = new Dictionary<PropertyInfo, TextField>();
+            foreach (var property in manager.AvailableProperties)
+            {
+                var value = property.GetValue(currentOptions);
+                var textView = new Label { X = 0, Y = i, Width = property.Name.Length + 2, Height = 1, Text = $"{property.Name}: " };
+                var textField = new TextField { X = maxLength + 1, Y = i, Width = Dim.Fill(), Height = 1, Text = ToString(value) };
+                view.Add(textView, textField);
+                propertyViews.Add(property, textField);
+                i++;
+            }
+            var button = new Button("Save", true) { X = 0, Y = i, Width = Dim.Fill(), Height = 1 };
+            button.Clicked += () =>
+            {
+                var faultyProps = new List<PropertyInfo>();
+                foreach (var (prop, field) in propertyViews)
                 {
-                    X = 0,
-                    Y = views.Count == 0 ? 0 : Pos.Bottom(views.Last()),
-                    Width = Dim.Fill(),
-                    Height = 3 + propertyCount,
-                };
-                var maxLength = manager.AvailableProperties.Max(static x => x.Name.Length);
-                var i = 0;
-                var propertyViews = new Dictionary<PropertyInfo, TextField>();
-                foreach (var property in manager.AvailableProperties)
-                {
-                    var value = property.GetValue(currentOptions);
-                    var textView = new Label { X = 0, Y = i, Width = property.Name.Length + 2, Height = 1, Text = $"{property.Name}: " };
-                    var textField = new TextField { X = maxLength + 1, Y = i, Width = Dim.Fill(), Height = 1, Text = ToString(value) };
-                    view.Add(textView, textField);
-                    propertyViews.Add(property, textField);
-                    i++;
-                }
-                var button = new Button("Save", true) { X = 0, Y = i, Width = Dim.Fill(), Height = 1 };
-                button.Clicked += () =>
-                {
-                    var faultyProps = new List<PropertyInfo>();
-                    foreach (var (prop, field) in propertyViews)
+                    try
                     {
-                        try
+                        if (prop.PropertyType == typeof(bool))
                         {
-                            if (prop.PropertyType == typeof(bool))
-                            {
-                                manager.SetProperty(prop, field.Text.ToString()?.ToLowerInvariant() ?? string.Empty);
-                            }
-                            else
-                            {
-                                manager.SetProperty(prop, field.Text.ToString() ?? string.Empty);
-                            }
+                            manager.SetProperty(prop, field.Text.ToString()?.ToLowerInvariant() ?? string.Empty);
                         }
-                        catch (Exception)
+                        else
                         {
-                            faultyProps.Add(prop);
-                            var defaultValue = ToString(prop.GetValue(currentOptions));
-                            manager.SetProperty(prop, defaultValue);
-                            field.Text = defaultValue;
+                            manager.SetProperty(prop, field.Text.ToString() ?? string.Empty);
                         }
                     }
-                    MessageBox.Query(faultyProps.Count == 0 ? "Success!" : "Warning!", faultyProps.Count == 0
-                        ? "Saved successfully!"
-                        : $"Some properties were not saved and were reverted to their default values - {string.Join(", ", faultyProps.Select(static x => x.Name))}", "Ok");
-                };
-                view.Add(button);
-                views.Add(view);
-            }
-
-            Add(views.ToArray());
+                    catch (Exception)
+                    {
+                        faultyProps.Add(prop);
+                        var defaultValue = ToString(prop.GetValue(currentOptions));
+                        manager.SetProperty(prop, defaultValue);
+                        field.Text = defaultValue;
+                    }
+                }
+                MessageBox.Query(faultyProps.Count == 0 ? "Success!" : "Warning!", faultyProps.Count == 0
+                    ? "Saved successfully!"
+                    : $"Some properties were not saved and were reverted to their default values - {string.Join(", ", faultyProps.Select(static x => x.Name))}", "Ok");
+            };
+            view.Add(button);
+            views.Add(view);
         }
+
+        Add(views.ToArray());
+    }
 }

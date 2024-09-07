@@ -17,22 +17,22 @@ internal class SayCommandManager : CommandManager
 
     public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
     {
-            if (arguments.Length == 1)
-            {
-                var message = arguments[0].TrimStart('"').TrimEnd('"');
-                await SendServerMessageAsync(message, ct);
-            }
-            else if (arguments.Length > 1)
-            {
-                var message = string.Join(" ", arguments);
-                await SendServerMessageAsync(message, ct);
-            }
-            else
-                await SendMessageAsync(player, "Invalid arguments given.", ct);
+        if (arguments.Length == 1)
+        {
+            var message = arguments[0].TrimStart('"').TrimEnd('"');
+            await SendServerMessageAsync(message, ct);
         }
+        else if (arguments.Length > 1)
+        {
+            var message = string.Join(" ", arguments);
+            await SendServerMessageAsync(message, ct);
+        }
+        else
+            await SendMessageAsync(player, "Invalid arguments given.", ct);
+    }
 
     public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
     {
-            await SendMessageAsync(player, $"Correct usage is /{alias} <message>", ct);
-        }
+        await SendMessageAsync(player, $"Correct usage is /{alias} <message>", ct);
+    }
 }

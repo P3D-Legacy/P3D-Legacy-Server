@@ -20,23 +20,23 @@ public class AccountsController : ControllerBase
 
     public AccountsController(IUserRepository userRepository)
     {
-            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-        }
+        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+    }
 
     [HttpPost]
     public async Task<IActionResult> PostAsync([FromBody] RegisterModel model, CancellationToken ct)
     {
-            var newUser = new UserEntity(PlayerId.FromName(model.Username), model.Username);
+        var newUser = new UserEntity(PlayerId.FromName(model.Username), model.Username);
 
-            var result = await _userRepository.CreateAsync(newUser, model.Password, false, ct);
+        var result = await _userRepository.CreateAsync(newUser, model.Password, false, ct);
 
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(static x => x.Description);
+        if (!result.Succeeded)
+        {
+            var errors = result.Errors.Select(static x => x.Description);
 
-                return Ok(new RegisterResult { Successful = false, Errors = errors });
-            }
-
-            return Ok(new RegisterResult { Successful = true });
+            return Ok(new RegisterResult { Successful = false, Errors = errors });
         }
+
+        return Ok(new RegisterResult { Successful = true });
+    }
 }

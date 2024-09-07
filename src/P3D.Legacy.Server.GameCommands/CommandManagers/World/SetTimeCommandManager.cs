@@ -21,26 +21,26 @@ internal class SetTimeCommandManager : CommandManager
 
     public override async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
     {
-            if (arguments.Length == 1)
+        if (arguments.Length == 1)
+        {
+            if (TimeSpan.TryParseExact(arguments[0], "g", null, out var time))
             {
-                if (TimeSpan.TryParseExact(arguments[0], "g", null, out var time))
-                {
-                    await CommandDispatcher.DispatchAsync(new ChangeWorldTimeCommand(time), ct);
-                    await SendMessageAsync(player, $"Set time to {time}!", ct);
-                }
-                else
-                {
-                    await SendMessageAsync(player, "Invalid time!", ct);
-                }
+                await CommandDispatcher.DispatchAsync(new ChangeWorldTimeCommand(time), ct);
+                await SendMessageAsync(player, $"Set time to {time}!", ct);
             }
             else
             {
-                await SendMessageAsync(player, "Invalid arguments given.", ct);
+                await SendMessageAsync(player, "Invalid time!", ct);
             }
         }
+        else
+        {
+            await SendMessageAsync(player, "Invalid arguments given.", ct);
+        }
+    }
 
     public override async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
     {
-            await SendMessageAsync(player, $"Correct usage is /{alias} <time[HH:mm:ss]>", ct);
-        }
+        await SendMessageAsync(player, $"Correct usage is /{alias} <time[HH:mm:ss]>", ct);
+    }
 }

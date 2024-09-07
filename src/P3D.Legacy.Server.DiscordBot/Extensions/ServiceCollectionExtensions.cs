@@ -14,12 +14,12 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDiscordBot(this IServiceCollection services)
     {
-            services.AddHostedServiceAsSingleton<DiscordPassthroughService>();
-            services.AddEventHandler(static sp => sp.GetRequiredService<DiscordPassthroughService>());
+        services.AddHostedServiceAsSingleton<DiscordPassthroughService>();
+        services.AddEventHandler(static sp => sp.GetRequiredService<DiscordPassthroughService>());
 
-            services.AddSingleton<DiscordSocketClient>();
-            services.AddSingleton<IDiscordClient, DiscordSocketClient>(static sp => sp.GetRequiredService<DiscordSocketClient>());
+        services.AddSingleton<DiscordSocketClient>();
+        services.AddSingleton<IDiscordClient, DiscordSocketClient>(static sp => sp.GetRequiredService<DiscordSocketClient>());
 
-            return services;
-        }
+        return services;
+    }
 }

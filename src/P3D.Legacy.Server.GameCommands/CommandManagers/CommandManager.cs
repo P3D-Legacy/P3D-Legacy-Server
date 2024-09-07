@@ -30,37 +30,37 @@ internal abstract class CommandManager
 
     protected CommandManager(IServiceProvider serviceProvider)
     {
-            if (serviceProvider is null)
-                throw new ArgumentNullException(nameof(serviceProvider));
+        if (serviceProvider is null)
+            throw new ArgumentNullException(nameof(serviceProvider));
 
-            CommandDispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
-            QueryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
-            EventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
-        }
+        CommandDispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
+        QueryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+        EventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
+    }
 
     protected async Task<IPlayer?> GetPlayerAsync(string name, CancellationToken ct)
     {
-            var players = await QueryDispatcher.DispatchAsync(new GetPlayersInitializedQuery(), ct);
-            return players.FirstOrDefault(x => x.Name.Equals(name, StringComparison.Ordinal));
-        }
+        var players = await QueryDispatcher.DispatchAsync(new GetPlayersInitializedQuery(), ct);
+        return players.FirstOrDefault(x => x.Name.Equals(name, StringComparison.Ordinal));
+    }
 
     protected async Task SendMessageAsync(IPlayer player, string message, CancellationToken ct)
     {
-            await EventDispatcher.DispatchAsync(new MessageToPlayerEvent(IPlayer.Server, player, message), ct);
-        }
+        await EventDispatcher.DispatchAsync(new MessageToPlayerEvent(IPlayer.Server, player, message), ct);
+    }
 
     protected async Task SendServerMessageAsync(string message, CancellationToken ct)
     {
-            await EventDispatcher.DispatchAsync(new ServerMessageEvent(message), ct);
-        }
+        await EventDispatcher.DispatchAsync(new ServerMessageEvent(message), ct);
+    }
 
     public virtual async Task HandleAsync(IPlayer player, string alias, string[] arguments, CancellationToken ct)
     {
-            await HelpAsync(player, alias, ct);
-        }
+        await HelpAsync(player, alias, ct);
+    }
 
     public virtual async Task HelpAsync(IPlayer player, string alias, CancellationToken ct)
     {
-            await SendMessageAsync(player, $@"Command ""{alias}"" is not functional!", ct);
-        }
+        await SendMessageAsync(player, $@"Command ""{alias}"" is not functional!", ct);
+    }
 }

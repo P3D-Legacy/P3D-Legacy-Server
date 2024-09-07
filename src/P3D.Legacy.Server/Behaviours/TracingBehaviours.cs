@@ -17,26 +17,26 @@ internal class CommandTracingBehaviour<TCommand> : ICommandBehavior<TCommand> wh
 
     public CommandTracingBehaviour(TracerProvider tracerProvider)
     {
-            _tracer = tracerProvider.GetTracer("P3D.Legacy.Server.Host");
-        }
+        _tracer = tracerProvider.GetTracer("P3D.Legacy.Server.Host");
+    }
 
     public async Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct)
     {
-            var span = _tracer.StartActiveSpan($"{typeof(TCommand).Name} Handle");
-            try
-            {
-                return await next();
-            }
-            catch
-            {
-                span.SetStatus(Status.Error);
-                throw;
-            }
-            finally
-            {
-                span.Dispose();
-            }
+        var span = _tracer.StartActiveSpan($"{typeof(TCommand).Name} Handle");
+        try
+        {
+            return await next();
         }
+        catch
+        {
+            span.SetStatus(Status.Error);
+            throw;
+        }
+        finally
+        {
+            span.Dispose();
+        }
+    }
 }
 
 internal class QueryTracingBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
@@ -45,24 +45,24 @@ internal class QueryTracingBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQue
 
     public QueryTracingBehaviour(TracerProvider tracerProvider)
     {
-            _tracer = tracerProvider.GetTracer("P3D.Legacy.Server.Host");
-        }
+        _tracer = tracerProvider.GetTracer("P3D.Legacy.Server.Host");
+    }
 
     public async Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct)
     {
-            var span = _tracer.StartActiveSpan($"{typeof(TQuery).Name} Handle");
-            try
-            {
-                return await next();
-            }
-            catch
-            {
-                span.SetStatus(Status.Error);
-                throw;
-            }
-            finally
-            {
-                span.Dispose();
-            }
+        var span = _tracer.StartActiveSpan($"{typeof(TQuery).Name} Handle");
+        try
+        {
+            return await next();
         }
+        catch
+        {
+            span.SetStatus(Status.Error);
+            throw;
+        }
+        finally
+        {
+            span.Dispose();
+        }
+    }
 }

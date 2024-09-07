@@ -11,7 +11,7 @@ public static class AsyncEnumerablerExtensions
 {
     public static async Task<ImmutableArray<T>> ToImmutableArrayAsync<T>(this IAsyncEnumerable<T> source, CancellationToken ct = default)
     {
-            var array = await source.ToArrayAsync(ct);
-            return Unsafe.As<T[], ImmutableArray<T>>(ref array);
-        }
+        var array = await source.ToArrayAsync(ct);
+        return Unsafe.As<T[], ImmutableArray<T>>(ref array);
+    }
 }

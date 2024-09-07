@@ -24,8 +24,8 @@ public class ServerV1Controller : ControllerBase
 
     public ServerV1Controller(ILogger<ServerV1Controller> logger)
     {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
     [HttpGet("status")]
     [Produces("application/json")]

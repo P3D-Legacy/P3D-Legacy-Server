@@ -6,8 +6,8 @@ public static class TracerProviderBuilderExtensions
 {
     public static TracerProviderBuilder AddHostInstrumentation(this TracerProviderBuilder builder)
     {
-            builder.AddSource("P3D.Legacy.Server.Host");
+        builder.AddSource("P3D.Legacy.Server.Host");
 
-            return builder;
-        }
+        return builder;
+    }
 }

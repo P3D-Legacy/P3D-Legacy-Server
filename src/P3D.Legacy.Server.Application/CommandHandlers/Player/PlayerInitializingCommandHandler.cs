@@ -21,33 +21,33 @@ internal sealed class PlayerInitializingCommandHandler : ICommandHandler<PlayerI
 
     public PlayerInitializingCommandHandler(IPlayerContainerWriterAsync playerContainer, IPlayerOriginGenerator playerIdGenerator, IBanRepository banRepository)
     {
-            _playerIdGenerator = playerIdGenerator ?? throw new ArgumentNullException(nameof(playerIdGenerator));
-            _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
-            _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
-        }
+        _playerIdGenerator = playerIdGenerator ?? throw new ArgumentNullException(nameof(playerIdGenerator));
+        _playerContainer = playerContainer ?? throw new ArgumentNullException(nameof(playerContainer));
+        _banRepository = banRepository ?? throw new ArgumentNullException(nameof(banRepository));
+    }
 
     public async Task<CommandResult> HandleAsync(PlayerInitializingCommand command, CancellationToken ct)
     {
-            var player = command.Player;
+        var player = command.Player;
 
-            Debug.Assert(player.State == PlayerState.Initializing);
+        Debug.Assert(player.State == PlayerState.Initializing);
 
-            var gameJoltId = await player.GetGameJoltIdOrNoneAsync(ct);
-            var playerId = gameJoltId.IsNone ? PlayerId.FromName(player.Name) : PlayerId.FromGameJolt(gameJoltId);
+        var gameJoltId = await player.GetGameJoltIdOrNoneAsync(ct);
+        var playerId = gameJoltId.IsNone ? PlayerId.FromName(player.Name) : PlayerId.FromGameJolt(gameJoltId);
 
-            if (await _banRepository.GetAsync(playerId, ct) is { } banEntity)
-            {
-                await player.KickAsync($"You are banned: {banEntity.Reason}", ct);
-                return CommandResult.Success;
-            }
-
-            await player.AssignIdAsync(playerId, ct);
-
-            var origin = await _playerIdGenerator.GenerateAsync(ct);
-            await player.AssignOriginAsync(origin, ct);
-
-            await _playerContainer.AddAsync(player, ct);
-
+        if (await _banRepository.GetAsync(playerId, ct) is { } banEntity)
+        {
+            await player.KickAsync($"You are banned: {banEntity.Reason}", ct);
             return CommandResult.Success;
         }
+
+        await player.AssignIdAsync(playerId, ct);
+
+        var origin = await _playerIdGenerator.GenerateAsync(ct);
+        await player.AssignOriginAsync(origin, ct);
+
+        await _playerContainer.AddAsync(player, ct);
+
+        return CommandResult.Success;
+    }
 }

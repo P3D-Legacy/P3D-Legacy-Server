@@ -17,13 +17,13 @@ public class DynamicConfigurationProviderManager
 
     public DynamicConfigurationProviderManager(IServiceProvider serviceProvider, IConfiguration configuration)
     {
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
-            if (configuration is IConfigurationRoot root)
-            {
-                _configurationProviders = root.Providers.OfType<IDynamicConfigurationProvider>().ToArray();
-            }
+        if (configuration is IConfigurationRoot root)
+        {
+            _configurationProviders = root.Providers.OfType<IDynamicConfigurationProvider>().ToArray();
         }
+    }
 
     public IEnumerable<Type> GetRegisteredOptionTypes() => _configurationProviders.Select(static x => x.OptionsType);
 
@@ -31,9 +31,9 @@ public class DynamicConfigurationProviderManager
     public IDynamicConfigurationProvider? GetProvider<TOptions>() => GetProvider(typeof(TOptions));
     public object? GetOptions([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
     {
-            var openMethod = typeof(DynamicConfigurationProviderManager).GetMethod(nameof(GetOptionsInternal), BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
-            var method = openMethod?.MakeGenericMethod(type);
-            return method?.Invoke(this, parameters: null);
-        }
+        var openMethod = typeof(DynamicConfigurationProviderManager).GetMethod(nameof(GetOptionsInternal), BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+        var method = openMethod?.MakeGenericMethod(type);
+        return method?.Invoke(this, parameters: null);
+    }
     public TOptions GetOptionsInternal<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] TOptions>() where TOptions : class => _serviceProvider.GetRequiredService<IOptions<TOptions>>().Value;
 }

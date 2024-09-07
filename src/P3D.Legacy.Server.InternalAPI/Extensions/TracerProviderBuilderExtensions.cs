@@ -6,8 +6,8 @@ public static class TracerProviderBuilderExtensions
 {
     public static TracerProviderBuilder AddInternalAPIInstrumentation(this TracerProviderBuilder builder)
     {
-            builder.AddSource("P3D.Legacy.Server.InternalAPI");
+        builder.AddSource("P3D.Legacy.Server.InternalAPI");
 
-            return builder;
-        }
+        return builder;
+    }
 }

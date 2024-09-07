@@ -19,12 +19,12 @@ internal sealed class GetWorldStateQueryHandler : IQueryHandler<GetWorldStateQue
 
     public GetWorldStateQueryHandler(ILogger<GetWorldStateQueryHandler> logger, WorldService world)
     {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _world = world ?? throw new ArgumentNullException(nameof(world));
-        }
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _world = world ?? throw new ArgumentNullException(nameof(world));
+    }
 
     public Task<WorldState> HandleAsync(GetWorldStateQuery query, CancellationToken ct)
     {
-            return Task.FromResult(_world.State);
-        }
+        return Task.FromResult(_world.State);
+    }
 }
