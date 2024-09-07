@@ -2,7 +2,8 @@
 using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common.Monsters;
-using P3D.Legacy.Server.Infrastructure.Options;
+using P3D.Legacy.Server.Domain.Options;
+using P3D.Legacy.Server.Domain.Services;
 
 using System;
 using System.Threading;

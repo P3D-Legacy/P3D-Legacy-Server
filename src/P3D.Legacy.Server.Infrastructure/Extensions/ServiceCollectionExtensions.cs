@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
+using P3D.Legacy.Server.Domain.Options;
+using P3D.Legacy.Server.Domain.Repositories;
+using P3D.Legacy.Server.Domain.Services;
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Repositories;
 using P3D.Legacy.Server.Infrastructure.Repositories.Bans;

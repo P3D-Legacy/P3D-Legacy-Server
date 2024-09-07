@@ -1,7 +1,7 @@
 ﻿using P3D.Legacy.Common;
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Commands.Trade;
-using P3D.Legacy.Server.CQERS.Commands;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Commands;
+using P3D.Legacy.Server.Domain.Commands.Trade;
 
 using System.Collections.Generic;
 using System.Threading;

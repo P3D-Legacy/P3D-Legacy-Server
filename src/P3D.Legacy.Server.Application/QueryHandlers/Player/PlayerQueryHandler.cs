@@ -1,9 +1,10 @@
 ﻿using P3D.Legacy.Common;
-using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Application.Extensions;
-using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Application.Services;
-using P3D.Legacy.Server.CQERS.Queries;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Queries;
+using P3D.Legacy.Server.Domain.Queries.Player;
+using P3D.Legacy.Server.Domain.Services;
 
 using System;
 using System.Collections.Immutable;

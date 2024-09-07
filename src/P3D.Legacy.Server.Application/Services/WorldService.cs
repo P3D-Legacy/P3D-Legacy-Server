@@ -3,9 +3,10 @@
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common.Data;
-using P3D.Legacy.Server.Abstractions.Events;
-using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.Domain.Events;
+using P3D.Legacy.Server.Domain.Events.World;
+using P3D.Legacy.Server.Domain.Extensions;
+using P3D.Legacy.Server.Shared;
 
 using RateLimiter;
 

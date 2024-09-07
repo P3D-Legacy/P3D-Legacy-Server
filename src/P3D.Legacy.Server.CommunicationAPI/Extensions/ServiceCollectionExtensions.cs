@@ -2,7 +2,7 @@
 
 using P3D.Legacy.Server.CommunicationAPI.Controllers;
 using P3D.Legacy.Server.CommunicationAPI.Services;
-using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.Domain.Extensions;
 
 namespace P3D.Legacy.Server.CommunicationAPI.Extensions;
 

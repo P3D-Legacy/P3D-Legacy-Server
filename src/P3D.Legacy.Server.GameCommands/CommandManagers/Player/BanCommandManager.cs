@@ -1,5 +1,5 @@
-﻿using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Commands.Administration;
+﻿using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Commands.Administration;
 
 using System;
 using System.Collections.Generic;

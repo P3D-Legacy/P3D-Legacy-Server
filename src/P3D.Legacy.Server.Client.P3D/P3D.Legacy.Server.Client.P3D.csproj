@@ -9,10 +9,12 @@
   <ItemGroup>
     <PackageReference Include="IPNetwork2" />
     <PackageReference Include="Open.NAT.NET5" />
+    <PackageReference Include="OpenTelemetry.Api" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\P3D.Legacy.Server.Application\P3D.Legacy.Server.Application.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Connections\P3D.Legacy.Server.Connections.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Domain\P3D.Legacy.Server.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,6 +7,7 @@ using OpenTelemetry.Trace;
 using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Client.P3D;
 using P3D.Legacy.Server.Client.P3D.Packets;
+using P3D.Legacy.Server.Connections.Services;
 using P3D.Legacy.Tests.Utils;
 
 using System;

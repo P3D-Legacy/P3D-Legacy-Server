@@ -3,8 +3,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Server.Infrastructure.Models.Users;
-using P3D.Legacy.Server.Infrastructure.Repositories.Users;
+using P3D.Legacy.Server.Domain.Entities.Users;
+using P3D.Legacy.Server.Domain.Repositories;
 using P3D.Legacy.Server.InternalAPI.Options;
 using P3D.Legacy.Server.UI.Shared.Models;
 

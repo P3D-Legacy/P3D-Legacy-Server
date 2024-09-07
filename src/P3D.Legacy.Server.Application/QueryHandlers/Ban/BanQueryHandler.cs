@@ -1,12 +1,8 @@
-﻿using P3D.Legacy.Server.Abstractions.Extensions;
-using P3D.Legacy.Server.Application.Queries.Ban;
-using P3D.Legacy.Server.CQERS.Queries;
-using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
+﻿using P3D.Legacy.Server.Domain.Queries;
+using P3D.Legacy.Server.Domain.Queries.Ban;
+using P3D.Legacy.Server.Domain.Repositories;
 
 using System;
-using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -3,14 +3,15 @@
 using Nerdbank.Streams;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Events;
-using P3D.Legacy.Server.Application.Commands.Player;
 using P3D.Legacy.Server.CommunicationAPI.Models;
 using P3D.Legacy.Server.CommunicationAPI.Utils;
-using P3D.Legacy.Server.CQERS.Commands;
-using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Commands;
+using P3D.Legacy.Server.Domain.Commands.Player;
+using P3D.Legacy.Server.Domain.Events;
+using P3D.Legacy.Server.Domain.Events.Administration;
+using P3D.Legacy.Server.Domain.Events.Player;
+using P3D.Legacy.Server.Domain.Extensions;
 
 using System;
 using System.Net;

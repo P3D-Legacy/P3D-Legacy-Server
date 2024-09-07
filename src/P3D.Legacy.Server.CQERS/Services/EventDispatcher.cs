@@ -1,6 +1,7 @@
 ﻿using OpenTelemetry.Trace;
 
 using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.Domain.Events;
 
 using System;
 using System.Threading;

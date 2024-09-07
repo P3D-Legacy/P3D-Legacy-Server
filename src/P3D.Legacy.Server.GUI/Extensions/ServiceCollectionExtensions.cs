@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.Domain.Extensions;
 using P3D.Legacy.Server.GUI.Services;
 using P3D.Legacy.Server.GUI.Views;
 

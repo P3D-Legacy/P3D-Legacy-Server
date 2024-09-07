@@ -6,7 +6,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common.Monsters;
-using P3D.Legacy.Server.Infrastructure.Models.Monsters;
+using P3D.Legacy.Server.Domain.Entities.Monsters;
+using P3D.Legacy.Server.Domain.Options;
+using P3D.Legacy.Server.Domain.Services;
 using P3D.Legacy.Server.Infrastructure.Options;
 
 using System;

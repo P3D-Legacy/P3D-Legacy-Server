@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
+using P3D.Legacy.Server.Domain.Events;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

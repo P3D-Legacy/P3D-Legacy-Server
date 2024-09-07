@@ -1,7 +1,7 @@
 ﻿using P3D.Legacy.Common.Monsters;
 using P3D.Legacy.Server.Client.P3D.Extensions;
-using P3D.Legacy.Server.Infrastructure;
-using P3D.Legacy.Server.Infrastructure.Models.Monsters;
+using P3D.Legacy.Server.Domain.Entities.Monsters;
+using P3D.Legacy.Server.Domain.Services;
 
 using System;
 using System.Collections.Generic;

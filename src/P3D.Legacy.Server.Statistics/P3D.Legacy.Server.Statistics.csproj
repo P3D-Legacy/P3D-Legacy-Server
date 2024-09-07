@@ -11,11 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+    <PackageReference Include="OpenTelemetry.Api" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\P3D.Legacy.Server.Application\P3D.Legacy.Server.Application.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Domain\P3D.Legacy.Server.Domain.csproj" />
   </ItemGroup>
 
 </Project>

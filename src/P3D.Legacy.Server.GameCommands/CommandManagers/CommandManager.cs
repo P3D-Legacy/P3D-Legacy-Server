@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Events;
-using P3D.Legacy.Server.Application.Queries.Player;
-using P3D.Legacy.Server.CQERS.Commands;
-using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
-using P3D.Legacy.Server.CQERS.Queries;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Commands;
+using P3D.Legacy.Server.Domain.Events;
+using P3D.Legacy.Server.Domain.Events.Administration;
+using P3D.Legacy.Server.Domain.Events.Player;
+using P3D.Legacy.Server.Domain.Extensions;
+using P3D.Legacy.Server.Domain.Queries;
+using P3D.Legacy.Server.Domain.Queries.Player;
 
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.CQERS.Commands;
+using P3D.Legacy.Server.Domain.Commands;
 
 using System;
 using System.Threading;

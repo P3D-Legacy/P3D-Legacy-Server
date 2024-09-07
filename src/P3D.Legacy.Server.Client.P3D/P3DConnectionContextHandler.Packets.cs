@@ -5,12 +5,6 @@ using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.PlayerEvents;
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Events;
-using P3D.Legacy.Server.Application.Commands.Player;
-using P3D.Legacy.Server.Application.Queries.Options;
-using P3D.Legacy.Server.Application.Queries.Player;
-using P3D.Legacy.Server.Application.Queries.World;
 using P3D.Legacy.Server.Client.P3D.Events;
 using P3D.Legacy.Server.Client.P3D.Packets;
 using P3D.Legacy.Server.Client.P3D.Packets.Battle;
@@ -19,7 +13,13 @@ using P3D.Legacy.Server.Client.P3D.Packets.Client;
 using P3D.Legacy.Server.Client.P3D.Packets.Common;
 using P3D.Legacy.Server.Client.P3D.Packets.Server;
 using P3D.Legacy.Server.Client.P3D.Packets.Trade;
-using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Commands.Player;
+using P3D.Legacy.Server.Domain.Events.Player;
+using P3D.Legacy.Server.Domain.Extensions;
+using P3D.Legacy.Server.Domain.Queries.Options;
+using P3D.Legacy.Server.Domain.Queries.Player;
+using P3D.Legacy.Server.Domain.Queries.World;
 
 using System;
 using System.Collections.Immutable;

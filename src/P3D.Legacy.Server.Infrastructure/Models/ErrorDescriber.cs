@@ -1,4 +1,6 @@
-﻿namespace P3D.Legacy.Server.Infrastructure.Models;
+﻿using P3D.Legacy.Server.Domain.Models;
+
+namespace P3D.Legacy.Server.Infrastructure.Models;
 
 internal static class ErrorDescriber
 {

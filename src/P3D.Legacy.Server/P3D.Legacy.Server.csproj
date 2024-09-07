@@ -31,6 +31,7 @@
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
     <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" />
@@ -56,10 +57,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\P3D.Legacy.Common\P3D.Legacy.Common.csproj" />
-    <ProjectReference Include="..\P3D.Legacy.Server.Abstractions\P3D.Legacy.Server.Abstractions.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Connections\P3D.Legacy.Server.Connections.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Application\P3D.Legacy.Server.Application.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.Client.P3D\P3D.Legacy.Server.Client.P3D.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.CommunicationAPI\P3D.Legacy.Server.CommunicationAPI.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.CQERS\P3D.Legacy.Server.CQERS.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.DiscordBot\P3D.Legacy.Server.DiscordBot.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.GameCommands\P3D.Legacy.Server.GameCommands.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.GUI\P3D.Legacy.Server.GUI.csproj" />
@@ -69,7 +71,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="P3D.Legacy.Server.Abstractions.Utils.BuildDateTimeAttribute">
+    <AssemblyAttribute Include="P3D.Legacy.Server.Shared.BuildDateTimeAttribute">
       <_Parameter1>$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>

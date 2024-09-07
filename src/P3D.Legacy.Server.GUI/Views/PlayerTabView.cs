@@ -2,12 +2,12 @@
 
 using NStack;
 
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Events;
-using P3D.Legacy.Server.Application.Commands.Administration;
-using P3D.Legacy.Server.Application.Services;
-using P3D.Legacy.Server.CQERS.Commands;
-using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Commands;
+using P3D.Legacy.Server.Domain.Commands.Administration;
+using P3D.Legacy.Server.Domain.Events;
+using P3D.Legacy.Server.Domain.Events.Player;
+using P3D.Legacy.Server.Domain.Services;
 using P3D.Legacy.Server.GUI.Utils;
 
 using System;
@@ -35,7 +35,7 @@ public sealed class PlayerTabView : View,
     private readonly Button _banButton;
 #pragma warning restore IDISP006
 
-    private readonly PlayerListDataSource _currentPlayers = new(new());
+    private readonly PlayerListDataSource _currentPlayers = new([]);
     private IPlayer? _selectedPlayer;
 
     [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]

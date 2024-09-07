@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
-using P3D.Legacy.Server.Abstractions.Utils;
+using P3D.Legacy.Server.Connections.Utils;
 
 using System;
 using System.Diagnostics.CodeAnalysis;

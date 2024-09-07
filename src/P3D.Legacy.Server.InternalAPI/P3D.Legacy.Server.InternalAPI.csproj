@@ -1,5 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <!-- Controllers don't support trimming -->
+    <IsTrimmable>false</IsTrimmable>
+  </PropertyGroup>
+  
   <ItemGroup>
     <AssemblyAttribute Include="CLSCompliantAttribute">
       <_Parameter1>false</_Parameter1>
@@ -16,8 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\P3D.Legacy.Server.Abstractions\P3D.Legacy.Server.Abstractions.csproj" />
-    <ProjectReference Include="..\P3D.Legacy.Server.Infrastructure\P3D.Legacy.Server.Infrastructure.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Domain\P3D.Legacy.Server.Domain.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.UI.Shared\P3D.Legacy.Server.UI.Shared.csproj" />
   </ItemGroup>
 

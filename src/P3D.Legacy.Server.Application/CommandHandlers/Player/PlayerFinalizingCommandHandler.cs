@@ -1,10 +1,11 @@
-﻿using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Events;
-using P3D.Legacy.Server.Application.Commands.Player;
-using P3D.Legacy.Server.Application.Services;
-using P3D.Legacy.Server.CQERS.Commands;
-using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
+﻿using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Commands;
+using P3D.Legacy.Server.Domain.Commands.Player;
+using P3D.Legacy.Server.Domain.Events;
+using P3D.Legacy.Server.Domain.Events.Player;
+using P3D.Legacy.Server.Domain.Extensions;
+using P3D.Legacy.Server.Domain.Services;
 
 using System;
 using System.Diagnostics;

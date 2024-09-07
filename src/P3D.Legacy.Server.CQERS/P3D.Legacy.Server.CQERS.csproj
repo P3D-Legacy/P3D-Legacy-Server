@@ -14,4 +14,8 @@
     <PackageReference Include="OpenTelemetry.Api" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\P3D.Legacy.Server.Domain\P3D.Legacy.Server.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

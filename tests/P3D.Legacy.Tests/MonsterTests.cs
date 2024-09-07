@@ -8,6 +8,8 @@ using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Client.P3D.Data.P3DDatas;
 using P3D.Legacy.Server.Client.P3D.Extensions;
 using P3D.Legacy.Server.Client.P3D.Services;
+using P3D.Legacy.Server.Domain.Options;
+using P3D.Legacy.Server.Domain.Services;
 using P3D.Legacy.Server.Infrastructure;
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Tests.Utils;

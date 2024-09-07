@@ -11,15 +11,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="OpenTelemetry.Api" />
     <PackageReference Include="Polly.Extensions.Http" />
     <PackageReference Include="Nerdbank.Streams" />
     <PackageReference Include="RateLimiter" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\P3D.Legacy.Common\P3D.Legacy.Common.csproj" />
-    <ProjectReference Include="..\P3D.Legacy.Server.Abstractions\P3D.Legacy.Server.Abstractions.csproj" />
-    <ProjectReference Include="..\P3D.Legacy.Server.Infrastructure\P3D.Legacy.Server.Infrastructure.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Connections\P3D.Legacy.Server.Connections.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Domain\P3D.Legacy.Server.Domain.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Shared\P3D.Legacy.Server.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Hosting;
 
-using P3D.Legacy.Server.Abstractions.Events;
-using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.Domain.Events;
+using P3D.Legacy.Server.Domain.Events.Administration;
+using P3D.Legacy.Server.Domain.Extensions;
+using P3D.Legacy.Server.Shared;
 
 using System.Threading;
 using System.Threading.Tasks;

@@ -1,4 +1,4 @@
-﻿using P3D.Legacy.Server.CQERS.Queries;
+﻿using P3D.Legacy.Server.Domain.Queries;
 
 using System.Threading;
 using System.Threading.Tasks;

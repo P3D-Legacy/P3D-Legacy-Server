@@ -10,7 +10,9 @@ using P3D.Legacy.Server.Application.QueryHandlers.Permission;
 using P3D.Legacy.Server.Application.QueryHandlers.Player;
 using P3D.Legacy.Server.Application.QueryHandlers.World;
 using P3D.Legacy.Server.Application.Services;
-using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.Connections.Services;
+using P3D.Legacy.Server.Domain.Extensions;
+using P3D.Legacy.Server.Domain.Services;
 
 namespace P3D.Legacy.Server.Application.Extensions;
 

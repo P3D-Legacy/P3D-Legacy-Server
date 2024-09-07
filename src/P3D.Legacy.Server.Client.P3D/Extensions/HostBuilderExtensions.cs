@@ -9,8 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using P3D.Legacy.Server.Application.Extensions;
 using P3D.Legacy.Server.Client.P3D.Options;
+using P3D.Legacy.Server.Connections.Extensions;
 
 using RateLimiter;
 

@@ -23,7 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\P3D.Legacy.Server.Application\P3D.Legacy.Server.Application.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Domain\P3D.Legacy.Server.Domain.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Shared\P3D.Legacy.Server.Shared.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Server.UI.Shared\P3D.Legacy.Server.UI.Shared.csproj" />
   </ItemGroup>
 

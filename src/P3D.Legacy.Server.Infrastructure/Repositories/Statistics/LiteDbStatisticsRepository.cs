@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Server.Infrastructure.Models.Statistics;
+using P3D.Legacy.Server.Domain.Entities.Statistics;
 using P3D.Legacy.Server.Infrastructure.Options;
 
 using System;

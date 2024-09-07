@@ -8,16 +8,17 @@ using Moq;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Options;
-using P3D.Legacy.Server.Application.Queries.Options;
-using P3D.Legacy.Server.Application.Queries.Player;
 using P3D.Legacy.Server.Client.P3D;
 using P3D.Legacy.Server.Client.P3D.Packets.Client;
 using P3D.Legacy.Server.Client.P3D.Packets.Server;
-using P3D.Legacy.Server.CQERS.Commands;
 using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Queries;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Commands;
+using P3D.Legacy.Server.Domain.Events;
+using P3D.Legacy.Server.Domain.Options;
+using P3D.Legacy.Server.Domain.Queries;
+using P3D.Legacy.Server.Domain.Queries.Options;
+using P3D.Legacy.Server.Domain.Queries.Player;
 
 using System;
 using System.Collections.Immutable;

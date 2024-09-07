@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using P3D.Legacy.Server.Domain.Events;
+
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace P3D.Legacy.Server.CQERS.Events;

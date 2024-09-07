@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Application.Services;
+using P3D.Legacy.Server.Connections.Services;
 
 using System;
 using System.Threading.Tasks;

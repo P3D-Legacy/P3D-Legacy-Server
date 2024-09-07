@@ -1,4 +1,6 @@
-﻿namespace P3D.Legacy.Server.CQERS.Events;
+﻿using P3D.Legacy.Server.Domain.Events;
+
+namespace P3D.Legacy.Server.CQERS.Events;
 
 public class NullReceiveContext<TEvent> : IReceiveContext<TEvent> where TEvent : IEvent
 {

@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Common.Data;
-using P3D.Legacy.Server.Application.Queries.World;
 using P3D.Legacy.Server.Application.Services;
-using P3D.Legacy.Server.CQERS.Queries;
+using P3D.Legacy.Server.Domain.Queries;
+using P3D.Legacy.Server.Domain.Queries.World;
 
 using System;
 using System.Diagnostics.CodeAnalysis;

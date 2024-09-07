@@ -17,11 +17,10 @@
     <PackageReference Include="LiteDB" />
     <PackageReference Include="LiteDB.Async" />
     <PackageReference Include="OpenTelemetry.Api" />
-    <PackageReference Include="System.Text.Encodings.Web" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\P3D.Legacy.Server.Abstractions\P3D.Legacy.Server.Abstractions.csproj" />
+    <ProjectReference Include="..\P3D.Legacy.Server.Domain\P3D.Legacy.Server.Domain.csproj" />
     <ProjectReference Include="..\P3D.Legacy.Site.API\P3D.Legacy.Site.API.csproj" />
   </ItemGroup>
 

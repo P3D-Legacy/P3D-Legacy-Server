@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Application.Commands.Player;
-using P3D.Legacy.Server.CQERS.Commands;
-using P3D.Legacy.Server.Infrastructure.Repositories.Mutes;
+using P3D.Legacy.Server.Domain.Commands;
+using P3D.Legacy.Server.Domain.Commands.Player;
+using P3D.Legacy.Server.Domain.Repositories;
 
 using System;
 using System.Diagnostics.CodeAnalysis;

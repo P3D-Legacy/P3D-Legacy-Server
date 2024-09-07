@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Client.P3D.EventHandlers;
 using P3D.Legacy.Server.Client.P3D.Packets;
 using P3D.Legacy.Server.Client.P3D.Services;
-using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.Domain.Extensions;
+using P3D.Legacy.Server.Domain.Services;
 
 using System.Linq;
 

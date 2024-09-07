@@ -1,7 +1,7 @@
 ﻿using P3D.Legacy.Common;
-using P3D.Legacy.Server.Abstractions;
 using P3D.Legacy.Server.Client.P3D.Data.P3DDatas;
-using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Events;
 
 namespace P3D.Legacy.Server.Client.P3D.Events;
 

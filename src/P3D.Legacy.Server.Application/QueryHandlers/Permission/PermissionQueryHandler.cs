@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Queries.Permission;
-using P3D.Legacy.Server.CQERS.Queries;
-using P3D.Legacy.Server.Infrastructure.Repositories.Permissions;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Queries;
+using P3D.Legacy.Server.Domain.Queries.Permission;
+using P3D.Legacy.Server.Domain.Repositories;
 
 using System;
 using System.Diagnostics.CodeAnalysis;

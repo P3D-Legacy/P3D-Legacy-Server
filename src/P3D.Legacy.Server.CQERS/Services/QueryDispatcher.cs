@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.CQERS.Queries;
+using P3D.Legacy.Server.Domain.Queries;
 
 using System;
 using System.Collections.Concurrent;

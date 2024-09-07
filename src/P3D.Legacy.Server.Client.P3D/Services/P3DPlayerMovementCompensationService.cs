@@ -3,10 +3,10 @@ using Microsoft.Extensions.Logging;
 
 using OpenTelemetry.Trace;
 
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Events;
-using P3D.Legacy.Server.Application.Services;
-using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Events;
+using P3D.Legacy.Server.Domain.Events.Player;
+using P3D.Legacy.Server.Domain.Services;
 
 using RateLimiter;
 

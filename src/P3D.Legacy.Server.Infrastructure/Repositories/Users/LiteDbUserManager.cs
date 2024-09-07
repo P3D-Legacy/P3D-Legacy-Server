@@ -9,8 +9,11 @@ using Microsoft.Extensions.Options;
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common;
+using P3D.Legacy.Server.Domain.Entities.Users;
+using P3D.Legacy.Server.Domain.Models;
+using P3D.Legacy.Server.Domain.Options;
+using P3D.Legacy.Server.Domain.Repositories;
 using P3D.Legacy.Server.Infrastructure.Models;
-using P3D.Legacy.Server.Infrastructure.Models.Users;
 using P3D.Legacy.Server.Infrastructure.Options;
 
 using System;

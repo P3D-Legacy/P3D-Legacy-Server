@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.Domain.Extensions;
 using P3D.Legacy.Server.GameCommands.CommandManagers;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Chat;
 using P3D.Legacy.Server.GameCommands.CommandManagers.Permission;

@@ -3,10 +3,10 @@
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Infrastructure.Models.Bans;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Entities.Bans;
+using P3D.Legacy.Server.Domain.Entities.Permissions;
 using P3D.Legacy.Server.Infrastructure.Models.P3D;
-using P3D.Legacy.Server.Infrastructure.Models.Permissions;
 
 using System;
 using System.Collections.Generic;
@@ -64,7 +64,7 @@ internal sealed partial class Pokemon3DAPIClient
                     permissions &= ~PermissionTypes.UnVerified;
                     permissions |= PermissionTypes.User;
 
-                    foreach (var permissionDto in user.Roles?.SelectMany(static x => x.Permissions) ?? Enumerable.Empty<PermissionDTO>())
+                    foreach (var permissionDto in user.Roles?.SelectMany(static x => x.Permissions) ?? [])
                     {
                         if (permissionDto.Name.Equals("gameserver.debug", StringComparison.OrdinalIgnoreCase))
                             permissions |= PermissionTypes.Debug;

@@ -5,8 +5,8 @@ using Discord.WebSocket;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using P3D.Legacy.Server.CQERS.Extensions;
 using P3D.Legacy.Server.DiscordBot.BackgroundServices;
+using P3D.Legacy.Server.Domain.Extensions;
 
 namespace P3D.Legacy.Server.DiscordBot.Extensions;
 

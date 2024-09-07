@@ -1,4 +1,4 @@
-﻿using P3D.Legacy.Server.Abstractions.Configuration;
+﻿using P3D.Legacy.Server.Domain.Services;
 
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ public sealed class SettingsTabView : View
     };
 
     [SuppressMessage("IDisposableAnalyzers.Correctness", "IDISP001:Dispose created")]
-    public SettingsTabView(DynamicConfigurationProviderManager dynamicConfigurationProvider)
+    public SettingsTabView(IDynamicConfigurationProviderManager dynamicConfigurationProvider)
     {
         Width = Dim.Fill();
         Height = Dim.Fill();

@@ -3,7 +3,7 @@
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Server.Infrastructure.Models.Permissions;
+using P3D.Legacy.Server.Domain.Entities.Permissions;
 
 using System;
 using System.Threading;

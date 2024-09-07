@@ -3,10 +3,11 @@
 using NStack;
 
 using P3D.Legacy.Common.PlayerEvents;
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Abstractions.Events;
-using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Extensions;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Events;
+using P3D.Legacy.Server.Domain.Events.Administration;
+using P3D.Legacy.Server.Domain.Events.Player;
+using P3D.Legacy.Server.Domain.Extensions;
 
 using System;
 using System.Diagnostics.CodeAnalysis;

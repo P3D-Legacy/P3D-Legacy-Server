@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions.Events;
-using P3D.Legacy.Server.CQERS.Events;
+using P3D.Legacy.Server.Domain.Events;
+using P3D.Legacy.Server.Domain.Events.Player;
 
 using System;
 using System.Diagnostics.CodeAnalysis;

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.GUI.Views;
+using P3D.Legacy.Server.Shared;
 
 using System;
 using System.Threading;

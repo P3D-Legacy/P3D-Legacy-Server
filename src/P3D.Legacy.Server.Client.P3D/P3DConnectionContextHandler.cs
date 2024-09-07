@@ -5,14 +5,15 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Trace;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Commands.Player;
-using P3D.Legacy.Server.Application.Services;
 using P3D.Legacy.Server.Client.P3D.Packets.Client;
 using P3D.Legacy.Server.Client.P3D.Services;
-using P3D.Legacy.Server.CQERS.Commands;
-using P3D.Legacy.Server.CQERS.Events;
-using P3D.Legacy.Server.CQERS.Queries;
+using P3D.Legacy.Server.Connections.Services;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Commands;
+using P3D.Legacy.Server.Domain.Commands.Player;
+using P3D.Legacy.Server.Domain.Events;
+using P3D.Legacy.Server.Domain.Queries;
+using P3D.Legacy.Server.Domain.Services;
 
 using System;
 using System.Diagnostics;

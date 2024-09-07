@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.Abstractions.Utils;
-using P3D.Legacy.Server.Application.Queries.Player;
-using P3D.Legacy.Server.CQERS.Queries;
-using P3D.Legacy.Server.Infrastructure.Repositories.Statistics;
+using P3D.Legacy.Server.Domain.Queries;
+using P3D.Legacy.Server.Domain.Queries.Player;
+using P3D.Legacy.Server.Domain.Repositories;
+using P3D.Legacy.Server.Shared;
 using P3D.Legacy.Server.UI.Shared.Models;
 
 using System;

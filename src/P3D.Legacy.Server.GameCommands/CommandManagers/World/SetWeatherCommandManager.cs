@@ -1,6 +1,6 @@
 ﻿using P3D.Legacy.Common.Data;
-using P3D.Legacy.Server.Abstractions;
-using P3D.Legacy.Server.Application.Commands.World;
+using P3D.Legacy.Server.Domain;
+using P3D.Legacy.Server.Domain.Commands.World;
 
 using System;
 using System.Collections.Generic;

@@ -20,12 +20,11 @@ public sealed class ServerUI : Toplevel
         tabView.AddTab(new TabView.Tab("Settings", settingsTabView), andSelect: false);
         win.Add(tabView);
 
-        var statusBar = new StatusBar(new StatusItem[]
-        {
-                new(Key.F1, "~F1~ Help", static () => MessageBox.Query(50, 7, "Help", "Helping", "Ok")),
-                new(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => OnStop?.Invoke(this, EventArgs.Empty)),
-                new(Key.Null, Terminal.Gui.Application.Driver.GetType().Name, null)
-        });
+        var statusBar = new StatusBar([
+            new(Key.F1, "~F1~ Help", static () => MessageBox.Query(50, 7, "Help", "Helping", "Ok")),
+            new(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => OnStop?.Invoke(this, EventArgs.Empty)),
+            new(Key.Null, Terminal.Gui.Application.Driver.GetType().Name, null)
+        ]);
 
         Add(win, statusBar);
     }

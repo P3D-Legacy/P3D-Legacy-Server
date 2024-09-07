@@ -2,8 +2,8 @@
 
 using P3D.Legacy.Server.CQERS.Behaviours.Command;
 using P3D.Legacy.Server.CQERS.Behaviours.Query;
-using P3D.Legacy.Server.CQERS.Commands;
-using P3D.Legacy.Server.CQERS.Queries;
+using P3D.Legacy.Server.Domain.Commands;
+using P3D.Legacy.Server.Domain.Queries;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;

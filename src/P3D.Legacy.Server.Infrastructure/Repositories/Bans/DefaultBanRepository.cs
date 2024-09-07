@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common;
-using P3D.Legacy.Server.Infrastructure.Models.Bans;
+using P3D.Legacy.Server.Domain.Entities.Bans;
+using P3D.Legacy.Server.Domain.Repositories;
 using P3D.Legacy.Server.Infrastructure.Options;
 
 using System;

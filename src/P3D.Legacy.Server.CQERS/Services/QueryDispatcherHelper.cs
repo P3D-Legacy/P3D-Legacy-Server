@@ -1,5 +1,5 @@
 ﻿using P3D.Legacy.Server.CQERS.Behaviours.Query;
-using P3D.Legacy.Server.CQERS.Queries;
+using P3D.Legacy.Server.Domain.Queries;
 
 using System;
 using System.Collections.Generic;

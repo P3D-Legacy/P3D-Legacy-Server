@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Server.CQERS.Queries;
+using P3D.Legacy.Server.Domain.Queries;
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
