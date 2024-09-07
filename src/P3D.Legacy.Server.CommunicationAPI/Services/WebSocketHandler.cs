@@ -113,7 +113,11 @@ public sealed partial class WebSocketHandler :
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, ct);
         var ct2 = cts.Token;
 
-        await _webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, ct2);
+        try
+        {
+            await _webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, ct2);
+        }
+        catch (OperationCanceledException) { }
     }
 
     private async Task CloseAsync(WebSocketCloseStatus closeStatus, string? statusDescription, CancellationToken ct)
@@ -122,7 +126,11 @@ public sealed partial class WebSocketHandler :
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, ct);
         var ct2 = cts.Token;
 
-        await _webSocket.CloseAsync(closeStatus, statusDescription, ct2);
+        try
+        {
+            await _webSocket.CloseAsync(closeStatus, statusDescription, ct2);
+        }
+        catch (OperationCanceledException) { }
     }
 
     public async Task ListenAsync(CancellationToken ct)
@@ -143,6 +151,7 @@ public sealed partial class WebSocketHandler :
                     await ProcessPayloadAsync(payload, ct2);
             }
         }
+        catch (OperationCanceledException) { }
         catch (WebSocketException e) when (e.WebSocketErrorCode == WebSocketError.ConnectionClosedPrematurely) { }
     }
 

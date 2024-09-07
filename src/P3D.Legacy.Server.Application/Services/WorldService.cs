@@ -97,7 +97,7 @@ public class WorldService : LongRunningBackgroundService
                 }, ct);
             }
         }
-        catch (Exception e) when (e is TaskCanceledException or OperationCanceledException) { }
+        catch (OperationCanceledException) { }
         catch (Exception e)
         {
             _logger.LogError(e, "Exception!");

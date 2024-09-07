@@ -49,7 +49,7 @@ internal sealed partial class Pokemon3DAPIClient
                 HttpCompletionOption.ResponseHeadersRead,
                 ct);
         }
-        catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
+        catch (Exception e) when (e is OperationCanceledException or HttpRequestException)
         {
             return new PermissionEntity(permissions);
         }
@@ -108,7 +108,7 @@ internal sealed partial class Pokemon3DAPIClient
                 HttpCompletionOption.ResponseHeadersRead,
                 ct);
         }
-        catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
+        catch (Exception e) when (e is OperationCanceledException or HttpRequestException)
         {
             return null;
         }
@@ -153,7 +153,7 @@ internal sealed partial class Pokemon3DAPIClient
                     new Uri("ban/gamejoltaccount", UriKind.Relative),
                     new TextReasonBanRequest(id.GameJoltIdOrNone.Value, reason, expiration, bannerId.GameJoltIdOrNone.Value), _jsonContext.TextReasonBanRequest, ct);
         }
-        catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
+        catch (Exception e) when (e is OperationCanceledException or HttpRequestException)
         {
             return false;
         }
@@ -190,7 +190,7 @@ internal sealed partial class Pokemon3DAPIClient
                     new Uri($"ban/gamejoltaccount/{currentBan.Uid}", UriKind.Relative),
                     ct);
             }
-            catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
+            catch (Exception e) when (e is OperationCanceledException or HttpRequestException)
             {
                 return false;
             }
@@ -222,7 +222,7 @@ internal sealed partial class Pokemon3DAPIClient
                 HttpCompletionOption.ResponseHeadersRead,
                 ct);
         }
-        catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
+        catch (Exception e) when (e is OperationCanceledException or HttpRequestException)
         {
             return null;
         }
@@ -257,7 +257,7 @@ internal sealed partial class Pokemon3DAPIClient
                 HttpCompletionOption.ResponseHeadersRead,
                 ct);
         }
-        catch (Exception e) when (e is TaskCanceledException or HttpRequestException)
+        catch (Exception e) when (e is OperationCanceledException or HttpRequestException)
         {
             return null;
         }

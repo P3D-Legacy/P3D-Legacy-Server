@@ -119,7 +119,6 @@ internal sealed partial class P3DConnectionContextHandler : ConnectionContextHan
                 }
             }
         }
-        catch (TaskCanceledException) { }
         catch (OperationCanceledException) { }
         catch (Exception e)
         {

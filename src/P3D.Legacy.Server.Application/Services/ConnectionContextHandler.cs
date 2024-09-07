@@ -36,7 +36,7 @@ public abstract class ConnectionContextHandler : IDisposable
     public async Task ListenAsync()
     {
         try { await (_executingTask ?? Task.CompletedTask); }
-        catch (Exception e) when (e is TaskCanceledException or OperationCanceledException) { }
+        catch (Exception e) when (e is OperationCanceledException or OperationCanceledException) { }
     }
 
     public virtual async Task StopAsync(CancellationToken ct)

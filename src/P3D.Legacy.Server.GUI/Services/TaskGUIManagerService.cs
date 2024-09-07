@@ -48,6 +48,7 @@ public sealed class TaskGUIManagerService : LongRunningBackgroundService
             Terminal.Gui.Application.End(runState);
             serverUI.OnStop -= OnServerUIOnOnStop;
         }
+        catch (OperationCanceledException) { }
         catch (Exception e)
         {
             _logger.LogError(e, "UI Error!");
@@ -71,7 +72,7 @@ public sealed class TaskGUIManagerService : LongRunningBackgroundService
                 if (string.Equals(result, "/uimode", StringComparison.Ordinal)) await LoopAsync(ct).ConfigureAwait(false);
             }
         }
-        catch (Exception e) when (e is TaskCanceledException or OperationCanceledException) { }
+        catch (OperationCanceledException) { }
         catch (Exception e)
         {
             _logger.LogError(e, "Exception!");
