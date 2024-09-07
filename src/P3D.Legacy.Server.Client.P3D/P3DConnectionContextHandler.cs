@@ -1,7 +1,6 @@
 ﻿using Bedrock.Framework.Protocols;
 
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.Threading;
 
 using OpenTelemetry.Trace;
 
@@ -132,23 +131,20 @@ internal sealed partial class P3DConnectionContextHandler : ConnectionContextHan
         await _finalizationDelayer.Task.WaitAsync(TimeSpan.FromSeconds(5), ct);
     }
 
-    protected override void OnConnectionClosed(ConnectionContextHandler connectionContextHandler)
+    protected override async Task OnConnectionClosedAsync(ConnectionContextHandler connectionContextHandler)
     {
         if (connectionContextHandler is not P3DConnectionContextHandler connection) return;
 
         using var finishSpan = connection._tracer.StartActiveSpan("P3D Client Closing", SpanKind.Internal, parentSpan: connection._connectionSpan);
         var oldState = connection.State;
         connection.State = PlayerState.Finalizing;
-        if (oldState ==
-            PlayerState.Initialized) // If the sever initialized the player, make others aware of finalization
+        if (oldState == PlayerState.Initialized) // If the sever initialized the player, make others aware of finalization
         {
             // Start finalization. Here it should complete _finalizationDelayer.
             async Task<CommandResult> FinalizeAsync() =>
-                await connection._commandDispatcher.DispatchAsync(new PlayerFinalizingCommand(connection),
-                    CancellationToken.None);
+                await connection._commandDispatcher.DispatchAsync(new PlayerFinalizingCommand(connection), CancellationToken.None);
 
-            using var jctx = new JoinableTaskContext(); // Should I create it here or in the main method?
-            new JoinableTaskFactory(jctx).Run(FinalizeAsync);
+            await FinalizeAsync();
         }
 
         connection.State = PlayerState.Finalized;

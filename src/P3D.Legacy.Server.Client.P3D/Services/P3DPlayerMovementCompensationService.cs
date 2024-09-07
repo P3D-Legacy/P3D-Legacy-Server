@@ -59,8 +59,8 @@ internal class P3DPlayerMovementCompensationService : BackgroundService
                     .Where(static x => x.Skip(1).Any());
 
                 foreach (var players in playersInLevel)
-                foreach (var player in players.Where(static x => x.Moving).OfType<IPlayer>())
-                    await _eventDispatcher.DispatchAsync(new PlayerUpdatedStateEvent(player), DispatchStrategy.ParallelNoWait, trace: false, ct);
+                    foreach (var player in players.Where(static x => x.Moving).OfType<IPlayer>())
+                        await _eventDispatcher.DispatchAsync(new PlayerUpdatedStateEvent(player), DispatchStrategy.ParallelNoWait, trace: false, ct);
             }, ct);
         }
     }

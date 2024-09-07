@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bedrock.Framework" />
     <PackageReference Include="Polly.Extensions.Http" />
     <PackageReference Include="Nerdbank.Streams" />
     <PackageReference Include="RateLimiter" />

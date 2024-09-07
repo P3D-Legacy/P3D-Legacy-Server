@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bedrock.Framework" />
     <PackageReference Include="GitInfo" />
     <PackageReference Include="Nerdbank.Streams" />
     <PackageReference Include="OpenTelemetry.Api" />

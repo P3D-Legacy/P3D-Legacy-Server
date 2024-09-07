@@ -2,8 +2,6 @@
   <ItemGroup>
     <PackageVersion Include="Aragas.Coroutines" Version="1.0.0.1" />
     <PackageVersion Include="Aragas.Extensions.Options.FluentValidation" Version="1.1.0.14" />
-    <PackageVersion Include="Bedrock.Framework" Version="0.1.63-alpha.gf69fa1b135" />
-    <PackageVersion Include="Bedrock.Framework.Experimental" Version="0.1.63-alpha.gf69fa1b135" />
     <PackageVersion Include="BetterHostedServices" Version="2.0.3" />
     <PackageVersion Include="Discord.Net.WebSocket" Version="3.15.3" />
     <PackageVersion Include="Extensions.Logging.NUnit" Version="1.0.1" />
@@ -23,8 +21,6 @@
     <PackageVersion Include="Microsoft.Extensions.Http.Polly" Version="8.0.8" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="17.11.20" />
-    <PackageVersion Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20" />
     <PackageVersion Include="Moq" Version="4.20.71" />
     <PackageVersion Include="NUnit" Version="4.2.2" />
     <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />

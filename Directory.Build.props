@@ -34,8 +34,6 @@
     <PackageReference Include="IDisposableAnalyzers" />
     <PackageReference Include="Meziantou.Analyzer" />
     <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" />
     <PackageReference Include="ReflectionAnalyzers" />
   </ItemGroup>
 
