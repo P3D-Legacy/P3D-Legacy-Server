@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Pipelines;
 using System.Threading;
@@ -86,25 +87,29 @@ public sealed class ProtocolReader : IAsyncDisposable
         return new ValueTask<ProtocolReadResult<TReadMessage?>>(new ProtocolReadResult<TReadMessage?>(default, _isCanceled, _isCompleted));
     }
 
-    private async ValueTask<ProtocolReadResult<TReadMessage?>> DoAsyncReadAsync<TReadMessage>(int? maximumMessageSize, IMessageReader<TReadMessage> reader, CancellationToken cancellationToken)
+    private ValueTask<ProtocolReadResult<TReadMessage?>> DoAsyncReadAsync<TReadMessage>(int? maximumMessageSize, IMessageReader<TReadMessage> reader, CancellationToken ct)
     {
         while (true)
         {
-            var readTask = _reader.ReadAsync(cancellationToken);
+            var readTask = _reader.ReadAsync(ct);
             ReadResult result;
             if (readTask.IsCompletedSuccessfully)
             {
-                result = await readTask;
+#pragma warning disable VSTHRD103
+#pragma warning disable MA0042
+                result = readTask.Result;
+#pragma warning restore MA0042
+#pragma warning restore VSTHRD103
             }
             else
             {
-                return await ContinueDoAsyncReadAsync(readTask, maximumMessageSize, reader, cancellationToken);
+                return ContinueDoAsyncReadAsync(readTask, maximumMessageSize, reader, ct);
             }
 
             var (shouldContinue, hasMessage) = TrySetMessage(result, maximumMessageSize, reader, out var protocolReadResult);
             if (hasMessage)
             {
-                return await new ValueTask<ProtocolReadResult<TReadMessage?>>(protocolReadResult);
+                return new ValueTask<ProtocolReadResult<TReadMessage?>>(protocolReadResult);
             }
 
             if (!shouldContinue)
@@ -113,10 +118,10 @@ public sealed class ProtocolReader : IAsyncDisposable
             }
         }
 
-        return await new ValueTask<ProtocolReadResult<TReadMessage?>>(new ProtocolReadResult<TReadMessage?>(default, _isCanceled, _isCompleted));
+        return new ValueTask<ProtocolReadResult<TReadMessage?>>(new ProtocolReadResult<TReadMessage?>(default, _isCanceled, _isCompleted));
     }
 
-    private async ValueTask<ProtocolReadResult<TReadMessage?>> ContinueDoAsyncReadAsync<TReadMessage>(ValueTask<ReadResult> readTask, int? maximumMessageSize, IMessageReader<TReadMessage> reader, CancellationToken cancellationToken)
+    private async ValueTask<ProtocolReadResult<TReadMessage?>> ContinueDoAsyncReadAsync<TReadMessage>(ValueTask<ReadResult> readTask, int? maximumMessageSize, IMessageReader<TReadMessage> reader, CancellationToken ct)
     {
         while (true)
         {
@@ -133,7 +138,7 @@ public sealed class ProtocolReader : IAsyncDisposable
                 break;
             }
 
-            readTask = _reader.ReadAsync(cancellationToken);
+            readTask = _reader.ReadAsync(ct);
         }
 
         return new ProtocolReadResult<TReadMessage?>(default, _isCanceled, _isCompleted);
@@ -185,7 +190,7 @@ public sealed class ProtocolReader : IAsyncDisposable
         return (true, false);
     }
 
-    private bool TryParseMessage<TReadMessage>(int? maximumMessageSize, IMessageReader<TReadMessage> reader, in ReadOnlySequence<byte> buffer, out TReadMessage protocolMessage)
+    private bool TryParseMessage<TReadMessage>(int? maximumMessageSize, IMessageReader<TReadMessage> reader, in ReadOnlySequence<byte> buffer, [NotNullWhen(true)] out TReadMessage? protocolMessage)
     {
         // No message limit, just parse and dispatch
         if (maximumMessageSize == null)

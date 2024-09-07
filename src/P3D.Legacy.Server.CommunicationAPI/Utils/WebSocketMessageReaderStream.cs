@@ -48,7 +48,7 @@ internal class WebSocketMessageReaderStream : Stream, IDisposableObservable
     /// <returns>A completed task.</returns>
     public override Task FlushAsync(CancellationToken ct) => Task.CompletedTask;
 
-    public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+    public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken ct = default)
     {
         Verify.NotDisposed(this);
 
@@ -57,7 +57,7 @@ internal class WebSocketMessageReaderStream : Stream, IDisposableObservable
             return 0;
         }
 
-        var result = await _webSocket.ReceiveAsync(buffer, cancellationToken);
+        var result = await _webSocket.ReceiveAsync(buffer, ct);
         _endOfMessageReceived = result.EndOfMessage;
         _messageSize += result.Count;
         return result.Count;

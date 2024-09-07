@@ -2,12 +2,12 @@
 
 using Microsoft.Extensions.Logging;
 
-using P3D.Legacy.Common;
 using P3D.Legacy.Server.Client.P3D.Extensions;
 using P3D.Legacy.Server.Client.P3D.Packets;
 
 using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace P3D.Legacy.Server.Client.P3D;
@@ -41,7 +41,7 @@ public sealed partial class P3DProtocol : IMessageReader<P3DPacket?>, IMessageWr
         _packetFactory = packetFactory ?? throw new ArgumentNullException(nameof(packetFactory));
     }
 
-    public bool TryParseMessage(in ReadOnlySequence<byte> input, ref SequencePosition consumed, ref SequencePosition examined, out P3DPacket? message)
+    public bool TryParseMessage(in ReadOnlySequence<byte> input, ref SequencePosition consumed, ref SequencePosition examined, [NotNullWhen(true)] out P3DPacket? message)
     {
         var reader = new SequenceReader<byte>(input);
         if (!reader.TryReadTo(out ReadOnlySequence<byte> line, NewLine))

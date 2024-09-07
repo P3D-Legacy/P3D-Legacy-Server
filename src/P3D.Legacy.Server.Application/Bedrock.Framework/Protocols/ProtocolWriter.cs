@@ -22,9 +22,9 @@ public sealed class ProtocolWriter : IAsyncDisposable
         _semaphore = new SemaphoreSlim(1);
     }
 
-    public async ValueTask WriteAsync<TWriteMessage>(IMessageWriter<TWriteMessage> writer, TWriteMessage protocolMessage, CancellationToken cancellationToken = default)
+    public async ValueTask WriteAsync<TWriteMessage>(IMessageWriter<TWriteMessage> writer, TWriteMessage protocolMessage, CancellationToken ct = default)
     {
-        await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+        await _semaphore.WaitAsync(ct).ConfigureAwait(false);
 
         try
         {
@@ -35,7 +35,7 @@ public sealed class ProtocolWriter : IAsyncDisposable
 
             writer.WriteMessage(protocolMessage, _writer);
 
-            var result = await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+            var result = await _writer.FlushAsync(ct).ConfigureAwait(false);
 
             if (result.IsCanceled)
             {
@@ -53,9 +53,9 @@ public sealed class ProtocolWriter : IAsyncDisposable
         }
     }
 
-    public async ValueTask WriteManyAsync<TWriteMessage>(IMessageWriter<TWriteMessage> writer, IEnumerable<TWriteMessage> protocolMessages, CancellationToken cancellationToken = default)
+    public async ValueTask WriteManyAsync<TWriteMessage>(IMessageWriter<TWriteMessage> writer, IEnumerable<TWriteMessage> protocolMessages, CancellationToken ct = default)
     {
-        await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+        await _semaphore.WaitAsync(ct).ConfigureAwait(false);
 
         try
         {
@@ -69,7 +69,7 @@ public sealed class ProtocolWriter : IAsyncDisposable
                 writer.WriteMessage(protocolMessage, _writer);
             }
 
-            var result = await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+            var result = await _writer.FlushAsync(ct).ConfigureAwait(false);
 
             if (result.IsCanceled)
             {
@@ -84,7 +84,6 @@ public sealed class ProtocolWriter : IAsyncDisposable
         finally
         {
             _semaphore.Release();
-            _semaphore.Dispose();
         }
     }
 

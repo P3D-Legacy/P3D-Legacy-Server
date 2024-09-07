@@ -124,7 +124,8 @@ internal partial class P3DConnectionContextHandler
         }
         // Catch Writing is not allowed after writer was completed.
         // We can't catch it in worst case scenarios
-        catch (Exception ex) when (ex is InvalidOperationException) { }
+        catch (InvalidOperationException) { }
+        catch (OperationCanceledException) when (cts.IsCancellationRequested) { }
     }
 
     private async Task SendServerMessageAsync(string text, CancellationToken ct) => await SendPacketAsync(new ChatMessageGlobalPacket

@@ -64,7 +64,7 @@ internal sealed partial class DiscordPassthroughService : IHostedService, IDispo
         _applicationEnder.ShutDownApplication();
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken ct)
     {
         // Store the task we're executing
         _executingTask = Task.Factory.StartNew(() => ExecuteAsync(_stoppingCts.Token), _stoppingCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
@@ -98,7 +98,7 @@ internal sealed partial class DiscordPassthroughService : IHostedService, IDispo
         }
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken ct)
     {
         // Stop called without start
         if (_executingTask == null)
@@ -115,7 +115,7 @@ internal sealed partial class DiscordPassthroughService : IHostedService, IDispo
         {
             // Wait until the task completes or the stop token triggers
 #pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
-            await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, cancellationToken));
+            await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, ct));
 #pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
         }
     }

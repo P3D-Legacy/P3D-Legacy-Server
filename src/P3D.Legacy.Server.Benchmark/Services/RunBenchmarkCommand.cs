@@ -35,7 +35,7 @@ public class RunBenchmarkCommand : RootCommand
             _benchmarkStatusService = benchmarkStatusService ?? throw new ArgumentNullException(nameof(benchmarkStatusService));
         }
 
-        public async Task<int> InvokeAsync(InvocationContext context) => await await InvokeAsync(context);
+        public async Task<int> InvokeAsync(InvocationContext context) => await InvokeAsync(context);
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {

@@ -11,7 +11,7 @@ public abstract class LongRunningBackgroundService : IHostedService, IDisposable
     private Task? _executingTask;
     private readonly CancellationTokenSource _stoppingCts = new();
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken ct)
     {
         // Store the task we're executing
         _executingTask = Task.Factory.StartNew(() => ExecuteAsync(_stoppingCts.Token), _stoppingCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
@@ -26,7 +26,7 @@ public abstract class LongRunningBackgroundService : IHostedService, IDisposable
         return Task.CompletedTask;
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken ct)
     {
         // Stop called without start
         if (_executingTask == null)
@@ -43,7 +43,7 @@ public abstract class LongRunningBackgroundService : IHostedService, IDisposable
         {
             // Wait until the task completes or the stop token triggers
 #pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
-            await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, cancellationToken));
+            await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite, ct));
 #pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
         }
 

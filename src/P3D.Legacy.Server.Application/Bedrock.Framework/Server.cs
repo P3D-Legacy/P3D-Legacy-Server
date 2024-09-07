@@ -44,13 +44,13 @@ public class Server
         }
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken = default)
+    public async Task StartAsync(CancellationToken ct = default)
     {
         try
         {
             foreach (var binding in _builder.Bindings)
             {
-                await foreach (var listener in binding.BindAsync(cancellationToken).ConfigureAwait(false))
+                await foreach (var listener in binding.BindAsync(ct).ConfigureAwait(false))
                 {
                     var runningListener = new RunningListener(this, binding, listener);
                     _listeners.Add(runningListener);
@@ -82,13 +82,13 @@ public class Server
         }
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken = default)
+    public async Task StopAsync(CancellationToken ct = default)
     {
         var tasks = new Task[_listeners.Count];
 
         for (int i = 0; i < _listeners.Count; i++)
         {
-            tasks[i] = _listeners[i].Listener.UnbindAsync(cancellationToken).AsTask();
+            tasks[i] = _listeners[i].Listener.UnbindAsync(ct).AsTask();
         }
 
         await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -104,9 +104,9 @@ public class Server
 
         var shutdownTask = Task.WhenAll(tasks);
 
-        if (cancellationToken.CanBeCanceled)
+        if (ct.CanBeCanceled)
         {
-            await shutdownTask.WithCancellationAsync(cancellationToken).ConfigureAwait(false);
+            await shutdownTask.WithCancellationAsync(ct).ConfigureAwait(false);
         }
         else
         {

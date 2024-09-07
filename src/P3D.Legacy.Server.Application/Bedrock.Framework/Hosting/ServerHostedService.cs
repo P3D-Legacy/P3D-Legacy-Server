@@ -11,7 +11,7 @@ public class ServerHostedService(IOptions<ServerHostedServiceOptions> options) :
 {
     private readonly Server _server = options.Value.ServerBuilder.Build();
 
-    public Task StartAsync(CancellationToken cancellationToken) => _server.StartAsync(cancellationToken);
+    public Task StartAsync(CancellationToken ct) => _server.StartAsync(ct);
 
-    public Task StopAsync(CancellationToken cancellationToken) => _server.StopAsync(cancellationToken);
+    public Task StopAsync(CancellationToken ct) => _server.StopAsync(ct);
 }

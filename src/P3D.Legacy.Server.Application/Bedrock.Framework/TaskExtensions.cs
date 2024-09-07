@@ -7,12 +7,12 @@ namespace Bedrock.Framework;
 
 internal static class TaskExtensions
 {
-    public static async Task<bool> WithCancellationAsync(this Task task, CancellationToken cancellationToken)
+    public static async Task<bool> WithCancellationAsync(this Task task, CancellationToken ct)
     {
         var tcs = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         // This disposes the registration as soon as one of the tasks trigger
-        await using var register = cancellationToken.Register(state =>
+        await using var register = ct.Register(state =>
         {
             if (state is TaskCompletionSource<object?> stateTcs)
             {

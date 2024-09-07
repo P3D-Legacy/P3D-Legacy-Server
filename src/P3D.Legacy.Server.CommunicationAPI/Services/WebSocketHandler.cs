@@ -107,40 +107,40 @@ public sealed partial class WebSocketHandler :
             await _cts.CancelAsync();
     }
 
-    private async Task SendAsync(ArraySegment<byte> buffer, CancellationToken cancellationToken)
+    private async Task SendAsync(ArraySegment<byte> buffer, CancellationToken ct)
     {
-        await CheckWebSocketStateAsync(cancellationToken);
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
-        var ct = cts.Token;
+        await CheckWebSocketStateAsync(ct);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, ct);
+        var ct2 = cts.Token;
 
-        await _webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, ct);
+        await _webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, ct2);
     }
 
-    private async Task CloseAsync(WebSocketCloseStatus closeStatus, string? statusDescription, CancellationToken cancellationToken)
+    private async Task CloseAsync(WebSocketCloseStatus closeStatus, string? statusDescription, CancellationToken ct)
     {
-        await CheckWebSocketStateAsync(cancellationToken);
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
-        var ct = cts.Token;
+        await CheckWebSocketStateAsync(ct);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, ct);
+        var ct2 = cts.Token;
 
-        await _webSocket.CloseAsync(closeStatus, statusDescription, ct);
+        await _webSocket.CloseAsync(closeStatus, statusDescription, ct2);
     }
 
-    public async Task ListenAsync(CancellationToken cancellationToken)
+    public async Task ListenAsync(CancellationToken ct)
     {
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
-        var ct = cts.Token;
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, ct);
+        var ct2 = cts.Token;
 
         try
         {
             const int maxMessageSize = 1 * 1024 * 1024;
-            while (!ct.IsCancellationRequested)
+            while (!ct2.IsCancellationRequested)
             {
-                await CheckWebSocketStateAsync(ct);
+                await CheckWebSocketStateAsync(ct2);
 
                 await using var reader = new WebSocketMessageReaderStream(_webSocket, maxMessageSize);
-                var payload = await JsonSerializer.DeserializeAsync<RequestPayload>(reader, _jsonContext.RequestPayload, ct);
+                var payload = await JsonSerializer.DeserializeAsync<RequestPayload>(reader, _jsonContext.RequestPayload, ct2);
                 if (payload is not null)
-                    await ProcessPayloadAsync(payload, ct);
+                    await ProcessPayloadAsync(payload, ct2);
             }
         }
         catch (WebSocketException e) when (e.WebSocketErrorCode == WebSocketError.ConnectionClosedPrematurely) { }
