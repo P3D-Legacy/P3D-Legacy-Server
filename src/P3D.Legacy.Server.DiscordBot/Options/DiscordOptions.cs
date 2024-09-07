@@ -13,6 +13,6 @@ public sealed class DiscordOptionsValidator : AbstractValidator<DiscordOptions>
 
 public sealed record DiscordOptions
 {
-    public required string BotToken { get; init; } = default!;
-    public required ulong PasstroughChannelId { get; init; } = default!;
+    public required string BotToken { get; init; }
+    public required ulong PasstroughChannelId { get; init; }
 }

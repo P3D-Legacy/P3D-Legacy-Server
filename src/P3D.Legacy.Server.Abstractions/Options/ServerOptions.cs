@@ -6,10 +6,10 @@ public sealed class ServerOptionsValidator : AbstractValidator<ServerOptions>
 {
     public ServerOptionsValidator()
     {
-            RuleFor(static x => x.Name).NotEmpty();
-            RuleFor(static x => x.Message).NotEmpty();
-            RuleFor(static x => x.MaxPlayers).NotEmpty();
-        }
+        RuleFor(static x => x.Name).NotEmpty();
+        RuleFor(static x => x.Message).NotEmpty();
+        RuleFor(static x => x.MaxPlayers).NotEmpty();
+    }
 }
 
 public sealed record ServerOptions

@@ -16,5 +16,5 @@ public sealed class PokeAPIOptionsValidator : AbstractValidator<PokeAPIOptions>
 
 public sealed record PokeAPIOptions
 {
-    public required string GraphQLEndpoint { get; init; } = default!;
+    public required string GraphQLEndpoint { get; init; }
 }

@@ -14,5 +14,5 @@ public sealed class LiteDbOptionsValidator : AbstractValidator<LiteDbOptions>
 
 public sealed record LiteDbOptions
 {
-    public required string ConnectionString { get; init; } = default!;
+    public required string ConnectionString { get; init; }
 }

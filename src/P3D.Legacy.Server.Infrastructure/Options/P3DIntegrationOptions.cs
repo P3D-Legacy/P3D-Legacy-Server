@@ -9,5 +9,5 @@ public sealed class P3DIntegrationOptionsValidator : AbstractValidator<P3DIntegr
 
 public sealed record P3DIntegrationOptions
 {
-    public required bool IsOfficial { get; init; } = default!;
+    public required bool IsOfficial { get; init; }
 }

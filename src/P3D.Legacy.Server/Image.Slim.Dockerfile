@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/nightly/runtime-deps:8.0-jammy-chiseled AS base
+FROM mcr.microsoft.com/dotnet/runtime-deps:8.0-jammy-chiseled AS base
 WORKDIR /app
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/nightly/sdk:8.0-jammy AS restore
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-jammy AS restore
 WORKDIR /build
 ARG TARGETPLATFORM
 
