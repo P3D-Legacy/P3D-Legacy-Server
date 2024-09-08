@@ -11,6 +11,8 @@ public class CommandPreProcessorBehavior<TCommand> : ICommandBehavior<TCommand>
 {
     private readonly IEnumerable<ICommandPreProcessor<TCommand>> _preProcessors;
 
+    public int Order => int.MinValue;
+
     public CommandPreProcessorBehavior(IEnumerable<ICommandPreProcessor<TCommand>> preProcessors)
     {
         _preProcessors = preProcessors;

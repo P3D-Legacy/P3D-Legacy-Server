@@ -36,7 +36,7 @@ internal class QueryDispatcherHelper<TQuery, TQueryResult> : IQueryDispatcherHel
     {
         Task<TQueryResult> GetHandlerAsync() => _handler.HandleAsync(query, ct);
         return _behaviors
-            .Reverse()
+            .OrderBy(behavior => behavior.Order)
             .Aggregate((QueryHandlerDelegate<TQueryResult>) GetHandlerAsync, (next, pipeline) => () => pipeline.HandleAsync(query, next, ct))();
     }
 }

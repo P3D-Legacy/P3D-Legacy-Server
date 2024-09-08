@@ -23,6 +23,8 @@ internal class CommandValidationBehaviour<TCommand> : ICommandBehavior<TCommand>
         _validators = validators;
     }
 
+    public int Order => 1000;
+
     public async Task<CommandResult> HandleAsync(TCommand command, CommandHandlerDelegate next, CancellationToken ct)
     {
         if (_validators.Any())
@@ -42,6 +44,8 @@ internal class CommandValidationBehaviour<TCommand> : ICommandBehavior<TCommand>
 internal class QueryValidationBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
 {
     private readonly IEnumerable<IValidator<TQuery>> _validators;
+
+    public int Order => 1000;
 
     public QueryValidationBehaviour(IEnumerable<IValidator<TQuery>> validators)
     {

@@ -8,11 +8,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query;
 
 internal partial class QueryLoggingBehaviour<TQuery> : IQueryPreProcessor<TQuery> where TQuery : notnull
 {
-#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
-        [LoggerMessage(Level = LogLevel.Information, Message = "Query: {Name} {@Query}")]
-#else
-    [LoggerMessage(Level = LogLevel.Information, Message = "Query: {Name} {Query}")]
-#endif
+    [LoggerMessage(Level = LogLevel.Information, Message = "Query: {Name} {@Query}")]
     private partial void Query(string name, TQuery query);
 
     private readonly ILogger<TQuery> _logger;

@@ -15,6 +15,8 @@ internal class CommandTracingBehaviour<TCommand> : ICommandBehavior<TCommand> wh
 {
     private readonly Tracer _tracer;
 
+    public int Order => 2000;
+
     public CommandTracingBehaviour(TracerProvider tracerProvider)
     {
         _tracer = tracerProvider.GetTracer("P3D.Legacy.Server.Host");
@@ -47,6 +49,8 @@ internal class QueryTracingBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQue
     {
         _tracer = tracerProvider.GetTracer("P3D.Legacy.Server.Host");
     }
+
+    public int Order => 2000;
 
     public async Task<TQueryResult> HandleAsync(TQuery query, QueryHandlerDelegate<TQueryResult> next, CancellationToken ct)
     {

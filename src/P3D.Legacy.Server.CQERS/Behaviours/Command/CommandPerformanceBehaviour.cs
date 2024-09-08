@@ -11,15 +11,13 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command;
 
 internal partial class CommandPerformanceBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
 {
-#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
-        [LoggerMessage(Level = LogLevel.Warning, Message = "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Command}")]
-#else
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {Command}")]
-#endif
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Command}")]
     private partial void Command(string name, long elapsedMilliseconds, TCommand command);
 
     private readonly ILogger<TCommand> _logger;
     private readonly Stopwatch _timer = new();
+
+    public int Order => 100;
 
     [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
     public CommandPerformanceBehaviour(ILogger<TCommand> logger)

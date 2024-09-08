@@ -11,6 +11,8 @@ public class CommandPostProcessorBehavior<TCommand> : ICommandBehavior<TCommand>
 {
     private readonly IEnumerable<ICommandPostProcessor<TCommand>> _postProcessors;
 
+    public int Order => int.MaxValue;
+
     public CommandPostProcessorBehavior(IEnumerable<ICommandPostProcessor<TCommand>> postProcessors)
     {
         _postProcessors = postProcessors;

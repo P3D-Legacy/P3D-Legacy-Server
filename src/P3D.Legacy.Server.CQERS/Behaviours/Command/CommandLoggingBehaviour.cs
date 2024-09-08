@@ -8,11 +8,7 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command;
 
 internal partial class CommandLoggingBehaviour<TCommand> : ICommandPreProcessor<TCommand> where TCommand : notnull
 {
-#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
-        [LoggerMessage(Level = LogLevel.Information, Message = "Command: {Name} {@Command}")]
-#else
-    [LoggerMessage(Level = LogLevel.Information, Message = "Command: {Name} {Command}")]
-#endif
+    [LoggerMessage(Level = LogLevel.Information, Message = "Command: {Name} {@Command}")]
     private partial void Command(string name, TCommand command);
 
     private readonly ILogger<TCommand> _logger;

@@ -11,14 +11,12 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Command;
 
 internal partial class CommandUnhandledExceptionBehaviour<TCommand> : ICommandBehavior<TCommand> where TCommand : ICommand
 {
-#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
-        [LoggerMessage(Level = LogLevel.Error, Message = "Request: Unhandled Exception for Request {Name} {@Command}")]
-#else
-    [LoggerMessage(Level = LogLevel.Error, Message = "Request: Unhandled Exception for Request {Name} {Command}")]
-#endif
+    [LoggerMessage(Level = LogLevel.Error, Message = "Request: Unhandled Exception for Request {Name} {@Command}")]
     private partial void Command(string name, TCommand command, Exception exception);
 
     private readonly ILogger<TCommand> _logger;
+
+    public int Order => 200;
 
     [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
     public CommandUnhandledExceptionBehaviour(ILogger<TCommand> logger)

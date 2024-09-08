@@ -24,7 +24,7 @@ internal sealed class CommandDispatcherHelper<TCommand> where TCommand : IComman
     {
         Task<CommandResult> GetHandlerAsync() => _handler.HandleAsync(command, ct);
         return _behaviors
-            .Reverse()
+            .OrderBy(behavior => behavior.Order)
             .Aggregate((CommandHandlerDelegate) GetHandlerAsync, (next, pipeline) => () => pipeline.HandleAsync(command, next, ct))();
     }
 }

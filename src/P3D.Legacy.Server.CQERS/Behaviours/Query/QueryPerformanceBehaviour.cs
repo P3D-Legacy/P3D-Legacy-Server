@@ -11,15 +11,13 @@ namespace P3D.Legacy.Server.CQERS.Behaviours.Query;
 
 internal partial class QueryPerformanceBehaviour<TQuery, TQueryResult> : IQueryBehavior<TQuery, TQueryResult> where TQuery : IQuery<TQueryResult>
 {
-#if FALSE // TODO: https://github.com/dotnet/runtime/issues/60968
-        [LoggerMessage(Level = LogLevel.Warning, Message = "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Query}")]
-#else
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {Query}")]
-#endif
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Query}")]
     private partial void Query(string name, long elapsedMilliseconds, TQuery query);
 
     private readonly ILogger<TQuery> _logger;
     private readonly Stopwatch _timer = new();
+
+    public int Order => 100;
 
     [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
     public QueryPerformanceBehaviour(ILogger<TQuery> logger)

@@ -11,6 +11,8 @@ public class QueryPreProcessorBehavior<TQuery, TQueryResult> : IQueryBehavior<TQ
 {
     private readonly IEnumerable<IQueryPreProcessor<TQuery>> _preProcessors;
 
+    public int Order => int.MinValue;
+
     public QueryPreProcessorBehavior(IEnumerable<IQueryPreProcessor<TQuery>> preProcessors)
     {
         _preProcessors = preProcessors;

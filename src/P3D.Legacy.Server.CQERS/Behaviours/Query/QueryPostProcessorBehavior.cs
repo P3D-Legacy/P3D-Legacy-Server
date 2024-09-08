@@ -11,6 +11,8 @@ public class QueryPostProcessorBehavior<TQuery, TQueryResult> : IQueryBehavior<T
 {
     private readonly IEnumerable<IQueryPostProcessor<TQuery, TQueryResult>> _postProcessors;
 
+    public int Order => int.MaxValue;
+
     public QueryPostProcessorBehavior(IEnumerable<IQueryPostProcessor<TQuery, TQueryResult>> postProcessors)
     {
         _postProcessors = postProcessors;
