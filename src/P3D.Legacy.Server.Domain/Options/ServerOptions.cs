@@ -14,9 +14,9 @@ public sealed class ServerOptionsValidator : AbstractValidator<ServerOptions>
 
 public sealed record ServerOptions
 {
-    public string Name { get; init; } = default!;
-    public string Message { get; init; } = default!;
-    public int MaxPlayers { get; init; } = default!;
-    public bool OfflineEnabled { get; init; } = default!;
-    public bool ValidationEnabled { get; init; } = default!;
+    public string Name { get; set; } = default!;
+    public string Message { get; set; } = default!;
+    public int MaxPlayers { get; set; } = default!;
+    public bool OfflineEnabled { get; set; } = default!;
+    public bool ValidationEnabled { get; set; } = default!;
 }

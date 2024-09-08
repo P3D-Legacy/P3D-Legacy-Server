@@ -94,7 +94,6 @@ LABEL org.opencontainers.image.title="P3D Legacy Server" \
       org.opencontainers.image.created=$DATE \
       org.opencontainers.image.revision=$REVISION
 
-ENV DOTNET_EnableDiagnostics=0
 EXPOSE 8080/tcp
 EXPOSE 15124/tcp
 ENTRYPOINT ["./P3D.Legacy.Server"]

@@ -8,6 +8,7 @@ using P3D.Legacy.Server.Domain.Queries.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,10 +16,14 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers;
 
 [ApiController]
 [Route("api/v1/server")]
-public class ServerV1Controller : ControllerBase
+public partial class ServerV1Controller : ControllerBase
 {
-    private sealed record StatusResponseV1Player(string Name, string GameJoltId);
-    private sealed record StatusResponseV1(IEnumerable<StatusResponseV1Player> Players);
+    [JsonSerializable(typeof(StatusResponseV1))]
+    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default)]
+    public partial class ServerV1JsonContext : JsonSerializerContext;
+
+    public sealed record StatusResponseV1Player(string Name, string GameJoltId);
+    public sealed record StatusResponseV1(IEnumerable<StatusResponseV1Player> Players);
 
     private readonly ILogger _logger;
 

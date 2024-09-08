@@ -19,8 +19,8 @@ public enum KeyType { None, Rsa, ECDsa }
 
 public sealed record JwtOptions : IDisposable
 {
-    public required string PrivateKey { get; init; }
-    public required KeyType KeyType { get; init; }
+    public required string PrivateKey { get; set; }
+    public required KeyType KeyType { get; set; }
 
     private RSA? _rsa;
 

@@ -3,6 +3,7 @@
 using P3D.Legacy.Server.Domain.Options;
 using P3D.Legacy.Server.Domain.Repositories;
 using P3D.Legacy.Server.Domain.Services;
+using P3D.Legacy.Server.Infrastructure.Configuration;
 using P3D.Legacy.Server.Infrastructure.Options;
 using P3D.Legacy.Server.Infrastructure.Repositories;
 using P3D.Legacy.Server.Infrastructure.Repositories.Bans;
@@ -24,6 +25,8 @@ public static class ServiceCollectionExtensions
         services.AddOptions<LockoutOptions>();
 
         services.AddHttpClient();
+
+        services.AddTransient<IDynamicConfigurationProviderManager, DynamicConfigurationProviderManager>();
 
         services.AddTransient<IUserRepository, LiteDbUserRepository>();
 

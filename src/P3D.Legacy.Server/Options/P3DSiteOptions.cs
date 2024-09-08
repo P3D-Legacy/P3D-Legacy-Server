@@ -17,6 +17,6 @@ public sealed class P3DSiteOptionsValidator : AbstractValidator<P3DSiteOptions>
 
 public sealed record P3DSiteOptions
 {
-    public required string APIEndpointV1 { get; init; }
-    public required string APIToken { get; init; }
+    public required string APIEndpointV1 { get; set; }
+    public required string APIToken { get; set; }
 }

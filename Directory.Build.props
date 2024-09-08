@@ -5,16 +5,17 @@
     <Nullable>enable</Nullable>
     <MSBuildWarningsAsMessages>SYSLIB1006;SYSLIB1037</MSBuildWarningsAsMessages>
 
-    <PublishTrimmed>false</PublishTrimmed>
+    <PublishTrimmed>true</PublishTrimmed>
     <IsTrimmable>true</IsTrimmable>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <!-- full breaks OpenTelemetry. Additional 20MB at least -->
     <TrimMode>partial</TrimMode>
     <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
 
     <!-- Additional 30MB at least -->
-    <PublishReadyToRun>false</PublishReadyToRun>
+    <PublishReadyToRun>true</PublishReadyToRun>
 
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 

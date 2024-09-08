@@ -7,6 +7,7 @@ using P3D.Legacy.Server.UI.Shared.Models;
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,8 +15,13 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AccountsController : ControllerBase
+public partial class AccountsController : ControllerBase
 {
+    [JsonSerializable(typeof(RegisterModel))]
+    [JsonSerializable(typeof(RegisterResult))]
+    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default)]
+    public partial class AccountsJsonContext : JsonSerializerContext;
+
     private readonly IUserRepository _userRepository;
 
     public AccountsController(IUserRepository userRepository)

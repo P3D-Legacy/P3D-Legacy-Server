@@ -35,7 +35,7 @@ public sealed partial class WebSocketHandler :
     [JsonSerializable(typeof(RequestPayload))]
     [JsonSerializable(typeof(ResponsePayload))]
     [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default)]
-    internal partial class JsonContext : JsonSerializerContext { }
+    internal partial class JsonContext : JsonSerializerContext;
 
     private class WebSocketPlayer : IPlayer
     {

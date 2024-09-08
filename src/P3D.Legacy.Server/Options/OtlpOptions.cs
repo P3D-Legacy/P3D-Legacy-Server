@@ -18,10 +18,10 @@ public sealed class OtlpOptionsValidator : AbstractValidator<OtlpOptions>
 
 public sealed record OtlpOptions
 {
-    public required string LoggingEndpoint { get; init; }
-    public required OtlpExportProtocol LoggingProtocol { get; init; }
-    public required string TracingEndpoint { get; init; }
-    public required OtlpExportProtocol TracingProtocol { get; init; }
-    public required string MetricsEndpoint { get; init; }
-    public required OtlpExportProtocol MetricsProtocol { get; init; }
+    public required string LoggingEndpoint { get; set; }
+    public required OtlpExportProtocol LoggingProtocol { get; set; }
+    public required string TracingEndpoint { get; set; }
+    public required OtlpExportProtocol TracingProtocol { get; set; }
+    public required string MetricsEndpoint { get; set; }
+    public required OtlpExportProtocol MetricsProtocol { get; set; }
 }

@@ -16,8 +16,8 @@ public sealed class P3DServerOptionsValidator : AbstractValidator<P3DServerOptio
 
 public sealed record P3DServerOptions
 {
-    public required string IP { get; init; }
-    public required ushort Port { get; init; }
-    public required bool PortForward { get; init; } = true;
-    public required int PortForwardTimeoutMilliseconds { get; init; } = 10000;
+    public required string IP { get; set; }
+    public required ushort Port { get; set; }
+    public required bool PortForward { get; set; } = true;
+    public required int PortForwardTimeoutMilliseconds { get; set; } = 10000;
 }

@@ -12,6 +12,7 @@ using System;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,8 +20,13 @@ namespace P3D.Legacy.Server.InternalAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class LoginController : ControllerBase
+public partial class LoginController : ControllerBase
 {
+    [JsonSerializable(typeof(LoginModel))]
+    [JsonSerializable(typeof(LoginResult))]
+    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default)]
+    public partial class LoginJsonContext : JsonSerializerContext;
+
     private readonly JwtOptions _jwtOptions;
     private readonly IUserRepository _userRepository;
 

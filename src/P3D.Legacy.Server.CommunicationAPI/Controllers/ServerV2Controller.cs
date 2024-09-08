@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using P3D.Legacy.Server.Domain.Queries;
@@ -14,7 +13,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,8 +21,16 @@ namespace P3D.Legacy.Server.CommunicationAPI.Controllers;
 
 [ApiController]
 [Route("api/v2/server")]
-public class ServerV2Controller : ControllerBase
+public partial class ServerV2Controller : ControllerBase
 {
+    [JsonSerializable(typeof(PagingResponse<StatusResponseV2Player>))]
+    [JsonSerializable(typeof(StatusResponseV2Player))]
+    [JsonSerializable(typeof(string[]))]
+    [JsonSerializable(typeof(ServerStatisticsResponse))]
+    [JsonSerializable(typeof(PlayerStatisticsResponse))]
+    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default)]
+    public partial class ServerV2JsonContext : JsonSerializerContext;
+
     public record StatusRequestV2Query(int Page, int PageSize);
     public sealed record StatusResponseV2Player(string Name, ulong GameJoltId);
     public sealed record ServerStatisticsResponse
@@ -72,7 +79,7 @@ public class ServerV2Controller : ControllerBase
 
     [HttpGet("metadata")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
     public ActionResult GetMetadata()
     {
@@ -93,7 +100,7 @@ public class ServerV2Controller : ControllerBase
             yield return $"Git Tag: {ThisAssembly.Git.Tag}";
             yield return $"Git Commit Date: {ThisAssembly.Git.CommitDate}";
         }
-        return Ok(Metadata());
+        return Ok(Metadata().ToArray());
     }
 
     [HttpGet("statistics/server")]

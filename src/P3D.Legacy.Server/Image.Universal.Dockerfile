@@ -37,7 +37,6 @@ RUN \
     elif [ $TARGETPLATFORM = "windows/amd64" ]; then \
         RID="win-x64"; \
     fi \
-    # && dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r $RID -p:PublishReadyToRun=true;
     && dotnet restore "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" -r $RID;
 
 COPY ["src/P3D.Legacy.Common/", "src/P3D.Legacy.Common/"]
@@ -75,7 +74,6 @@ RUN \
     elif [ $TARGETPLATFORM = "windows/amd64" ]; then \
         RID="win-x64"; \
     fi \
-    # && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained false -o /app/publish -p:PublishReadyToRun=true;
     && dotnet publish "src/P3D.Legacy.Server/P3D.Legacy.Server.csproj" --no-restore -c Release -r $RID --self-contained false -o /app/publish;
 
 FROM base AS final
@@ -100,7 +98,6 @@ LABEL org.opencontainers.image.title="P3D Legacy Server" \
       org.opencontainers.image.created=$DATE \
       org.opencontainers.image.revision=$REVISION
 
-ENV DOTNET_EnableDiagnostics=0
 EXPOSE 8080/tcp
 EXPOSE 15124/tcp
 ENTRYPOINT ["dotnet", "P3D.Legacy.Server.dll"]

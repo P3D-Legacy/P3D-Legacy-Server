@@ -4,11 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
+using P3D.Legacy.Server.CommunicationAPI.Controllers;
 using P3D.Legacy.Server.Connections.Utils;
+using P3D.Legacy.Server.InternalAPI.Controllers;
 
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -32,6 +32,13 @@ public class Startup
         opt.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         opt.Converters.Add(new DateTimeOffsetSerializer());
         opt.Converters.Add(new DateTimeOffsetNullableSerializer());
+
+        // TODO: Should be in Project specific code
+        opt.TypeInfoResolverChain.Add(ServerV1Controller.ServerV1JsonContext.Default);
+        opt.TypeInfoResolverChain.Add(ServerV2Controller.ServerV2JsonContext.Default);
+        opt.TypeInfoResolverChain.Add(AccountsController.AccountsJsonContext.Default);
+        opt.TypeInfoResolverChain.Add(LoginController.LoginJsonContext.Default);
+        opt.TypeInfoResolverChain.Add(ValidationController.ValidationJsonContext.Default);
         return opt;
     }
 

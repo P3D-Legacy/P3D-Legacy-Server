@@ -5,13 +5,18 @@ using Microsoft.Extensions.Options;
 
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json.Serialization;
 
 namespace P3D.Legacy.Server.InternalAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ValidationController : ControllerBase
+public partial class ValidationController : ControllerBase
 {
+    [JsonSerializable(typeof(AuthenticateResult))]
+    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default)]
+    public partial class ValidationJsonContext : JsonSerializerContext;
+
     private const string Bearer = "Bearer ";
 
     private readonly JwtBearerOptions _jwtBearerOptions;
