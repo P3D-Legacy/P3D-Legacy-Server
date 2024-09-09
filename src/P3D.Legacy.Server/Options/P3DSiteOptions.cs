@@ -1,6 +1,4 @@
-﻿using Aragas.Extensions.Options.FluentValidation.Extensions;
-
-using FluentValidation;
+﻿using FluentValidation;
 
 using System.Net.Http;
 
@@ -10,13 +8,11 @@ public sealed class P3DSiteOptionsValidator : AbstractValidator<P3DSiteOptions>
 {
     public P3DSiteOptionsValidator(HttpClient httpClient)
     {
-        RuleFor(static x => x.APIEndpointV1).IsUri().IsUriAvailable(httpClient).When(static x => !string.IsNullOrEmpty(x.APIEndpointV1));
-        RuleFor(static x => x.APIToken).NotEmpty().When(static x => !string.IsNullOrEmpty(x.APIEndpointV1));
+
     }
 }
 
 public sealed record P3DSiteOptions
 {
-    public required string APIEndpointV1 { get; set; }
     public required string APIToken { get; set; }
 }

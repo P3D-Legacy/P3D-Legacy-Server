@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
                 var backendOptionsSnapshot = sp.GetRequiredService<IOptions<P3DSiteOptions>>();
                 var backendOptions = backendOptionsSnapshot.Value;
 
-                client.BaseAddress = new Uri(backendOptions.APIEndpointV1);
+                client.BaseAddress = new Uri("https+http://officialsite");
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", backendOptions.APIToken);
                 client.Timeout = Timeout.InfiniteTimeSpan;
             })

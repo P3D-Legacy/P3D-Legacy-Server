@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.SystemTextJson;
+
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
@@ -16,6 +19,8 @@ using P3D.Legacy.Tests.Utils;
 
 using System;
 using System.IO;
+using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,11 +35,24 @@ internal sealed class MonsterTests
     public async Task TestMonsterCreationViaPokeAPIAsync(string line) => await TestService.CreateNew()
         .Configure(static services =>
         {
-            services.AddTransient<IOptions<PokeAPIOptions>>(static _ => new OptionsWrapper<PokeAPIOptions>(new PokeAPIOptions
+            var assemblyName = Assembly.GetEntryAssembly()?.GetName();
+            var userAgent = $"{assemblyName?.Name ?? "ERROR"} v{assemblyName?.Version?.ToString() ?? "ERROR"}";
+            services.AddHttpClient("pokeapi").ConfigureHttpClient((sp, client) =>
             {
-                GraphQLEndpoint = "https://beta.pokeapi.co/graphql/v1beta"
-            }));
-            services.AddTransient<IMonsterDataProvider, PokeAPIMonsterDataProvider>();
+                client.BaseAddress = new Uri("https://beta.pokeapi.co/graphql/v1beta");
+                client.DefaultRequestHeaders.Add("User-Agent", userAgent);
+            }).AddServiceDiscovery();
+            services.AddTransient<IMonsterDataProvider, PokeAPIMonsterDataProvider>(sp =>
+                {
+                    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+
+#pragma warning disable IDISP001
+                    var httpClient = httpClientFactory.CreateClient("pokeapi");
+                    var graphQlClient = new GraphQLHttpClient(new GraphQLHttpClientOptions(), new SystemTextJsonSerializer(), httpClient);
+#pragma warning restore IDISP001
+                    return ActivatorUtilities.CreateInstance<PokeAPIMonsterDataProvider>(sp, graphQlClient);
+                }
+            );
             services.AddTransient<IMonsterValidator, DefaultMonsterValidator>();
             services.AddTransient<P3DMonsterConverter>();
         }).DoTestAsync(async sp =>

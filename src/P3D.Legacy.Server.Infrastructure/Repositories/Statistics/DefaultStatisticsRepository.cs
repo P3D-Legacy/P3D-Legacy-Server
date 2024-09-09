@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-
-using P3D.Legacy.Common;
+﻿using P3D.Legacy.Common;
 using P3D.Legacy.Server.Domain.Entities.Statistics;
-using P3D.Legacy.Server.Domain.Options;
 using P3D.Legacy.Server.Domain.Repositories;
 
 using System;
@@ -14,12 +11,10 @@ namespace P3D.Legacy.Server.Infrastructure.Repositories.Statistics;
 
 public sealed class DefaultStatisticsRepository : IStatisticsRepository
 {
-    private readonly ServerOptions _options;
     private readonly LiteDbStatisticsRepository _liteDbStatisticsRepository;
 
-    public DefaultStatisticsRepository(IOptions<ServerOptions> options, LiteDbStatisticsRepository liteDbStatisticsRepository)
+    public DefaultStatisticsRepository(LiteDbStatisticsRepository liteDbStatisticsRepository)
     {
-        _options = options.Value ?? throw new ArgumentNullException(nameof(options));
         _liteDbStatisticsRepository = liteDbStatisticsRepository ?? throw new ArgumentNullException(nameof(liteDbStatisticsRepository));
     }
 

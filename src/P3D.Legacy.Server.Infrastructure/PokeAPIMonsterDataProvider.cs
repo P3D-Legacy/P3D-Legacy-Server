@@ -1,15 +1,11 @@
 ﻿using GraphQL;
-using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.SystemTextJson;
+using GraphQL.Client.Abstractions;
 
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 using P3D.Legacy.Common.Monsters;
 using P3D.Legacy.Server.Domain.Entities.Monsters;
-using P3D.Legacy.Server.Domain.Options;
 using P3D.Legacy.Server.Domain.Services;
-using P3D.Legacy.Server.Infrastructure.Options;
 
 using System;
 using System.Linq;
@@ -77,25 +73,24 @@ query MonsterStaticData($id: Int, $itemId: Int) {
 ";
 
     private readonly ILogger _logger;
-    private readonly PokeAPIOptions _options;
+    private readonly IGraphQLClient _graphQLClient;
 
-    public PokeAPIMonsterDataProvider(ILogger<PokeAPIMonsterDataProvider> logger, IOptions<PokeAPIOptions> options)
+    public PokeAPIMonsterDataProvider(ILogger<PokeAPIMonsterDataProvider> logger, IGraphQLClient graphQLClient)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+        _graphQLClient = graphQLClient;
     }
 
     /// <inheritdoc />
     public async Task<(IMonsterStaticData, IItemInstance?)> GetStaticDataAsync(int id, int itemId, CancellationToken ct)
     {
-        using var graphQLClient = new GraphQLHttpClient(_options.GraphQLEndpoint, new SystemTextJsonSerializer());
         var monsterStaticDataRequest = new GraphQLRequest
         {
             Query = GetQuery,
             OperationName = "MonsterStaticData",
             Variables = new { ID = id, ItemId = itemId }
         };
-        var data = await graphQLClient.SendQueryAsync<Response>(monsterStaticDataRequest, ct);
+        var data = await _graphQLClient.SendQueryAsync<Response>(monsterStaticDataRequest, ct);
 
 
         var monsterData = data.Data.Monster[0];

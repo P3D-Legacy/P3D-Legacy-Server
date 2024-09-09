@@ -16,6 +16,7 @@
     <PackageReference Include="Isopoh.Cryptography.Argon2" />
     <PackageReference Include="LiteDB" />
     <PackageReference Include="LiteDB.Async" />
+    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" />
     <PackageReference Include="OpenTelemetry.Api" />
   </ItemGroup>
 

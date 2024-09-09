@@ -14,12 +14,10 @@ namespace P3D.Legacy.Server.Application.Services;
 public class DefaultMonsterValidator : IMonsterValidator
 {
     private readonly ILogger _logger;
-    private readonly PokeAPIOptions _options;
 
-    public DefaultMonsterValidator(ILogger<DefaultMonsterValidator> logger, IOptions<PokeAPIOptions> options)
+    public DefaultMonsterValidator(ILogger<DefaultMonsterValidator> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = options.Value ?? throw new ArgumentNullException(nameof(options));
     }
 
     /// <inheritdoc />

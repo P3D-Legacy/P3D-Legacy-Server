@@ -23,8 +23,10 @@ public sealed class QueryDispatcher : IQueryDispatcher
     {
         var queryType = query.GetType();
         var handler = GetCached<TQueryResult>(queryType, _serviceProvider);
+        if (handler is null)
+            throw new InvalidOperationException($"No handler found for query '{queryType.Name}'.");
 
-        return await handler!.DispatchAsync(query, ct);
+        return await handler.DispatchAsync(query, ct);
     }
 
     private IQueryDispatcherHelper<TQueryResult>? GetCached<TQueryResult>(Type queryType, IServiceProvider serviceProvider) => _cache.GetOrAdd(queryType, static (_, args) =>
