@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.Extensions.Logging;
 
-using OpenTelemetry.Trace;
-
 using P3D.Legacy.Common;
 using P3D.Legacy.Common.PlayerEvents;
 using P3D.Legacy.Server.Client.P3D.Events;
@@ -115,147 +113,154 @@ internal partial class P3DConnectionContextHandler
         stateUpdated = false;
         positionUpdated = false;
 
-        if (packet.DataItemStorage.Count == 0)
+        try
         {
-            DataItemsIsEmpty();
-            return;
-        }
-
-        if (packet.DataItemStorage.Count < 14)
-        {
-            DataItemsCountLessThan14(packet.DataItemStorage.ToString());
-            return;
-        }
-
-        for (var idx = 0; idx < packet.DataItemStorage.Count; idx++)
-        {
-            var rawData = packet.DataItemStorage.Get(idx);
-            if (string.IsNullOrEmpty(rawData))
-                continue;
-
-            switch (idx)
+            if (packet.DataItemStorage.Count == 0)
             {
-                case 0:
-                    if (!string.Equals(GameMode, packet.GameMode, StringComparison.Ordinal))
-                    {
-                        GameMode = packet.GameMode;
-                        stateUpdated = true;
-                    }
-                    break;
-
-                case 1:
-                    if (!IsGameJoltPlayer.Equals(packet.IsGameJoltPlayer))
-                    {
-                        IsGameJoltPlayer = packet.IsGameJoltPlayer;
-                        stateUpdated = true;
-                    }
-                    break;
-
-                case 2:
-                    if (!GameJoltId.Equals(packet.GameJoltId))
-                    {
-                        GameJoltId = GameJoltId.From(packet.GameJoltId);
-                        stateUpdated = true;
-                    }
-                    break;
-
-                case 3:
-                    if (packet.DecimalSeparator is { } decimalSeparator && !DecimalSeparator.Equals(decimalSeparator))
-                    {
-                        DecimalSeparator = decimalSeparator;
-                        stateUpdated = true;
-                    }
-                    break;
-
-                case 4:
-                    if (!string.Equals(Name, packet.Name, StringComparison.Ordinal))
-                    {
-                        Name = packet.Name;
-                        stateUpdated = true;
-                    }
-                    break;
-
-                case 5:
-                    if (!string.Equals(LevelFile, packet.LevelFile, StringComparison.Ordinal))
-                    {
-                        LevelFile = packet.LevelFile;
-                        positionUpdated = true;
-                    }
-                    break;
-
-                case 6:
-                    if (!Position.Equals(packet.Position))
-                    {
-                        Position = packet.Position;
-                        positionUpdated = true;
-                    }
-                    break;
-
-                case 7:
-                    if (!Facing.Equals(packet.Facing))
-                    {
-                        Facing = packet.Facing;
-                        positionUpdated = true;
-                    }
-                    break;
-
-                case 8:
-                    if (!Moving.Equals(packet.Moving))
-                    {
-                        Moving = packet.Moving;
-                        positionUpdated = true;
-                    }
-                    break;
-
-                case 9:
-                    if (!string.Equals(Skin, packet.Skin, StringComparison.Ordinal))
-                    {
-                        Skin = packet.Skin;
-                        stateUpdated = true;
-                    }
-                    break;
-
-                case 10:
-                    if (!string.Equals(BusyType, packet.BusyType, StringComparison.Ordinal))
-                    {
-                        BusyType = packet.BusyType;
-                        stateUpdated = true;
-                    }
-                    //Basic.ServersManager.UpdatePlayerList();
-                    break;
-
-                case 11:
-                    if (!MonsterVisible.Equals(packet.MonsterVisible))
-                    {
-                        MonsterVisible = packet.MonsterVisible;
-                        positionUpdated = true;
-                    }
-                    break;
-
-                case 12:
-                    if (!MonsterPosition.Equals(packet.MonsterPosition))
-                    {
-                        MonsterPosition = packet.MonsterPosition;
-                        positionUpdated = true;
-                    }
-                    break;
-
-                case 13:
-                    if (!string.Equals(MonsterSkin, packet.MonsterSkin, StringComparison.Ordinal))
-                    {
-                        MonsterSkin = packet.MonsterSkin;
-                        stateUpdated = true;
-                    }
-                    break;
-
-                case 14:
-                    if (!MonsterFacing.Equals(packet.MonsterFacing))
-                    {
-                        MonsterFacing = packet.MonsterFacing;
-                        positionUpdated = true;
-                    }
-                    break;
+                DataItemsIsEmpty();
+                return;
             }
+
+            if (packet.DataItemStorage.Count < 14)
+            {
+                DataItemsCountLessThan14(packet.DataItemStorage.ToString());
+                return;
+            }
+
+            for (var idx = 0; idx < packet.DataItemStorage.Count; idx++)
+            {
+                var rawData = packet.DataItemStorage.Get(idx);
+                if (string.IsNullOrEmpty(rawData))
+                    continue;
+
+                switch (idx)
+                {
+                    case 0:
+                        if (!string.Equals(GameMode, packet.GameMode, StringComparison.Ordinal))
+                        {
+                            GameMode = packet.GameMode;
+                            stateUpdated = true;
+                        }
+                        break;
+
+                    case 1:
+                        if (!IsGameJoltPlayer.Equals(packet.IsGameJoltPlayer))
+                        {
+                            IsGameJoltPlayer = packet.IsGameJoltPlayer;
+                            stateUpdated = true;
+                        }
+                        break;
+
+                    case 2:
+                        if (!GameJoltId.Equals(packet.GameJoltId))
+                        {
+                            GameJoltId = GameJoltId.From(packet.GameJoltId);
+                            stateUpdated = true;
+                        }
+                        break;
+
+                    case 3:
+                        if (packet.DecimalSeparator is { } decimalSeparator && !DecimalSeparator.Equals(decimalSeparator))
+                        {
+                            DecimalSeparator = decimalSeparator;
+                            stateUpdated = true;
+                        }
+                        break;
+
+                    case 4:
+                        if (!string.Equals(Name, packet.Name, StringComparison.Ordinal))
+                        {
+                            Name = packet.Name;
+                            stateUpdated = true;
+                        }
+                        break;
+
+                    case 5:
+                        if (!string.Equals(LevelFile, packet.LevelFile, StringComparison.Ordinal))
+                        {
+                            LevelFile = packet.LevelFile;
+                            positionUpdated = true;
+                        }
+                        break;
+
+                    case 6:
+                        if (!Position.Equals(packet.Position))
+                        {
+                            Position = packet.Position;
+                            positionUpdated = true;
+                        }
+                        break;
+
+                    case 7:
+                        if (!Facing.Equals(packet.Facing))
+                        {
+                            Facing = packet.Facing;
+                            positionUpdated = true;
+                        }
+                        break;
+
+                    case 8:
+                        if (!Moving.Equals(packet.Moving))
+                        {
+                            Moving = packet.Moving;
+                            positionUpdated = true;
+                        }
+                        break;
+
+                    case 9:
+                        if (!string.Equals(Skin, packet.Skin, StringComparison.Ordinal))
+                        {
+                            Skin = packet.Skin;
+                            stateUpdated = true;
+                        }
+                        break;
+
+                    case 10:
+                        if (!string.Equals(BusyType, packet.BusyType, StringComparison.Ordinal))
+                        {
+                            BusyType = packet.BusyType;
+                            stateUpdated = true;
+                        }
+                        //Basic.ServersManager.UpdatePlayerList();
+                        break;
+
+                    case 11:
+                        if (!MonsterVisible.Equals(packet.MonsterVisible))
+                        {
+                            MonsterVisible = packet.MonsterVisible;
+                            positionUpdated = true;
+                        }
+                        break;
+
+                    case 12:
+                        if (!MonsterPosition.Equals(packet.MonsterPosition))
+                        {
+                            MonsterPosition = packet.MonsterPosition;
+                            positionUpdated = true;
+                        }
+                        break;
+
+                    case 13:
+                        if (!string.Equals(MonsterSkin, packet.MonsterSkin, StringComparison.Ordinal))
+                        {
+                            MonsterSkin = packet.MonsterSkin;
+                            stateUpdated = true;
+                        }
+                        break;
+
+                    case 14:
+                        if (!MonsterFacing.Equals(packet.MonsterFacing))
+                        {
+                            MonsterFacing = packet.MonsterFacing;
+                            positionUpdated = true;
+                        }
+                        break;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while parsing GameDataPacket");
         }
     }
 

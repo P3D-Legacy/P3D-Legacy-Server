@@ -9,8 +9,6 @@ public static class Vector3Extensions
 {
     public static Vector3 FromP3DString(ReadOnlySpan<char> chars, char gameSeparator)
     {
-        var numberFormat = new NumberFormatInfo { NumberDecimalSeparator = gameSeparator.ToString() };
-
         Span<int> indices = stackalloc int[2];
         var spanIdx = 0;
         var span = chars;
@@ -30,6 +28,7 @@ public static class Vector3Extensions
         var ys = chars.Slice(indices[0] + 1, indices[1] - indices[0] - 1);
         var zs = chars.Slice(indices[1] + 1);
 
+        var numberFormat = new NumberFormatInfo { NumberDecimalSeparator = gameSeparator.ToString() };
         var xb = float.TryParse(xs, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, numberFormat, out var x);
         var yb = float.TryParse(ys, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, numberFormat, out var y);
         var zb = float.TryParse(zs, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, numberFormat, out var z);

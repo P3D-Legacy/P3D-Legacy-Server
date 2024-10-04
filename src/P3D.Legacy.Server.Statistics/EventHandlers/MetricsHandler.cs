@@ -5,7 +5,6 @@ using P3D.Legacy.Server.Domain.Events.Player;
 using P3D.Legacy.Server.Domain.Events.World;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Metrics;
 using System.Threading;
 using System.Threading.Tasks;

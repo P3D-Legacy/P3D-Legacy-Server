@@ -16,8 +16,4 @@
     <PackageReference Include="System.Linq.Async" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\P3D.Legacy.Common\P3D.Legacy.Common.csproj" />
-  </ItemGroup>
-
 </Project>
